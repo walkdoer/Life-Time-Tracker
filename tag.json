@@ -148,6 +148,66 @@
         "code": "travel",
         "abbr": "travel"
     }, {
+        "name": "看美剧",
+        "code": "watch_american_drama",
+        "abbr": "watchAD"
+    }, {
+        "name": "听音乐",
+        "code": "listen_music",
+        "abbr": "listenM"
+    }, {
+        "name": "交通",
+        "code": "traffic",
+        "abbr": "traffic"
+    }, {
+        "name": "前端开发",
+        "code": "frontend-dev",
+        "abbr": "frontDev"
+    }, {
+        "name": "技术漫游",
+        "code": "tech_wander",
+        "abbr": "techWander"
+    }, {
+        "name": "",
+        "code": "",
+        "abbr": ""
+    }, {
+        "name": "",
+        "code": "",
+        "abbr": ""
+    }, {
+        "name": "",
+        "code": "",
+        "abbr": ""
+    }, {
+        "name": "",
+        "code": "",
+        "abbr": ""
+    }, {
+        "name": "",
+        "code": "",
+        "abbr": ""
+    }, {
+        "name": "",
+        "code": "",
+        "abbr": ""
+    }, {
+        "name": "",
+        "code": "",
+        "abbr": ""
+    }, {
+        "name": "",
+        "code": "",
+        "abbr": ""
+    }, {
+        "name": "",
+        "code": "",
+        "abbr": ""
+    }, {
+        "name": "",
+        "code": "",
+        "abbr": ""
+    }, {
         "name": "",
         "code": "",
         "abbr": ""
