@@ -22,11 +22,16 @@ function info(msg) {
     console.log(createMsg('Info', msg).white);
 }
 
+function log(msg) {
+    console.log(msg);
+}
+
 
 //fs.readFile(DATA_FILE_PRIFIX + argv[1]);
 module.exports = {
     error: error,
     info: info,
     success: success,
-    warn: warn
+    warn: warn,
+    log: log
 };

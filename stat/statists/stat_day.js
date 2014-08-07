@@ -29,8 +29,8 @@ function analyse(result) {
         tagNum: tags.length,
         logNum: logs.length
     }));
-    msg.info('tags:' + tags.join(', '));
-    msg.info('classes:' + classes.join(', '));
+    msg.log('tags:'.bold + tags.join(', ').italic.blue);
+    msg.log('classes:'.bold + classes.join(', ').magenta);
 
     //calculate total time
     var totalMins = 0;
@@ -50,7 +50,7 @@ function analyse(result) {
     });
     var totalHours = totalMins / 60;
 
-    msg.info('total time: ' + totalMins + ' minutes; ' + totalHours + ' hours.');
+    msg.log('total time: ' + totalMins.toString().cyan + ' minutes; ' + totalHours.toFixed(2).cyan + ' hours.');
 }
 
 function getBasicInfo(data) {
