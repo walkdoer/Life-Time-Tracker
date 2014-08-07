@@ -1,0 +1,19 @@
+{
+  "name": "Life-Time-Tracker",
+  "version": "0.0.0",
+  "description": "my life time tracker",
+  "main": "index.js",
+  "dependencies": {
+    "colors": "~0.6.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:andrew_zhang/life-time-tracker.git"
+  },
+  "author": "andrew",
+  "license": "ISC"
+}
