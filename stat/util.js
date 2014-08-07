@@ -32,7 +32,19 @@ function readLogFiles(y, m, d) {
     return deferred.promise;
 }
 
+function getDayNumInMonth (year, month) {
+    return new Date(year, month, 0).getDate();
+}
+
+
+function isDayValid(y, m, d) {
+    //the day number of one month
+    var dayNum = getDayNumInMonth(y, m);
+    return d <= dayNum && d > 0;
+}
 module.exports = {
     isValidDate: isValidDate,
-    readLogFiles: readLogFiles
+    readLogFiles: readLogFiles,
+    getDayNumInMonth: getDayNumInMonth,
+    isDayValid: isDayValid
 };
