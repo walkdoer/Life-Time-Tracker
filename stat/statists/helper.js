@@ -6,15 +6,16 @@
 
 var moment = require('moment');
 var msg = require('../message');
+var extend = require('node.extend');
 
 exports.getLogs = function(data) {
     var logArr = data.split('\n').filter(isEmpty);
     return logArr;
 };
-
-exports.getClasses = function(data) {
+function getClasses(data) {
     var result = data.match(/\{.*?\}/g);
     var classes = [];
+    if (!result) { return null; }
     result.forEach(function(classStr) {
         var classArr;
         classStr = classStr.trim().replace(/[\{\}]/g, '');
@@ -25,11 +26,12 @@ exports.getClasses = function(data) {
     });
     //unique the classes array
     return classes.filter(onlyUnique);
-};
+}
 
-exports.getTags = function(data) {
+function getTags(data) {
     var result = data.match(/\[.*?\](?!\()/ig);
     var tags = [];
+    if (!result) { return null; }
     result.forEach(function(tagStr) {
         var tagArr;
         tagStr = tagStr.trim().replace(/[\[\]]/ig, '');
@@ -40,12 +42,12 @@ exports.getTags = function(data) {
     });
     //unique the tags array
     return tags.filter(onlyUnique);
-};
+}
 
-exports.getTimeSpan = function (log, date) {
+function getTimeSpan(log, date) {
     var timeSpan = null,
         plusOneDay = false;
-    var timeSpanRex = /\d{1,2}\s*:\s*\d{1,2}\s*~\s*\d{1,2}\s*:\s*\d{1,2}/ig;
+    var timeSpanRex = /\d{1,2}\s*:\s*\d{1,2}\s*[~-]\s*\d{1,2}\s*:\s*\d{1,2}/ig;
     var result = log.match(timeSpanRex);
     if (result && result.length) {
         timeSpan = {};
@@ -73,7 +75,16 @@ exports.getTimeSpan = function (log, date) {
         timeSpan.len = endTime.diff(startTime, 'minutes');
     }
     return timeSpan;
-};
+}
+
+function getLogInfo (log, date) {
+    var logInfo = {
+        classes: getClasses(log),
+        tags: getTags(log)
+    };
+    var timeSpan = getTimeSpan(log, date);
+    return extend(logInfo, timeSpan);
+}
 
 function isEmpty(val) {
     return !!val;
@@ -82,3 +93,7 @@ function isEmpty(val) {
 function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
 }
+exports.getClasses = getClasses;
+exports.getTags = getTags;
+exports.getTimeSpan = getTimeSpan;
+exports.getLogInfo = getLogInfo;

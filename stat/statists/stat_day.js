@@ -23,20 +23,26 @@ function analyse(result) {
     var logData = result.data;
     var logs = helper.getLogs(logData);
     var classes = helper.getClasses(logData);
-    console.log(classes);
     var tags = helper.getTags(logData);
     msg.info(getBasicInfo({
         date: date,
         tagNum: tags.length,
         logNum: logs.length
     }));
+    msg.info('tags:' + tags.join(', '));
+    msg.info('classes:' + classes.join(', '));
 
     //calculate total time
     var totalMins = 0;
     logs.forEach(function (log) {
-        var timeSpan = helper.getTimeSpan(log, date);
-        if (timeSpan) {
-            totalMins += timeSpan.len;
+        var logInfo = helper.getLogInfo(log, date);
+        if (logInfo) {
+            if (logInfo.len !== undefined) {
+                totalMins += logInfo.len;
+            } else {
+                msg.warn('May be there\' something wrong with you time format of this log: ' +
+                    log);
+            }
         }
     });
     var totalHours = totalMins / 60;
@@ -45,7 +51,6 @@ function analyse(result) {
 }
 
 function getBasicInfo(data) {
-
     return data.date + ' have ' + data.logNum + ' logs and ' + data.tagNum + ' tags;';
 }
 
@@ -55,5 +60,6 @@ function handleError(err) {
                 ', please check the existence of the file');
     } else {
         msg.error(err.message);
+        throw err;
     }
 }

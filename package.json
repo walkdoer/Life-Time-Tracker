@@ -6,7 +6,8 @@
   "dependencies": {
     "colors": "~0.6.2",
     "when": "~3.4.3",
-    "moment": "~2.8.1"
+    "moment": "~2.8.1",
+    "node.extend": "~1.0.10"
   },
   "devDependencies": {},
   "scripts": {
