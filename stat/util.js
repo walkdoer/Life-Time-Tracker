@@ -14,14 +14,19 @@ function isValidDate(date) {
     }
 }
 
-function readLogFiles(fileName) {
+function readLogFiles(y, m, d) {
+    var dateArr = [y, m, d].filter(function (val) { return !!val; });
+    var fileName = dateArr.join('/') + '.md';
     var deferred = when.defer(),
         filePath = [DATA_FILE_PRIFIX, fileName].join('/');
-    fs.readFile(filePath, function (err, data) {
+    fs.readFile(filePath, 'utf8', function (err, data) {
         if (err) {
             return deferred.reject(err, filePath);
         }
-        deferred.resolve(data);
+        deferred.resolve({
+            data: data,
+            date: dateArr.join('-')
+        });
     });
 
     return deferred.promise;
