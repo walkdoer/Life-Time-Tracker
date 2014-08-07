@@ -4,7 +4,7 @@ var fs = require('fs');
 var when = require('when');
 
 //const
-var DATA_FILE_PRIFIX = './logs';
+var DATA_FILE_PRIFIX = '../logs';
 
 function isValidDate(date) {
     if (Object.prototype.toString.call(date) === '[object Date]') {
@@ -19,10 +19,12 @@ function readLogFiles(fileName) {
         filePath = [DATA_FILE_PRIFIX, fileName].join('/');
     fs.readFile(filePath, function (err, data) {
         if (err) {
-            return deferred.reject(err);
+            return deferred.reject(err, filePath);
         }
         deferred.resolve(data);
     });
+
+    return deferred.promise;
 }
 
 module.exports = {
