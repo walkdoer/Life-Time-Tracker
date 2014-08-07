@@ -4,6 +4,7 @@
 var util = require('../util');
 var msg = require('../message');
 var helper = require('./helper');
+
 exports.stat = function (dateArr) {
     var year = parseInt(dateArr[0]);
     var month = parseInt(dateArr[1]);
@@ -18,14 +19,26 @@ exports.stat = function (dateArr) {
 
 
 function analyse(result) {
+    var date = result.date;
     var logData = result.data;
     var logs = helper.getLogs(logData);
     var tags = helper.getTags(logData);
     msg.info(getBasicInfo({
-        date: result.date,
+        date: date,
         tagNum: tags.length,
         logNum: logs.length
     }));
+
+    //calculate total time
+    var total = 0;
+    logs.forEach(function (log) {
+        var timeSpan = helper.getTimeSpan(log, date);
+        if (timeSpan) {
+            total += timeSpan.len;
+        }
+    });
+
+    msg.info('total time: ' + total);
 }
 
 function getBasicInfo(data) {
