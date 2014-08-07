@@ -34,12 +34,15 @@ function analyse(result) {
 
     //calculate total time
     var totalMins = 0;
-    logs.forEach(function (log) {
-        var logInfo = helper.getLogInfo(log, date);
+    logs.forEach(function (log, index) {
+        var logInfo = helper.getLogInfo(log, date, index);
         if (logInfo) {
+            if (isGetUpLog(logInfo)) {
+                msg.info('Get Up Time: ' + logInfo.start);
+            }
             if (logInfo.len !== undefined) {
                 totalMins += logInfo.len;
-            } else {
+            } else if(!logInfo.start){
                 msg.warn('May be there\' something wrong with you time format of this log: ' +
                     log);
             }
@@ -52,6 +55,10 @@ function analyse(result) {
 
 function getBasicInfo(data) {
     return data.date + ' have ' + data.logNum + ' logs and ' + data.tagNum + ' tags;';
+}
+
+function isGetUpLog(log) {
+    return log.start && !log.end && log.index === 0;
 }
 
 function handleError(err) {

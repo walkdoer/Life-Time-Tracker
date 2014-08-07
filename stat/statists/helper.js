@@ -47,7 +47,7 @@ function getTags(data) {
 function getTimeSpan(log, date) {
     var timeSpan = null,
         plusOneDay = false;
-    var timeSpanRex = /\d{1,2}\s*:\s*\d{1,2}\s*[~-]\s*\d{1,2}\s*:\s*\d{1,2}/ig;
+    var timeSpanRex = /\d{1,2}\s*:\s*\d{1,2}\s*([~-]\s*\d{1,2}\s*:\s*\d{1,2})*/ig;
     var result = log.match(timeSpanRex);
     if (result && result.length) {
         timeSpan = {};
@@ -55,32 +55,43 @@ function getTimeSpan(log, date) {
         var timeArr = timeStr.split(/[~-]/).map(function (val) {
             return val.trim();
         });
-        timeSpan.start = timeArr[0];
-        var startHour = parseInt(timeSpan.start.split(':')[0]);
-        timeSpan.end = timeArr[1];
-        var endHour = parseInt(timeSpan.end.split(':')[0]);
+        var startHour, endHour, start, end;
+        start = timeArr[0];
+        if (start) {
+            timeSpan.start = start;
+            startHour = parseInt(start.split(':')[0]);
+        }
+        end = timeArr[1];
+        if (end) {
+            timeSpan.end = end;
+            endHour = parseInt(end.split(':')[0]);
+        }
         //endHour should greater than startHour, except 23: 47 ~ 00:00
-        if (endHour < startHour) {
+        if (endHour !== undefined && startHour !== undefined && endHour < startHour) {
             if (endHour !== 0) {
                 msg.warn('make sure the date is right of this log: ' + log);
             } else {
                 plusOneDay = true;
             }
         }
-        var startTime = moment(date + ' ' + timeSpan.start),
-            endTime = moment(date + ' ' + timeSpan.end);
-        if (plusOneDay) {
-            endTime.add(1, 'd');
+        if (end && start) {
+            var dateFomate = 'YYYY-MM-DD HH:mm';
+            var startTime = new moment(date + ' ' + start, dateFomate),
+                endTime = new moment(date + ' ' + end, dateFomate);
+            if (plusOneDay) {
+                endTime.add(1, 'd');
+            }
+            timeSpan.len = endTime.diff(startTime, 'minutes');
         }
-        timeSpan.len = endTime.diff(startTime, 'minutes');
     }
     return timeSpan;
 }
 
-function getLogInfo (log, date) {
+function getLogInfo (log, date, index) {
     var logInfo = {
         classes: getClasses(log),
-        tags: getTags(log)
+        tags: getTags(log),
+        index: index
     };
     var timeSpan = getTimeSpan(log, date);
     return extend(logInfo, timeSpan);
