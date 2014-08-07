@@ -22,6 +22,8 @@ function analyse(result) {
     var date = result.date;
     var logData = result.data;
     var logs = helper.getLogs(logData);
+    var classes = helper.getClasses(logData);
+    console.log(classes);
     var tags = helper.getTags(logData);
     msg.info(getBasicInfo({
         date: date,
@@ -30,15 +32,16 @@ function analyse(result) {
     }));
 
     //calculate total time
-    var total = 0;
+    var totalMins = 0;
     logs.forEach(function (log) {
         var timeSpan = helper.getTimeSpan(log, date);
         if (timeSpan) {
-            total += timeSpan.len;
+            totalMins += timeSpan.len;
         }
     });
+    var totalHours = totalMins / 60;
 
-    msg.info('total time: ' + total);
+    msg.info('total time: ' + totalMins + ' minutes; ' + totalHours + ' hours.');
 }
 
 function getBasicInfo(data) {

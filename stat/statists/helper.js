@@ -12,6 +12,21 @@ exports.getLogs = function(data) {
     return logArr;
 };
 
+exports.getClasses = function(data) {
+    var result = data.match(/\{.*?\}/g);
+    var classes = [];
+    result.forEach(function(classStr) {
+        var classArr;
+        classStr = classStr.trim().replace(/[\{\}]/g, '');
+        if (classStr) {
+            classArr = classStr.split(',');
+        }
+        classes = classes.concat(classArr);
+    });
+    //unique the classes array
+    return classes.filter(onlyUnique);
+};
+
 exports.getTags = function(data) {
     var result = data.match(/\[.*?\](?!\()/ig);
     var tags = [];
@@ -53,7 +68,7 @@ exports.getTimeSpan = function (log, date) {
         var startTime = moment(date + ' ' + timeSpan.start),
             endTime = moment(date + ' ' + timeSpan.end);
         if (plusOneDay) {
-            endTime.add('d', 1);
+            endTime.add(1, 'd');
         }
         timeSpan.len = endTime.diff(startTime, 'minutes');
     }
