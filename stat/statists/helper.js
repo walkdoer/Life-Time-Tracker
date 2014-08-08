@@ -12,15 +12,18 @@ exports.getLogs = function(data) {
     var logArr = data.split('\n').filter(isEmpty);
     return logArr;
 };
-function getClasses(data) {
+
+function getSimpleClasses(data) {
     var result = data.match(/\{.*?\}/g);
     var classes = [];
-    if (!result) { return null; }
+    if (!result) {
+        return null;
+    }
     result.forEach(function(classStr) {
         var classArr;
         classStr = classStr.trim().replace(/[\{\}]/g, '');
         if (classStr) {
-            classArr = classStr.split(',').map(function (val) {
+            classArr = classStr.split(',').map(function(val) {
                 return val.trim();
             });
         }
@@ -30,15 +33,81 @@ function getClasses(data) {
     return classes.filter(onlyUnique);
 }
 
+function getClasses(data) {
+    var result = data.match(/\{.*?\}/g);
+    var classes = [];
+    if (!result) {
+        return null;
+    }
+    result.forEach(function(classStr) {
+        var classArr;
+        classStr = classStr.trim().replace(/[\{\}]/g, '');
+        if (classStr) {
+            classArr = classStr.split(',').map(function(val) {
+                return val.trim();
+            });
+        }
+        classes = classes.concat(classArr);
+    });
+    return classes.reduce(function(pv, cv) {
+        var target = pv.filter(function(val) {
+            return val.name === cv;
+        });
+        if (target && target.length > 0) {
+            target[0].frequence++;
+        } else {
+            pv.push({
+                name: cv,
+                frequence: 1
+            });
+        }
+        return pv;
+    }, []);
+}
+
 function getTags(data) {
     var result = data.match(/\[.*?\](?!\()/ig);
     var tags = [];
-    if (!result) { return null; }
+    if (!result) {
+        return null;
+    }
     result.forEach(function(tagStr) {
         var tagArr;
         tagStr = tagStr.trim().replace(/[\[\]]/ig, '');
         if (tagStr) {
-            tagArr = tagStr.split(',').map(function (val) {
+            tagArr = tagStr.split(',').map(function(val) {
+                return val.trim();
+            });
+        }
+        tags = tags.concat(tagArr);
+    });
+    return tags.reduce(function(pv, cv) {
+        var target = pv.filter(function(val) {
+            return val.name === cv;
+        });
+        if (target && target.length > 0) {
+            target[0].frequence++;
+        } else {
+            pv.push({
+                name: cv,
+                frequence: 1
+            });
+        }
+        return pv;
+    }, []);
+}
+
+function getSimpleTags(data) {
+    var result = data.match(/\[.*?\](?!\()/ig);
+    var tags = [];
+    if (!result) {
+        return null;
+    }
+    result.forEach(function(tagStr) {
+        var tagArr;
+        tagStr = tagStr.trim().replace(/[\[\]]/ig, '');
+        if (tagStr) {
+            tagArr = tagStr.split(',').map(function(val) {
                 return val.trim();
             });
         }
@@ -56,7 +125,7 @@ function getTimeSpan(log, date) {
     if (result && result.length) {
         timeSpan = {};
         var timeStr = result[0];
-        var timeArr = timeStr.split(/[~-]/).map(function (val) {
+        var timeArr = timeStr.split(/[~-]/).map(function(val) {
             return val.trim();
         });
         var startHour, endHour, start, end;
@@ -91,10 +160,10 @@ function getTimeSpan(log, date) {
     return timeSpan;
 }
 
-function getLogInfo (log, date, index) {
+function getLogInfo(log, date, index) {
     var logInfo = {
-        classes: getClasses(log),
-        tags: getTags(log),
+        classes: getSimpleClasses(log),
+        tags: getSimpleTags(log),
         index: index
     };
     var timeSpan = getTimeSpan(log, date);
@@ -109,6 +178,8 @@ function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
 }
 exports.getClasses = getClasses;
+exports.getSimpleClasses = getSimpleClasses;
 exports.getTags = getTags;
+exports.getSimpleTags = getSimpleTags;
 exports.getTimeSpan = getTimeSpan;
 exports.getLogInfo = getLogInfo;

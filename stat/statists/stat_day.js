@@ -29,8 +29,16 @@ function analyse(result) {
         tagNum: tags.length,
         logNum: logs.length
     }));
-    msg.log('Tags: '.bold + tags.join(', ').italic.blue);
-    msg.log('Classes: '.bold + classes.join(', ').magenta);
+    msg.log('Tags: '.bold + tags.map(readNameAndFrequence).join(', ').italic.blue);
+    msg.log('Classes: '.bold + classes.map(readNameAndFrequence).join(', ').magenta);
+
+    /**
+     * read the class or tagName and it's frequence
+     * @return
+     */
+    function readNameAndFrequence(obj) {
+        return obj.name + '(' + obj.frequence + ')';
+    }
 
     //calculate total time
     var totalMins = 0;
@@ -58,8 +66,8 @@ function analyse(result) {
     //output every classes time consume
     msg.log('========== Group By Classes =========='.grey);
     classes.forEach(function(cls) {
-        var consumeTime = calculateClassesTimeConsume(logInfoArr, cls);
-        msg.log(cls.bold + ':' + (consumeTime / 60).toFixed(2).cyan + ' hours');
+        var consumeTime = calculateClassesTimeConsume(logInfoArr, cls.name);
+        msg.log(cls.name.bold + ':' + (consumeTime / 60).toFixed(2).cyan + ' hours');
     });
 
 }
