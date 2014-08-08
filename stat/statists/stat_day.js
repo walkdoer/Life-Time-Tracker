@@ -22,8 +22,9 @@ function analyse(result) {
     var date = result.date;
     var logData = result.data;
     var logs = helper.getLogs(logData);
-    var classes = helper.getClasses(logData);
+    var classes = helper.getClasses(logData).sort(frequenceDesc);
     var tags = helper.getTags(logData);
+    var sortedTags = tags.sort(frequenceDesc);
     msg.info(getBasicInfo({
         date: date,
         tagNum: tags.length,
@@ -38,6 +39,10 @@ function analyse(result) {
      */
     function readNameAndFrequence(obj) {
         return obj.name + '(' + obj.frequence + ')';
+    }
+
+    function frequenceDesc(a, b) {
+        return b.frequence - a.frequence;
     }
 
     //calculate total time
