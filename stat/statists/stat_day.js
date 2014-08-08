@@ -69,10 +69,17 @@ function analyse(result) {
     msg.log('total time: ' + totalMins.toString().cyan + ' minutes; ' + totalHours.toFixed(2).cyan + ' hours.');
 
     //output every classes time consume
-    msg.log('========== Group By Classes =========='.grey);
+    msg.log('========== Group By Classes ==========');
     classes.forEach(function(cls) {
         var consumeTime = calculateClassesTimeConsume(logInfoArr, cls.name);
-        msg.log(cls.name.bold + ':' + (consumeTime / 60).toFixed(2).cyan + ' hours');
+        msg.log(cls.name.bold + ': ' + (consumeTime / 60).toFixed(2).cyan + ' hours');
+    });
+
+
+    msg.log('========== Group By Tags ==========');
+    groupTimeByTags(logInfoArr).forEach(function (tagTime) {
+        var hours = (tagTime.len / 60).toFixed(2);
+        msg.log(tagTime.name.bold + ': ' + tagTime.len + ' mins' +  '(' + hours.cyan + ')');
     });
 
 }
@@ -106,4 +113,27 @@ function calculateClassesTimeConsume(logInfoArr, cls) {
         }
     });
     return totalTime;
+}
+
+function groupTimeByTags (logInfoArr) {
+    var result = [];
+    logInfoArr.forEach(function (log) {
+        var tags = log.tags;
+        if (tags && tags.length) {
+            tags.forEach(function (tag) {
+                var target = result.filter(function (tagTime) {
+                    return tagTime.name === tag;
+                });
+                if (target && target.length) {
+                    target[0].len += log.len;
+                } else {
+                    result.push({
+                        name: tag,
+                        len: log.len
+                    });
+                }
+            });
+        }
+    });
+    return result;
 }
