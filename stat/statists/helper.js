@@ -160,6 +160,12 @@ function getTimeSpan(log, date) {
     return timeSpan;
 }
 
+/**
+ * get the detail log info
+ * @param log
+ * @param date
+ * @param index
+ */
 function getLogInfo(log, date, index) {
     var logInfo = {
         classes: getSimpleClasses(log),
@@ -177,6 +183,7 @@ function isEmpty(val) {
 function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
 }
+
 exports.getClasses = getClasses;
 exports.getSimpleClasses = getSimpleClasses;
 exports.getTags = getTags;

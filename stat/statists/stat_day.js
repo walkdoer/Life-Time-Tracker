@@ -3,6 +3,7 @@
 var util = require('../util');
 var msg = require('../message');
 var helper = require('./helper');
+var display = require('../dislpay_data');
 
 exports.stat = function(dateArr) {
     var year = parseInt(dateArr[0]);
@@ -70,16 +71,22 @@ function analyse(result) {
 
     //output every classes time consume
     msg.log('========== Group By Classes ==========');
+    var classesTime = [];
     classes.forEach(function(cls) {
         var consumeTime = calculateClassesTimeConsume(logInfoArr, cls.name);
-        msg.log(cls.name.bold + ': ' + (consumeTime / 60).toFixed(2).cyan + ' hours');
+        classesTime.push({
+            label: cls.name,
+            count: consumeTime
+        });
+        //msg.log(cls.name.bold + ': ' + (consumeTime / 60).toFixed(2).cyan + ' hours');
     });
 
+    display.bar(classesTime);
 
     msg.log('========== Group By Tags ==========');
     groupTimeByTags(logInfoArr).forEach(function (tagTime) {
         var hours = (tagTime.len / 60).toFixed(2);
-        msg.log(tagTime.name.bold + ': ' + tagTime.len + ' mins' +  '(' + hours.cyan + ')');
+        msg.log(tagTime.name.bold + ': ' + tagTime.len.toString().cyan + ' mins' +  '(' + hours.cyan + ')');
     });
 
 }
