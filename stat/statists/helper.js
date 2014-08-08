@@ -20,7 +20,9 @@ function getClasses(data) {
         var classArr;
         classStr = classStr.trim().replace(/[\{\}]/g, '');
         if (classStr) {
-            classArr = classStr.split(',');
+            classArr = classStr.split(',').map(function (val) {
+                return val.trim();
+            });
         }
         classes = classes.concat(classArr);
     });
@@ -36,7 +38,9 @@ function getTags(data) {
         var tagArr;
         tagStr = tagStr.trim().replace(/[\[\]]/ig, '');
         if (tagStr) {
-            tagArr = tagStr.split(',');
+            tagArr = tagStr.split(',').map(function (val) {
+                return val.trim();
+            });
         }
         tags = tags.concat(tagArr);
     });
