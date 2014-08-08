@@ -84,10 +84,8 @@ function analyse(result) {
     display.bar(classesTime);
 
     msg.log('========== Group By Tags ==========');
-    groupTimeByTags(logInfoArr).forEach(function (tagTime) {
-        var hours = (tagTime.len / 60).toFixed(2);
-        msg.log(tagTime.name.bold + ': ' + tagTime.len.toString().cyan + ' mins' +  '(' + hours.cyan + ')');
-    });
+    var tagTime = groupTimeByTags(logInfoArr);
+    display.bar(tagTime);
 
 }
 
@@ -135,8 +133,8 @@ function groupTimeByTags (logInfoArr) {
                     target[0].len += log.len;
                 } else {
                     result.push({
-                        name: tag,
-                        len: log.len
+                        label: tag,
+                        count: log.len
                     });
                 }
             });

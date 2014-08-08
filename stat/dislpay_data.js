@@ -28,15 +28,29 @@ function bar(percent) {
     return barStr;
 }
 
+
 function formatLabel(l) {
+    var len = getStrLen(l);
     var maxLen = 13, gap;
-    if (l.length > 10) {
+    if (len > 10) {
         l = l.substr(0, 10) + '...';
     } else {
-        gap = maxLen - l.length;
+        gap = maxLen - len;
         l = l + space(gap);
     }
     return l;
+}
+
+function getStrLen(str) {
+    var regex = /[\u4E00-\u9FA5]+/g;
+    var chinese = str.match(regex);
+    var chineseLen;
+    if (chinese) {
+        chinese = chinese[0];
+    }
+    chineseLen = chinese ? chinese.length: 0;
+    var engLen = str.replace(regex, '').length;
+    return engLen + 2 * chineseLen;
 }
 
 function space(l) {
