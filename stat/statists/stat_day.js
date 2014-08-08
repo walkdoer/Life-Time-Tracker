@@ -67,10 +67,9 @@ function analyse(result) {
         }
     });
     var totalHours = totalMins / 60;
-    msg.log('total time: ' + totalMins.toString().cyan + ' minutes; ' + totalHours.toFixed(2).cyan + ' hours.');
 
     //output every classes time consume
-    msg.log('========== Group By Classes ==========');
+    msg.log('========== Group By Classes =========='.white);
     var classesTime = [];
     classes.forEach(function(cls) {
         var consumeTime = calculateClassesTimeConsume(logInfoArr, cls.name);
@@ -83,9 +82,15 @@ function analyse(result) {
 
     display.bar(classesTime);
 
-    msg.log('========== Group By Tags ==========');
+    msg.log('========== Group By Tags =========='.white);
     var tagTime = groupTimeByTags(logInfoArr);
     display.bar(tagTime);
+    msg.log('total time: ' + totalMins.toString().cyan + ' minutes; ' + totalHours.toFixed(2).cyan + ' hours.');
+
+    console.log('========== Origin Logs ============'.white);
+    logs.forEach(function (logs) {
+        console.log(logs);
+    });
 
 }
 
@@ -127,10 +132,10 @@ function groupTimeByTags (logInfoArr) {
         if (tags && tags.length) {
             tags.forEach(function (tag) {
                 var target = result.filter(function (tagTime) {
-                    return tagTime.name === tag;
+                    return tagTime.label === tag;
                 });
                 if (target && target.length) {
-                    target[0].len += log.len;
+                    target[0].count += log.len;
                 } else {
                     result.push({
                         label: tag,
