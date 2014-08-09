@@ -85,9 +85,12 @@ function analyse(fileData) {
     });
     var totalHours = totalMins / 60;
     var allActiveTime = helper.timeSpan(startTime, endTime),
+        allActiveHours;
+    if (allActiveTime > 0) {
         allActiveHours = allActiveTime / 60;
-    msg.log('All active time: ' + allActiveTime.toString().cyan + ' mins;' + allActiveHours.toFixed(2).cyan + ' h');
-    msg.log('UnTracked time: ' + (allActiveTime - totalMins + '').cyan + ' mins');
+        msg.log('All active time: ' + allActiveTime.toString().cyan + ' mins;' + allActiveHours.toFixed(2).cyan + ' h');
+        msg.log('UnTracked time: ' + (allActiveTime - totalMins + '').cyan + ' mins');
+    }
     msg.log('Total time: ' + totalMins.toString().cyan + ' mins; ' + totalHours.toFixed(2).cyan + ' h');
 
 

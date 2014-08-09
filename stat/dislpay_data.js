@@ -31,7 +31,7 @@ function bar(percent) {
 
 function formatLabel(l) {
     var len = getStrLen(l);
-    var maxLen = 13, gap;
+    var maxLen = 14, gap;
     if (len > 10) {
         l = l.substr(0, 10) + '...';
     } else {
