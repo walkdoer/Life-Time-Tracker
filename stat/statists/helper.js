@@ -117,7 +117,7 @@ function getSimpleTags(data) {
     return tags.filter(onlyUnique);
 }
 
-function getTimeSpan(log, date) {
+function getTimeSpanFromLog(log, date) {
     var timeSpan = null,
         plusOneDay = false;
     var timeSpanRex = /\d{1,2}\s*:\s*\d{1,2}\s*([~-]\s*\d{1,2}\s*:\s*\d{1,2})*/ig;
@@ -132,12 +132,12 @@ function getTimeSpan(log, date) {
         start = timeArr[0];
         if (start) {
             timeSpan.start = start;
-            startHour = parseInt(start.split(':')[0]);
+            startHour = parseInt(start.split(':')[0], 10);
         }
         end = timeArr[1];
         if (end) {
             timeSpan.end = end;
-            endHour = parseInt(end.split(':')[0]);
+            endHour = parseInt(end.split(':')[0], 10);
         }
         //endHour should greater than startHour, except 23: 47 ~ 00:00
         if (endHour !== undefined && startHour !== undefined && endHour < startHour) {
@@ -172,12 +172,47 @@ function getLogInfo(log, date, index) {
         tags: getSimpleTags(log),
         index: index
     };
-    var timeSpan = getTimeSpan(log, date);
+    var timeSpan = getTimeSpanFromLog(log, date);
     return extend(logInfo, timeSpan);
+}
+
+
+function getTimeSpan(start, end) {
+    var startHour, endHour, plusOneDay = false, diff = -1;
+    if (end && start) {
+        startHour = parseInt(getHourFromDateStr(start), 10);
+        endHour = parseInt(getHourFromDateStr(end), 10);
+        //endHour should greater than startHour, except 23: 47 ~ 00:00
+        if (endHour !== undefined && startHour !== undefined && endHour < startHour) {
+            if (endHour === 0) {
+                plusOneDay = true;
+            }
+        }
+        var dateFomate = 'YYYY-MM-DD HH:mm';
+        var startTime = new moment(start, dateFomate),
+            endTime = new moment(end, dateFomate);
+        if (plusOneDay) {
+            endTime.add(1, 'd');
+        }
+        diff = endTime.diff(startTime, 'minutes');
+    }
+
+    return diff;
+}
+
+function getHourFromDateStr(dateStr) {
+    var timeRegxp = /\d{1,2}\s*:\s*\d{1,2}/ig;
+    var timeStr = dateStr.match(timeRegxp)[0];
+    var timeArr = timeStr.split(':').map(trim);
+    return timeArr[0];
 }
 
 function isEmpty(val) {
     return !!val;
+}
+
+function trim (val) {
+    return val.trim();
 }
 
 function onlyUnique(value, index, self) {
@@ -188,5 +223,6 @@ exports.getClasses = getClasses;
 exports.getSimpleClasses = getSimpleClasses;
 exports.getTags = getTags;
 exports.getSimpleTags = getSimpleTags;
-exports.getTimeSpan = getTimeSpan;
+exports.getTimeSpan = getTimeSpanFromLog;
 exports.getLogInfo = getLogInfo;
+exports.timeSpan = getTimeSpan;

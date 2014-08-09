@@ -55,13 +55,16 @@ function analyse(fileData) {
     var totalMins = 0;
     var logInfoArr = [];
     var lastIndex = logs.length - 1;
+    var startTime, endTime;
     logs.forEach(function(log, index) {
         var logInfo = helper.getLogInfo(log, date, index);
         if (logInfo) {
             if (isGetUpLog(logInfo)) {
                 logInfo.getup = true;
+                startTime = date + ' ' + logInfo.start;
                 msg.log('Get Up Time: ' + logInfo.start);
             } else if (isSleepTime(logInfo, lastIndex)){
+                endTime = date + ' ' + logInfo.start;
                 msg.log('Sleep Time: ' + logInfo.start);
             }
             if (logInfo.len !== undefined) {
@@ -75,6 +78,12 @@ function analyse(fileData) {
         }
     });
     var totalHours = totalMins / 60;
+    var allActiveTime = helper.timeSpan(startTime, endTime),
+        allActiveHours = allActiveTime / 60;
+    msg.log('All active time: ' + allActiveTime.toString().cyan + ' mins;' + allActiveHours.toFixed(2).cyan + ' h');
+    msg.log('UnTracked time: ' + (allActiveTime - totalMins + '').cyan + ' mins');
+    msg.log('Total time: ' + totalMins.toString().cyan + ' mins; ' + totalHours.toFixed(2).cyan + ' h');
+
 
     //output every classes time consume
     msg.log('========== Group By Classes =========='.white);
@@ -93,7 +102,6 @@ function analyse(fileData) {
     msg.log('========== Group By Tags =========='.white);
     var tagTime = groupTimeByTags(logInfoArr);
     display.bar(tagTime);
-    msg.log('total time: ' + totalMins.toString().cyan + ' minutes; ' + totalHours.toFixed(2).cyan + ' hours.');
 
     return fileData;
 }
