@@ -12,8 +12,9 @@ exports.stat = function(dateArr, showOriginLogs) {
     if (!util.isDayValid(year, month, day)) {
         throw new Error('day ' + day + ' is out of the day range of month ' + month);
     }
-    util.readLogFiles(year, month, day)
+    util.readLogFiles(dateArr.join('-'))
         .then(analyse)
+        .then(calculateSleepLength)
         .then(function (fileData) {
             if (showOriginLogs) {
                 console.log('========== Origin Logs ============'.white);
@@ -64,7 +65,12 @@ function analyse(fileData) {
                 startTime = date + ' ' + logInfo.start;
                 msg.log('Get Up Time: ' + logInfo.start);
             } else if (isSleepTime(logInfo, lastIndex)){
-                endTime = date + ' ' + logInfo.start;
+                var hour = parseInt(helper.getHour(logInfo.start), 10);
+                if (hour === 0) {
+                    endTime = helper.nextDay(date) + ' ' + logInfo.start;
+                } else {
+                    endTime = date + ' ' + logInfo.start;
+                }
                 msg.log('Sleep Time: ' + logInfo.start);
             }
             if (logInfo.len !== undefined) {
@@ -102,11 +108,26 @@ function analyse(fileData) {
     msg.log('========== Group By Tags =========='.white);
     var tagTime = groupTimeByTags(logInfoArr);
     display.bar(tagTime);
-
+    fileData.date = date;
+    fileData.sleepTime = endTime;
     return fileData;
 }
 
 
+function calculateSleepLength (data) {
+    var nextDay = helper.nextDay(data.date);
+    util.readLogFiles(nextDay)
+        .then(function (file) {
+            var wokeTime = nextDay + ' ' + getWokeTime(file.data);
+            var sleepTime = data.sleepTime;
+            var timeSpan = helper.timeSpan(sleepTime, wokeTime);
+            console.log('sleep time: ' + (timeSpan / 60).toFixed(2).cyan + 'h');
+        })
+        .catch(function () {
+            msg.error('Not enough data to calculate sleep length.');
+        });
+    return data;
+}
 
 function getBasicInfo(data) {
     return data.date + ' have ' + data.logNum + ' logs and ' + data.tagNum + ' tags;';
@@ -118,6 +139,11 @@ function isGetUpLog(log) {
 
 function isSleepTime(log, lastIndex) {
     return log.start && !log.end && log.index === lastIndex;
+}
+
+function getWokeTime(logData) {
+    var logs = helper.getLogs(logData);
+    return logs[0];
 }
 
 function handleError(err) {

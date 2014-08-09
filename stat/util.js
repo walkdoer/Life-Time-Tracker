@@ -14,8 +14,8 @@ function isValidDate(date) {
     }
 }
 
-function readLogFiles(y, m, d) {
-    var dateArr = [y, m, d].filter(function (val) { return !!val; });
+function readLogFiles(date) {
+    var dateArr = date.split('-');
     var fileName = dateArr.join('/') + '.md';
     var deferred = when.defer(),
         filePath = [DATA_FILE_PRIFIX, fileName].join('/');

@@ -178,22 +178,11 @@ function getLogInfo(log, date, index) {
 
 
 function getTimeSpan(start, end) {
-    var startHour, endHour, plusOneDay = false, diff = -1;
+    var diff = -1;
     if (end && start) {
-        startHour = parseInt(getHourFromDateStr(start), 10);
-        endHour = parseInt(getHourFromDateStr(end), 10);
-        //endHour should greater than startHour, except 23: 47 ~ 00:00
-        if (endHour !== undefined && startHour !== undefined && endHour < startHour) {
-            if (endHour === 0) {
-                plusOneDay = true;
-            }
-        }
         var dateFomate = 'YYYY-MM-DD HH:mm';
         var startTime = new moment(start, dateFomate),
             endTime = new moment(end, dateFomate);
-        if (plusOneDay) {
-            endTime.add(1, 'd');
-        }
         diff = endTime.diff(startTime, 'minutes');
     }
 
@@ -219,6 +208,15 @@ function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
 }
 
+function nextDay(date) {
+    var dateArr = date.split('-'),
+        year = parseInt(dateArr[0], 10),
+        month = parseInt(dateArr[1], 10),
+        day = parseInt(dateArr[2], 10),
+        nextDateStr = [year, month, day + 1].join('-');
+    return nextDateStr;
+}
+
 exports.getClasses = getClasses;
 exports.getSimpleClasses = getSimpleClasses;
 exports.getTags = getTags;
@@ -226,3 +224,5 @@ exports.getSimpleTags = getSimpleTags;
 exports.getTimeSpan = getTimeSpanFromLog;
 exports.getLogInfo = getLogInfo;
 exports.timeSpan = getTimeSpan;
+exports.getHour = getHourFromDateStr;
+exports.nextDay = nextDay;
