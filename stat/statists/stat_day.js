@@ -5,7 +5,7 @@ var msg = require('../message');
 var helper = require('./helper');
 var display = require('../dislpay_data');
 
-exports.stat = function(dateArr) {
+exports.stat = function(dateArr, showOriginLogs) {
     var year = parseInt(dateArr[0]);
     var month = parseInt(dateArr[1]);
     var day = parseInt(dateArr[2]);
@@ -14,18 +14,23 @@ exports.stat = function(dateArr) {
     }
     util.readLogFiles(year, month, day)
         .then(analyse)
-        .
-    catch (handleError);
+        .then(function (fileData) {
+            if (showOriginLogs) {
+                console.log('========== Origin Logs ============'.white);
+                console.log(fileData.data);
+            }
+            return fileData;
+        })
+        .catch (handleError);
 };
 
 
-function analyse(result) {
-    var date = result.date;
-    var logData = result.data;
+function analyse(fileData) {
+    var date = fileData.date;
+    var logData = fileData.data;
     var logs = helper.getLogs(logData);
     var classes = helper.getClasses(logData).sort(frequenceDesc);
-    var tags = helper.getTags(logData);
-    var sortedTags = tags.sort(frequenceDesc);
+    var tags = helper.getTags(logData).sort(frequenceDesc);
     msg.info(getBasicInfo({
         date: date,
         tagNum: tags.length,
@@ -49,12 +54,15 @@ function analyse(result) {
     //calculate total time
     var totalMins = 0;
     var logInfoArr = [];
+    var lastIndex = logs.length - 1;
     logs.forEach(function(log, index) {
         var logInfo = helper.getLogInfo(log, date, index);
         if (logInfo) {
             if (isGetUpLog(logInfo)) {
                 logInfo.getup = true;
-                msg.info('Get Up Time: ' + logInfo.start);
+                msg.log('Get Up Time: ' + logInfo.start);
+            } else if (isSleepTime(logInfo, lastIndex)){
+                msg.log('Sleep Time: ' + logInfo.start);
             }
             if (logInfo.len !== undefined) {
                 totalMins += logInfo.len;
@@ -87,11 +95,7 @@ function analyse(result) {
     display.bar(tagTime);
     msg.log('total time: ' + totalMins.toString().cyan + ' minutes; ' + totalHours.toFixed(2).cyan + ' hours.');
 
-    console.log('========== Origin Logs ============'.white);
-    logs.forEach(function (logs) {
-        console.log(logs);
-    });
-
+    return fileData;
 }
 
 
@@ -102,6 +106,10 @@ function getBasicInfo(data) {
 
 function isGetUpLog(log) {
     return log.start && !log.end && log.index === 0;
+}
+
+function isSleepTime(log, lastIndex) {
+    return log.start && !log.end && log.index === lastIndex;
 }
 
 function handleError(err) {

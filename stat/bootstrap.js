@@ -7,6 +7,7 @@ var util = require('./util'),
 //get the date that want to stat, it can be year or month or day
 var argv = process.argv;
 var dateStr = argv[2];
+var showOriginLogs = ['-origin', '-o'].indexOf(argv[3]) >= 0;
 
 if (!dateStr) {
     return msg.error('should have a date arguments.');
@@ -19,14 +20,17 @@ if (!util.isValidDate(date)) {
 
 msg.success('compute success');
 
-dispatch(dateStr);
+dispatch({
+    dateStr: dateStr,
+    showOriginLogs: showOriginLogs
+});
 
 
-function dispatch(dateStr) {
-    var dateArr = dateStr.split('-');
+function dispatch(config) {
+    var dateArr = config.dateStr.split('-');
     var type = [null, 'year', 'month', 'day'][dateArr.length];
     var statist = getStatist(type);
-    statist.stat(dateArr);
+    statist.stat(dateArr, config.showOriginLogs);
 }
 
 function getStatist(type) {
