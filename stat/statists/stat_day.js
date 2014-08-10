@@ -120,7 +120,7 @@ function analyse(fileData) {
     display.bar(classesTime);
 
     msg.log('========== Group By Tags =========='.white);
-    var tagTime = groupTimeByTags(logs);
+    var tagTime = helper.groupTimeByTags(logs);
     display.bar(tagTime);
     return fileData;
 }
@@ -164,27 +164,4 @@ function calculateClassesTimeConsume(logInfoArr, cls) {
         }
     });
     return totalTime;
-}
-
-function groupTimeByTags (logInfoArr) {
-    var result = [];
-    logInfoArr.forEach(function (log) {
-        var tags = log.tags;
-        if (tags && tags.length) {
-            tags.forEach(function (tag) {
-                var target = result.filter(function (tagTime) {
-                    return tagTime.label === tag;
-                });
-                if (target && target.length) {
-                    target[0].count += log.len;
-                } else {
-                    result.push({
-                        label: tag,
-                        count: log.len
-                    });
-                }
-            });
-        }
-    });
-    return result;
 }

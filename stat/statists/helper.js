@@ -264,6 +264,28 @@ function nextDay(date) {
     return nextDateStr;
 }
 
+function groupTimeByTags (logs) {
+    var result = [];
+    logs.forEach(function (log) {
+        var tags = log.tags;
+        if (tags && tags.length) {
+            tags.forEach(function (tag) {
+                var target = result.filter(function (tagTime) {
+                    return tagTime.label === tag;
+                });
+                if (target && target.length) {
+                    target[0].count += log.len;
+                } else {
+                    result.push({
+                        label: tag,
+                        count: log.len
+                    });
+                }
+            });
+        }
+    });
+    return result;
+}
 exports.getClasses = getClasses;
 exports.getSimpleClasses = getSimpleClasses;
 exports.getTags = getTags;
@@ -275,3 +297,4 @@ exports.getHour = getHourFromDateStr;
 exports.nextDay = nextDay;
 exports.getLogs = getLogs;
 exports.getWakeTime = getWakeTime;
+exports.groupTimeByTags = groupTimeByTags;
