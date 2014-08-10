@@ -46,7 +46,7 @@ function preprocessData(fileData) {
         return b.frequence - a.frequence;
     }
     logs.forEach(function(log) {
-        if (log.getup) {
+        if (log.wake) {
             wakeTime = log.time;
             msg.log('Wake Time: ' + wakeTime);
         } else if (log.sleep){
@@ -130,7 +130,7 @@ function calculateSleepLength (data) {
     var nextDay = helper.nextDay(data.date);
     util.readLogFiles(nextDay)
         .then(function (file) {
-            var wokeTime = getWokeTime(file.data, nextDay);
+            var wokeTime = helper.getWakeTime(file.data, nextDay);
             var sleepTime = data.sleepTime;
             var timeSpan = helper.timeSpan(sleepTime, wokeTime);
             console.log('Sleep length: ' + (timeSpan / 60).toFixed(2).cyan + 'h');
@@ -143,18 +143,6 @@ function calculateSleepLength (data) {
 
 function generateBasicInfo(data) {
     return data.date + ' have ' + data.logNum + ' logs and ' + data.tagNum + ' tags;';
-}
-
-
-function getWokeTime(logData, date) {
-    var wakeTime = null;
-    var getUpLog = helper.getLogs(logData, date).filter(function (log) {
-        return log.getup === true;
-    })[0];
-    if (getUpLog) {
-        wakeTime = getUpLog.time;
-    }
-    return wakeTime;
 }
 
 function handleError(err) {

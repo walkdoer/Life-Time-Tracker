@@ -8,7 +8,7 @@ var moment = require('moment');
 var msg = require('../message');
 var extend = require('node.extend');
 
-exports.getLogs = function(data, date) {
+function getLogs(data, date) {
     var logStrArr = data.split('\n').filter(isEmpty);
     var lastIndex = logStrArr.length - 1;
     var logs = [];
@@ -17,7 +17,7 @@ exports.getLogs = function(data, date) {
         var logInfo = getLogInfo(logStr, date, index);
         if (logInfo) {
             if (isGetUpLog(logInfo)) {
-                logInfo.getup = true;
+                logInfo.wake = true;
                 logInfo.time = date + ' ' + logInfo.start;
             } else if (isSleepTime(logInfo, lastIndex)){
                 logInfo.sleep = true;
@@ -43,7 +43,20 @@ exports.getLogs = function(data, date) {
         return log.start && !log.end && log.index === lastIndex;
     }
     return logs;
-};
+}
+
+
+
+function getWakeTime(logData, date) {
+    var wakeTime = null;
+    var getUpLog = getLogs(logData, date).filter(function (log) {
+        return log.wake === true;
+    })[0];
+    if (getUpLog) {
+        wakeTime = getUpLog.time;
+    }
+    return wakeTime;
+}
 
 function getSimpleClasses(data) {
     var result = data.match(/\{.*?\}/g);
@@ -260,3 +273,5 @@ exports.getLogInfo = getLogInfo;
 exports.timeSpan = getTimeSpan;
 exports.getHour = getHourFromDateStr;
 exports.nextDay = nextDay;
+exports.getLogs = getLogs;
+exports.getWakeTime = getWakeTime;
