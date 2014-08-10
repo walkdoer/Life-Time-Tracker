@@ -124,7 +124,12 @@ function calculateSleepLength (data) {
             var wokeTime = helper.getWakeTime(file.data, nextDay);
             var sleepTime = data.sleepTime;
             var timeSpan = helper.timeSpan(sleepTime, wokeTime);
-            console.log('Sleep length: ' + (timeSpan / 60).toFixed(2).cyan + 'h');
+            var hours = timeSpan / 60,
+                msg = '';
+            if (hours < 7) {
+                msg = 'WARN sleepTime is not enough'.yellow;
+            }
+            console.log('Sleep length: ' + hours.toFixed(2).cyan + 'h ' + msg);
         })
         .catch(function () {
             msg.error('Not enough data to calculate sleep length.');
