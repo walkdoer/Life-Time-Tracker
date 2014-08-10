@@ -107,20 +107,11 @@ function analyse(fileData) {
 
     //output every classes time consume
     msg.log('========== Group By Classes =========='.white);
-    var classesTime = [];
-    classes.forEach(function(cls) {
-        var consumeTime = calculateClassesTimeConsume(logs, cls.name);
-        classesTime.push({
-            label: cls.name,
-            count: consumeTime
-        });
-        //msg.log(cls.name.bold + ': ' + (consumeTime / 60).toFixed(2).cyan + ' hours');
-    });
-
+    var classesTime = helper.groupTimeByClass(logs, fileData.classes);
     display.bar(classesTime);
 
     msg.log('========== Group By Tags =========='.white);
-    var tagTime = helper.groupTimeByTags(logs);
+    var tagTime = helper.groupTimeByTag(logs);
     display.bar(tagTime);
     return fileData;
 }
@@ -155,13 +146,3 @@ function handleError(err) {
     }
 }
 
-function calculateClassesTimeConsume(logInfoArr, cls) {
-    var totalTime = 0;
-    logInfoArr.forEach(function(log) {
-        var classes = log.classes;
-        if (classes && classes.indexOf(cls) >= 0) {
-            totalTime += log.len;
-        }
-    });
-    return totalTime;
-}

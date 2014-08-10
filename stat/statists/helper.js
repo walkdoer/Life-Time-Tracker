@@ -264,7 +264,7 @@ function nextDay(date) {
     return nextDateStr;
 }
 
-function groupTimeByTags (logs) {
+function groupTimeByTag (logs) {
     var result = [];
     logs.forEach(function (log) {
         var tags = log.tags;
@@ -286,6 +286,30 @@ function groupTimeByTags (logs) {
     });
     return result;
 }
+
+
+function groupTimeByClass(logs, classes) {
+    var classesTime = [];
+    function calculateClassesTimeConsume(logs, cls) {
+        var totalTime = 0;
+        logs.forEach(function(log) {
+            var classes = log.classes;
+            if (classes && classes.indexOf(cls) >= 0) {
+                totalTime += log.len;
+            }
+        });
+        return totalTime;
+    }
+    classes.forEach(function(cls) {
+        var consumeTime = calculateClassesTimeConsume(logs, cls.name);
+        classesTime.push({
+            label: cls.name,
+            count: consumeTime
+        });
+        //msg.log(cls.name.bold + ': ' + (consumeTime / 60).toFixed(2).cyan + ' hours');
+    });
+    return classesTime;
+}
 exports.getClasses = getClasses;
 exports.getSimpleClasses = getSimpleClasses;
 exports.getTags = getTags;
@@ -297,4 +321,5 @@ exports.getHour = getHourFromDateStr;
 exports.nextDay = nextDay;
 exports.getLogs = getLogs;
 exports.getWakeTime = getWakeTime;
-exports.groupTimeByTags = groupTimeByTags;
+exports.groupTimeByTag = groupTimeByTag;
+exports.groupTimeByClass = groupTimeByClass;
