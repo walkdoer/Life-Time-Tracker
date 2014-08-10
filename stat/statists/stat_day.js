@@ -13,6 +13,7 @@ exports.stat = function(dateArr, showOriginLogs) {
         throw new Error('day ' + day + ' is out of the day range of month ' + month);
     }
     util.readLogFiles(dateArr.join('-'))
+        .then(preprocessData)
         .then(analyse)
         .then(calculateSleepLength)
         .then(function (fileData) {
@@ -25,19 +26,59 @@ exports.stat = function(dateArr, showOriginLogs) {
         .catch (handleError);
 };
 
+/**
+ * preprocess the file data,extract tags and classes
+ *
+ * @param fileData
+ * @return
+ */
+function preprocessData(fileData) {
+    var date = fileData.date,
+        totalMins = 0,
+        logs,
+        wakeTime,
+        sleepTime;
+    var logData = fileData.data;
+    fileData.logs = logs = helper.getLogs(logData, date);
+    fileData.classes = helper.getClasses(logData).sort(frequenceDesc);
+    fileData.tags = helper.getTags(logData).sort(frequenceDesc);
+    function frequenceDesc(a, b) {
+        return b.frequence - a.frequence;
+    }
+    logs.forEach(function(log) {
+        if (log.getup) {
+            wakeTime = log.time;
+            msg.log('Wake Time: ' + wakeTime);
+        } else if (log.sleep){
+            sleepTime = log.time;
+            msg.log('Sleep Time: ' + sleepTime);
+        }
+        if (log.len !== undefined) {
+            totalMins += log.len;
+        }
+    });
+    //all the tracked time from the log
+    fileData.totalMins = totalMins;
+    fileData.wakeTime = wakeTime;
+    fileData.sleepTime = sleepTime;
+    return fileData;
+}
+
 
 function analyse(fileData) {
+    var tags = fileData.tags,
+        classes = fileData.classes,
+        logs = fileData.logs;
     var date = fileData.date;
-    var logData = fileData.data;
-    var logs = helper.getLogs(logData);
-    var classes = helper.getClasses(logData).sort(frequenceDesc);
-    var tags = helper.getTags(logData).sort(frequenceDesc);
-    msg.info(getBasicInfo({
+    //out put the basic info of the log
+    msg.info(generateBasicInfo({
         date: date,
         tagNum: tags.length,
         logNum: logs.length
     }));
+    //output the tags which has been sorted by frequence
     msg.log('Tags: '.bold + tags.map(readNameAndFrequence).join(', ').italic.blue);
+    //output the classes which has been sorted by frequence
     msg.log('Classes: '.bold + classes.map(readNameAndFrequence).join(', ').magenta);
 
     /**
@@ -48,48 +89,18 @@ function analyse(fileData) {
         return obj.name + '(' + obj.frequence + ')';
     }
 
-    function frequenceDesc(a, b) {
-        return b.frequence - a.frequence;
-    }
 
     //calculate total time
-    var totalMins = 0;
-    var logInfoArr = [];
-    var lastIndex = logs.length - 1;
-    var startTime, endTime;
-    logs.forEach(function(log, index) {
-        var logInfo = helper.getLogInfo(log, date, index);
-        if (logInfo) {
-            if (isGetUpLog(logInfo)) {
-                logInfo.getup = true;
-                startTime = date + ' ' + logInfo.start;
-                msg.log('Get Up Time: ' + logInfo.start);
-            } else if (isSleepTime(logInfo, lastIndex)){
-                var hour = parseInt(helper.getHour(logInfo.start), 10);
-                if (hour === 0) {
-                    endTime = helper.nextDay(date) + ' ' + logInfo.start;
-                } else {
-                    endTime = date + ' ' + logInfo.start;
-                }
-                msg.log('Sleep Time: ' + logInfo.start);
-            }
-            if (logInfo.len !== undefined) {
-                totalMins += logInfo.len;
-            } else if (!logInfo.start) {
-                logInfo.len = 0;
-                msg.warn('May be there\' something wrong with you time format of this log: ' +
-                    log);
-            }
-            logInfoArr.push(logInfo);
-        }
-    });
-    var totalHours = totalMins / 60;
-    var allActiveTime = helper.timeSpan(startTime, endTime),
+    var totalMins = fileData.totalMins,
+        totalHours = totalMins / 60,
+        wakeTime = fileData.wakeTime,
+        sleepTime = fileData.sleepTime;
+    var allActiveTime = helper.timeSpan(wakeTime, sleepTime),
         allActiveHours;
     if (allActiveTime > 0) {
         allActiveHours = allActiveTime / 60;
         msg.log('All active time: ' + allActiveTime.toString().cyan + ' mins;' + allActiveHours.toFixed(2).cyan + ' h');
-        msg.log('UnTracked time: ' + (allActiveTime - totalMins + '').cyan + ' mins');
+        msg.log('Untracked time: ' + (allActiveTime - totalMins + '').cyan + ' mins');
     }
     msg.log('Total time: ' + totalMins.toString().cyan + ' mins; ' + totalHours.toFixed(2).cyan + ' h');
 
@@ -98,7 +109,7 @@ function analyse(fileData) {
     msg.log('========== Group By Classes =========='.white);
     var classesTime = [];
     classes.forEach(function(cls) {
-        var consumeTime = calculateClassesTimeConsume(logInfoArr, cls.name);
+        var consumeTime = calculateClassesTimeConsume(logs, cls.name);
         classesTime.push({
             label: cls.name,
             count: consumeTime
@@ -109,10 +120,8 @@ function analyse(fileData) {
     display.bar(classesTime);
 
     msg.log('========== Group By Tags =========='.white);
-    var tagTime = groupTimeByTags(logInfoArr);
+    var tagTime = groupTimeByTags(logs);
     display.bar(tagTime);
-    fileData.date = date;
-    fileData.sleepTime = endTime;
     return fileData;
 }
 
@@ -121,10 +130,10 @@ function calculateSleepLength (data) {
     var nextDay = helper.nextDay(data.date);
     util.readLogFiles(nextDay)
         .then(function (file) {
-            var wokeTime = nextDay + ' ' + getWokeTime(file.data);
+            var wokeTime = getWokeTime(file.data, nextDay);
             var sleepTime = data.sleepTime;
             var timeSpan = helper.timeSpan(sleepTime, wokeTime);
-            console.log('sleep time: ' + (timeSpan / 60).toFixed(2).cyan + 'h');
+            console.log('Sleep length: ' + (timeSpan / 60).toFixed(2).cyan + 'h');
         })
         .catch(function () {
             msg.error('Not enough data to calculate sleep length.');
@@ -132,21 +141,20 @@ function calculateSleepLength (data) {
     return data;
 }
 
-function getBasicInfo(data) {
+function generateBasicInfo(data) {
     return data.date + ' have ' + data.logNum + ' logs and ' + data.tagNum + ' tags;';
 }
 
-function isGetUpLog(log) {
-    return log.start && !log.end && log.index === 0;
-}
 
-function isSleepTime(log, lastIndex) {
-    return log.start && !log.end && log.index === lastIndex;
-}
-
-function getWokeTime(logData) {
-    var logs = helper.getLogs(logData);
-    return logs[0];
+function getWokeTime(logData, date) {
+    var wakeTime = null;
+    var getUpLog = helper.getLogs(logData, date).filter(function (log) {
+        return log.getup === true;
+    })[0];
+    if (getUpLog) {
+        wakeTime = getUpLog.time;
+    }
+    return wakeTime;
 }
 
 function handleError(err) {

@@ -8,9 +8,41 @@ var moment = require('moment');
 var msg = require('../message');
 var extend = require('node.extend');
 
-exports.getLogs = function(data) {
-    var logArr = data.split('\n').filter(isEmpty);
-    return logArr;
+exports.getLogs = function(data, date) {
+    var logStrArr = data.split('\n').filter(isEmpty);
+    var lastIndex = logStrArr.length - 1;
+    var logs = [];
+    logStrArr.forEach(function(logStr, index) {
+        var sleepTime;
+        var logInfo = getLogInfo(logStr, date, index);
+        if (logInfo) {
+            if (isGetUpLog(logInfo)) {
+                logInfo.getup = true;
+                logInfo.time = date + ' ' + logInfo.start;
+            } else if (isSleepTime(logInfo, lastIndex)){
+                logInfo.sleep = true;
+                var hour = parseInt(getHourFromDateStr(logInfo.start), 10);
+                if (hour === 0) {
+                    sleepTime = nextDay(date) + ' ' + logInfo.start;
+                } else {
+                    sleepTime = date + ' ' + logInfo.start;
+                }
+                logInfo.time = sleepTime;
+            }
+            if (logInfo.len === undefined) {
+                logInfo.len = 0;
+            }
+            logs.push(logInfo);
+        }
+    });
+    function isGetUpLog(log) {
+        return log.start && !log.end && log.index === 0;
+    }
+
+    function isSleepTime(log, lastIndex) {
+        return log.start && !log.end && log.index === lastIndex;
+    }
+    return logs;
 };
 
 function getSimpleClasses(data) {
@@ -184,6 +216,8 @@ function getTimeSpan(start, end) {
         var startTime = new moment(start, dateFomate),
             endTime = new moment(end, dateFomate);
         diff = endTime.diff(startTime, 'minutes');
+    } else {
+        throw new Error('date arguments not fit, should have start and end');
     }
 
     return diff;
