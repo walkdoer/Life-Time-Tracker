@@ -13,7 +13,6 @@ function getLogs(data, date) {
     var lastIndex = logStrArr.length - 1;
     var logs = [];
     logStrArr.forEach(function(logStr, index) {
-        var sleepTime;
         var logInfo = getLogInfo(logStr, date, index);
         if (logInfo) {
             if (isGetUpLog(logInfo)) {
@@ -21,13 +20,12 @@ function getLogs(data, date) {
                 logInfo.time = date + ' ' + logInfo.start;
             } else if (isSleepTime(logInfo, lastIndex)){
                 logInfo.sleep = true;
-                var hour = parseInt(getHourFromDateStr(logInfo.start), 10);
-                if (hour === 0) {
-                    sleepTime = nextDay(date) + ' ' + logInfo.start;
-                } else {
-                    sleepTime = date + ' ' + logInfo.start;
-                }
-                logInfo.time = sleepTime;
+                //需要校准，有可能凌晨之后睡觉
+                logInfo.time = alignTime(date, logInfo.start);
+            } else if (logInfo.sign.indexOf('off') >= 0) {
+                logInfo.offDuty = true;
+                //需要校准，是有可能存在加班到凌晨之后
+                logInfo.time = alignTime(date, logInfo.start);
             }
             if (logInfo.len === undefined) {
                 logInfo.len = 0;
@@ -46,6 +44,16 @@ function getLogs(data, date) {
 }
 
 
+function alignTime(date, time) {
+    var newDate;
+    var hour = parseInt(getHourFromDateStr(time), 10);
+    if (hour === 0) {
+        newDate = nextDay(date) + ' ' + time;
+    } else {
+        newDate = date + ' ' + time;
+    }
+    return newDate;
+}
 
 function getWakeTime(logData, date) {
     var wakeTime = null;
@@ -162,6 +170,27 @@ function getSimpleTags(data) {
     return tags.filter(onlyUnique);
 }
 
+
+function getSigns(data) {
+    var result = data.match(/`.*?`/g);
+    var signs = [];
+    if (!result) {
+        return signs;
+    } else {
+        result.forEach(function(signStr) {
+            var signArr;
+            signStr = signStr.trim().replace(/`/g, '');
+            if (signStr) {
+                signArr = signStr.split(',').map(function(val) {
+                    return val.trim();
+                });
+            }
+            signs = signs.concat(signArr);
+        });
+    }
+    return signs;
+}
+
 function getTimeSpanFromLog(log, date) {
     var timeSpan = null,
         plusOneDay = false;
@@ -215,6 +244,7 @@ function getLogInfo(log, date, index) {
     var logInfo = {
         classes: getSimpleClasses(log),
         tags: getSimpleTags(log),
+        sign: getSigns(log),
         index: index
     };
     var timeSpan = getTimeSpanFromLog(log, date);
@@ -323,3 +353,4 @@ exports.getLogs = getLogs;
 exports.getWakeTime = getWakeTime;
 exports.groupTimeByTag = groupTimeByTag;
 exports.groupTimeByClass = groupTimeByClass;
+exports.getSigns = getSigns;

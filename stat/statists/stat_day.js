@@ -59,6 +59,8 @@ function calculate(fileData) {
             wakeTime = log.time;
         } else if (log.sleep){
             sleepTime = log.time;
+        } else if (log.offDuty) {
+            fileData.offDutyTime = log.time;
         }
         if (log.len !== undefined) {
             totalMins += log.len;
@@ -115,8 +117,11 @@ function output(fileData, showOriginLogs) {
         tagNum: tags.length,
         logNum: logs.length
     }));
-    msg.log('Wake Time: ' + wakeTime);
-    msg.log('Sleep Time: ' + sleepTime);
+    msg.log('起床时间: ' + wakeTime);
+    if (fileData.offDutyTime) {
+        msg.log('下班时间: ' + fileData.offDutyTime);
+    }
+    msg.log('睡觉时间: ' + sleepTime);
 
     var allActiveHours;
     if (allActiveTime > 0) {
