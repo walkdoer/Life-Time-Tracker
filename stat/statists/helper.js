@@ -194,9 +194,9 @@ function getSigns(data) {
 function getTimeSpanFromLog(log, date) {
     var timeSpan = null,
         plusOneDay = false;
-    var timeSpanRex = /\d{1,2}\s*:\s*\d{1,2}\s*([~-]\s*\d{1,2}\s*:\s*\d{1,2})*/ig;
+    var timeSpanRex = /\d{1,2}\s*:\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*:\s*\d{1,2})*/ig;
     var result = log.match(timeSpanRex);
-    if (result && result.length) {
+    if (result && result.length === 1) {
         timeSpan = {};
         var timeStr = result[0];
         var timeArr = timeStr.split(/[~-]/).map(function(val) {
@@ -230,6 +230,9 @@ function getTimeSpanFromLog(log, date) {
             }
             timeSpan.len = endTime.diff(startTime, 'minutes');
         }
+    } else {
+        console.log(result);
+        msg.warn('make sure the date is right of this log: ' + log);
     }
     return timeSpan;
 }
