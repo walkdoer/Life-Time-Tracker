@@ -1,6 +1,7 @@
 'use strict';
 
 var util = require('../util');
+var when = require('when');
 var msg = require('../message');
 var helper = require('./helper');
 var display = require('../dislpay_data');
@@ -20,12 +21,26 @@ exports.stat = function(dateArr, showOriginLogs) {
         .catch (handleError);
 };
 
-/**
- * preprocess the file data,extract tags and classes
- *
- * @param fileData
- * @return
- */
+exports.calculate = function (dateArr) {
+    var deferred = when.defer();
+    var year = parseInt(dateArr[0]);
+    var month = parseInt(dateArr[1]);
+    var day = parseInt(dateArr[2]);
+    if (!util.isDayValid(year, month, day)) {
+        throw new Error('day ' + day + ' is out of the day range of month ' + month);
+    }
+    util.readLogFiles(dateArr.join('-'))
+        .then(function (fileData) {
+            var result = calculate(fileData);
+            deferred.resolve(result);
+        })
+        .catch (function () {
+            deferred.reject();
+        });
+
+    return deferred.promise;
+};
+
 function calculate(fileData) {
     var date = fileData.date,
         totalMins = 0,
