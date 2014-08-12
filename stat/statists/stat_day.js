@@ -13,14 +13,71 @@ exports.stat = function(dateArr, showOriginLogs) {
         throw new Error('day ' + day + ' is out of the day range of month ' + month);
     }
     util.readLogFiles(dateArr.join('-'))
-        .then(preprocessData)
-        .then(analyse)
-        .then(calculateSleepLength)
+        .then(calculate)
         .then(function (fileData) {
+            var tags = fileData.tags,
+                logs = fileData.logs,
+                date = fileData.date,
+                allActiveTime = fileData.allActiveTime,
+                classes = fileData.classes;
+            //calculate total time
+            var totalMins = fileData.totalMins,
+                totalHours = totalMins / 60,
+                wakeTime = fileData.wakeTime,
+                sleepTime = fileData.sleepTime;
+            //out put the basic info of the log
+            msg.info(generateBasicInfo({
+                date: date,
+                tagNum: tags.length,
+                logNum: logs.length
+            }));
+            msg.log('Wake Time: ' + wakeTime);
+            msg.log('Sleep Time: ' + sleepTime);
+
+            var allActiveHours;
+            if (allActiveTime > 0) {
+                allActiveHours = allActiveTime / 60;
+                msg.log('All active time: ' + allActiveTime.toString().cyan + ' mins;' + allActiveHours.toFixed(2).cyan + ' h');
+                msg.log('Untracked time: ' + (allActiveTime - totalMins + '').cyan + ' mins');
+            }
+            msg.log('Total time: ' + totalMins.toString().cyan + ' mins; ' + totalHours.toFixed(2).cyan + ' h');
+
+
+            var sleepLength = fileData.sleepLength;
+            if (sleepLength > 0) {
+                var hours = sleepLength / 60,
+                    warnMsg = '';
+                if (hours < 7) {
+                    warnMsg = 'WARN sleepTime is not enough'.yellow;
+                }
+                console.log('Sleep length: ' + hours.toFixed(2).cyan + 'h ' + warnMsg);
+            }
+
             if (showOriginLogs) {
                 console.log('========== Origin Logs ============'.white);
                 console.log(fileData.data);
             }
+            //output the tags which has been sorted by frequence
+            msg.log('Tags: '.bold + tags.map(readNameAndFrequence).join(', ').italic.blue);
+            //output the classes which has been sorted by frequence
+            msg.log('Classes: '.bold + classes.map(readNameAndFrequence).join(', ').magenta);
+
+            /**
+             * read the class or tagName and it's frequence
+             * @return
+             */
+            function readNameAndFrequence(obj) {
+                return obj.name + '(' + obj.frequence + ')';
+            }
+            //output every classes time consume
+            msg.log('========== Group By Classes =========='.white);
+            var classesTime = helper.groupTimeByClass(logs, fileData.classes);
+            display.bar(classesTime);
+
+            msg.log('========== Group By Tags =========='.white);
+            var tagTime = helper.groupTimeByTag(logs);
+            display.bar(tagTime);
+
             return fileData;
         })
         .catch (handleError);
@@ -32,7 +89,7 @@ exports.stat = function(dateArr, showOriginLogs) {
  * @param fileData
  * @return
  */
-function preprocessData(fileData) {
+function calculate(fileData) {
     var date = fileData.date,
         totalMins = 0,
         logs,
@@ -48,10 +105,8 @@ function preprocessData(fileData) {
     logs.forEach(function(log) {
         if (log.wake) {
             wakeTime = log.time;
-            msg.log('Wake Time: ' + wakeTime);
         } else if (log.sleep){
             sleepTime = log.time;
-            msg.log('Sleep Time: ' + sleepTime);
         }
         if (log.len !== undefined) {
             totalMins += log.len;
@@ -61,80 +116,29 @@ function preprocessData(fileData) {
     fileData.totalMins = totalMins;
     fileData.wakeTime = wakeTime;
     fileData.sleepTime = sleepTime;
-    return fileData;
-}
-
-
-function analyse(fileData) {
-    var tags = fileData.tags,
-        classes = fileData.classes,
-        logs = fileData.logs;
-    var date = fileData.date;
-    //out put the basic info of the log
-    msg.info(generateBasicInfo({
-        date: date,
-        tagNum: tags.length,
-        logNum: logs.length
-    }));
-    //output the tags which has been sorted by frequence
-    msg.log('Tags: '.bold + tags.map(readNameAndFrequence).join(', ').italic.blue);
-    //output the classes which has been sorted by frequence
-    msg.log('Classes: '.bold + classes.map(readNameAndFrequence).join(', ').magenta);
-
-    /**
-     * read the class or tagName and it's frequence
-     * @return
-     */
-    function readNameAndFrequence(obj) {
-        return obj.name + '(' + obj.frequence + ')';
-    }
-
-
-    //calculate total time
-    var totalMins = fileData.totalMins,
-        totalHours = totalMins / 60,
-        wakeTime = fileData.wakeTime,
-        sleepTime = fileData.sleepTime;
-    var allActiveTime = helper.timeSpan(wakeTime, sleepTime),
-        allActiveHours;
-    if (allActiveTime > 0) {
-        allActiveHours = allActiveTime / 60;
-        msg.log('All active time: ' + allActiveTime.toString().cyan + ' mins;' + allActiveHours.toFixed(2).cyan + ' h');
-        msg.log('Untracked time: ' + (allActiveTime - totalMins + '').cyan + ' mins');
-    }
-    msg.log('Total time: ' + totalMins.toString().cyan + ' mins; ' + totalHours.toFixed(2).cyan + ' h');
-
-
-    //output every classes time consume
-    msg.log('========== Group By Classes =========='.white);
-    var classesTime = helper.groupTimeByClass(logs, fileData.classes);
-    display.bar(classesTime);
-
-    msg.log('========== Group By Tags =========='.white);
-    var tagTime = helper.groupTimeByTag(logs);
-    display.bar(tagTime);
+    fileData.allActiveTime = helper.timeSpan(wakeTime, sleepTime);
+    fileData.sleepLength = calculateSleepLength(fileData);
     return fileData;
 }
 
 
 function calculateSleepLength (data) {
-    var nextDay = helper.nextDay(data.date);
-    util.readLogFiles(nextDay)
-        .then(function (file) {
-            var wokeTime = helper.getWakeTime(file.data, nextDay);
-            var sleepTime = data.sleepTime;
-            var timeSpan = helper.timeSpan(sleepTime, wokeTime);
-            var hours = timeSpan / 60,
-                msg = '';
-            if (hours < 7) {
-                msg = 'WARN sleepTime is not enough'.yellow;
-            }
-            console.log('Sleep length: ' + hours.toFixed(2).cyan + 'h ' + msg);
-        })
-        .catch(function () {
-            msg.error('Not enough data to calculate sleep length.');
-        });
-    return data;
+    var nextDay = helper.nextDay(data.date),
+        timeSpan = -1,
+        file;
+    try {
+        file = util.readLogFilesSync(nextDay);
+        var wokeTime = helper.getWakeTime(file.data, nextDay);
+        var sleepTime = data.sleepTime;
+        timeSpan = helper.timeSpan(sleepTime, wokeTime);
+    } catch (e) {
+        if (e.code === 'ENOENT') {
+            msg.warn('do not have enough data to calculate sleep lenth');
+        } else {
+            msg.error('error occur when calculate sleep time');
+        }
+    }
+    return timeSpan;
 }
 
 function generateBasicInfo(data) {

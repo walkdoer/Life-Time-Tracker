@@ -32,6 +32,19 @@ function readLogFiles(date) {
     return deferred.promise;
 }
 
+
+function readLogFilesSync(date) {
+
+    var dateArr = date.split('-');
+    var fileName = dateArr.join('/') + '.md';
+    var filePath = [DATA_FILE_PRIFIX, fileName].join('/');
+    var fileData = fs.readFileSync(filePath, 'utf8');
+    return {
+        data: fileData,
+        date: dateArr.join('-')
+    };
+}
+
 function getDayNumInMonth (year, month) {
     return new Date(year, month, 0).getDate();
 }
@@ -45,6 +58,7 @@ function isDayValid(y, m, d) {
 module.exports = {
     isValidDate: isValidDate,
     readLogFiles: readLogFiles,
+    readLogFilesSync: readLogFilesSync,
     getDayNumInMonth: getDayNumInMonth,
     isDayValid: isDayValid
 };

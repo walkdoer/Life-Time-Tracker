@@ -3,16 +3,17 @@
 var util = require('../util');
 var msg = require('../message');
 var helper = require('./helper');
+var statDay = require('./stat_day');
+
 exports.stat = function (dateArr) {
     var year = parseInt(dateArr[0]);
     var month = parseInt(dateArr[1]);
     //the day number of one month
     var dayNum = getDayNumInMonth(year, month);
     var day = 1;
+    
     while (day <= dayNum) {
-        util.readLogFiles(year, month, day)
-            .then(analyse)
-            .catch(handleError);
+        statDay.stat(year, month, day)
         day++;
     }
 };
