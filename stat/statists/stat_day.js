@@ -14,71 +14,8 @@ exports.stat = function(dateArr, showOriginLogs) {
     }
     util.readLogFiles(dateArr.join('-'))
         .then(calculate)
-        .then(function (fileData) {
-            var tags = fileData.tags,
-                logs = fileData.logs,
-                date = fileData.date,
-                allActiveTime = fileData.allActiveTime,
-                classes = fileData.classes;
-            //calculate total time
-            var totalMins = fileData.totalMins,
-                totalHours = totalMins / 60,
-                wakeTime = fileData.wakeTime,
-                sleepTime = fileData.sleepTime;
-            //out put the basic info of the log
-            msg.info(generateBasicInfo({
-                date: date,
-                tagNum: tags.length,
-                logNum: logs.length
-            }));
-            msg.log('Wake Time: ' + wakeTime);
-            msg.log('Sleep Time: ' + sleepTime);
-
-            var allActiveHours;
-            if (allActiveTime > 0) {
-                allActiveHours = allActiveTime / 60;
-                msg.log('All active time: ' + allActiveTime.toString().cyan + ' mins;' + allActiveHours.toFixed(2).cyan + ' h');
-                msg.log('Untracked time: ' + (allActiveTime - totalMins + '').cyan + ' mins');
-            }
-            msg.log('Total time: ' + totalMins.toString().cyan + ' mins; ' + totalHours.toFixed(2).cyan + ' h');
-
-
-            var sleepLength = fileData.sleepLength;
-            if (sleepLength > 0) {
-                var hours = sleepLength / 60,
-                    warnMsg = '';
-                if (hours < 7) {
-                    warnMsg = 'WARN sleepTime is not enough'.yellow;
-                }
-                console.log('Sleep length: ' + hours.toFixed(2).cyan + 'h ' + warnMsg);
-            }
-
-            if (showOriginLogs) {
-                console.log('========== Origin Logs ============'.white);
-                console.log(fileData.data);
-            }
-            //output the tags which has been sorted by frequence
-            msg.log('Tags: '.bold + tags.map(readNameAndFrequence).join(', ').italic.blue);
-            //output the classes which has been sorted by frequence
-            msg.log('Classes: '.bold + classes.map(readNameAndFrequence).join(', ').magenta);
-
-            /**
-             * read the class or tagName and it's frequence
-             * @return
-             */
-            function readNameAndFrequence(obj) {
-                return obj.name + '(' + obj.frequence + ')';
-            }
-            //output every classes time consume
-            msg.log('========== Group By Classes =========='.white);
-            var classesTime = helper.groupTimeByClass(logs, fileData.classes);
-            display.bar(classesTime);
-
-            msg.log('========== Group By Tags =========='.white);
-            var tagTime = helper.groupTimeByTag(logs);
-            display.bar(tagTime);
-
-            return fileData;
+        .then(function (file) {
+            output(file, showOriginLogs);
         })
         .catch (handleError);
 };
@@ -145,6 +82,74 @@ function generateBasicInfo(data) {
     return data.date + ' have ' + data.logNum + ' logs and ' + data.tagNum + ' tags;';
 }
 
+function output(fileData, showOriginLogs) {
+
+    var tags = fileData.tags,
+        logs = fileData.logs,
+        date = fileData.date,
+        allActiveTime = fileData.allActiveTime,
+        classes = fileData.classes;
+    //calculate total time
+    var totalMins = fileData.totalMins,
+        totalHours = totalMins / 60,
+        wakeTime = fileData.wakeTime,
+        sleepTime = fileData.sleepTime;
+    //out put the basic info of the log
+    msg.info(generateBasicInfo({
+        date: date,
+        tagNum: tags.length,
+        logNum: logs.length
+    }));
+    msg.log('Wake Time: ' + wakeTime);
+    msg.log('Sleep Time: ' + sleepTime);
+
+    var allActiveHours;
+    if (allActiveTime > 0) {
+        allActiveHours = allActiveTime / 60;
+        msg.log('All active time: ' + allActiveTime.toString().cyan + ' mins;' + allActiveHours.toFixed(2).cyan + ' h');
+        msg.log('Untracked time: ' + (allActiveTime - totalMins + '').cyan + ' mins');
+    }
+    msg.log('Total time: ' + totalMins.toString().cyan + ' mins; ' + totalHours.toFixed(2).cyan + ' h');
+
+
+    var sleepLength = fileData.sleepLength;
+    if (sleepLength > 0) {
+        var hours = sleepLength / 60,
+            warnMsg = '';
+        if (hours < 7) {
+            warnMsg = 'WARN sleepTime is not enough'.yellow;
+        }
+        console.log('Sleep length: ' + hours.toFixed(2).cyan + 'h ' + warnMsg);
+    }
+
+    //output the tags which has been sorted by frequence
+    msg.log('Tags: '.bold + tags.map(readNameAndFrequence).join(', ').italic.blue);
+    //output the classes which has been sorted by frequence
+    msg.log('Classes: '.bold + classes.map(readNameAndFrequence).join(', ').magenta);
+
+    /**
+     * read the class or tagName and it's frequence
+     * @return
+     */
+    function readNameAndFrequence(obj) {
+        return obj.name + '(' + obj.frequence + ')';
+    }
+    //output every classes time consume
+    msg.log('========== Group By Classes =========='.white);
+    var classesTime = helper.groupTimeByClass(logs, fileData.classes);
+    display.bar(classesTime);
+
+    msg.log('========== Group By Tags =========='.white);
+    var tagTime = helper.groupTimeByTag(logs);
+    display.bar(tagTime);
+
+    if (showOriginLogs) {
+        console.log('========== Origin Logs ============'.white);
+        console.log(fileData.data);
+    }
+    return fileData;
+}
+
 function handleError(err) {
     if (err.code === 'ENOENT') {
         msg.error('can\' find log file ' + err.path +
@@ -154,4 +159,3 @@ function handleError(err) {
         throw err;
     }
 }
-
