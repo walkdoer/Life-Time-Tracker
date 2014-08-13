@@ -5,6 +5,7 @@ var when = require('when');
 var moment = require('moment');
 var helper = require('./helper');
 var statDay = require('./stat_day');
+var display = require('../dislpay_data');
 
 exports.stat = function (dateArr) {
     var year = parseInt(dateArr[0]);
@@ -48,8 +49,16 @@ function analyse(datas, year, month) {
         });
     }
 
+    //filter the datas only left the fulfilled;
+    var days = datas.filter(function (d) {
+        return d.state === 'fulfilled';
+    }).map(function (d) {
+        return d.value;
+    });
     return {
-        sleepTimeArr : sleepTimeArr
+        sleepTimeArr : sleepTimeArr,
+        classTime: groupTimeByClass(days),
+        tagTime: groupTimeByTag(days)
     };
 }
 
@@ -59,8 +68,8 @@ function analyse(datas, year, month) {
 
 function output(result) {
     outputSleepPeriod(result.sleepTimeArr);
-    outputTimeGroupByTag(result);
-    outputTimeGroupByClass(result);
+    outputTimeGroupByTag(result.tagTime);
+    outputTimeGroupByClass(result.classTime);
 }
 
 
@@ -89,11 +98,67 @@ function outputSleepPeriod(sleepTimeArr) {
     });
 }
 
-function outputTimeGroupByTag () {
+function outputTimeGroupByTag (datas) {
+    display.bar(datas);
 
 }
 
 
-function outputTimeGroupByClass() {
+function outputTimeGroupByClass(datas) {
+    display.bar(datas);
+}
 
+
+
+function groupTimeByTag(days) {
+    var result = [];
+    days.forEach(function (d) {
+        var tagTime = d.tagTime;
+        tagTime.forEach(function (t) {
+            var target = getTarget(t.label);
+
+            if (target) {
+                target.count += t.count;
+            } else {
+                result.push(t);
+            }
+        });
+    });
+
+    function getTarget(label) {
+        var target = result.filter(function (itm) {
+            return itm.label === label;
+        });
+
+        return target[0] || null;
+    }
+
+    return result;
+}
+
+
+function groupTimeByClass(days) {
+    var result = [];
+    days.forEach(function (d) {
+        var classTime = d.classTime;
+        classTime.forEach(function (t) {
+            var target = getTarget(t.label);
+
+            if (target) {
+                target.count += t.count;
+            } else {
+                result.push(t);
+            }
+        });
+    });
+
+    function getTarget(label) {
+        var target = result.filter(function (itm) {
+            return itm.label === label;
+        });
+
+        return target[0] || null;
+    }
+
+    return result;
 }
