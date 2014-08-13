@@ -45,8 +45,8 @@ function calculate(fileData) {
     var date = fileData.date,
         trackedTime = 0,
         logs,
-        wakeTime,
-        sleepTime;
+        wakeMoment,
+        sleepMoment;
     var logData = fileData.data;
     fileData.logs = logs = helper.getLogs(logData, date);
     fileData.classes = helper.getClasses(logData).sort(frequenceDesc);
@@ -56,9 +56,9 @@ function calculate(fileData) {
     }
     logs.forEach(function(log) {
         if (log.wake) {
-            wakeTime = log.time;
+            wakeMoment = log.time;
         } else if (log.sleep){
-            sleepTime = log.time;
+            sleepMoment = log.time;
         } else if (log.offDuty) {
             fileData.offDutyTime = log.time;
         }
@@ -68,10 +68,10 @@ function calculate(fileData) {
     });
     //all the tracked time from the log
     fileData.trackedTime = trackedTime;
-    fileData.wakeTime = wakeTime;
-    fileData.sleepTime = sleepTime;
-    fileData.activeTime = helper.timeSpan(wakeTime, sleepTime);
-    fileData.sleepLength = calculateSleepLength(fileData);
+    fileData.wakeMoment = wakeMoment;
+    fileData.sleepMoment = sleepMoment;
+    fileData.activeTime = helper.timeSpan(wakeMoment, sleepMoment);
+    fileData.sleepTime = calculateSleepLength(fileData);
     fileData.classTime = helper.groupTimeByClass(logs, fileData.classes);
     fileData.tagTime = helper.groupTimeByTag(logs);
     return fileData;
@@ -85,8 +85,8 @@ function calculateSleepLength (data) {
     try {
         file = util.readLogFilesSync(nextDay);
         var wokeTime = helper.getWakeTime(file.data, nextDay);
-        var sleepTime = data.sleepTime;
-        timeSpan = helper.timeSpan(sleepTime, wokeTime);
+        var sleepMoment = data.sleepMoment;
+        timeSpan = helper.timeSpan(sleepMoment, wokeTime);
     } catch (e) {
         if (e.code === 'ENOENT') {
             msg.warn('do not have enough data to calculate sleep lenth');
@@ -111,19 +111,19 @@ function output(fileData, showOriginLogs) {
     //calculate total time
     var trackedTime = fileData.trackedTime,
         totalHours = trackedTime / 60,
-        wakeTime = fileData.wakeTime,
-        sleepTime = fileData.sleepTime;
+        wakeMoment = fileData.wakeMoment,
+        sleepMoment = fileData.sleepMoment;
     //out put the basic info of the log
     msg.info(generateBasicInfo({
         date: date,
         tagNum: tags.length,
         logNum: logs.length
     }));
-    msg.log('起床时间: ' + wakeTime);
+    msg.log('起床时间: ' + wakeMoment);
     if (fileData.offDutyTime) {
         msg.log('下班时间: ' + fileData.offDutyTime);
     }
-    msg.log('睡觉时间: ' + sleepTime);
+    msg.log('睡觉时间: ' + sleepMoment);
 
     var allActiveHours;
     if (activeTime > 0) {
@@ -134,12 +134,12 @@ function output(fileData, showOriginLogs) {
     }
 
 
-    var sleepLength = fileData.sleepLength;
-    if (sleepLength > 0) {
-        var hours = sleepLength / 60,
+    var sleepTime = fileData.sleepTime;
+    if (sleepTime > 0) {
+        var hours = sleepTime / 60,
             warnMsg = '';
         if (hours < 7) {
-            warnMsg = 'WARN sleepTime is not enough'.yellow;
+            warnMsg = 'WARN sleepMoment is not enough'.yellow;
         }
         console.log('Sleep length: ' + hours.toFixed(2).cyan + 'h ' + warnMsg);
     }

@@ -31,7 +31,7 @@ function getDayNumInMonth (year, month) {
 
 
 function analyse(datas, year, month) {
-    var sleepTimeArr = [];
+    var sleepMomentArr = [];
     datas.forEach(function (d, index) {
         var day = index + 1,
             date = [year, month, day].join('-');
@@ -39,13 +39,13 @@ function analyse(datas, year, month) {
             msg.warn(date + ' calculate fail');
         } else if (d.state === 'fulfilled'){
             var dayData = d.value;
-            recordSleepTime(date, dayData.sleepTime);
+            recordSleepTime(date, dayData.sleepMoment);
         }
     });
-    function recordSleepTime(date, sleepTime) {
-        sleepTimeArr.push({
+    function recordSleepTime(date, sleepMoment) {
+        sleepMomentArr.push({
             date: date,
-            time: new moment(sleepTime)
+            time: new moment(sleepMoment)
         });
     }
 
@@ -56,7 +56,7 @@ function analyse(datas, year, month) {
         return d.value;
     });
     return {
-        sleepTimeArr : sleepTimeArr,
+        sleepMomentArr : sleepMomentArr,
         classTime: groupTimeByClass(days),
         tagTime: groupTimeByTag(days)
     };
@@ -67,16 +67,16 @@ function analyse(datas, year, month) {
 
 
 function output(result) {
-    outputSleepPeriod(result.sleepTimeArr);
+    outputSleepPeriod(result.sleepMomentArr);
     outputTimeGroupByTag(result.tagTime);
     outputTimeGroupByClass(result.classTime);
 }
 
 
-function outputSleepPeriod(sleepTimeArr) {
+function outputSleepPeriod(sleepMomentArr) {
 
     console.log("======== Sleep Period========");
-    sleepTimeArr.sort(function (a, b) {
+    sleepMomentArr.sort(function (a, b) {
         var aTime = a.time,
             bTime = b.time,
             aHour = aTime.hour(),
