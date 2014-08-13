@@ -58,7 +58,13 @@ function analyse(datas, year, month) {
 
 
 function output(result) {
-    var sleepTimeArr = result.sleepTimeArr;
+    outputSleepPeriod(result.sleepTimeArr);
+    outputTimeGroupByTag(result);
+    outputTimeGroupByClass(result);
+}
+
+
+function outputSleepPeriod(sleepTimeArr) {
 
     console.log("======== Sleep Period========");
     sleepTimeArr.sort(function (a, b) {
@@ -81,4 +87,13 @@ function output(result) {
         var str = d.date.split('-')[2] + '号睡觉时间：' + d.time.format('HH:mm').magenta;
         console.log(str);
     });
+}
+
+function outputTimeGroupByTag () {
+
+}
+
+
+function outputTimeGroupByClass() {
+
 }

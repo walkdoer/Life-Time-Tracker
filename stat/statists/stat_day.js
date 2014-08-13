@@ -43,7 +43,7 @@ exports.calculate = function (dateArr) {
 
 function calculate(fileData) {
     var date = fileData.date,
-        totalMins = 0,
+        trackedTime = 0,
         logs,
         wakeTime,
         sleepTime;
@@ -63,15 +63,17 @@ function calculate(fileData) {
             fileData.offDutyTime = log.time;
         }
         if (log.len !== undefined) {
-            totalMins += log.len;
+            trackedTime += log.len;
         }
     });
     //all the tracked time from the log
-    fileData.totalMins = totalMins;
+    fileData.trackedTime = trackedTime;
     fileData.wakeTime = wakeTime;
     fileData.sleepTime = sleepTime;
-    fileData.allActiveTime = helper.timeSpan(wakeTime, sleepTime);
+    fileData.activeTime = helper.timeSpan(wakeTime, sleepTime);
     fileData.sleepLength = calculateSleepLength(fileData);
+    fileData.classTime = helper.groupTimeByClass(logs, fileData.classes);
+    fileData.tagTime = helper.groupTimeByTag(logs);
     return fileData;
 }
 
@@ -104,11 +106,11 @@ function output(fileData, showOriginLogs) {
     var tags = fileData.tags,
         logs = fileData.logs,
         date = fileData.date,
-        allActiveTime = fileData.allActiveTime,
+        activeTime = fileData.activeTime,
         classes = fileData.classes;
     //calculate total time
-    var totalMins = fileData.totalMins,
-        totalHours = totalMins / 60,
+    var trackedTime = fileData.trackedTime,
+        totalHours = trackedTime / 60,
         wakeTime = fileData.wakeTime,
         sleepTime = fileData.sleepTime;
     //out put the basic info of the log
@@ -124,12 +126,12 @@ function output(fileData, showOriginLogs) {
     msg.log('睡觉时间: ' + sleepTime);
 
     var allActiveHours;
-    if (allActiveTime > 0) {
-        allActiveHours = allActiveTime / 60;
-        msg.log('All active time: ' + allActiveTime.toString().cyan + ' mins;' + allActiveHours.toFixed(2).cyan + ' h');
-        msg.log('Untracked time: ' + (allActiveTime - totalMins + '').cyan + ' mins');
+    if (activeTime > 0) {
+        allActiveHours = activeTime / 60;
+        msg.log('Active Time:' + activeTime.toString().cyan + ' mins;' + allActiveHours.toFixed(2).cyan + ' h');
+        msg.log('有记录时间: ' + trackedTime.toString().cyan + ' mins; ' + totalHours.toFixed(2).cyan + ' h');
+        msg.log('未记录时间: ' + (activeTime - trackedTime + '').cyan + ' mins');
     }
-    msg.log('Total time: ' + totalMins.toString().cyan + ' mins; ' + totalHours.toFixed(2).cyan + ' h');
 
 
     var sleepLength = fileData.sleepLength;
@@ -156,12 +158,10 @@ function output(fileData, showOriginLogs) {
     }
     //output every classes time consume
     msg.log('========== Group By Classes =========='.white);
-    var classesTime = helper.groupTimeByClass(logs, fileData.classes);
-    display.bar(classesTime);
+    display.bar(fileData.classTime);
 
     msg.log('========== Group By Tags =========='.white);
-    var tagTime = helper.groupTimeByTag(logs);
-    display.bar(tagTime);
+    display.bar(fileData.tagTime);
 
     if (showOriginLogs) {
         console.log('========== Origin Logs ============'.white);
