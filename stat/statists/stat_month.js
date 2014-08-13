@@ -31,7 +31,7 @@ function getDayNumInMonth (year, month) {
 
 
 function analyse(datas, year, month) {
-    var sleepMomentArr = [];
+    var sleepPeriodArr = [];
     datas.forEach(function (d, index) {
         var day = index + 1,
             date = [year, month, day].join('-');
@@ -39,13 +39,15 @@ function analyse(datas, year, month) {
             msg.warn(date + ' calculate fail');
         } else if (d.state === 'fulfilled'){
             var dayData = d.value;
-            recordSleepTime(date, dayData.sleepMoment);
+            recordSleepPeriod(dayData);
         }
     });
-    function recordSleepTime(date, sleepMoment) {
-        sleepMomentArr.push({
-            date: date,
-            time: new moment(sleepMoment)
+    function recordSleepPeriod(data) {
+        sleepPeriodArr.push({
+            date: data.date,
+            sleepMoment: new moment(data.sleepMoment),
+            wakeMoment: new moment(data.wakeMoment),
+            sleepTime: data.sleepTime
         });
     }
 
@@ -56,7 +58,7 @@ function analyse(datas, year, month) {
         return d.value;
     });
     return {
-        sleepMomentArr : sleepMomentArr,
+        sleepPeriodArr: sleepPeriodArr,
         classTime: groupTimeByClass(days),
         tagTime: groupTimeByTag(days)
     };
@@ -67,35 +69,58 @@ function analyse(datas, year, month) {
 
 
 function output(result) {
-    outputSleepPeriod(result.sleepMomentArr);
+    outputSleepPeriod(result.sleepPeriodArr);
     outputTimeGroupByTag(result.tagTime);
     outputTimeGroupByClass(result.classTime);
 }
 
 
-function outputSleepPeriod(sleepMomentArr) {
+function outputSleepPeriod(sleepPeriodArr) {
 
-    console.log("======== Sleep Period========");
-    sleepMomentArr.sort(function (a, b) {
-        var aTime = a.time,
-            bTime = b.time,
-            aHour = aTime.hour(),
-            aMins = aTime.minute(),
-            bHour = bTime.hour(),
-            bMins = bTime.minute();
-        aHour = aHour === 0 ? 24 : aHour;
-        bHour = bHour === 0 ? 24 : bHour;
-        var hourSpan = aHour-bHour,
-            minSpan = aMins - bMins;
-        if (hourSpan === 0) {
-            return minSpan;
-        } else {
-            return hourSpan;
-        }
-    }).forEach(function (d) {
-        var str = d.date.split('-')[2] + '号睡觉时间：' + d.time.format('HH:mm').magenta;
+    var dateFormat = 'HH:mm';
+    console.log("======== 睡眠周期 (起床) - (睡觉) = (睡眠时长) ========");
+    sleepPeriodArr.forEach(outputSleepMoment);
+
+    var lastSleep = sleepPeriodArr.sort(sortBy('sleepMoment', 'desc'))[0];
+    var firstWake = sleepPeriodArr.sort(sortBy('wakeMoment', 'asc'))[0];
+
+    console.log(('这个月' + lastSleep.date.split('-')[2] + '号最晚睡觉').blue);
+    console.log(('这个月' + firstWake.date.split('-')[2] + '号最早起').blue);
+
+    function sortBy(time, order) {
+        return function (a, b) {
+            var aTime = a[time],
+                bTime = b[time],
+                aHour = aTime.hour(),
+                aMins = aTime.minute(),
+                bHour = bTime.hour(),
+                bMins = bTime.minute();
+            aHour = aHour === 0 ? 24 : aHour;
+            bHour = bHour === 0 ? 24 : bHour;
+            var hourSpan, minSpan;
+
+            if (order === 'desc') {
+                hourSpan = bHour - aHour;
+                minSpan = bMins - aMins;
+            } else {
+                hourSpan = aHour-bHour;
+                minSpan = aMins - bMins;
+            }
+            if (hourSpan === 0) {
+                return minSpan;
+            } else {
+                return hourSpan;
+            }
+        };
+    }
+
+    function outputSleepMoment (d) {
+        var str = d.date.split('-')[2] + '号: ' +
+                d.wakeMoment.format(dateFormat).blue + ' - ' +
+                d.sleepMoment.format(dateFormat).magenta + ' = '+ 
+                ((d.sleepTime / 60).toFixed(2) + 'h').yellow;
         console.log(str);
-    });
+    }
 }
 
 function outputTimeGroupByTag (datas) {
