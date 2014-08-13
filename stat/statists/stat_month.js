@@ -32,6 +32,10 @@ function getDayNumInMonth (year, month) {
 
 function analyse(datas, year, month) {
     var sleepPeriodArr = [];
+
+    /**
+     * record sleep period
+     */
     datas.forEach(function (d, index) {
         var day = index + 1,
             date = [year, month, day].join('-');
@@ -42,6 +46,8 @@ function analyse(datas, year, month) {
             recordSleepPeriod(dayData);
         }
     });
+
+
     function recordSleepPeriod(data) {
         sleepPeriodArr.push({
             date: data.date,
@@ -57,21 +63,21 @@ function analyse(datas, year, month) {
     }).map(function (d) {
         return d.value;
     });
+
     return {
         sleepPeriodArr: sleepPeriodArr,
         classTime: groupTimeByClass(days),
-        tagTime: groupTimeByTag(days)
+        tagTime: groupTimeByTag(days),
+        sumTime: sumTime(days)
     };
 }
-
-
-
 
 
 function output(result) {
     outputSleepPeriod(result.sleepPeriodArr);
     outputTimeGroupByTag(result.tagTime);
     outputTimeGroupByClass(result.classTime);
+    outputSumTime(result.sumTime);
 }
 
 
@@ -134,6 +140,12 @@ function outputTimeGroupByClass(datas) {
 }
 
 
+function outputSumTime(sumtime) {
+
+    display.bar(sumtime);
+}
+
+
 
 function groupTimeByTag(days) {
     var result = [];
@@ -186,4 +198,19 @@ function groupTimeByClass(days) {
     }
 
     return result;
+}
+
+
+function sumTime(days) {
+    var sum = days.reduce(function (sum, d) {
+        sum.trackedTime += d.trackedTime;
+        sum.sleepTime += d.sleepTime;
+        sum.activeTime += d.activeTime;
+        return sum;
+    }, {
+        sleepTime: 0,
+        trackedTime: 0,
+        activeTime: 0
+    });
+    return sum;
 }

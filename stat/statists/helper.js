@@ -262,10 +262,7 @@ function getTimeSpan(start, end) {
         var startTime = new moment(start, dateFomate),
             endTime = new moment(end, dateFomate);
         diff = endTime.diff(startTime, 'minutes');
-    } else {
-        throw new Error('date arguments not fit, should have start and end');
     }
-
     return diff;
 }
 

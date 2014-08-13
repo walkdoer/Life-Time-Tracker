@@ -4,7 +4,17 @@ var MAX_BAR_LEN = 100;
 
 
 function displayBar(data, color) {
-    var total = 0;
+    var total = 0, dataNew = [];
+    if (Object.prototype.toString.call(data) === '[object Object]') {
+        var keys = Object.keys(data);
+        keys.forEach(function (key) {
+            dataNew.push({
+                label: key,
+                count: data[key]
+            });
+        });
+        data = dataNew;
+    }
     data.forEach(function (l) {
         total += l.count;
     });

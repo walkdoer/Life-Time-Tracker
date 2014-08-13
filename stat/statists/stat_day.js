@@ -103,6 +103,8 @@ function generateBasicInfo(data) {
 
 function output(fileData, showOriginLogs) {
 
+    var UNRECORDED = '未记录';
+
     var tags = fileData.tags,
         logs = fileData.logs,
         date = fileData.date,
@@ -123,7 +125,7 @@ function output(fileData, showOriginLogs) {
     if (fileData.offDutyTime) {
         msg.log('下班时间: ' + fileData.offDutyTime);
     }
-    msg.log('睡觉时间: ' + sleepMoment);
+    msg.log('睡觉时间: ' + (sleepMoment || UNRECORDED.red));
 
     var allActiveHours;
     if (activeTime > 0) {
