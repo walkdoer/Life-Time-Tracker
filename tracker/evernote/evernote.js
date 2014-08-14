@@ -40,7 +40,7 @@ noteStore.listNotebooks(function(err, notebooks) {
 });
 
 
-var logsPath = '../../logs/test/',
+var logsPath = '../../logs/',
     ext = 'md';
 function findEventLog(note) {
     var filter = new Evernote.NoteFilter(),
