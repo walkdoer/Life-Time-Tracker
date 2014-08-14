@@ -20,6 +20,9 @@ userStore.checkVersion(
     Evernote.EDAM_VERSION_MAJOR,
     Evernote.EDAM_VERSION_MINOR,
     function(err, versionOk) {
+        if (err) {
+            throw err;
+        }
         console.log("Is my Evernote API version up to date? " + versionOk);
         if (!versionOk) {
             process.exit(1);
