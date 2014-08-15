@@ -4,19 +4,27 @@ var util = require('../util');
 var when = require('when');
 var msg = require('../message');
 var helper = require('./helper');
-var display = require('../dislpay_data');
+var display = require('../dislpay_data'),
+    db = require('../model/db'),
+    mongoose = require('mongoose'),
+    DayStat =  require('../model/dayStat');
+
 
 exports.stat = function(dateArr, showOriginLogs) {
-    var year = parseInt(dateArr[0]);
-    var month = parseInt(dateArr[1]);
-    var day = parseInt(dateArr[2]);
+    dateArr = dateArr.map(function (val){
+        return parseInt(val, 10);
+    });
+    var year = dateArr[0];
+    var month = dateArr[1];
+    var day = dateArr[2];
     if (!util.isDayValid(year, month, day)) {
         throw new Error('day ' + day + ' is out of the day range of month ' + month);
     }
     util.readLogFiles(dateArr.join('-'))
         .then(calculate)
-        .then(function (file) {
-            output(file, showOriginLogs);
+        .then(function (statResult) {
+            persistent(statResult);
+            output(statResult, showOriginLogs);
         })
         .catch (handleError);
 };
@@ -170,6 +178,20 @@ function output(fileData, showOriginLogs) {
         console.log(fileData.data);
     }
     return fileData;
+}
+
+
+function persistent(result) {
+    result.id = result.date;
+    var dayStat = new DayStat(result);
+    dayStat.save(function (err) {
+        if (err) {
+            msg.error('save to database failed');
+            throw err;
+        }
+        msg.info('save to database success');
+        mongoose.disconnect();
+    });
 }
 
 function handleError(err) {

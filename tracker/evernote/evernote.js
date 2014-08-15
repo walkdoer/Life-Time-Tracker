@@ -65,10 +65,12 @@ function findEventLog(note) {
                         throw err;
                     }
                     var noteTitle = note.title;
-                    console.log('同步' + noteTitle);
                     var content = stripENML(result.content);
-                    var dateArr = noteTitle.split('-');
+                    var dateArr = noteTitle.split('-').map(function (val) {
+                        return parseInt(val);
+                    });
                     var path = logsPath + dateArr.slice(0, 2).join('/');
+                    //mkdir is the directory is not exist;
                     mkdirp(path, function (err) {
                         if (err) {
                             throw err;
