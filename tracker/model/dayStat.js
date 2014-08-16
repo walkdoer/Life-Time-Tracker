@@ -3,13 +3,26 @@ var mongoose = require('mongoose'),
 
 var dayStatSchema = Schema({
     id: String,
-    wakeTime: Date,
-    sleepTime: Date,
-    sleepLength: Number,
+    //起床时刻
+    wakeMoment: Date,
+    //睡觉时刻
+    sleepMoment: Date,
+    //睡觉长度
+    sleepTime: Number,
+    //有记录的时间
     trackedTime: Number,
-    activedTime: Number,
+    //活动时间 = sleepMoment - wakeMoment;
+    activeTime: Number,
+    //时间类别
     classes: Array,
-    tags: Array
+    //标签
+    tags: Array,
+    //时间按标签归类
+    tagTime: Array,
+    //时间按类别分类
+    classTime: Array,
+    //日志
+    logs: Array
 });
 
 module.exports = mongoose.model('DayStat', dayStatSchema);

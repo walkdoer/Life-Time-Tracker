@@ -4,13 +4,34 @@
 
 'use strict';
 var mongoose = require('mongoose'),
+    when = require('when'),
     msg = require('../message');
+var conn = null;
 
-//connect to lifeTimeTracker database
-mongoose.connect('mongodb://localhost/lifeTimeTracker');
-var db = mongoose.connection;
+module.exports = {
+    connect: function () {
+        var deferred = when.defer();
+        //connect to lifeTimeTracker database
+        mongoose.connect('mongodb://localhost/lifeTimeTracker');
+        conn = mongoose.connection;
 
-db.on('error', msg.error.bind(msg, 'Database connect error.'));
-db.once('open', msg.info.bind(msg, 'Database connected.'));
+        conn.on('error', function (err) {
+            msg.error('Database connect error.');
+            deferred.reject(err);
+        });
+        conn.once('open', function () {
+            msg.info('Database connect success.');
+            deferred.resolve();
+        });
+        return deferred.promise;
+    },
 
-module.exports = db;
+
+    disconnect: function () {
+        mongoose.disconnect();
+    },
+
+    conn: function () {
+        return conn;
+    }
+};

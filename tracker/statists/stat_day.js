@@ -3,15 +3,35 @@
 var util = require('../util');
 var when = require('when');
 var msg = require('../message');
+var db = require('../model/db');
 var helper = require('./helper');
 var display = require('../dislpay_data'),
-    db = require('../model/db'),
-    mongoose = require('mongoose'),
-    DayStat =  require('../model/dayStat');
+    DayStat = require('../model/dayStat');
 
 
-exports.stat = function(dateArr, showOriginLogs) {
-    dateArr = dateArr.map(function (val){
+exports.dispose = function (config) {
+
+    /**
+     * 先从数据库读取数据，如果没有，再执行日志统计
+     */
+    var condition = { id: config.dateStr };
+    DayStat.find(condition, function (err, result) {
+        if (err) {
+            throw err;
+        }
+
+        if (result.length) {
+            var statResult = result[0].toJSON();
+            output(statResult);
+            db.disconnect();
+        } else {
+            stat(config);
+        }
+    });
+};
+
+function stat(config) {
+    var dateArr = config.dateStr.split('-').map(function (val){
         return parseInt(val, 10);
     });
     var year = dateArr[0];
@@ -20,14 +40,17 @@ exports.stat = function(dateArr, showOriginLogs) {
     if (!util.isDayValid(year, month, day)) {
         throw new Error('day ' + day + ' is out of the day range of month ' + month);
     }
-    util.readLogFiles(dateArr.join('-'))
+    util.readLogFiles(config.dateStr)
         .then(calculate)
         .then(function (statResult) {
             persistent(statResult);
-            output(statResult, showOriginLogs);
+            output(statResult, config.showOriginLogs);
         })
         .catch (handleError);
-};
+}
+
+exports.stat = stat;
+
 
 exports.calculate = function (dateArr) {
     var deferred = when.defer();
@@ -151,7 +174,7 @@ function output(fileData, showOriginLogs) {
         if (hours < 7) {
             warnMsg = 'WARN sleepMoment is not enough'.yellow;
         }
-        console.log('Sleep length: ' + hours.toFixed(2).cyan + 'h ' + warnMsg);
+        console.log('睡眠长度: ' + hours.toFixed(2).cyan + 'h ' + warnMsg);
     }
 
     //output the tags which has been sorted by frequence
@@ -181,16 +204,27 @@ function output(fileData, showOriginLogs) {
 }
 
 
-function persistent(result) {
-    result.id = result.date;
-    var dayStat = new DayStat(result);
-    dayStat.save(function (err) {
-        if (err) {
-            msg.error('save to database failed');
-            throw err;
+function persistent(statResult) {
+    statResult.id = statResult.date;
+    //检查数据库是否已存在改天的记录
+    DayStat.find({
+        id: statResult.id
+    }, function (err, result) {
+        if (result.length === 0) {
+            var dayStat = new DayStat(statResult);
+            dayStat.save(function (err, obj) {
+                if (err) {
+                    msg.error('save to database failed');
+                    throw err;
+                }
+                msg.info('save to database success');
+                console.log(obj);
+                db.disconnect();
+            });
+        } else {
+            msg.warn('record already in database, if need update --update');
+            db.disconnect();
         }
-        msg.info('save to database success');
-        mongoose.disconnect();
     });
 }
 
