@@ -9,5 +9,5 @@ module.exports = {
     //健身日志
     Fitness: 1,
     //读书日志
-    Read: 2
+    ReadBook: 2
 };

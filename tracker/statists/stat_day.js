@@ -6,6 +6,8 @@ var msg = require('../message');
 var db = require('../model/db');
 var helper = require('./helper');
 var display = require('../dislpay_data'),
+    Log = require('../model/log'),
+    logType = require('../enum/logType'),
     DayStat = require('../model/dayStat');
 
 
@@ -206,25 +208,43 @@ function output(fileData, showOriginLogs) {
 
 
 function persistent(statResult) {
-    statResult.id = statResult.date;
+    var date = statResult.date;
+    statResult.id = date;
     //检查数据库是否已存在改天的记录
     DayStat.find({
         id: statResult.id
     }, function (err, result) {
         if (result.length === 0) {
             var dayStat = new DayStat(statResult);
-            dayStat.save(function (err, obj) {
+            dayStat.save(function (err) {
                 if (err) {
                     msg.error('save to database failed');
                     throw err;
                 }
                 msg.info('save to database success');
-                db.disconnect();
             });
         } else {
             msg.warn('record already in database, if need update --update');
             db.disconnect();
         }
+    });
+    var logs = statResult.logs;
+
+    logs.forEach(function(log) {
+        log.date = date;
+        var classes = log.classes,
+            tags = log.tags;
+        if (classes && classes.indexOf('RB') >= 0) {
+            log.type = logType.ReadBook;
+        } else if (tags && tags.indexOf('健身') >= 0){
+            log.type = logType.Fitness;
+        } else {
+            log.type = logType.Normal;
+        }
+        // Todo
+        log.note = '';
+        log.projects = [];
+        new Log(log).save();
     });
 }
 

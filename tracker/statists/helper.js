@@ -17,17 +17,20 @@ function getLogs(data, date) {
         if (logInfo) {
             if (isGetUpLog(logInfo)) {
                 logInfo.wake = true;
-                logInfo.time = date + ' ' + logInfo.start;
+                logInfo.end = logInfo.start;
+                logInfo.time = logInfo.start;
             } else if (isSleepTime(logInfo, lastIndex)){
                 logInfo.sleep = true;
+                logInfo.end = logInfo.start;
                 //需要校准，有可能凌晨之后睡觉
-                logInfo.time = alignTime(date, logInfo.start);
+                logInfo.time = logInfo.start;
             } else if (logInfo.sign.indexOf('off') >= 0) {
                 logInfo.offDuty = true;
+                logInfo.end = logInfo.start;
                 //需要校准，是有可能存在加班到凌晨之后
-                logInfo.time = alignTime(date, logInfo.start);
+                logInfo.time = logInfo.start;
             }
-            if (logInfo.len === undefined) {
+            if (logInfo.len === undefined || logInfo.len < 0) {
                 logInfo.len = 0;
             }
             logs.push(logInfo);
@@ -195,6 +198,7 @@ function getTimeSpanFromLog(log, date) {
     var timeSpan = null,
         plusOneDay = false;
     var timeSpanRex = /\d{1,2}\s*:\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*:\s*\d{1,2})*/ig;
+    var dateFormat = 'YYYY-MM-DD HH:mm';
     var result = log.match(timeSpanRex);
     if (result && result.length === 1) {
         timeSpan = {};
@@ -202,15 +206,17 @@ function getTimeSpanFromLog(log, date) {
         var timeArr = timeStr.split(/[~-]/).map(function(val) {
             return val.trim();
         });
-        var startHour, endHour, start, end;
+        var startTime, endTime,
+            startHour, endHour, start, end;
         start = timeArr[0];
         if (start) {
-            timeSpan.start = start;
+            var algTime = alignTime(date, start);
+            startTime = new moment(algTime, dateFormat);
             startHour = parseInt(start.split(':')[0], 10);
+            timeSpan.start = startTime.format(dateFormat);
         }
         end = timeArr[1];
         if (end) {
-            timeSpan.end = end;
             endHour = parseInt(end.split(':')[0], 10);
         }
         //endHour should greater than startHour, except 23: 47 ~ 00:00
@@ -221,13 +227,14 @@ function getTimeSpanFromLog(log, date) {
                 plusOneDay = true;
             }
         }
-        if (end && start) {
-            var dateFomate = 'YYYY-MM-DD HH:mm';
-            var startTime = new moment(date + ' ' + start, dateFomate),
-                endTime = new moment(date + ' ' + end, dateFomate);
+        if (end) {
+            endTime = new moment(date + ' ' + end, dateFormat);
             if (plusOneDay) {
                 endTime.add(1, 'd');
             }
+            timeSpan.end = endTime.format(dateFormat);
+        }
+        if (end && start) {
             timeSpan.len = endTime.diff(startTime, 'minutes');
         }
     } else {

@@ -20,9 +20,7 @@ var dayStatSchema = Schema({
     //时间按标签归类
     tagTime: Array,
     //时间按类别分类
-    classTime: Array,
-    //日志
-    logs: Array
+    classTime: Array
 });
 
 module.exports = mongoose.model('DayStat', dayStatSchema);

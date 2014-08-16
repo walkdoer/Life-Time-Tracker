@@ -18,6 +18,7 @@ module.exports = {
         conn.on('error', function (err) {
             msg.error('Database connect error.');
             deferred.reject(err);
+            throw err;
         });
         conn.once('open', function () {
             msg.info('Database connect success.');
