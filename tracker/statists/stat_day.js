@@ -22,6 +22,7 @@ exports.dispose = function (config) {
 
         if (result.length) {
             var statResult = result[0].toJSON();
+            statResult.date = statResult.id;
             output(statResult);
             db.disconnect();
         } else {
@@ -218,7 +219,6 @@ function persistent(statResult) {
                     throw err;
                 }
                 msg.info('save to database success');
-                console.log(obj);
                 db.disconnect();
             });
         } else {
