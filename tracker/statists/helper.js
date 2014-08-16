@@ -255,7 +255,8 @@ function getLogInfo(log, date, index) {
         classes: getSimpleClasses(log),
         tags: getSimpleTags(log),
         sign: getSigns(log),
-        index: index
+        index: index,
+        origin: log
     };
     var timeSpan = getTimeSpanFromLog(log, date);
     return extend(logInfo, timeSpan);
@@ -361,3 +362,5 @@ exports.getWakeTime = getWakeTime;
 exports.groupTimeByTag = groupTimeByTag;
 exports.groupTimeByClass = groupTimeByClass;
 exports.getSigns = getSigns;
+exports.dateFormat = 'YYYY-MM-DD HH:mm';
+exports.timeFormat = 'HH:mm';

@@ -7,6 +7,7 @@ var db = require('../model/db');
 var helper = require('./helper');
 var display = require('../dislpay_data'),
     Log = require('../model/log'),
+    moment = require('moment'),
     logType = require('../enum/logType'),
     DayStat = require('../model/dayStat');
 
@@ -25,8 +26,14 @@ exports.dispose = function (config) {
         if (result.length) {
             var statResult = result[0].toJSON();
             statResult.date = statResult.id;
-            output(statResult);
-            db.disconnect();
+            Log.find({date: config.dateStr}, function (err, result) {
+                if (err) {
+                    throw err;
+                }
+                statResult.logs = result;
+                output(statResult);
+                db.disconnect();
+            });
         } else {
             stat(config);
         }
@@ -136,7 +143,6 @@ function generateBasicInfo(data) {
 }
 
 function output(fileData, showOriginLogs) {
-
     var UNRECORDED = '未记录';
 
     var tags = fileData.tags,
@@ -147,19 +153,19 @@ function output(fileData, showOriginLogs) {
     //calculate total time
     var trackedTime = fileData.trackedTime,
         totalHours = trackedTime / 60,
-        wakeMoment = fileData.wakeMoment,
-        sleepMoment = fileData.sleepMoment;
+        wakeMoment = new moment(fileData.wakeMoment),
+        sleepMoment = new moment(fileData.sleepMoment);
     //out put the basic info of the log
     msg.info(generateBasicInfo({
         date: date,
         tagNum: tags.length,
         logNum: logs.length
     }));
-    msg.log('起床时间: ' + wakeMoment);
+    msg.log('起床时间: ' + wakeMoment.format(helper.dateFormat));
     if (fileData.offDutyTime) {
         msg.log('下班时间: ' + fileData.offDutyTime);
     }
-    msg.log('睡觉时间: ' + (sleepMoment || UNRECORDED.red));
+    msg.log('睡觉时间: ' + (sleepMoment.format(helper.dateFormat) || UNRECORDED.red));
 
     var allActiveHours;
     if (activeTime > 0) {

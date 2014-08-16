@@ -20,7 +20,9 @@ var Log = Schema({
     //标签
     tags: Array,
     //项目 /book movie music program
-    projects: Array
+    projects: Array,
+    //原始日志
+    origin: String
 });
 
 module.exports = mongoose.model('Log', Log);
