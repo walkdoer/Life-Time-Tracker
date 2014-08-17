@@ -23,16 +23,23 @@ exports.dispose = function (config) {
         }
 
         if (result.length) {
-            var statResult = result[0].toJSON();
-            statResult.date = statResult.id;
-            Log.find({date: config.dateStr}, function (err, result) {
-                if (err) {
-                    throw err;
-                }
-                statResult.logs = result;
-                output(statResult);
-                db.disconnect();
-            });
+            if (config.updateDatabase) {
+                result.forEach(function (model) {
+                    model.remove();
+                });
+                stat(config);
+            } else {
+                var statResult = result[0].toJSON();
+                statResult.date = statResult.id;
+                Log.find({date: config.dateStr}, function (err, result) {
+                    if (err) {
+                        throw err;
+                    }
+                    statResult.logs = result;
+                    output(statResult);
+                    db.disconnect();
+                });
+            }
         } else {
             stat(config);
         }
