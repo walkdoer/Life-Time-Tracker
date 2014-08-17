@@ -248,7 +248,6 @@ function persistent(statResult) {
         }
         // Todo
         log.note = '';
-        log.projects = [];
         new Log(log).save();
     });
 }

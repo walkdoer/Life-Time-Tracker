@@ -254,6 +254,7 @@ function getLogInfo(log, date, index) {
     var logInfo = {
         classes: getSimpleClasses(log),
         tags: getSimpleTags(log),
+        projects: getSimpleProjects(log),
         sign: getSigns(log),
         index: index,
         origin: log
@@ -348,6 +349,41 @@ function groupTimeByClass(logs, classes) {
     });
     return classesTime;
 }
+
+function getProjects(log) {
+    return getItem(log, /<.*?>/g, /[<>]/g, function (str) {
+        return {
+            name: str
+        };
+    });
+}
+
+
+function getSimpleProjects(log) {
+    return getItem(log, /<.*?>/g, /[<>]/g);
+}
+
+
+function getItem(log, regexp, replace, process) {
+
+    var result = log.match(regexp);
+    if (!result) {
+        return [];
+    }
+    result = result.map(function(itemStr) {
+        var item;
+        itemStr = itemStr.trim().replace(replace, '').trim();
+        if (typeof process === 'function') {
+            item = process(itemStr);
+        } else {
+            item = itemStr;
+        }
+        return item;
+    });
+
+    return result;
+}
+
 exports.getClasses = getClasses;
 exports.getSimpleClasses = getSimpleClasses;
 exports.getTags = getTags;
@@ -362,3 +398,5 @@ exports.getWakeTime = getWakeTime;
 exports.groupTimeByTag = groupTimeByTag;
 exports.groupTimeByClass = groupTimeByClass;
 exports.getSigns = getSigns;
+exports.getProjects = getProjects;
+exports.getSimpleProjects = getSimpleProjects;
