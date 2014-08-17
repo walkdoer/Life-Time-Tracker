@@ -1,7 +1,8 @@
 'use strict';
 
-var fs = require('fs');
-var when = require('when');
+var fs = require('fs'),
+    moment = require('moment'),
+    when = require('when');
 
 //const
 var DATA_FILE_PRIFIX = '../logs';
@@ -57,10 +58,35 @@ function isDayValid(y, m, d) {
     var dayNum = getDayNumInMonth(y, m);
     return d <= dayNum && d > 0;
 }
+
+var dateFormat = 'YYYY-MM-DD HH:mm',
+    timeFormat = 'HH:mm';
+function formatDate (date) {
+    return format(date, dateFormat);
+}
+
+function format (date, formatStr) {
+    var m;
+    if (typeof date === 'string') {
+        m = new moment(date, dateFormat);
+    } else {
+        m = new moment(date);
+    }
+    return m.format(formatStr);
+}
+
+function formatTime (time) {
+    return format(time, timeFormat);
+}
+
 module.exports = {
     isValidDate: isValidDate,
     readLogFiles: readLogFiles,
     readLogFilesSync: readLogFilesSync,
     getDayNumInMonth: getDayNumInMonth,
-    isDayValid: isDayValid
+    isDayValid: isDayValid,
+    formatTime: formatTime,
+    formatDate: formatDate,
+    timeFormat: timeFormat,
+    dateFormat: dateFormat
 };

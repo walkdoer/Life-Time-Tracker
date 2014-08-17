@@ -7,7 +7,6 @@ var db = require('../model/db');
 var helper = require('./helper');
 var display = require('../dislpay_data'),
     Log = require('../model/log'),
-    moment = require('moment'),
     logType = require('../enum/logType'),
     DayStat = require('../model/dayStat');
 
@@ -101,7 +100,7 @@ function calculate(fileData) {
         } else if (log.sleep){
             sleepMoment = log.time;
         } else if (log.offDuty) {
-            fileData.offDutyTime = log.time;
+            fileData.offDutyMoment = log.time;
         }
         if (log.len !== undefined) {
             trackedTime += log.len;
@@ -153,19 +152,19 @@ function output(fileData, showOriginLogs) {
     //calculate total time
     var trackedTime = fileData.trackedTime,
         totalHours = trackedTime / 60,
-        wakeMoment = new moment(fileData.wakeMoment),
-        sleepMoment = new moment(fileData.sleepMoment);
+        wakeMoment = fileData.wakeMoment,
+        sleepMoment = fileData.sleepMoment;
     //out put the basic info of the log
     msg.info(generateBasicInfo({
         date: date,
         tagNum: tags.length,
         logNum: logs.length
     }));
-    msg.log('起床时间: ' + wakeMoment.format(helper.dateFormat));
-    if (fileData.offDutyTime) {
-        msg.log('下班时间: ' + fileData.offDutyTime);
+    msg.log('起床时间: ' + util.formatTime(wakeMoment));
+    if (fileData.offDutyMoment) {
+        msg.log('下班时间: ' + util.formatTime(fileData.offDutyMoment));
     }
-    msg.log('睡觉时间: ' + (sleepMoment.format(helper.dateFormat) || UNRECORDED.red));
+    msg.log('睡觉时间: ' + (util.formatTime(sleepMoment) || UNRECORDED.red));
 
     var allActiveHours;
     if (activeTime > 0) {

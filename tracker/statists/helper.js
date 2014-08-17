@@ -362,5 +362,3 @@ exports.getWakeTime = getWakeTime;
 exports.groupTimeByTag = groupTimeByTag;
 exports.groupTimeByClass = groupTimeByClass;
 exports.getSigns = getSigns;
-exports.dateFormat = 'YYYY-MM-DD HH:mm';
-exports.timeFormat = 'HH:mm';

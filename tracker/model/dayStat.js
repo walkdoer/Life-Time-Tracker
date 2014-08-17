@@ -7,6 +7,8 @@ var dayStatSchema = Schema({
     wakeMoment: Date,
     //睡觉时刻
     sleepMoment: Date,
+    //下班时间
+    offDutyMoment: Date,
     //睡觉长度
     sleepTime: Number,
     //有记录的时间
