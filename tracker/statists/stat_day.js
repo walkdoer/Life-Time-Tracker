@@ -91,6 +91,7 @@ function calculate(fileData) {
     fileData.logs = logs = helper.getLogs(logData, date);
     fileData.classes = helper.getClasses(logData).sort(frequenceDesc);
     fileData.tags = helper.getTags(logData).sort(frequenceDesc);
+    fileData.projects = helper.getProjects(logData);
     function frequenceDesc(a, b) {
         return b.frequence - a.frequence;
     }
@@ -114,6 +115,7 @@ function calculate(fileData) {
     fileData.sleepTime = calculateSleepLength(fileData);
     fileData.classTime = helper.groupTimeByClass(logs, fileData.classes);
     fileData.tagTime = helper.groupTimeByTag(logs);
+    fileData.projectTime = helper.groupTimeByProject(logs);
     return fileData;
 }
 
@@ -198,11 +200,14 @@ function output(fileData, showOriginLogs) {
         return obj.name + '(' + obj.frequence + ')';
     }
     //output every classes time consume
-    msg.log('========== Group By Classes =========='.white);
+    msg.log('========== Group By Classe =========='.white);
     display.bar(fileData.classTime);
 
-    msg.log('========== Group By Tags =========='.white);
+    msg.log('========== Group By Tag =========='.white);
     display.bar(fileData.tagTime);
+
+    msg.log('========== Group By Project =========='.white);
+    display.bar(fileData.projectTime);
 
     if (showOriginLogs) {
         console.log('========== Origin Logs ============'.white);

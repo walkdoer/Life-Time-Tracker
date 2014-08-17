@@ -345,41 +345,76 @@ function groupTimeByClass(logs, classes) {
             label: cls.name,
             count: consumeTime
         });
-        //msg.log(cls.name.bold + ': ' + (consumeTime / 60).toFixed(2).cyan + ' hours');
     });
     return classesTime;
 }
 
-function getProjects(log) {
-    return getItem(log, /<.*?>/g, /[<>]/g, function (str) {
-        return {
-            name: str
-        };
+
+function groupTimeByProject(logs) {
+    return groupTimeBy(logs, 'projects');
+}
+
+function groupTimeBy (logs, condition) {
+    var result = [];
+    logs.forEach(function (log) {
+        var items = log[condition];
+        if (items && items.length) {
+            items.forEach(function (item) {
+                var target = result.filter(function (resultItem) {
+                    return resultItem.label === item;
+                });
+                if (target && target.length) {
+                    target[0].count += log.len;
+                } else {
+                    result.push({
+                        label: item,
+                        count: log.len
+                    });
+                }
+            });
+        }
     });
+    return result;
+}
+
+
+function getProjects(log) {
+    return getItem(log, /<.*?>/g, /[<>]/g, Object);
 }
 
 
 function getSimpleProjects(log) {
-    return getItem(log, /<.*?>/g, /[<>]/g);
+    return getItem(log, /<.*?>/g, /[<>]/g, String);
 }
 
 
-function getItem(log, regexp, replace, process) {
+function getItem(data, regexp, replace, type){
 
-    var result = log.match(regexp);
+    var result = data.match(regexp);
     if (!result) {
         return [];
     }
     result = result.map(function(itemStr) {
-        var item;
-        itemStr = itemStr.trim().replace(replace, '').trim();
-        if (typeof process === 'function') {
-            item = process(itemStr);
-        } else {
-            item = itemStr;
-        }
-        return item;
+        return itemStr.trim().replace(replace, '').trim();
     });
+    if (type === Object) {
+        result = result.reduce(function(pv, cv) {
+            var target = pv.filter(function(val) {
+                return val.name === cv;
+            });
+            if (target && target.length > 0) {
+                target[0].frequence++;
+            } else {
+                pv.push({
+                    name: cv,
+                    frequence: 1
+                });
+            }
+            return pv;
+        }, []);
+    } else {
+        result = result.filter(onlyUnique);
+    }
 
     return result;
 }
@@ -397,6 +432,7 @@ exports.getLogs = getLogs;
 exports.getWakeTime = getWakeTime;
 exports.groupTimeByTag = groupTimeByTag;
 exports.groupTimeByClass = groupTimeByClass;
+exports.groupTimeByProject = groupTimeByProject;
 exports.getSigns = getSigns;
 exports.getProjects = getProjects;
 exports.getSimpleProjects = getSimpleProjects;
