@@ -39,10 +39,15 @@ db.connect()
 
 
 function dispatch(dateStr) {
-    var dateArr = dateStr.split('-');
+    var dateArr = dateStr.split('-').map(function (val){
+        return parseInt(val, 10);
+    });
     var type = [null, 'year', 'month', 'day'][dateArr.length];
     var statist = getStatist(type);
-    var disposeCfg = extend({}, userOptions, {dateStr: dateStr});
+    var disposeCfg = extend({}, userOptions, {
+        dateStr: dateStr,
+        dateArr: dateArr
+    });
     if (statist) {
         statist.dispose(disposeCfg);
     } else {

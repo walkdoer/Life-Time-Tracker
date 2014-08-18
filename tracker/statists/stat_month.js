@@ -3,17 +3,19 @@
 var msg = require('../message');
 var when = require('when');
 var moment = require('moment');
-var helper = require('./helper');
 var statDay = require('./stat_day');
 var display = require('../dislpay_data');
 
-exports.stat = function (dateArr) {
+exports.dispose = function (config) {
+    stat(config.dateArr);
+};
+
+function stat(dateArr) {
     var year = parseInt(dateArr[0]);
     var month = parseInt(dateArr[1]);
     //the day number of one month
     var dayNum = getDayNumInMonth(year, month);
     var day = 1;
-    
     var queue = [];
     while (day <= dayNum) {
         queue.push(statDay.calculate([year, month, day]));
@@ -23,7 +25,7 @@ exports.stat = function (dateArr) {
         var result = analyse(datas, year, month);
         output(result);
     });
-};
+}
 
 function getDayNumInMonth (year, month) {
     return new Date(year, month, 0).getDate();

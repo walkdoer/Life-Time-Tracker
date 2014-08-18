@@ -7,6 +7,7 @@
 var moment = require('moment');
 var msg = require('../message');
 var extend = require('node.extend');
+var timeSplitter = ':';
 
 function getLogs(data, date) {
     var logStrArr = data.split('\n').filter(isEmpty);
@@ -197,7 +198,7 @@ function getSigns(data) {
 function getTimeSpanFromLog(log, date) {
     var timeSpan = null,
         plusOneDay = false;
-    var timeSpanRex = /\d{1,2}\s*:\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*:\s*\d{1,2})*/ig;
+    var timeSpanRex = /\d{1,2}\s*[:：]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:：]\s*\d{1,2})*/ig;
     var dateFormat = 'YYYY-MM-DD HH:mm';
     var result = log.match(timeSpanRex);
     if (result && result.length === 1) {
@@ -212,17 +213,17 @@ function getTimeSpanFromLog(log, date) {
         if (start) {
             var algTime = alignTime(date, start);
             startTime = new moment(algTime, dateFormat);
-            startHour = parseInt(start.split(':')[0], 10);
+            startHour = parseInt(start.split(timeSplitter)[0], 10);
             timeSpan.start = startTime.format(dateFormat);
         }
         end = timeArr[1];
         if (end) {
-            endHour = parseInt(end.split(':')[0], 10);
+            endHour = parseInt(end.split(timeSplitter)[0], 10);
         }
         //endHour should greater than startHour, except 23: 47 ~ 00:00
         if (endHour !== undefined && startHour !== undefined && endHour < startHour) {
             if (endHour !== 0) {
-                msg.warn('make sure the date is right of this log: ' + log);
+                msg.warn('make sure the time of is right of '+ date + '\'s log: ' + log);
             } else {
                 plusOneDay = true;
             }
@@ -239,7 +240,7 @@ function getTimeSpanFromLog(log, date) {
         }
     } else {
         console.log(result);
-        msg.warn('make sure the date is right of this log: ' + log);
+        msg.warn('make sure the time is right of ' + date +'\'s log: ' + log);
     }
     return timeSpan;
 }
@@ -278,12 +279,12 @@ function getTimeSpan(start, end) {
 function getHourFromDateStr(dateStr) {
     var timeRegxp = /\d{1,2}\s*:\s*\d{1,2}/ig;
     var timeStr = dateStr.match(timeRegxp)[0];
-    var timeArr = timeStr.split(':').map(trim);
+    var timeArr = timeStr.split(timeSplitter).map(trim);
     return timeArr[0];
 }
 
 function isEmpty(val) {
-    return !!val;
+    return !!val.trim();
 }
 
 function trim (val) {

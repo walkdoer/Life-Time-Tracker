@@ -138,9 +138,10 @@ function calculateSleepLength (data) {
         timeSpan = helper.timeSpan(sleepMoment, wokeTime);
     } catch (e) {
         if (e.code === 'ENOENT') {
-            msg.warn('do not have enough data to calculate sleep lenth');
+            msg.warn('do not have enough data to calculate sleep lenth of ' + data.date);
         } else {
-            msg.error('error occur when calculate sleep time');
+            msg.error('error occur when calculate sleep time of ' + data.date);
+            throw e;
         }
     }
     return timeSpan;
