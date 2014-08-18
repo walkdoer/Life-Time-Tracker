@@ -133,6 +133,7 @@ function calculate(fileData) {
     fileData.wakeMoment = wakeMoment;
     fileData.sleepMoment = sleepMoment;
     fileData.activeTime = activeTime;
+    fileData.unTrackedTime = unTrackedTime;
     fileData.sleepTime = calculateSleepLength(fileData);
     fileData.classTime = helper.groupTimeByClass(logs, fileData.classes);
     fileData.tagTime = helper.groupTimeByTag(logs);

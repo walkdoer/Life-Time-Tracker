@@ -13,6 +13,8 @@ var dayStatSchema = Schema({
     sleepTime: Number,
     //有记录的时间
     trackedTime: Number,
+    //未记录到的时间
+    unTrackedTime: Number,
     //活动时间 = sleepMoment - wakeMoment;
     activeTime: Number,
     //时间类别

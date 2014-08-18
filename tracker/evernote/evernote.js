@@ -93,7 +93,10 @@ function findEventLog(note) {
 function stripENML(content) {
     var bodyRegexp = /<en-note.*?>([\s\S]*?)<\/en-note>/g;
     var body = bodyRegexp.exec(content)[1];
-    body = body.replace(/<\/?div>/g, '');
+    body = body.replace(/<\/?div.*?>/g, '');
+    body = body.replace(/<\/?span.*?>/g, '');
+    body = body.replace(/<\/?a.*?>/g, '');
+    body = body.replace(/<\/?p.*?>/g, '');
     body = body.replace(/<br\/>/g, '');
     body = body.replace(/\&gt;/g, '>');
     body = body.replace(/\&lt;/g, '<');

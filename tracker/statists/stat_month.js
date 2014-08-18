@@ -33,7 +33,8 @@ function getDayNumInMonth (year, month) {
 
 
 function analyse(datas, year, month) {
-    var sleepPeriodArr = [];
+    var sleepPeriodArr = [],
+        unTrackedTime = [];
 
     /**
      * record sleep period
@@ -46,6 +47,7 @@ function analyse(datas, year, month) {
         } else if (d.state === 'fulfilled'){
             var dayData = d.value;
             recordSleepPeriod(dayData);
+            recordUnTrackedTime(dayData);
         }
     });
 
@@ -56,6 +58,13 @@ function analyse(datas, year, month) {
             sleepMoment: new moment(data.sleepMoment),
             wakeMoment: new moment(data.wakeMoment),
             sleepTime: data.sleepTime
+        });
+    }
+
+    function recordUnTrackedTime(day) {
+        unTrackedTime.push({
+            label: day.date,
+            count: day.unTrackedTime
         });
     }
 
@@ -70,6 +79,7 @@ function analyse(datas, year, month) {
         sleepPeriodArr: sleepPeriodArr,
         classTime: groupTimeByClass(days),
         tagTime: groupTimeByTag(days),
+        unTrackedTime: unTrackedTime,
         sumTime: sumTime(days)
     };
 }
@@ -80,6 +90,7 @@ function output(result) {
     outputTimeGroupByTag(result.tagTime);
     outputTimeGroupByClass(result.classTime);
     outputSumTime(result.sumTime);
+    outputUnTrackedTime(result.unTrackedTime);
 }
 
 
@@ -152,6 +163,12 @@ function outputSumTime(sumtime) {
 
 function outputGroup (groupName) {
     console.log('\n========= Group Time By ' + groupName + ' =======\n');
+}
+
+
+function outputUnTrackedTime(data) {
+    outputGroup('未记录时间');
+    display.bar(data);
 }
 
 function groupTimeByTag(days) {

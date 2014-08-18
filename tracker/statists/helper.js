@@ -143,7 +143,8 @@ function getTags(data) {
         tagStr = tagStr.trim().replace(/[\[\]]/ig, '');
         if (tagStr) {
             tagArr = tagStr.split(',').map(function(val) {
-                return val.trim();
+                //tag不区分大小写
+                return val.trim().toLowerCase();
             });
         }
         tags = tags.concat(tagArr);
@@ -175,7 +176,8 @@ function getSimpleTags(data) {
         tagStr = tagStr.trim().replace(/[\[\]]/ig, '');
         if (tagStr) {
             tagArr = tagStr.split(',').map(function(val) {
-                return val.trim();
+                //tag不区分大小写
+                return val.trim().toLowerCase();
             });
         }
         tags = tags.concat(tagArr);
@@ -454,7 +456,7 @@ function checkLogSequence(logs) {
             cvStart = new moment(cv.start, dateFormat);
         if (cvStart.diff(pvEnd, 'minute') < 0) {
             checkResult = false;
-            msg.warn('The sequence of "' + pv.origin + '" and "' + cv.origin + '" is not right.');
+            msg.warn('The sequence of "' + pv.origin + '" and "' + cv.origin + '" of  ' +  pvEnd.format('YYYY-MM-DD') + ' is not right.');
         }
         return cv;
     });
