@@ -100,6 +100,7 @@ function stripENML(content) {
     body = body.replace(/<br\/>/g, '');
     body = body.replace(/\&gt;/g, '>');
     body = body.replace(/\&lt;/g, '<');
+    body = body.replace(/\&quot;/g, '"');
 
     return body;
 }

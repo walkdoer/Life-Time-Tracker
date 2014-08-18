@@ -79,6 +79,7 @@ function analyse(datas, year, month) {
         sleepPeriodArr: sleepPeriodArr,
         classTime: groupTimeByClass(days),
         tagTime: groupTimeByTag(days),
+        projectTime: groupTimeBy('project', days),
         unTrackedTime: unTrackedTime,
         sumTime: sumTime(days)
     };
@@ -90,6 +91,7 @@ function output(result) {
     outputTimeGroupByTag(result.tagTime);
     outputTimeGroupByClass(result.classTime);
     outputSumTime(result.sumTime);
+    outputTimeGroupByProject(result.projectTime);
     outputUnTrackedTime(result.unTrackedTime);
 }
 
@@ -148,6 +150,10 @@ function outputTimeGroupByTag (datas) {
 }
 
 
+function outputTimeGroupByProject (datas) {
+    outputGroup('Project');
+    display.bar(datas);
+}
 
 function outputTimeGroupByClass(datas) {
     outputGroup('Class');
@@ -167,14 +173,19 @@ function outputGroup (groupName) {
 
 
 function outputUnTrackedTime(data) {
-    outputGroup('未记录时间');
+    console.log('\n========= 未记录时间 =========\n');
     display.bar(data);
 }
 
 function groupTimeByTag(days) {
+    return groupTimeBy('tag', days);
+}
+
+
+function groupTimeBy(type, days) {
     var result = [];
     days.forEach(function (d) {
-        var tagTime = d.tagTime;
+        var tagTime = d[type + 'Time'];
         tagTime.forEach(function (t) {
             var target = getTarget(t.label);
 
@@ -196,7 +207,6 @@ function groupTimeByTag(days) {
 
     return result;
 }
-
 
 function groupTimeByClass(days) {
     var result = [];
