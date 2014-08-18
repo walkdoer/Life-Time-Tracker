@@ -132,22 +132,27 @@ function outputSleepPeriod(sleepPeriodArr) {
 }
 
 function outputTimeGroupByTag (datas) {
+    outputGroup('Tag');
     display.bar(datas);
-
 }
 
 
+
 function outputTimeGroupByClass(datas) {
+    outputGroup('Class');
     display.bar(datas);
 }
 
 
 function outputSumTime(sumtime) {
-
+    outputGroup('Time Type');
     display.bar(sumtime);
 }
 
 
+function outputGroup (groupName) {
+    console.log('\n========= Group Time By ' + groupName + ' =======\n');
+}
 
 function groupTimeByTag(days) {
     var result = [];
