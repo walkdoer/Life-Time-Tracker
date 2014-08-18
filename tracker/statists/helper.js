@@ -7,6 +7,7 @@
 var moment = require('moment');
 var msg = require('../message');
 var extend = require('node.extend');
+var dateFormat = 'YYYY-MM-DD HH:mm';
 var timeSplitter = ':';
 
 function getLogs(data, date) {
@@ -14,7 +15,13 @@ function getLogs(data, date) {
     var lastIndex = logStrArr.length - 1;
     var logs = [];
     logStrArr.forEach(function(logStr, index) {
-        var logInfo = getLogInfo(logStr, date, index);
+        var logInfo = getLogInfo({
+            logStr: logStr,
+            date: date,
+            index: index,
+            isFirst: index === 0,
+            isLast: index === lastIndex
+        });
         if (logInfo) {
             if (isGetUpLog(logInfo)) {
                 logInfo.wake = true;
@@ -30,6 +37,9 @@ function getLogs(data, date) {
                 logInfo.end = logInfo.start;
                 //需要校准，是有可能存在加班到凌晨之后
                 logInfo.time = logInfo.start;
+            }
+            if (logInfo.len < 0) {
+                msg.error(date + '\'s ' + logStr + '\'s time length is less that 0');
             }
             if (logInfo.len === undefined || logInfo.len < 0) {
                 logInfo.len = 0;
@@ -48,10 +58,10 @@ function getLogs(data, date) {
 }
 
 
-function alignTime(date, time) {
+function alignTime(date, time, config) {
     var newDate;
     var hour = parseInt(getHourFromDateStr(time), 10);
-    if (hour === 0) {
+    if (hour === 0 || (hour > 0 && hour < 5 && config.moment && config.isLast)) {
         newDate = nextDay(date) + ' ' + time;
     } else {
         newDate = date + ' ' + time;
@@ -195,11 +205,11 @@ function getSigns(data) {
     return signs;
 }
 
-function getTimeSpanFromLog(log, date) {
+function getTimeSpanFromLog(log, config) {
+    var date = config.date;
     var timeSpan = null,
         plusOneDay = false;
     var timeSpanRex = /\d{1,2}\s*[:：]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:：]\s*\d{1,2})*/ig;
-    var dateFormat = 'YYYY-MM-DD HH:mm';
     var result = log.match(timeSpanRex);
     if (result && result.length === 1) {
         timeSpan = {};
@@ -210,13 +220,14 @@ function getTimeSpanFromLog(log, date) {
         var startTime, endTime,
             startHour, endHour, start, end;
         start = timeArr[0];
+        end = timeArr[1];
         if (start) {
-            var algTime = alignTime(date, start);
+            var alignConfig = extend({}, config, { moment: !end });
+            var algTime = alignTime(date, start, alignConfig);
             startTime = new moment(algTime, dateFormat);
             startHour = parseInt(start.split(timeSplitter)[0], 10);
             timeSpan.start = startTime.format(dateFormat);
         }
-        end = timeArr[1];
         if (end) {
             endHour = parseInt(end.split(timeSplitter)[0], 10);
         }
@@ -227,6 +238,9 @@ function getTimeSpanFromLog(log, date) {
             } else {
                 plusOneDay = true;
             }
+        }
+        if (startHour === 0) {
+            plusOneDay = true;
         }
         if (end) {
             endTime = new moment(date + ' ' + end, dateFormat);
@@ -251,16 +265,17 @@ function getTimeSpanFromLog(log, date) {
  * @param date
  * @param index
  */
-function getLogInfo(log, date, index) {
+function getLogInfo(config) {
+    var log = config.logStr;
     var logInfo = {
         classes: getSimpleClasses(log),
         tags: getSimpleTags(log),
         projects: getSimpleProjects(log),
         sign: getSigns(log),
-        index: index,
+        index: config.index,
         origin: log
     };
-    var timeSpan = getTimeSpanFromLog(log, date);
+    var timeSpan = getTimeSpanFromLog(log, config);
     return extend(logInfo, timeSpan);
 }
 
@@ -420,6 +435,32 @@ function getItem(data, regexp, replace, type){
     return result;
 }
 
+
+/**
+ * checkLogSequence
+ * 检查日志的时序是否正确
+ * 确保不会出现类似下面的日志
+ *
+ *    9:00 ~ 11: 00
+ *   10:49 ~ 12:00
+ *
+ * @param logs
+ * @return
+ */
+function checkLogSequence(logs) {
+    var checkResult = true;
+    logs.reduce(function (pv, cv) {
+        var pvEnd = new moment(pv.end, dateFormat),
+            cvStart = new moment(cv.start, dateFormat);
+        if (cvStart.diff(pvEnd, 'minute') < 0) {
+            checkResult = false;
+            msg.warn('The sequence of "' + pv.origin + '" and "' + cv.origin + '" is not right.');
+        }
+        return cv;
+    });
+    return checkResult;
+}
+
 exports.getClasses = getClasses;
 exports.getSimpleClasses = getSimpleClasses;
 exports.getTags = getTags;
@@ -437,3 +478,4 @@ exports.groupTimeByProject = groupTimeByProject;
 exports.getSigns = getSigns;
 exports.getProjects = getProjects;
 exports.getSimpleProjects = getSimpleProjects;
+exports.checkLogSequence = checkLogSequence;

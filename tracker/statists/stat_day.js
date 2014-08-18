@@ -93,16 +93,19 @@ function calculate(fileData) {
         trackedTime = 0,
         logs,
         wakeMoment,
+        lastMoment,
         sleepMoment;
     var logData = fileData.data;
     fileData.logs = logs = helper.getLogs(logData, date);
+    helper.checkLogSequence(logs);
     fileData.classes = helper.getClasses(logData).sort(frequenceDesc);
     fileData.tags = helper.getTags(logData).sort(frequenceDesc);
     fileData.projects = helper.getProjects(logData);
     function frequenceDesc(a, b) {
         return b.frequence - a.frequence;
     }
-    logs.forEach(function(log) {
+    var lastIndex = logs.length - 1;
+    logs.forEach(function(log, index) {
         if (log.wake) {
             wakeMoment = log.time;
         } else if (log.sleep){
@@ -113,12 +116,23 @@ function calculate(fileData) {
         if (log.len !== undefined) {
             trackedTime += log.len;
         }
+        if (lastIndex === index) {
+            lastMoment = log.end;
+        }
     });
+    var activeTime = 0, unTrackedTime;
+    activeTime = helper.timeSpan(wakeMoment, sleepMoment || lastMoment);
+    unTrackedTime = activeTime - trackedTime;
+    if (unTrackedTime < 0) {
+        msg.error(date + '\'s trackedTime is bigger than activeTime, that\'s impossible. ' + 'trackedTime = ' + trackedTime + ' activeTime = ' + activeTime);
+    } else if (unTrackedTime > 200) {
+        msg.warn(date + '\'s untrackedTime is too much untrackedTime = ' + unTrackedTime);
+    }
     //all the tracked time from the log
     fileData.trackedTime = trackedTime;
     fileData.wakeMoment = wakeMoment;
     fileData.sleepMoment = sleepMoment;
-    fileData.activeTime = helper.timeSpan(wakeMoment, sleepMoment);
+    fileData.activeTime = activeTime;
     fileData.sleepTime = calculateSleepLength(fileData);
     fileData.classTime = helper.groupTimeByClass(logs, fileData.classes);
     fileData.tagTime = helper.groupTimeByTag(logs);
