@@ -13,7 +13,14 @@ var dateStr = argv[2];
 var userOptions = {};
 argv.slice(3).forEach(function (val) {
     userOptions.showOriginLogs = ['--origin', '-o'].indexOf(val) >= 0;
-    userOptions.updateDatabase= ['--updateDb', '-udb'].indexOf(val) >= 0;
+    userOptions.updateDatabase = ['--updateDb', '-udb'].indexOf(val) >= 0;
+    if (['--sport', '-spr'].indexOf(val) >= 0) {
+        userOptions.logClass = 'SPR';
+    } else if (['--think', '-tk'].indexOf(val) >= 0) {
+        userOptions.logClass = 'TK';
+    } else if (['--break', '-brk'].indexOf(val) >= 0) {
+        userOptions.logClass = 'BRK';
+    }
 });
 
 if (!dateStr) {
@@ -43,7 +50,7 @@ function dispatch(dateStr) {
         return parseInt(val, 10);
     });
     var type = [null, 'year', 'month', 'day'][dateArr.length];
-    var statist = getStatist(type);
+    var statist = getStatist(type, userOptions);
     var disposeCfg = extend({}, userOptions, {
         dateStr: dateStr,
         dateArr: dateArr

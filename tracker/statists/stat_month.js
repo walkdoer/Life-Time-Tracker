@@ -5,20 +5,31 @@ var when = require('when');
 var moment = require('moment');
 var statDay = require('./stat_day');
 var display = require('../dislpay_data');
+var statSport = require('./stat_sport');
 
 exports.dispose = function (config) {
-    stat(config.dateArr);
+    if (config.logType === 'SPR') {
+        return require('./sport').dispose(config);
+    }
+    stat(config);
 };
 
-function stat(dateArr) {
-    var year = parseInt(dateArr[0]);
-    var month = parseInt(dateArr[1]);
+function stat(config) {
+    var dateArr = config.dateArr,
+        year = dateArr[0],
+        month = dateArr[1];
     //the day number of one month
     var dayNum = getDayNumInMonth(year, month);
     var day = 1;
     var queue = [];
     while (day <= dayNum) {
-        queue.push(statDay.calculate([year, month, day]));
+        var procedure;
+        if (config.logType === 'SPR') {
+            procedure = statSport.dispose(config);
+        } else {
+            procedure = statDay.calculate([year, month, day]);
+        }
+        queue.push(procedure);
         day++;
     }
     when.settle(queue).then(function (datas) {
