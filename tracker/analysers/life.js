@@ -1,23 +1,15 @@
 'use strict';
 var moment = require('moment');
-var msg = require('../message');
-function dispose(datas, year, month) {
+function dispose(datas) {
     var sleepPeriodArr = [],
         unTrackedTime = [];
 
     /**
      * record sleep period
      */
-    datas.forEach(function (d, index) {
-        var day = index + 1,
-            date = [year, month, day].join('-');
-        if (d.state === 'rejected') {
-            msg.warn(date + ' calculate fail');
-        } else if (d.state === 'fulfilled'){
-            var dayData = d.value;
-            recordSleepPeriod(dayData);
-            recordUnTrackedTime(dayData);
-        }
+    datas.forEach(function (d) {
+        recordSleepPeriod(d);
+        recordUnTrackedTime(d);
     });
 
 
