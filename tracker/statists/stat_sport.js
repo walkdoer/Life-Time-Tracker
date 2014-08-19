@@ -1,8 +1,8 @@
 /**
- * 健身日志
+ * 运动日志
  *
- * 单次健身
- *  type: normal 正常健身 / short 短运 / morning 晨运
+ * 单次运动
+ *  type: fitness 健身,short 短运, morning 晨运,swimming 游泳
  *  items: 健身项目
  *      name: 项目名称
  *      sets: 组数
@@ -19,9 +19,12 @@
  */
 'use strict';
 
+
 var when = require('when'),
     util = require('../util'),
+    msg = require('../message'),
     helper = require('./helper'),
+    sportType = require('../conf/sportType'),
     config = require('../conf/sport');
 
 function dispose (config) {
@@ -47,9 +50,12 @@ function getSportLogs(fileData) {
 
     var sportLogs = logs.filter(function (log) {
         var sportClassName = config.className;
-        return log.classes.filter(function (cls) {
-            return sportClassName.indexOf(cls) >= 0;
-        }).length > 0;
+        if (log.classes) {
+            return log.classes.filter(function (cls) {
+                return sportClassName.indexOf(cls) >= 0;
+            }).length > 0;
+        }
+        return false;
     });
     fileData.logs = sportLogs;
     return fileData;
@@ -57,6 +63,28 @@ function getSportLogs(fileData) {
 
 function calculate(fileData) {
     var logs = fileData.logs;
+    var sportLogs = [];
+    var statResult = {
+        time: 0,
+        count: 0,
+        logs: sportLogs
+    };
+    logs.forEach(function (log) {
+        var sportLog = {
+            time: log.len,
+            start: log.start,
+            end: log.end
+        };
+        var type = sportType.get(log.tags);
+        if (type.length === 0) {
+            msg.warn('Unknow sport type:' + log.tags.join(','));
+        }
+        sportLog.type = type;
+        sportLogs.push(sportLog);
+        statResult.count++;
+        statResult.time += log.len;
+    });
+    return logs;
 }
 
 
