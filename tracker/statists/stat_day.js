@@ -68,7 +68,8 @@ function stat(config) {
 exports.stat = stat;
 
 
-exports.calculate = function (dateArr) {
+exports.calculate = function (config) {
+    var dateArr = config.dateStr.split('-');
     var deferred = when.defer();
     var year = parseInt(dateArr[0]);
     var month = parseInt(dateArr[1]);
