@@ -37,7 +37,8 @@ function dispose (config) {
         util.readLogFiles(config.dateStr)
             .then(getSportLogs)
             .then(calculate)
-            .then(deferred.resolve.bind(deferred));
+            .then(deferred.resolve.bind(deferred))
+            .catch(deferred.reject.bind(deferred));
     }
     return deferred.promise;
 }
@@ -67,7 +68,8 @@ function calculate(fileData) {
     var statResult = {
         time: 0,
         count: 0,
-        logs: sportLogs
+        logs: sportLogs,
+        origin: fileData
     };
     logs.forEach(function (log) {
         var sportLog = {
@@ -84,7 +86,7 @@ function calculate(fileData) {
         statResult.count++;
         statResult.time += log.len;
     });
-    return logs;
+    return statResult;
 }
 
 

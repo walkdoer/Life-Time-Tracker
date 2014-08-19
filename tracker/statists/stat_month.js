@@ -42,8 +42,8 @@ function stat(config) {
             result = sportAnalyser.dispose(datas, year, month);
         } else {
             result = lifeAnalyser.dispose(datas, year, month);
+            output(result);
         }
-        output(result);
     });
 }
 
