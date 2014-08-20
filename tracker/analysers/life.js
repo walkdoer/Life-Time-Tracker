@@ -13,6 +13,10 @@ function dispose(days) {
     });
 
 
+    /**
+     * 记录睡眠周期
+     *
+     */
     function recordSleepPeriod(data) {
         sleepPeriodArr.push({
             date: data.date,
@@ -22,6 +26,9 @@ function dispose(days) {
         });
     }
 
+    /**
+     * 记录每一天没有跟踪到的时间
+     */
     function recordUnTrackedTime(day) {
         unTrackedTime.push({
             label: day.date,
@@ -31,12 +38,16 @@ function dispose(days) {
 
     return {
         sleepPeriodArr: sleepPeriodArr,
-        classTime: groupTimeByClass(days),
-        tagTime: groupTimeByTag(days),
-        projectTime: groupTimeBy('project', days),
+        classTime: groupTimeByClass(days).sort(desc),
+        tagTime: groupTimeByTag(days).sort(desc),
+        projectTime: groupTimeBy('project', days).sort(desc),
         unTrackedTime: unTrackedTime,
         sumTime: sumTime(days)
     };
+
+    function desc(a, b) {
+        return b.count - a.count;
+    }
 }
 
 function groupTimeByTag(days) {
