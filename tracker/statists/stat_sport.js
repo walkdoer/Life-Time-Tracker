@@ -21,6 +21,7 @@
 
 
 var when = require('when'),
+    extend = require('node.extend'),
     util = require('../util'),
     msg = require('../message'),
     helper = require('./helper'),
@@ -82,11 +83,53 @@ function calculate(fileData) {
             msg.warn('Unknow sport type:' + log.tags.join(','));
         }
         sportLog.type = type;
+        sportLog.items = getSportItems(log.projects);
         sportLogs.push(sportLog);
         statResult.count++;
         statResult.time += log.len;
     });
     return statResult;
+
+    function getSportItems(projects) {
+        var SPLITTER = ':';
+        var items = [];
+        projects.forEach(function (proj) {
+            // push-up:10s4r means push-up 10 sets, 4reps
+            if (proj.indexOf(SPLITTER)) {
+                var result = transform(proj);
+                items.push(result);
+            } else {
+                items.push({
+                    name: proj
+                });
+            }
+
+            function transform(proj) {
+                var projInfo = proj.split(SPLITTER),
+                    getSetsAndReps = function (str) {
+                        //format: \ds\dr example: 10s9r
+                        var regexp = /^(\d+)s(\d+)r$/g,
+                            result = regexp.exec(str);
+                        if (result.length < 3) {
+                            return null;
+                        }
+                        return {
+                            sets: parseInt(result[1], 10),
+                            reps: parseInt(result[2], 10)
+                        };
+                    };
+                var setsAndReps = getSetsAndReps(projInfo[1].trim());
+                if (setsAndReps === null) {
+                    msg.warn('Sport item record is wrong:' + proj + 'in ' +
+                            fileData.date);
+                }
+                return extend({
+                    name: projInfo[0].trim()
+                }, setsAndReps);
+            }
+        });
+        return items;
+    }
 }
 
 

@@ -1,6 +1,8 @@
 'use strict';
 
+var Table = require('cli-table');
 var MAX_BAR_LEN = 100;
+
 
 
 function displayBar(data, color) {
@@ -72,4 +74,19 @@ function space(l) {
     return str;
 }
 
+
+function displayTable(config) {
+    var table = new Table({
+        head: config.head,
+        colWidth: config.colWidth
+    });
+
+    config.data.forEach(function (row) {
+        table.push(row);
+    });
+
+    console.log(table.toString());
+}
+
 exports.bar = displayBar;
+exports.table = displayTable;
