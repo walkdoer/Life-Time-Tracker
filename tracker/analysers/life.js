@@ -1,13 +1,13 @@
 'use strict';
 var moment = require('moment');
-function dispose(datas) {
+function dispose(days) {
     var sleepPeriodArr = [],
         unTrackedTime = [];
 
     /**
      * record sleep period
      */
-    datas.forEach(function (d) {
+    days.forEach(function (d) {
         recordSleepPeriod(d);
         recordUnTrackedTime(d);
     });
@@ -28,13 +28,6 @@ function dispose(datas) {
             count: day.unTrackedTime
         });
     }
-
-    //filter the datas only left the fulfilled;
-    var days = datas.filter(function (d) {
-        return d.state === 'fulfilled';
-    }).map(function (d) {
-        return d.value;
-    });
 
     return {
         sleepPeriodArr: sleepPeriodArr,
