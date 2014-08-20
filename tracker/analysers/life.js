@@ -1,5 +1,6 @@
 'use strict';
 var moment = require('moment');
+var extend = require('node.extend');
 function dispose(days) {
     var sleepPeriodArr = [],
         unTrackedTime = [];
@@ -40,7 +41,12 @@ function dispose(days) {
         sleepPeriodArr: sleepPeriodArr,
         classTime: groupTimeByClass(days).sort(desc),
         tagTime: groupTimeByTag(days).sort(desc),
-        projectTime: groupTimeBy('project', days).sort(desc),
+        projectTime: groupTimeBy('project', days, function (t) {
+            t.label = t.label.split(':')[0];
+            return t;
+        }, function (item, target) {
+            return target.indexOf(item.label) === 0;
+        }).sort(desc),
         unTrackedTime: unTrackedTime,
         sumTime: sumTime(days)
     };
@@ -54,7 +60,7 @@ function groupTimeByTag(days) {
     return groupTimeBy('tag', days);
 }
 
-function groupTimeBy(type, days) {
+function groupTimeBy(type, days, process, filter) {
     var result = [];
     days.forEach(function (d) {
         var tagTime = d[type + 'Time'];
@@ -64,14 +70,21 @@ function groupTimeBy(type, days) {
             if (target) {
                 target.count += t.count;
             } else {
+                if(typeof process === 'function') {
+                    t = process(extend({}, t));
+                }
                 result.push(t);
             }
         });
     });
 
-    function getTarget(label) {
+    function getTarget(targetLabel) {
         var target = result.filter(function (itm) {
-            return itm.label === label;
+            if (filter) {
+                return filter(itm, targetLabel);
+            } else {
+                return itm.label === targetLabel;
+            }
         });
 
         return target[0] || null;
