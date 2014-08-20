@@ -42,7 +42,9 @@ function dispose(days) {
         classTime: groupTimeByClass(days).sort(desc),
         tagTime: groupTimeByTag(days).sort(desc),
         projectTime: groupTimeBy('project', days, function (t) {
-            t.label = t.label.split(':')[0];
+            var label = t.label.split(':')[0];
+            label = label.split(' ')[0];
+            t.label = label;
             return t;
         }, function (item, target) {
             return target.indexOf(item.label) === 0;
