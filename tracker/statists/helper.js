@@ -369,21 +369,34 @@ function groupTimeByClass(logs, classes) {
 
 
 function groupTimeByProject(logs) {
-    return groupTimeBy(logs, 'projects');
+    return groupTimeBy(logs, 'projects', function (label) {
+        label = label.split(':')[0];
+        label = label.split(' ')[0];
+        return label;
+    }, function (label, target) {
+        return label.indexOf(target) === 0;
+    });
 }
 
-function groupTimeBy (logs, condition) {
+function groupTimeBy (logs, condition, process, filter) {
     var result = [];
     logs.forEach(function (log) {
         var items = log[condition];
         if (items && items.length) {
             items.forEach(function (item) {
                 var target = result.filter(function (resultItem) {
-                    return resultItem.label === item;
+                    if (filter) {
+                        return filter(resultItem.label, item);
+                    } else {
+                        return resultItem.label === item;
+                    }
                 });
                 if (target && target.length) {
                     target[0].count += log.len;
                 } else {
+                    if (typeof process === 'function') {
+                        item = process(item);
+                    }
                     result.push({
                         label: item,
                         count: log.len
