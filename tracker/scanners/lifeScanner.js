@@ -16,9 +16,14 @@ var dateTypeEnum = require('../enum/dateType'),
 exports.scan = function (options) {
     var deferred = when.defer();
     readLogFile(options)
-        .then(preprocessFileData)
-        .then(extractLogs)
+        .then(preprocessFileData.bind(null, options))
+        .then(extractLogs.bind(null, options))
         .then(function (scanResult) {
+            if (options.dateType === dateTypeEnum.Month) {
+                scanResult = {
+                    days: scanResult
+                };
+            }
             scanResult.options = options;
             deferred.resolve(scanResult);
         })
@@ -75,14 +80,36 @@ function readOneMonthLog(year, month) {
     return when.settle(queue);
 }
 
-function preprocessFileData(fileData) {
+function preprocessFileData(options, fileData) {
+    var dateStr = options.dateStr;
+    if (options.dateType === dateTypeEnum.Month) {
+        fileData = fileData.filter(function (d, index) {
+            var day = index + 1,
+                date = [dateStr, day].join('-');
+            if (d.state === 'rejected') {
+                msg.warn(date + ' calculate fail');
+                return false;
+            } else if (d.state === 'fulfilled'){
+                return true;
+            }
+        }).map(function (d) {
+            return d.value;
+        });
+    }
     return fileData;
 }
 
 
-function extractLogs(fileData) {
+function extractLogs(options, fileData) {
     var date = fileData.date,
         fileContent = fileData.fileContent;
-    fileData.logs = helper.getLogs(fileContent, date);
+
+    if (options.dateType === dateTypeEnum.Month) {
+        fileData.forEach(function (file) {
+            file.logs = helper.getLogs(file.fileContent, file.date);
+        });
+    } else if (options.dateType === dateTypeEnum.Day) {
+        fileData.logs = helper.getLogs(fileContent, date);
+    }
     return fileData;
 }

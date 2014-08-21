@@ -5,14 +5,15 @@
 
 var display = require('../dislpay_data');
 
-function output(result) {
-    outputSleepPeriod(result.sleepPeriodArr);
-    outputTimeGroupByTag(result.tagTime);
-    outputTimeGroupByClass(result.classTime);
-    outputSumTime(result.sumTime);
-    outputTimeGroupByProject(result.projectTime);
-    outputUnTrackedTime(result.unTrackedTime);
-}
+
+exports.dispose = function (statResult) {
+    outputSleepPeriod(statResult.sleepPeriodArr);
+    outputTimeGroupByTag(statResult.tagTime);
+    outputTimeGroupByClass(statResult.classTime);
+    outputSumTime(statResult.sumTime);
+    outputTimeGroupByProject(statResult.projectTime);
+    outputUnTrackedTime(statResult.unTrackedTime);
+};
 
 
 function outputSleepPeriod(sleepPeriodArr) {
@@ -94,5 +95,3 @@ function outputUnTrackedTime(data) {
     console.log('\n========= 未记录时间 =========\n');
     display.bar(data);
 }
-
-exports.dispose = output;
