@@ -95,4 +95,4 @@ function outputUnTrackedTime(data) {
     display.bar(data);
 }
 
-module.exports = output;
+exports.dispose = output;

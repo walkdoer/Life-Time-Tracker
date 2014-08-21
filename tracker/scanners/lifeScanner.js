@@ -18,8 +18,9 @@ exports.scan = function (options) {
     readLogFile(options)
         .then(preprocessFileData)
         .then(extractLogs)
-        .then(function (fileData) {
-            deferred.resolve(fileData);
+        .then(function (scanResult) {
+            scanResult.options = options;
+            deferred.resolve(scanResult);
         })
         .catch(function (err) {
             msg.error(err);
