@@ -4,6 +4,10 @@ var util = require('./util'),
     msg = require('./message'),
     moment = require('moment'),
     extend = require('node.extend'),
+    //normal life scanner
+    scanner = require('./scanner'),
+    //output the stat result
+    outputor = require('./outputor'),
     db = require('./model/db');
 
 //get the date that want to stat, it can be year or month or day
@@ -49,22 +53,32 @@ function dispatch(dateStr) {
     var dateArr = dateStr.split('-').map(function (val){
         return parseInt(val, 10);
     });
-    var type = [null, 'year', 'month', 'day'][dateArr.length];
-    var statist = getStatist(type, userOptions);
-    var disposeCfg = extend({}, userOptions, {
+    var dateType = [null, 'year', 'month', 'day'][dateArr.length];
+    //the statist is used to stat the log data the then scanner have scan;
+    var statist = getStatist(dateType, userOptions);
+
+
+    var options = extend({}, userOptions, {
+        dateType: dateType,
         dateStr: dateStr,
         dateArr: dateArr
     });
-    if (statist) {
-        statist.dispose(disposeCfg);
-    } else {
-        msg.warn('找不到对应的统计程序');
-    }
+
+    /**
+     * process step:
+     *     1. scan
+     *     2. stat
+     *     3. output
+     */
+    scanner.scan(options)
+           .then(statist.dispose.bind(statist))
+           .then(outputor.dispose.bind(outputer));
 }
 
 function getStatist(type) {
     return require('./statists/stat_' + type);
 }
+
 
 function standardizeDate(dateStr) {
     var length = dateStr.split('-').length;
