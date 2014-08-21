@@ -72,11 +72,17 @@ function dispatch(dateStr) {
      */
     scanner.scan(options)
            .then(statist.dispose.bind(statist))
-           .then(outputor.dispose.bind(outputer));
+           .then(outputor.dispose.bind(outputor));
 }
 
-function getStatist(type) {
-    return require('./statists/stat_' + type);
+function getStatist(type, userOptions) {
+    var statistPath = './statists/',
+        statistsMap = {
+            SPR: 'sport'
+        },
+        logClass = userOptions.logClass;
+    statistPath += statistsMap[logClass] || type;
+    return require(statistPath);
 }
 
 

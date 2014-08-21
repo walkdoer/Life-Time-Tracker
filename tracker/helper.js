@@ -5,7 +5,7 @@
 'use strict';
 
 var moment = require('moment');
-var msg = require('../message');
+var msg = require('./message');
 var extend = require('node.extend');
 var dateFormat = 'YYYY-MM-DD HH:mm';
 var timeSplitter = ':';

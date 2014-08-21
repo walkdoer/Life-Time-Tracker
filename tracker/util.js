@@ -27,7 +27,7 @@ function readLogFiles(date) {
             return deferred.reject(err, filePath);
         }
         deferred.resolve({
-            data: data,
+            fileContent: data,
             date: date
         });
     });
