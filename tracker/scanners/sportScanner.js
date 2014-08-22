@@ -11,14 +11,15 @@
 'use strict';
 
 var dateTypeEnum = require('../enum/dateType'),
-    helper = require('./helper'),
+    logClassEnum = require('../enum/logClass'),
     msg = require('../message'),
     helper = require('../helper'),
+    scannerhelper = require('./helper'),
     when = require('when');
 
 exports.scan = function (options) {
     var deferred = when.defer();
-    helper.readLogFile(options)
+    scannerHelper.readLogFile(options)
         .then(extractLogs.bind(null, options))
         .then(function (scanResult) {
             if (options.dateType === dateTypeEnum.Month) {
@@ -49,10 +50,25 @@ function extractLogs(options, fileData) {
 
     if (options.dateType === dateTypeEnum.Month) {
         fileData.forEach(function (file) {
-            file.logs = helper.getLogs(file.fileContent, file.date);
+            file.logs = helper.getLogs(file.fileContent, file.date)
+                              .filter(sportLog);
         });
     } else if (options.dateType === dateTypeEnum.Day) {
-        fileData.logs = helper.getLogs(fileContent, date);
+        fileData.logs = helper.getLogs(fileContent, date)
+                              .filter(sportLog);
     }
     return fileData;
+}
+
+
+/**
+ * filter sport logs
+ */
+function sportLog(log) {
+    if (log.classes) {
+        return log.classes.filter(function (cls) {
+            return cls === logClassEnum.Sport;
+        }).length > 0;
+    }
+    return false;
 }
