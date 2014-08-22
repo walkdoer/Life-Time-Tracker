@@ -28,40 +28,10 @@ var when = require('when'),
     sportType = require('../conf/sportType'),
     config = require('../conf/sport');
 
-function dispose (config) {
-    var deferred = when.defer();
-    var fileData = config.fileData;
-    if (fileData) {
-        deferred.resovle(calculate(getSportLogs(fileData)));
-    } else {
-        //读取文件，然后过滤出健身日志，然后对日志进行分析
-        util.readLogFiles(config.dateStr)
-            .then(getSportLogs)
-            .then(calculate)
-            .then(deferred.resolve.bind(deferred))
-            .catch(deferred.reject.bind(deferred));
-    }
-    return deferred.promise;
-}
+exports.dispose = function (scanResult) {
+    var options = scanResult.options;
+};
 
-
-function getSportLogs(fileData) {
-    var logData = fileData.data,
-        date = fileData.date;
-    var logs = helper.getLogs(logData, date);
-
-    var sportLogs = logs.filter(function (log) {
-        var sportClassName = config.className;
-        if (log.classes) {
-            return log.classes.filter(function (cls) {
-                return sportClassName.indexOf(cls) >= 0;
-            }).length > 0;
-        }
-        return false;
-    });
-    fileData.logs = sportLogs;
-    return fileData;
-}
 
 function calculate(fileData) {
     var logs = fileData.logs;
@@ -131,6 +101,3 @@ function calculate(fileData) {
         return items;
     }
 }
-
-
-exports.dispose = dispose;

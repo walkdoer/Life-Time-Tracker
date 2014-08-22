@@ -30,8 +30,8 @@ argv.slice(3).forEach(function (val) {
 if (!dateStr) {
     return msg.error('should have a date arguments.');
 }
-//对日期进行标准化
 
+//standardlize the date 2014-08-01 to 2014-8-1
 dateStr = standardizeDate(dateStr);
 var date = new Date(dateStr);
 if (!util.isValidDate(date)) {
