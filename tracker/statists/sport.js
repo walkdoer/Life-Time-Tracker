@@ -33,7 +33,8 @@ exports.dispose = function (scanResult) {
         scanResult.days.forEach(processSportLog);
         statResult = stat(scanResult);
     } else if (options.dateType === dateTypeEnum.Day) {
-        statResult = stat(processSportLog(scanResult));
+        processSportLog(scanResult);
+        statResult = stat(scanResult);
     }
     return statResult;
 };
@@ -110,7 +111,8 @@ function processSportLog(day) {
 
 
 function stat(scanResult) {
-    var result = scanResult.days.reduce(function (result, day) {
+    var datas = scanResult.days || [scanResult];
+    var result = datas.reduce(function (result, day) {
         var sportTypeTime = result.sportTypeTime,
             sportItemSum = result.sportItemSum;
         result.count += day.count;
