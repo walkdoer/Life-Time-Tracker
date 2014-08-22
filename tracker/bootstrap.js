@@ -3,6 +3,7 @@
 var util = require('./util'),
     msg = require('./message'),
     moment = require('moment'),
+    logClassEnum = require('./enum/logClass'),
     extend = require('node.extend'),
     //normal life scanner
     scanner = require('./scanner'),
@@ -14,16 +15,20 @@ var util = require('./util'),
 var argv = process.argv;
 var dateStr = argv[2];
 
-var userOptions = {};
+var userOptions = {
+    logClass: logClassEnum.NormalThing
+};
 argv.slice(3).forEach(function (val) {
     userOptions.showOriginLogs = ['--origin', '-o'].indexOf(val) >= 0;
     userOptions.updateDatabase = ['--updateDb', '-udb'].indexOf(val) >= 0;
     if (['--sport', '-spr'].indexOf(val) >= 0) {
-        userOptions.logClass = 'SPR';
+        userOptions.logClass = logClassEnum.Sport;
     } else if (['--think', '-tk'].indexOf(val) >= 0) {
-        userOptions.logClass = 'TK';
+        userOptions.logClass = logClassEnum.Think;
     } else if (['--break', '-brk'].indexOf(val) >= 0) {
-        userOptions.logClass = 'BRK';
+        userOptions.logClass = logClassEnum.Break;
+    } else {
+        userOptions.logClass = logClassEnum.NormalThing;
     }
 });
 
@@ -72,7 +77,7 @@ function dispatch(dateStr) {
      */
     scanner.scan(options)
            .then(statist.dispose.bind(statist))
-           .then(outputor.dispose.bind(outputor));
+           .then(outputor.dispose.bind(outputor, options));
 }
 
 function getStatist(type, userOptions) {

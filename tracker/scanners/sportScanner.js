@@ -14,7 +14,7 @@ var dateTypeEnum = require('../enum/dateType'),
     logClassEnum = require('../enum/logClass'),
     msg = require('../message'),
     helper = require('../helper'),
-    scannerhelper = require('./helper'),
+    scannerHelper = require('./helper'),
     when = require('when');
 
 exports.scan = function (options) {

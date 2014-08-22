@@ -6,7 +6,7 @@
 
 var display = require('../dislpay_data');
 
-function output(result) {
+exports.dispose = function (result) {
     preprocessResult(result);
     console.log('健身次数:' + result.count);
     console.log('一共花了' + (result.time / 60).toFixed(1) + 'h 在健身');
@@ -15,7 +15,7 @@ function output(result) {
     display.bar(result.sportTypeTime);
     console.log('\n======= 运动项目详情=========\n');
     display.table(transformToTable(result.sportItemSum));
-}
+};
 
 function preprocessResult(result) {
     result.sportTypeTime.map(function (item) {
@@ -39,6 +39,3 @@ function transformToTable(sportItemSum) {
     table.data = data;
     return table;
 }
-
-
-module.exports = output;

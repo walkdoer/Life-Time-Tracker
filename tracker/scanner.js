@@ -2,7 +2,7 @@
  * the entr of scanner
  */
 'use strict';
-
+var msg = require('./message');
 var logClassEnum = require('./enum/logClass');
 var lifeScanner = require('./scanners/lifeScanner');
 var sportScanner = require('./scanners/sportScanner');
@@ -17,6 +17,9 @@ exports.scan = function (options) {
     } else if (options.logClass === logClassEnum.Sport) {
         scanner = sportScanner;
     }
-
-    return scanner.scan(options);
+    if (scanner) {
+        return scanner.scan(options);
+    } else {
+        msg.error('Sorry Can\'t find handler for you!');
+    }
 };

@@ -10,13 +10,14 @@ var monthOutput = require('./outputors/month');
 var sportOutput = require('./outputors/sport');
 var logClassEnum = require('./enum/logClass');
 
-exports.dispose = function (statResult) {
-    var options = statResult.options;
+exports.dispose = function (options, statResult) {
 
-    if (options.dateType === dateTypeEnum.Day) {
-        dayOutput.dispose(statResult);
-    } else if (options.dateType === dateTypeEnum.Month) {
-        monthOutput.dispose(statResult);
+    if (options.logClass === logClassEnum.NormalThing) {
+        if (options.dateType === dateTypeEnum.Day) {
+            dayOutput.dispose(statResult);
+        } else if (options.dateType === dateTypeEnum.Month) {
+            monthOutput.dispose(statResult);
+        }
     } else if (options.logClass === logClassEnum.Sport) {
         sportOutput.dispose(statResult);
     }
