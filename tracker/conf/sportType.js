@@ -8,6 +8,9 @@ var sportTypes = [{
 }, {
     cn: '短运',
     en: 'se' //short exercise
+}, {
+    cn: '跑步',
+    en: 'running'
 }];
 
 exports.get = function (sports) {
