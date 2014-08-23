@@ -15,9 +15,11 @@ var extend = require('node.extend');
 var dayStat = require('./day');
 var util = require('../util');
 var msg = require('../message');
+var logClassEnum = require('../enum/logClass');
 
 exports.dispose = function(scanResult) {
     var days = scanResult.days,
+        dayNum = days.length,
         sleepPeriodArr = [],
         unTrackedTimes = [];
 
@@ -62,11 +64,27 @@ exports.dispose = function(scanResult) {
         });
     }
 
+    var classTime = groupTimeByClass(days).sort(desc),
+        tagTime = groupTimeByTag(days).sort(desc),
+        projectTime = groupTimeBy('project', days, function (t) {
+            var label = t.label.split(':')[0];
+            label = label.split(' ')[0];
+            t.label = label;
+            return t;
+        }, function (item, target) {
+            return target.indexOf(item.label) === 0;
+        }).sort(desc);
 
     var meanSleepTime = util.mean(days.filter(function (d) {
         return d.sleepTime > 0;
     }), 'sleepTime');
     var sumTimeResult = sumTime(days);
+
+    //calculate the mean value for all logClasses
+    var meanValues = {};
+    Object.keys(logClassEnum).forEach(function (key) {
+        meanValues['mean' + key + 'Time'] = mean(classTime, dayNum, logClassEnum[key]);
+    });
     return extend({
         days: days,
         unTrackedDays: scanResult.unTrackedDays,
@@ -74,17 +92,10 @@ exports.dispose = function(scanResult) {
         sleepPeriodArr: sleepPeriodArr,
         //mean sleep time of a month
         meanSleepTime: meanSleepTime,
-        classTime: groupTimeByClass(days).sort(desc),
-        tagTime: groupTimeByTag(days).sort(desc),
-        projectTime: groupTimeBy('project', days, function (t) {
-            var label = t.label.split(':')[0];
-            label = label.split(' ')[0];
-            t.label = label;
-            return t;
-        }, function (item, target) {
-            return target.indexOf(item.label) === 0;
-        }).sort(desc)
-    }, sumTimeResult);
+        classTime: classTime,
+        tagTime: tagTime,
+        projectTime: projectTime
+    }, sumTimeResult, meanValues);
 
     function desc(a, b) {
         return b.count - a.count;
@@ -169,4 +180,13 @@ function sumTime(days) {
         unTrackedTime: 0
     });
     return sum;
+}
+
+
+function mean(data, len, logClass) {
+    var total = data.filter(function (d) {
+        return d.label === logClass;
+    })[0];
+
+    return total.count / len;
 }

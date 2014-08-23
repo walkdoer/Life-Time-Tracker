@@ -28,6 +28,14 @@ function outputOverivew(statResult, options) {
     console.log("一共记录了" + trackedDaysLen + '天,占' + (trackedRate * 100).toFixed(2) +
             '% 但是有' + unTrackedDays.length + '天没有记录, 分别是:\n' +
         '\t' + unTrackedDays.join(', '));
+    display.bar({
+        '平均睡眠时间': statResult.meanSleepTime,
+        '平均工作时间': statResult.meanWorkTime,
+        '平均休息时间': statResult.meanBreakTime,
+        '平均思考时间': statResult.meanThinkTime,
+        '平均运动时间': statResult.meanSportTime,
+        '平均学习时间': statResult.meanStudyTime
+    });
 }
 
 
