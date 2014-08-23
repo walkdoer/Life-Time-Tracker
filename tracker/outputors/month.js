@@ -4,6 +4,7 @@
 'use strict';
 
 var display = require('../dislpay_data');
+var moment = require('moment');
 
 
 exports.dispose = function (statResult) {
@@ -32,25 +33,14 @@ function outputSleepPeriod(sleepPeriodArr) {
         return function (a, b) {
             var aTime = a[time],
                 bTime = b[time],
-                aHour = aTime.hour(),
-                aMins = aTime.minute(),
-                bHour = bTime.hour(),
-                bMins = bTime.minute();
-            aHour = aHour === 0 ? 24 : aHour;
-            bHour = bHour === 0 ? 24 : bHour;
-            var hourSpan, minSpan;
-
+                aZero = new moment(a.date + ' 00:00').add(1, 'day'),
+                bZero = new moment(b.date + ' 00:00').add(1, 'day');
+            var aSpan = aZero.diff(aTime, 'minute');
+            var bSpan = bZero.diff(bTime, 'minute');
             if (order === 'desc') {
-                hourSpan = bHour - aHour;
-                minSpan = bMins - aMins;
+                return aSpan - bSpan;
             } else {
-                hourSpan = aHour-bHour;
-                minSpan = aMins - bMins;
-            }
-            if (hourSpan === 0) {
-                return minSpan;
-            } else {
-                return hourSpan;
+                return bSpan - aSpan;
             }
         };
     }
@@ -58,7 +48,7 @@ function outputSleepPeriod(sleepPeriodArr) {
     function outputSleepMoment (d) {
         var str = d.date.split('-')[2] + '号: ' +
                 d.wakeMoment.format(dateFormat).blue + ' - ' +
-                d.sleepMoment.format(dateFormat).magenta + ' = '+ 
+                d.sleepMoment.format(dateFormat).magenta + ' = '+
                 ((d.sleepTime / 60).toFixed(2) + 'h').yellow;
         console.log(str);
     }

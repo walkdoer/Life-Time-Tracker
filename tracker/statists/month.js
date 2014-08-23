@@ -13,6 +13,7 @@
 var moment = require('moment');
 var extend = require('node.extend');
 var dayStat = require('./day');
+var msg = require('../message');
 
 exports.dispose = function(scanResult) {
     var days = scanResult.days,
@@ -36,6 +37,12 @@ exports.dispose = function(scanResult) {
      *
      */
     function recordSleepPeriod(data) {
+        if (!data.sleepMoment) {
+            msg.error(data.date + 'have no sleepTime');
+        }
+        if (!data.wakeMoment) {
+            msg.error(data.date + 'have no wakeTime');
+        }
         sleepPeriodArr.push({
             date: data.date,
             sleepMoment: new moment(data.sleepMoment),
