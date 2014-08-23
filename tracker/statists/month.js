@@ -19,7 +19,7 @@ var msg = require('../message');
 exports.dispose = function(scanResult) {
     var days = scanResult.days,
         sleepPeriodArr = [],
-        unTrackedTime = [];
+        unTrackedTimes = [];
 
 
     /**
@@ -56,7 +56,7 @@ exports.dispose = function(scanResult) {
      * 记录每一天没有跟踪到的时间
      */
     function recordUnTrackedTime(day) {
-        unTrackedTime.push({
+        unTrackedTimes.push({
             label: day.date,
             count: day.unTrackedTime
         });
@@ -66,9 +66,11 @@ exports.dispose = function(scanResult) {
     var meanSleepTime = util.mean(days.filter(function (d) {
         return d.sleepTime > 0;
     }), 'sleepTime');
-    return {
+    var sumTimeResult = sumTime(days);
+    return extend({
         days: days,
         unTrackedDays: scanResult.unTrackedDays,
+        unTrackedTimes: unTrackedTimes,
         sleepPeriodArr: sleepPeriodArr,
         //mean sleep time of a month
         meanSleepTime: meanSleepTime,
@@ -81,10 +83,8 @@ exports.dispose = function(scanResult) {
             return t;
         }, function (item, target) {
             return target.indexOf(item.label) === 0;
-        }).sort(desc),
-        unTrackedTime: unTrackedTime,
-        sumTime: sumTime(days)
-    };
+        }).sort(desc)
+    }, sumTimeResult);
 
     function desc(a, b) {
         return b.count - a.count;
@@ -160,11 +160,13 @@ function sumTime(days) {
         sum.trackedTime += d.trackedTime;
         sum.sleepTime += d.sleepTime;
         sum.activeTime += d.activeTime;
+        sum.unTrackedTime += d.unTrackedTime;
         return sum;
     }, {
         sleepTime: 0,
         trackedTime: 0,
-        activeTime: 0
+        activeTime: 0,
+        unTrackedTime: 0
     });
     return sum;
 }

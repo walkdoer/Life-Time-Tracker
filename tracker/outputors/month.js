@@ -13,9 +13,9 @@ exports.dispose = function (statResult, options) {
     console.log('平均睡眠时长:' + (statResult.meanSleepTime / 60).toFixed(2));
     outputTimeGroupByTag(statResult.tagTime);
     outputTimeGroupByClass(statResult.classTime);
-    outputSumTime(statResult.sumTime);
+    outputSumTime(statResult);
     outputTimeGroupByProject(statResult.projectTime);
-    outputUnTrackedTime(statResult.unTrackedTime);
+    outputUnTrackedTime(statResult.unTrackedTimes);
 };
 
 function outputOverivew(statResult, options) {
@@ -85,9 +85,14 @@ function outputTimeGroupByClass(datas) {
 }
 
 
-function outputSumTime(sumtime) {
+function outputSumTime(statResult) {
     outputGroup('Time Type');
-    display.bar(sumtime);
+    display.bar({
+        '已记录时间': statResult.trackedTime,
+        '未记录时间': statResult.unTrackedTime,
+        '睡觉时间': statResult.sleepTime,
+        '活跃时间': statResult.activeTime
+    });
 }
 
 function outputGroup (groupName) {
