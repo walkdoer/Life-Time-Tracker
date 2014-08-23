@@ -18,11 +18,6 @@ exports.scan = function (options) {
     scannerHelper.readLogFile(options)
         .then(extractLogs.bind(null, options))
         .then(function (scanResult) {
-            if (options.dateType === dateTypeEnum.Month) {
-                scanResult = {
-                    days: scanResult
-                };
-            }
             scanResult.options = options;
             deferred.resolve(scanResult);
         })
@@ -39,14 +34,14 @@ exports.scan = function (options) {
 
 
 function extractLogs(options, fileData) {
-    var date = fileData.date,
-        fileContent = fileData.fileContent;
+    var date = fileData.date;
 
     if (options.dateType === dateTypeEnum.Month) {
-        fileData.forEach(function (file) {
-            file.logs = helper.getLogs(file.fileContent, file.date);
+        fileData.days.forEach(function (day) {
+            day.logs = helper.getLogs(day.fileContent, day.date);
         });
     } else if (options.dateType === dateTypeEnum.Day) {
+        var fileContent = fileData.fileContent;
         fileData.logs = helper.getLogs(fileContent, date);
     }
     return fileData;

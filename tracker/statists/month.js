@@ -67,7 +67,8 @@ exports.dispose = function(scanResult) {
         return d.sleepTime > 0;
     }), 'sleepTime');
     return {
-        options: scanResult.options,
+        days: days,
+        unTrackedDays: scanResult.unTrackedDays,
         sleepPeriodArr: sleepPeriodArr,
         //mean sleep time of a month
         meanSleepTime: meanSleepTime,

@@ -55,13 +55,15 @@ function readOneMonthLog(year, month) {
 }
 
 function preprocessFileData(options, fileData) {
-    var dateStr = options.dateStr;
+    var dateStr = options.dateStr,
+        unTrackedDays = [];
     if (options.dateType === dateTypeEnum.Month) {
         fileData = fileData.filter(function (d, index) {
             var day = index + 1,
                 date = [dateStr, day].join('-');
             if (d.state === 'rejected') {
                 msg.warn(date + ' calculate fail');
+                unTrackedDays.push(day);
                 return false;
             } else if (d.state === 'fulfilled'){
                 return true;
@@ -69,6 +71,15 @@ function preprocessFileData(options, fileData) {
         }).map(function (d) {
             return d.value;
         });
+        var today = new Date().getDate();
+        unTrackedDays = unTrackedDays.filter(function (d) {
+            //future is not count;
+            return d <= today;
+        });
+        return {
+            days: fileData,
+            unTrackedDays: unTrackedDays
+        };
     }
     return fileData;
 }

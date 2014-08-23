@@ -7,7 +7,8 @@ var display = require('../dislpay_data');
 var moment = require('moment');
 
 
-exports.dispose = function (statResult) {
+exports.dispose = function (statResult, options) {
+    outputOverivew(statResult, options);
     outputSleepPeriod(statResult.sleepPeriodArr);
     console.log('平均睡眠时长:' + (statResult.meanSleepTime / 60).toFixed(2));
     outputTimeGroupByTag(statResult.tagTime);
@@ -16,6 +17,14 @@ exports.dispose = function (statResult) {
     outputTimeGroupByProject(statResult.projectTime);
     outputUnTrackedTime(statResult.unTrackedTime);
 };
+
+function outputOverivew(statResult, options) {
+    var unTrackedDays = statResult.unTrackedDays;
+    console.log("======= " + options.dateStr + "的概括 ========");
+    console.log("一共记录了" + statResult.days.length + '天' +
+            '但是有' + unTrackedDays.length + '天没有记录, 分别是:\n' +
+        '\t' + unTrackedDays.join(', '));
+}
 
 
 function outputSleepPeriod(sleepPeriodArr) {
