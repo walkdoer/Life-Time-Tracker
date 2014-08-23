@@ -20,9 +20,13 @@ exports.dispose = function (statResult, options) {
 
 function outputOverivew(statResult, options) {
     var unTrackedDays = statResult.unTrackedDays;
+    var trackedDaysLen = statResult.days.length,
+        unTrackedDaysLen = unTrackedDays.length,
+        total = unTrackedDaysLen + trackedDaysLen,
+        trackedRate = trackedDaysLen / total;
     console.log("======= " + options.dateStr + "的概括 ========");
-    console.log("一共记录了" + statResult.days.length + '天' +
-            '但是有' + unTrackedDays.length + '天没有记录, 分别是:\n' +
+    console.log("一共记录了" + trackedDaysLen + '天,占' + (trackedRate * 100).toFixed(2) +
+            '% 但是有' + unTrackedDays.length + '天没有记录, 分别是:\n' +
         '\t' + unTrackedDays.join(', '));
 }
 
@@ -30,7 +34,7 @@ function outputOverivew(statResult, options) {
 function outputSleepPeriod(sleepPeriodArr) {
 
     var dateFormat = 'HH:mm';
-    console.log("======== 睡眠周期 (起床) - (睡觉) = (睡眠时长) ========");
+    console.log("======== 睡眠周期 睡眠时长, 起床, 睡觉 =========");
     sleepPeriodArr.forEach(outputSleepMoment);
 
     var lastSleep = sleepPeriodArr.sort(sortBy('sleepMoment', 'desc'))[0];
@@ -57,9 +61,9 @@ function outputSleepPeriod(sleepPeriodArr) {
 
     function outputSleepMoment (d) {
         var str = d.date.split('-')[2] + '号: ' +
-                d.wakeMoment.format(dateFormat).blue + ' - ' +
-                d.sleepMoment.format(dateFormat).magenta + ' = '+
-                ((d.sleepTime / 60).toFixed(2) + 'h').yellow;
+                ((d.sleepTime / 60).toFixed(2) + 'h').yellow + ' , ' +
+                d.wakeMoment.format(dateFormat).blue + ' , ' +
+                d.sleepMoment.format(dateFormat).magenta;
         console.log(str);
     }
 }
