@@ -79,6 +79,14 @@ function formatTime (time) {
     return format(time, timeFormat);
 }
 
+function mean(days, prop) {
+    var total = days.length;
+    var sum = days.reduce(function (sum, value) {
+        return sum += value[prop];
+    }, 0);
+    return sum/total;
+}
+
 module.exports = {
     isValidDate: isValidDate,
     readLogFiles: readLogFiles,
@@ -88,5 +96,6 @@ module.exports = {
     formatTime: formatTime,
     formatDate: formatDate,
     timeFormat: timeFormat,
-    dateFormat: dateFormat
+    dateFormat: dateFormat,
+    mean: mean
 };

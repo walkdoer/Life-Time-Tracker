@@ -13,6 +13,7 @@
 var moment = require('moment');
 var extend = require('node.extend');
 var dayStat = require('./day');
+var util = require('../util');
 var msg = require('../message');
 
 exports.dispose = function(scanResult) {
@@ -61,9 +62,15 @@ exports.dispose = function(scanResult) {
         });
     }
 
+
+    var meanSleepTime = util.mean(days.filter(function (d) {
+        return d.sleepTime > 0;
+    }), 'sleepTime');
     return {
         options: scanResult.options,
         sleepPeriodArr: sleepPeriodArr,
+        //mean sleep time of a month
+        meanSleepTime: meanSleepTime,
         classTime: groupTimeByClass(days).sort(desc),
         tagTime: groupTimeByTag(days).sort(desc),
         projectTime: groupTimeBy('project', days, function (t) {

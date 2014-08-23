@@ -9,6 +9,7 @@ var moment = require('moment');
 
 exports.dispose = function (statResult) {
     outputSleepPeriod(statResult.sleepPeriodArr);
+    console.log('平均睡眠时长:' + (statResult.meanSleepTime / 60).toFixed(2));
     outputTimeGroupByTag(statResult.tagTime);
     outputTimeGroupByClass(statResult.classTime);
     outputSumTime(statResult.sumTime);
