@@ -73,15 +73,9 @@ function formatLabel(l, maxStringLen) {
 }
 
 function getStrLen(str) {
-    var regex = /[\u4E00-\u9FA5]+/g;
-    var chinese = str.match(regex);
-    var chineseLen;
-    if (chinese) {
-        chinese = chinese[0];
-    }
-    chineseLen = chinese ? chinese.length: 0;
-    var engLen = str.replace(regex, '').length;
-    return engLen + 2 * chineseLen;
+    return str.match(/[^ -~]/g) === null ?
+        str.length :
+        str.length + str.match(/[^ -~]/g).length;
 }
 
 function space(l) {
