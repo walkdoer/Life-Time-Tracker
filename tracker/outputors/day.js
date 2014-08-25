@@ -66,13 +66,13 @@ exports.dispose = function (statResult) {
     }
     //output every classes time consume
     msg.log('========== Group By Classe =========='.white);
-    display.bar(statResult.classTime);
+    display.bar(statResult.classTime, {order: 'desc'});
 
     msg.log('========== Group By Tag =========='.white);
-    display.bar(statResult.tagTime);
+    display.bar(statResult.tagTime, {order: 'desc'});
 
     msg.log('========== Group By Project =========='.white);
-    display.bar(statResult.projectTime);
+    display.bar(statResult.projectTime, {order: 'desc'});
 
     if (options.showOriginLogs) {
         console.log('========== Origin Logs ============'.white);

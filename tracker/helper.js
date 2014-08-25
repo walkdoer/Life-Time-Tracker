@@ -360,7 +360,7 @@ function groupTimeByLogClass(logs, classes) {
         return totalTime;
     }
     classes.forEach(function(cls) {
-        var consumeTime = calculateClassesTimeConsume(logs, cls.name);
+        var consumeTime = calculateClassesTimeConsume(logs, cls.code);
         classesTime.push({
             label: cls.name,
             count: consumeTime

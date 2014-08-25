@@ -5,8 +5,19 @@ var MAX_BAR_LEN = 100;
 
 
 
-function displayBar(data, color) {
+function displayBar(data, config) {
+    var color = config.color;
     var total = 0, dataNew = [];
+    var order = config.order;
+    if (order === 'desc') {
+        data = data.sort(function (a, b) {
+            return b.count - a.count;
+        });
+    } else if (order === 'asc') {
+        data = data.sort(function (a, b) {
+            return a.count - b.count;
+        });
+    }
     if (Object.prototype.toString.call(data) === '[object Object]') {
         var keys = Object.keys(data);
         keys.forEach(function (key) {
