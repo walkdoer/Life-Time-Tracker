@@ -31,11 +31,13 @@ function displayBar(data, config) {
     data.forEach(function (l) {
         total += l.count;
     });
-
+    var maxStringLen = getMaxStringLen(data, function (d) {
+        return getStrLen(d.label);
+    });
     data.forEach(function (l) {
         var percent = l.count / total;
         var hours = (l.count / 60).toFixed(2);
-        var output = formatLabel(l.label).bold + '  ' + bar(percent)[color || 'blue'] + ' ' + (hours+'h').cyan;
+        var output = formatLabel(l.label, maxStringLen).bold + '  ' + bar(percent)[color || 'blue'] + ' ' + (hours+'h').cyan;
         console.log(output);
     });
 }
@@ -51,16 +53,21 @@ function bar(percent) {
     return barStr;
 }
 
+function getMaxStringLen(data, getTarget) {
+    var maxStringLen = 0;
+    //the default getTarget function is prepare for data like ['string1', 'string2']
+    getTarget = getTarget || function (d) { return d.length; };
+    data.forEach(function (d) {
+        var len = getTarget(d);
+        maxStringLen = len > maxStringLen ? len : maxStringLen;
+    });
+    return maxStringLen;
+}
 
-function formatLabel(l) {
+function formatLabel(l, maxStringLen) {
     var len = getStrLen(l);
-    var maxLen = 14, gap;
-    if (len > maxLen) {
-        l = l.substr(0, maxLen);
-    } else {
-        gap = maxLen - len;
-        l = l + space(gap);
-    }
+    var gap = maxStringLen - len;
+    l = space(gap) + l + ' ';
     return l;
 }
 
