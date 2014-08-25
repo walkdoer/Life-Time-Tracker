@@ -363,6 +363,7 @@ function groupTimeByLogClass(logs, classes) {
         var consumeTime = calculateClassesTimeConsume(logs, cls.code);
         classesTime.push({
             label: cls.name,
+            code: cls.code,
             count: consumeTime
         });
     });

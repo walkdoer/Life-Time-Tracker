@@ -111,7 +111,7 @@ function groupTimeBy(type, days, process, filter) {
     days.forEach(function (d) {
         var tagTime = d[type + 'Time'];
         tagTime.forEach(function (t) {
-            var target = getTarget(t.label);
+            var target = getTarget(t.label, t.code);
 
             if (target) {
                 target.count += t.count;
@@ -144,7 +144,7 @@ function groupTimeByClass(days) {
     days.forEach(function (d) {
         var classTime = d.classTime;
         classTime.forEach(function (t) {
-            var target = getTarget(t.label);
+            var target = getTarget(t.code);
 
             if (target) {
                 target.count += t.count;
@@ -154,9 +154,9 @@ function groupTimeByClass(days) {
         });
     });
 
-    function getTarget(label) {
+    function getTarget(code) {
         var target = result.filter(function (itm) {
-            return itm.label === label;
+            return itm.code === code;
         });
 
         return target[0] || null;
@@ -185,7 +185,7 @@ function sumTime(days) {
 
 function mean(data, len, logClass) {
     var total = data.filter(function (d) {
-        return d.label === logClass;
+        return d.code === logClass;
     })[0];
 
     return total.count / len;

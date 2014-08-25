@@ -6,6 +6,7 @@ var MAX_BAR_LEN = 100;
 
 
 function displayBar(data, config) {
+    config = config || {};
     var color = config.color;
     var total = 0, dataNew = [];
     var order = config.order;
@@ -67,7 +68,7 @@ function getMaxStringLen(data, getTarget) {
 function formatLabel(l, maxStringLen) {
     var len = getStrLen(l);
     var gap = maxStringLen - len;
-    l = space(gap) + l + ' ';
+    l = space(gap) + l + '';
     return l;
 }
 
