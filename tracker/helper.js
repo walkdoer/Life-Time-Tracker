@@ -5,6 +5,8 @@
 'use strict';
 
 var moment = require('moment');
+var LogClass = require('./model/fundament/logClass');
+var logClassName = require('./conf/logClassName');
 var msg = require('./message');
 var extend = require('node.extend');
 var dateFormat = 'YYYY-MM-DD HH:mm';
@@ -100,7 +102,7 @@ function getSimpleClasses(data) {
     return classes.filter(onlyUnique);
 }
 
-function getClasses(data) {
+function getLogClasses(data) {
     var result = data.match(/\{.*?\}/g);
     var classes = [];
     if (!result) {
@@ -116,19 +118,19 @@ function getClasses(data) {
         }
         classes = classes.concat(classArr);
     });
-    return classes.reduce(function(pv, cv) {
-        var target = pv.filter(function(val) {
-            return val.name === cv;
+    return classes.reduce(function(result, cv) {
+        var target = result.filter(function(val) {
+            return val.code === cv;
         });
         if (target && target.length > 0) {
             target[0].frequence++;
         } else {
-            pv.push({
-                name: cv,
-                frequence: 1
-            });
+            var name = logClassName[cv];
+            var logClass = new LogClass({name: name, code: cv});
+            logClass.frequence = 1;
+            result.push(logClass);
         }
-        return pv;
+        return result;
     }, []);
 }
 
@@ -345,7 +347,7 @@ function groupTimeByTag (logs) {
 }
 
 
-function groupTimeByClass(logs, classes) {
+function groupTimeByLogClass(logs, classes) {
     var classesTime = [];
     function calculateClassesTimeConsume(logs, cls) {
         var totalTime = 0;
@@ -476,7 +478,7 @@ function checkLogSequence(logs) {
     return checkResult;
 }
 
-exports.getClasses = getClasses;
+exports.getLogClasses = getLogClasses;
 exports.getSimpleClasses = getSimpleClasses;
 exports.getTags = getTags;
 exports.getSimpleTags = getSimpleTags;
@@ -488,7 +490,7 @@ exports.nextDay = nextDay;
 exports.getLogs = getLogs;
 exports.getWakeTime = getWakeTime;
 exports.groupTimeByTag = groupTimeByTag;
-exports.groupTimeByClass = groupTimeByClass;
+exports.groupTimeByLogClass = groupTimeByLogClass;
 exports.groupTimeByProject = groupTimeByProject;
 exports.getSigns = getSigns;
 exports.getProjects = getProjects;

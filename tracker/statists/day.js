@@ -31,7 +31,7 @@ exports.dispose = function (scanResult) {
 
     //check the correctness of time frequence for the logs
     helper.checkLogSequence(logs);
-    statResult.classes = helper.getClasses(fileContent).sort(frequenceDesc);
+    statResult.classes = helper.getLogClasses(fileContent).sort(frequenceDesc);
     statResult.tags = helper.getTags(fileContent).sort(frequenceDesc);
     statResult.projects = helper.getProjects(fileContent);
 
@@ -67,7 +67,7 @@ exports.dispose = function (scanResult) {
     statResult.activeTime = activeTime;
     statResult.unTrackedTime = unTrackedTime;
     statResult.sleepTime = calculateSleepLength(date, sleepMoment);
-    statResult.classTime = helper.groupTimeByClass(logs, statResult.classes);
+    statResult.classTime = helper.groupTimeByLogClass(logs, statResult.classes);
     statResult.tagTime = helper.groupTimeByTag(logs);
     statResult.projectTime = helper.groupTimeByProject(logs);
     return statResult;
