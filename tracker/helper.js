@@ -416,16 +416,29 @@ function groupTimeBy (logs, condition, process, filter) {
 
 function getProjects(log) {
     return getItem(log, /<.*?>/g, /[<>]/g, Project, function (projStr) {
-        var tmpArr = projStr.split(':'),
-            name = tmpArr[0],
-            attrs = tmpArr[1];
+        var nameRegexp = /^(.*?):/,
+            name;
+        projStr = projStr.trim();
+        if (!projStr) {
+            return;
+        }
+        var attrs = projStr.replace(nameRegexp, '');
+        if (attrs === projStr) {
+            name = projStr;
+            attrs = null;
+        } else {
+            name = projStr.match(nameRegexp)[1].trim();
+        }
+        //delete the project name string and the rest is attrs;
         if (attrs) {
             attrs = attrs.trim().split(/\s+/g).map(function (val) {
-                var result = val.match(/(\w+)\s*=\s*"?(\w+)"?/g);
+                var result = val.match(/(.+)\s*=\s*"(.+)"|(.+)\s*=\s*(.+)/);
                 if (result) {
+                    var key = result[1] || result[3];
+                    var value = result[2] || result[4];
                     return {
-                        key: result[1],
-                        value: result[2].trim()
+                        key: key,
+                        value: value
                     };
                 }
             });
