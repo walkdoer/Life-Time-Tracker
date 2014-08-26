@@ -66,14 +66,7 @@ exports.dispose = function(scanResult) {
 
     var classTime = groupTimeByClass(days).sort(desc),
         tagTime = groupTimeByTag(days).sort(desc),
-        projectTime = groupTimeBy('project', days, function (t) {
-            var label = t.label.split(':')[0];
-            label = label.split(' ')[0];
-            t.label = label;
-            return t;
-        }, function (item, target) {
-            return target.indexOf(item.label) === 0;
-        }).sort(desc);
+        projectTime = groupTimeBy('project', days).sort(desc);
 
     var meanSleepTime = util.mean(days.filter(function (d) {
         return d.sleepTime > 0;
@@ -108,33 +101,24 @@ function groupTimeByTag(days) {
 
 function groupTimeBy(type, days, process, filter) {
     var result = [];
+    filter = filter || function (item, groupItem) {
+        return item.label === groupItem.label;
+    };
     days.forEach(function (d) {
-        var tagTime = d[type + 'Time'];
-        tagTime.forEach(function (t) {
-            var target = getTarget(t.label, t.code);
-
-            if (target) {
-                target.count += t.count;
+        var times = d[type + 'Time'];
+        times.forEach(function (time) {
+            var target = result.filter(filter.bind(null, time));
+            if (target && target.length > 0) {
+                target.count += time.count;
             } else {
                 if(typeof process === 'function') {
-                    t = process(extend({}, t));
+                    time = process(extend({}, time));
                 }
-                result.push(t);
+                result.push(time);
             }
         });
     });
 
-    function getTarget(targetLabel) {
-        var target = result.filter(function (itm) {
-            if (filter) {
-                return filter(itm, targetLabel);
-            } else {
-                return itm.label === targetLabel;
-            }
-        });
-
-        return target[0] || null;
-    }
 
     return result;
 }
