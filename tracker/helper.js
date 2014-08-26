@@ -281,7 +281,7 @@ function getLogInfo(config) {
     var logInfo = {
         classes: getSimpleClasses(log),
         tags: getSimpleTags(log),
-        projects: getSimpleProjects(log),
+        projects: getProjects(log),
         sign: getSigns(log),
         index: config.index,
         origin: log
@@ -379,28 +379,23 @@ function groupTimeByLogClass(logs, classes) {
 
 
 function groupTimeByProject(logs) {
-    return groupTimeBy(logs, 'projects', function (label) {
-        label = label.split(':')[0];
-        label = label.split(' ')[0];
-        return label;
-    }, function (label, target) {
-        return label.indexOf(target) === 0;
+    return groupTimeBy(logs, 'projects', function (project) {
+        return project.name;
+    }, function (project, groupItem) {
+        return groupItem.label === project.name;
     });
 }
 
 function groupTimeBy (logs, condition, process, filter) {
     var result = [];
+    filter = filter || function (item, groupItem) {
+        return groupItem.label === item;
+    };
     logs.forEach(function (log) {
         var items = log[condition];
         if (items && items.length) {
             items.forEach(function (item) {
-                var target = result.filter(function (resultItem) {
-                    if (filter) {
-                        return filter(resultItem.label, item);
-                    } else {
-                        return resultItem.label === item;
-                    }
-                });
+                var target = result.filter(filter.bind(null, item));
                 if (target && target.length) {
                     target[0].count += log.len;
                 } else {
