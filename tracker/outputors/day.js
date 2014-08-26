@@ -76,7 +76,7 @@ exports.dispose = function (statResult) {
 
     if (options.showOriginLogs) {
         console.log('========== Origin Logs ============'.white);
-        console.log(statResult.data);
+        console.log(statResult.fileContent.magenta);
     }
     return statResult;
 };

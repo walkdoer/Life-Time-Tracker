@@ -73,6 +73,7 @@ exports.dispose = function (scanResult) {
     statResult.classTime = helper.groupTimeByLogClass(logs, statResult.classes);
     statResult.tagTime = helper.groupTimeByTag(logs);
     statResult.projectTime = helper.groupTimeByProject(logs);
+    statResult.fileContent = fileContent;
     return statResult;
     function frequenceDesc(a, b) {
         return b.frequence - a.frequence;
