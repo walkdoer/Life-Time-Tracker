@@ -16,6 +16,7 @@ var timeSplitter = ':';
 
 var tagReplaceRegexp = /[\[\]]/ig,
     projectReplaceRegexp = /[<>]/g,
+    timeSpanRegexp = /\d{1,2}\s*[:]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:]\s*\d{1,2})*/ig,
     logClassReplaceRegexp = /[\{\}]/g;
 
 function getLogs(data, date) {
@@ -224,8 +225,7 @@ function getTimeSpanFromLog(log, config) {
     var date = config.date;
     var timeSpan = null,
         plusOneDay = false;
-    var timeSpanRex = /\d{1,2}\s*[:：]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:：]\s*\d{1,2})*/ig;
-    var result = log.match(timeSpanRex);
+    var result = log.match(timeSpanRegexp);
     if (result && result.length === 1) {
         timeSpan = {};
         var timeStr = result[0];
@@ -291,6 +291,9 @@ function getLogInfo(config) {
         index: config.index,
         origin: log
     };
+    if (logInfo.content) {
+        msg.info(logInfo.content);
+    }
     var timeSpan = getTimeSpanFromLog(log, config);
     return extend(logInfo, timeSpan);
 }
@@ -300,6 +303,7 @@ function getLogContent(logStr) {
         projectReplaceRegexp = /<.*?>/g,
         logClassReplaceRegexp = /\{.*?\}/g;
     return logStr.replace(tagReplaceRegexp, '')
+          .replace(timeSpanRegexp, '')
           .replace(projectReplaceRegexp, '')
           .replace(logClassReplaceRegexp, '').trim();
 }
