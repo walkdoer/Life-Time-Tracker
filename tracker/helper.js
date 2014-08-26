@@ -14,6 +14,10 @@ var extend = require('node.extend');
 var dateFormat = 'YYYY-MM-DD HH:mm';
 var timeSplitter = ':';
 
+var tagReplaceRegexp = /[\[\]]/ig,
+    projectReplaceRegexp = /[<>]/g,
+    logClassReplaceRegexp = /[\{\}]/g;
+
 function getLogs(data, date) {
     var logStrArr = data.split('\n').filter(isEmpty);
     var lastIndex = logStrArr.length - 1;
@@ -105,7 +109,7 @@ function getSimpleClasses(data) {
 }
 
 function getLogClasses(data, unique) {
-    var result = getItem(data, /\{.*?\}/g, /[\{\}]/g, LogClass,
+    var result = getItem(data, /\{.*?\}/g, logClassReplaceRegexp, LogClass,
         null, /*no processor*/
         function (value) {
             var name = logClassName[value];
@@ -149,7 +153,7 @@ function getTags(data) {
     }
     result.forEach(function(tagStr) {
         var tagArr;
-        tagStr = tagStr.trim().replace(/[\[\]]/ig, '');
+        tagStr = tagStr.trim().replace(tagReplaceRegexp, '');
         if (tagStr) {
             tagArr = tagStr.split(',').map(function(val) {
                 //tag不区分大小写
@@ -279,6 +283,7 @@ function getTimeSpanFromLog(log, config) {
 function getLogInfo(config) {
     var log = config.logStr;
     var logInfo = {
+        content: getLogContent(log),
         classes: getSimpleClasses(log),
         tags: getSimpleTags(log),
         projects: getProjects(log),
@@ -290,6 +295,14 @@ function getLogInfo(config) {
     return extend(logInfo, timeSpan);
 }
 
+function getLogContent(logStr) {
+    var tagReplaceRegexp = /\[.*?\](?!\()/ig,
+        projectReplaceRegexp = /<.*?>/g,
+        logClassReplaceRegexp = /\{.*?\}/g;
+    return logStr.replace(tagReplaceRegexp, '')
+          .replace(projectReplaceRegexp, '')
+          .replace(logClassReplaceRegexp, '').trim();
+}
 
 function getTimeSpan(start, end) {
     var diff = -1;
@@ -415,7 +428,7 @@ function groupTimeBy (logs, condition, process, filter) {
 
 
 function getProjects(log) {
-    return getItem(log, /<.*?>/g, /[<>]/g, Project, function (projStr) {
+    return getItem(log, /<.*?>/g, projectReplaceRegexp, Project, function (projStr) {
         var nameRegexp = /^(.*?):/,
             name;
         projStr = projStr.trim();
