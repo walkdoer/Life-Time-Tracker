@@ -31,9 +31,12 @@ exports.dispose = function (scanResult) {
 
     //check the correctness of time frequence for the logs
     helper.checkLogSequence(logs);
-    statResult.classes = helper.getLogClasses(fileContent).sort(frequenceDesc);
+    statResult.classes = helper.getLogClasses(fileContent, true/*unique*/).sort(frequenceDesc);
     statResult.tags = helper.getTags(fileContent).sort(frequenceDesc);
     statResult.projects = helper.getProjects(fileContent);
+    statResult.projectsFrequence = util.frequence(statResult.projects, function (value, target) {
+        return value.name === target.name;
+    });
 
     //last index of the logs
     var lastIndex = logs.length - 1;

@@ -4,8 +4,10 @@
  */
 'use strict';
 
-var moment = require('moment');
-var LogClass = require('./model/fundament/logClass');
+var moment = require('moment'),
+    util = require('./util');
+var LogClass = require('./model/fundament/logClass'),
+    Project = require('./model/fundament/Project');
 var logClassName = require('./conf/logClassName');
 var msg = require('./message');
 var extend = require('node.extend');
@@ -102,7 +104,21 @@ function getSimpleClasses(data) {
     return classes.filter(onlyUnique);
 }
 
-function getLogClasses(data) {
+function getLogClasses(data, unique) {
+    var result = getItem(data, /\{.*?\}/g, /[\{\}]/g, LogClass,
+        null, /*no processor*/
+        function (value) {
+            var name = logClassName[value];
+            return new LogClass(name, value);
+        });
+
+    if (unique === true) {
+        result = util.frequence(result, function (val, target) {
+            return val.name === target.name;
+        });
+    }
+    return result;
+    /*
     var result = data.match(/\{.*?\}/g);
     var classes = [];
     if (!result) {
@@ -110,12 +126,6 @@ function getLogClasses(data) {
     }
     result.forEach(function(classStr) {
         var classArr;
-        classStr = classStr.trim().replace(/[\{\}]/g, '');
-        if (classStr) {
-            classArr = classStr.split(',').map(function(val) {
-                return val.trim();
-            });
-        }
         classes = classes.concat(classArr);
     });
     return classes.reduce(function(result, cv) {
@@ -125,13 +135,10 @@ function getLogClasses(data) {
         if (target && target.length > 0) {
             target[0].frequence++;
         } else {
-            var name = logClassName[cv];
-            var logClass = new LogClass({name: name, code: cv});
-            logClass.frequence = 1;
-            result.push(logClass);
         }
         return result;
     }, []);
+    */
 }
 
 function getTags(data) {
@@ -413,45 +420,61 @@ function groupTimeBy (logs, condition, process, filter) {
 
 
 function getProjects(log) {
-    return getItem(log, /<.*?>/g, /[<>]/g, Object);
+    return getItem(log, /<.*?>/g, /[<>]/g, Project, function (projStr) {
+        var tmpArr = projStr.split(':'),
+            name = tmpArr[0],
+            attrs = tmpArr[1];
+        if (attrs) {
+            attrs = attrs.trim().split(/\s+/g).map(function (val) {
+                var result = val.match(/(\w+)\s*=\s*"?(\w+)"?/g);
+                if (result) {
+                    return {
+                        key: result[1],
+                        value: result[2].trim()
+                    };
+                }
+            });
+        }
+        if (!name) { msg.error('project has no name. origin:' + projStr); }
+        return {
+            name: name,
+            attributes: attrs
+        };
+    }, function (value) {
+        return new Project(value.name, value.attributes);
+    });
 }
-
 
 function getSimpleProjects(log) {
     return getItem(log, /<.*?>/g, /[<>]/g, String);
 }
 
 
-function getItem(data, regexp, replace, type){
+function getItem(data, regexp, replace, type, processor, creator){
 
     var result = data.match(regexp);
     if (!result) {
         return [];
     }
     result = result.map(function(itemStr) {
-        return itemStr.trim().replace(replace, '').trim();
+        var str = itemStr.trim().replace(replace, '').trim();
+        if (typeof processor === 'function') {
+            return processor(str);
+        }
+        return str;
     });
-    if (type === Object) {
+    if (type === String) {
+        result = result.filter(onlyUnique);
+    } else {
         result = result.reduce(function(pv, cv) {
-            var target = pv.filter(function(val) {
-                return val.name === cv;
-            });
-            if (target && target.length > 0) {
-                target[0].frequence++;
-            } else {
-                pv.push({
-                    name: cv,
-                    frequence: 1
-                });
-            }
+            pv.push(creator(cv));
             return pv;
         }, []);
-    } else {
-        result = result.filter(onlyUnique);
     }
 
     return result;
 }
+
 
 
 /**

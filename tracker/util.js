@@ -2,6 +2,7 @@
 
 var fs = require('fs'),
     moment = require('moment'),
+    extend = require('node.extend'),
     when = require('when');
 
 //const
@@ -87,6 +88,23 @@ function mean(days, prop) {
     return sum/total;
 }
 
+
+function frequence(data, filter, creator) {
+    return data.reduce(function (result, d){
+        var target = result.filter(filter.bind(null, d));
+        if (target && target.length > 0) {
+            target[0].frequence++;
+        } else {
+            if (creator) {
+                d = creator(d);
+            }
+            d = extend({frequence: 1}, d);
+            result.push(d);
+        }
+        return result;
+    }, []);
+}
+
 module.exports = {
     isValidDate: isValidDate,
     readLogFiles: readLogFiles,
@@ -97,5 +115,6 @@ module.exports = {
     formatDate: formatDate,
     timeFormat: timeFormat,
     dateFormat: dateFormat,
+    frequence: frequence,
     mean: mean
 };

@@ -9,11 +9,11 @@
  */
 'use strict';
 
-var LogClass = function (config) {
+var LogClass = function (name, code) {
     //class name;
-    this.name = config.name;
+    this.name = name;
     //class code;
-    this.code = config.code;
+    this.code = code;
 };
 
 
