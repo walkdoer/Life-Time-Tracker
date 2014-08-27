@@ -55,8 +55,6 @@ function dispatch(dateStr) {
         return parseInt(val, 10);
     });
     var dateType = [null, 'year', 'month', 'day'][dateArr.length];
-    //the statist is used to stat the log data the then scanner have scan;
-    var statist = getStatist(dateType);
 
 
     var options = extend({}, userOptions, {
@@ -64,20 +62,23 @@ function dispatch(dateStr) {
         dateStr: dateStr,
         dateArr: dateArr
     });
+    var statist = getStatist(dateType, options);
 
     /**
-     * process step:
+     * the statist is used to stat the log data the then scanner have scan
+     *
+     * process step
      *     1. scan
      *     2. stat
      *     3. output
      */
     scanner.scan(options)
-           .then(statist.dispose.bind(statist))
+           .then(statist.dispose.bind(statist, options))
            .then(outputor.dispose.bind(outputor, options));
 }
 
 function getStatist(type) {
-    var statistPath = './statists/' + type;
+    var statistPath = './statists/' + type ;
     return require(statistPath);
 }
 
