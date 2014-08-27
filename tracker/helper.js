@@ -470,10 +470,13 @@ function getProjects(log) {
         if (!name) { msg.error('project has no name. origin:' + projStr); }
         return {
             name: name,
-            attributes: attrs
+            attributes: attrs,
+            origin: projStr
         };
     }, function (value) {
-        return new Project(value.name, value.attributes);
+        var proj = new Project(value.name, value.attributes);
+        proj.origin = value.origin;
+        return proj;
     });
 }
 

@@ -76,12 +76,13 @@ function processSportLog(day) {
         var items = [];
         projects.forEach(function (proj) {
             // push-up:10s4r means push-up 10 sets, 4reps
-            if (proj.indexOf(SPLITTER)) {
-                var result = transform(proj);
+            var projStr = proj.origin;
+            if (projStr.indexOf(SPLITTER)) {
+                var result = transform(projStr);
                 items.push(result);
             } else {
                 items.push({
-                    name: proj
+                    name: proj.name
                 });
             }
 

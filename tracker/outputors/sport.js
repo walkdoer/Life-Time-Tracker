@@ -26,15 +26,14 @@ function preprocessResult(result) {
 
 function transformToTable(sportItemSum) {
     var table = {
-            head: ['Sport Item', 'Sets', 'Reps'],
-            colWidths: [200, 100, 100]
+            head: ['Sport Item', 'All Sets', 'All Reps', 'Mean Reps'],
         },
         //table data
         data = [];
     var keys = Object.keys(sportItemSum);
     keys.forEach(function (key) {
         var item = sportItemSum[key];
-        data.push([key, item.sets, item.reps]);
+        data.push([key, item.sets, item.reps, Math.round(item.reps / item.sets)]);
     });
     table.data = data;
     return table;
