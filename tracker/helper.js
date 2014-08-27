@@ -114,6 +114,10 @@ function getLogClasses(data, unique) {
         null, /*no processor*/
         function (value) {
             var name = logClassName[value];
+            if (!name) {
+                name = 'UNKNOW CLASS NAME';
+                msg.error(data + ' className is not right');
+            }
             return new LogClass(name, value);
         });
 
@@ -492,7 +496,11 @@ function getItem(data, regexp, replace, type, processor, creator){
         result = result.filter(onlyUnique);
     } else {
         result = result.reduce(function(pv, cv) {
-            pv.push(creator(cv));
+            if (cv) {
+                pv.push(creator(cv));
+            } else {
+                msg.error(data + 'has no content');
+            }
             return pv;
         }, []);
     }
