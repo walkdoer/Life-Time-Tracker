@@ -3,19 +3,17 @@
  */
 'use strict';
 var msg = require('./message');
-var logClassEnum = require('./enum/logClass');
-var lifeScanner = require('./scanners/lifeScanner');
-var sportScanner = require('./scanners/sportScanner');
+var dateTypeEnum = require('./enum/dateType');
 
 /**
  * dispatch the scan task to the corresponding scanner
  */
 exports.scan = function (options) {
     var scanner = null;
-    if (options.logClass === logClassEnum.NormalThing) {
-        scanner = lifeScanner;
-    } else if (options.logClass === logClassEnum.Sport) {
-        scanner = sportScanner;
+    if (options.dateType === dateTypeEnum.Day) {
+        scanner = require('./scanners/dayLifeScanner');
+    } else if (options.dateType === dateTypeEnum.Month){
+        scanner = require('./scanners/monthLifeScanner');
     }
     if (scanner) {
         return scanner.scan(options);

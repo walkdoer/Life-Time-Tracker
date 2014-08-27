@@ -7,8 +7,7 @@
 
 'use strict';
 
-var dateTypeEnum = require('../enum/dateType'),
-    msg = require('../message'),
+var msg = require('../message'),
     helper = require('../helper'),
     scannerHelper = require('./helper'),
     when = require('when');
@@ -34,15 +33,9 @@ exports.scan = function (options) {
 
 
 function extractLogs(options, fileData) {
-    var date = fileData.date;
-
-    if (options.dateType === dateTypeEnum.Month) {
-        fileData.days.forEach(function (day) {
-            day.logs = helper.getLogs(day.fileContent, day.date);
-        });
-    } else if (options.dateType === dateTypeEnum.Day) {
-        var fileContent = fileData.fileContent;
-        fileData.logs = helper.getLogs(fileContent, date);
-    }
+    fileData.days.forEach(function (day) {
+        day.logs = helper.getLogs(day.fileContent, day.date);
+        day.logs = scannerHelper.filterClass(day.data, options);
+    });
     return fileData;
 }

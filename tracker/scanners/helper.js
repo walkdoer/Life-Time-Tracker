@@ -4,7 +4,8 @@
  */
 'use strict';
 
-var dateTypeEnum = require('../enum/dateType');
+var dateTypeEnum = require('../enum/dateType'),
+    logClassEnum = require('../enum/logClass');
 var util = require('../util');
 var when = require('when');
 var msg = require('../message');
@@ -84,6 +85,20 @@ function preprocessFileData(options, fileData) {
     return fileData;
 }
 
+function filterClass(logs, options) {
+    var logClass = options.logClass,
+        result;
+    if (!logClass) { return logs; }
+    Object.keys(logClassEnum).forEach(function (clsKey) {
+        if (logClass === logClassEnum[clsKey]) {
+            var filter = require('./filters/classes/' + clsKey.toLowerCase());
+            result = logs.filter(filter);
+        }
+    });
+    return result;
+}
+
 exports.readLogFile = readLogFile;
 exports.readOneDayLog = readOneDayLog;
 exports.readOneMonthLog = readOneMonthLog;
+exports.filterClass = filterClass;

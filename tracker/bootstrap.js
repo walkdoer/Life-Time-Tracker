@@ -15,9 +15,7 @@ var util = require('./util'),
 var argv = process.argv;
 var dateStr = argv[2];
 
-var userOptions = {
-    logClass: logClassEnum.NormalThing
-};
+var userOptions = {};
 argv.slice(3).forEach(function (val) {
     userOptions.showOriginLogs = ['--origin', '-o'].indexOf(val) >= 0;
     userOptions.updateDatabase = ['--updateDb', '-udb'].indexOf(val) >= 0;
@@ -27,8 +25,6 @@ argv.slice(3).forEach(function (val) {
         userOptions.logClass = logClassEnum.Think;
     } else if (['--break', '-brk'].indexOf(val) >= 0) {
         userOptions.logClass = logClassEnum.Break;
-    } else {
-        userOptions.logClass = logClassEnum.NormalThing;
     }
 });
 
@@ -60,7 +56,7 @@ function dispatch(dateStr) {
     });
     var dateType = [null, 'year', 'month', 'day'][dateArr.length];
     //the statist is used to stat the log data the then scanner have scan;
-    var statist = getStatist(dateType, userOptions);
+    var statist = getStatist(dateType);
 
 
     var options = extend({}, userOptions, {
@@ -80,13 +76,8 @@ function dispatch(dateStr) {
            .then(outputor.dispose.bind(outputor, options));
 }
 
-function getStatist(type, userOptions) {
-    var statistPath = './statists/',
-        statistsMap = {
-            SPR: 'sport'
-        },
-        logClass = userOptions.logClass;
-    statistPath += statistsMap[logClass] || type;
+function getStatist(type) {
+    var statistPath = './statists/' + type;
     return require(statistPath);
 }
 

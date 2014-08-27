@@ -12,7 +12,7 @@ var logClassEnum = require('./enum/logClass');
 
 exports.dispose = function (options, statResult) {
 
-    if (options.logClass === logClassEnum.NormalThing) {
+    if (!options.logClass) {
         if (options.dateType === dateTypeEnum.Day) {
             dayOutput.dispose(statResult, options);
         } else if (options.dateType === dateTypeEnum.Month) {

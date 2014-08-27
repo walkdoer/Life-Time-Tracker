@@ -1,7 +1,6 @@
 /**
  * Log Class
  *
- * @return
  */
 module.exports = {
     NormalThing: 'NT',
