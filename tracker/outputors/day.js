@@ -8,7 +8,21 @@ var msg = require('../message'),
     util = require('../util'),
     display = require('../dislpay_data');
 
-exports.dispose = function (statResult) {
+var logClassEnum = require('../enum/logClass');
+
+var logClassMap = util.inversObj(logClassEnum);
+
+exports.dispose = function (statResult, options) {
+    if (options.logClass) {
+        outputPerspectives(statResult, logClassMap[options.logClass].toLowerCase());
+    } else {
+        outputMain(statResult);
+        outputPerspectives(statResult);
+    }
+    return statResult;
+};
+
+function outputMain(statResult) {
     var UNRECORDED = '未记录',
         options = statResult.options,
         tags = statResult.tags,
@@ -79,12 +93,15 @@ exports.dispose = function (statResult) {
         console.log(statResult.fileContent.magenta);
     }
 
-    outputPerspectives(statResult);
-    return statResult;
-};
-
-function outputPerspectives(statResult) {
-    ['sport'].forEach(function (key) {
+}
+function outputPerspectives(statResult, perspective) {
+    var perspectives;
+    if (perspective) {
+        perspectives = [perspective];
+    } else {
+        perspectives = ['sport'];
+    }
+    perspectives.forEach(function (key) {
         var perspectiveName = key.toLowerCase(),
             outputor;
         try {

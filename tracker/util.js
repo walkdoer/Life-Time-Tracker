@@ -105,6 +105,14 @@ function frequence(data, filter, creator) {
     }, []);
 }
 
+function inversObj(obj) {
+    var result = {};
+    Object.keys(obj).forEach(function (key) {
+        result[obj[key]] = key;
+    });
+    return result;
+}
+
 module.exports = {
     isValidDate: isValidDate,
     readLogFiles: readLogFiles,
@@ -116,5 +124,6 @@ module.exports = {
     timeFormat: timeFormat,
     dateFormat: dateFormat,
     frequence: frequence,
+    inversObj: inversObj,
     mean: mean
 };
