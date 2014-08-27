@@ -288,7 +288,7 @@ function getLogInfo(config) {
     var log = config.logStr;
     var logInfo = {
         content: getLogContent(log),
-        classes: getSimpleClasses(log),
+        classes: getLogClasses(log),
         tags: getSimpleTags(log),
         projects: getProjects(log),
         sign: getSigns(log),
@@ -381,14 +381,20 @@ function groupTimeByLogClass(logs, classes) {
         var totalTime = 0;
         logs.forEach(function(log) {
             var classes = log.classes;
-            if (classes && classes.indexOf(cls) >= 0) {
+            if (classes && hasClass(cls)) {
                 totalTime += log.len;
+            }
+            function hasClass(targetCls) {
+                var clsCode = targetCls.code;
+                return classes.filter(function (cls) {
+                    return cls.code === clsCode;
+                }).length > 0;
             }
         });
         return totalTime;
     }
     classes.forEach(function(cls) {
-        var consumeTime = calculateClassesTimeConsume(logs, cls.code);
+        var consumeTime = calculateClassesTimeConsume(logs, cls);
         classesTime.push({
             label: cls.name,
             code: cls.code,
