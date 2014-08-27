@@ -8,7 +8,7 @@
 var logClassEnum = require('../enum/logClass'),
     overviewPerspective = require('./perspectives/overview');
 var msg = require('../message');
-
+var perspectiveCache = {};
 /**
  * dispose the scan result of the scanner
  * @param scanResult
@@ -20,9 +20,14 @@ exports.dispose = function (options, scanResult) {
         var perspectiveName = key.toLowerCase(),
             perspective;
         try {
-            perspective = require('./perspectives/' + perspectiveName);
+            perspective = perspectiveCache[perspectiveName];
+            if (perspective === undefined) {
+                perspective = require('./perspectives/' + perspectiveName);
+                perspectiveCache[perspectiveName] = perspective;
+            }
         } catch (e) {
             msg.warn('Perspective ' + perspectiveName + ' is Not Exsit');
+            perspectiveCache[perspectiveName] = false;
         }
         if (perspective) {
             //use name like sportPerspective to save the stat result

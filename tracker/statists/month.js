@@ -109,7 +109,7 @@ function groupTimeBy(type, days, process, filter) {
         times.forEach(function (time) {
             var target = result.filter(filter.bind(null, time));
             if (target && target.length > 0) {
-                target.count += time.count;
+                target[0].count += time.count;
             } else {
                 if(typeof process === 'function') {
                     time = process(extend({}, time));
