@@ -272,7 +272,7 @@ function getTimeSpanFromLog(log, config) {
             timeSpan.len = endTime.diff(startTime, 'minutes');
         }
     } else {
-        console.log(result);
+        //console.log(result);
         msg.warn('make sure the time is right of ' + date +'\'s log: ' + log);
     }
     return timeSpan;
@@ -295,9 +295,6 @@ function getLogInfo(config) {
         index: config.index,
         origin: log
     };
-    if (logInfo.content) {
-        msg.info(logInfo.content);
-    }
     var timeSpan = getTimeSpanFromLog(log, config);
     return extend(logInfo, timeSpan);
 }
@@ -501,13 +498,11 @@ function getItem(data, regexp, replace, type, processor, creator){
     if (type === String) {
         result = result.filter(onlyUnique);
     } else {
-        result = result.reduce(function(pv, cv) {
-            if (cv) {
-                pv.push(creator(cv));
-            } else {
-                msg.error(data + 'has no content');
-            }
-            return pv;
+        result = result.filter(function (item) {
+            return !!item;
+        }).reduce(function(items, item) {
+            items.push(creator(item));
+            return items;
         }, []);
     }
 
