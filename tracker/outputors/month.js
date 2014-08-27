@@ -5,9 +5,22 @@
 
 var display = require('../dislpay_data');
 var moment = require('moment');
-
+var util = require('../util');
+var logClassEnum = require('../enum/logClass');
+var outputHelper = require('./helper');
+var logClassMap = util.inversObj(logClassEnum);
 
 exports.dispose = function (statResult, options) {
+    if (options.logClass) {
+        outputHelper.outputPerspectives(statResult, logClassMap[options.logClass].toLowerCase());
+    } else {
+        outputMain(statResult, options);
+        outputHelper.outputPerspectives(statResult);
+    }
+    return statResult;
+};
+
+function outputMain(statResult, options) {
     outputOverivew(statResult, options);
     outputSleepPeriod(statResult.sleepPeriodArr);
     console.log('平均睡眠时长:' + (statResult.meanSleepTime / 60).toFixed(2));
@@ -16,7 +29,7 @@ exports.dispose = function (statResult, options) {
     outputSumTime(statResult);
     outputTimeGroupByProject(statResult.projectTime);
     outputUnTrackedTime(statResult.unTrackedTimes);
-};
+}
 
 function outputOverivew(statResult, options) {
     var unTrackedDays = statResult.unTrackedDays;

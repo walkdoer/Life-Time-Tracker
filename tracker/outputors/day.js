@@ -7,17 +7,16 @@
 var msg = require('../message'),
     util = require('../util'),
     display = require('../dislpay_data');
-
 var logClassEnum = require('../enum/logClass');
-
+var outputHelper = require('./helper');
 var logClassMap = util.inversObj(logClassEnum);
 
 exports.dispose = function (statResult, options) {
     if (options.logClass) {
-        outputPerspectives(statResult, logClassMap[options.logClass].toLowerCase());
+        outputHelper.outputPerspectives(statResult, logClassMap[options.logClass].toLowerCase());
     } else {
         outputMain(statResult);
-        outputPerspectives(statResult);
+        outputHelper.outputPerspectives(statResult);
     }
     return statResult;
 };
@@ -92,29 +91,6 @@ function outputMain(statResult) {
         console.log('========== Origin Logs ============'.white);
         console.log(statResult.fileContent.magenta);
     }
-
-}
-function outputPerspectives(statResult, perspective) {
-    var perspectives;
-    if (perspective) {
-        perspectives = [perspective];
-    } else {
-        perspectives = ['sport'];
-    }
-    perspectives.forEach(function (key) {
-        var perspectiveName = key.toLowerCase(),
-            outputor;
-        try {
-            outputor = require('./' + perspectiveName);
-        } catch (e) {
-            msg.warn('Outputor for Perspective ' + perspectiveName + ' is Not Exsit');
-        }
-        if (outputor) {
-            //use name like sportPerspective to save the stat result
-            var name = perspectiveName + 'Perspective';
-            outputor.dispose(statResult[name]);
-        }
-    });
 
 }
 

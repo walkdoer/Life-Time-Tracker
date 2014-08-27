@@ -527,6 +527,9 @@ function getItem(data, regexp, replace, type, processor, creator){
  */
 function checkLogSequence(logs) {
     var checkResult = true;
+    if (logs && logs.length === 0) {
+        return true;
+    }
     logs.reduce(function (pv, cv) {
         var pvEnd = new moment(pv.end, dateFormat),
             cvStart = new moment(cv.start, dateFormat);
