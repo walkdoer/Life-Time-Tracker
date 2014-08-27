@@ -17,7 +17,7 @@ var util = require('../util');
 var msg = require('../message');
 var logClassEnum = require('../enum/logClass');
 
-exports.dispose = function(scanResult) {
+exports.dispose = function(options, scanResult) {
     var days = scanResult.days,
         dayNum = days.length,
         sleepPeriodArr = [],
@@ -28,7 +28,7 @@ exports.dispose = function(scanResult) {
      * record sleep period
      */
     days = days.map(function (d) {
-        d = dayStat.dispose(d);
+        d = dayStat.dispose(null, d);
         recordSleepPeriod(d);
         recordUnTrackedTime(d);
         return d;

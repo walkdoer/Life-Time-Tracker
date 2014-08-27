@@ -17,8 +17,7 @@ exports.focus = function (date, scanResult) {
     var statResult = {
         date: date,
         options: scanResult.options,
-        logs: scanResult.logs,
-        scanResult: scanResult
+        logs: scanResult.logs
     };
 
     //check the correctness of time frequence for the logs
@@ -65,7 +64,6 @@ exports.focus = function (date, scanResult) {
     statResult.classTime = helper.groupTimeByLogClass(logs, statResult.classes);
     statResult.tagTime = helper.groupTimeByTag(logs);
     statResult.projectTime = helper.groupTimeByProject(logs);
-    statResult.fileContent = fileContent;
     return statResult;
     function frequenceDesc(a, b) {
         return b.frequence - a.frequence;

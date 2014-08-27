@@ -35,7 +35,7 @@ exports.scan = function (options) {
 function extractLogs(options, fileData) {
     fileData.days.forEach(function (day) {
         day.logs = helper.getLogs(day.fileContent, day.date);
-        day.logs = scannerHelper.filterClass(day.data, options);
+        day.logs = scannerHelper.filterClass(day.logs, options);
     });
     return fileData;
 }

@@ -14,7 +14,8 @@ var msg = require('../message');
  * @param scanResult
  */
 exports.dispose = function (options, scanResult) {
-    var statResult = overviewPerspective.focus(options.dateStr, scanResult);
+    var date = options ? (options.date || scanResult.date) : scanResult.date;
+    var statResult = overviewPerspective.focus(date, scanResult);
     Object.keys(logClassEnum).forEach(function (key) {
         var perspectiveName = key.toLowerCase(),
             perspective;
@@ -26,7 +27,7 @@ exports.dispose = function (options, scanResult) {
         if (perspective) {
             //use name like sportPerspective to save the stat result
             var name = perspectiveName + 'Perspective';
-            statResult[name] = perspective.focus(options.dateStr, scanResult);
+            statResult[name] = perspective.focus(date, scanResult);
         }
     });
     //save the raw data of log;
