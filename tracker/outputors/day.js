@@ -78,9 +78,28 @@ exports.dispose = function (statResult) {
         console.log('========== Origin Logs ============'.white);
         console.log(statResult.fileContent.magenta);
     }
+
+    outputPerspectives(statResult);
     return statResult;
 };
 
+function outputPerspectives(statResult) {
+    ['sport'].forEach(function (key) {
+        var perspectiveName = key.toLowerCase(),
+            outputor;
+        try {
+            outputor = require('./' + perspectiveName);
+        } catch (e) {
+            msg.warn('Outputor for Perspective ' + perspectiveName + ' is Not Exsit');
+        }
+        if (outputor) {
+            //use name like sportPerspective to save the stat result
+            var name = perspectiveName + 'Perspective';
+            outputor.dispose(statResult[name]);
+        }
+    });
+
+}
 
 
 function generateBasicInfo(data) {

@@ -21,21 +21,15 @@
 
 
 var extend = require('node.extend'),
-    msg = require('../message'),
-    dateTypeEnum = require('../enum/dateType'),
-    sportType = require('../conf/sportType');
+    msg = require('../../message'),
+    logClassEnum = require('../../enum/logClass'),
+    sportType = require('../../conf/sportType');
 
-exports.dispose = function (scanResult) {
-    var options = scanResult.options,
-        statResult = null;
+exports.focus = function (date, scanResult) {
+    var statResult = null;
 
-    if (options.dateType === dateTypeEnum.Month) {
-        scanResult.days.forEach(processSportLog);
-        statResult = stat(scanResult);
-    } else if (options.dateType === dateTypeEnum.Day) {
-        processSportLog(scanResult);
-        statResult = stat(scanResult);
-    }
+    processSportLog(scanResult);
+    statResult = stat(scanResult);
     return statResult;
 };
 
@@ -47,14 +41,18 @@ function processSportLog(day) {
     var count = 0,
         time = 0;
     logs.forEach(function (log) {
+        if (!isSportLog(log)) {
+            return;
+        }
+        var tags = log.tags;
         var sportLog = {
             time: log.len,
             start: log.start,
             end: log.end
         };
-        var type = sportType.get(log.tags);
+        var type = sportType.get(tags);
         if (type.length === 0) {
-            msg.warn('Unknow sport type:' + log.tags.join(','));
+            msg.warn('Unknow sport type:' + (tags || []).join(','));
         }
         sportLog.type = type;
         sportLog.items = getSportItems(log.projects);
@@ -62,6 +60,12 @@ function processSportLog(day) {
         count++;
         time += log.len;
     });
+
+    function isSportLog(log) {
+        return log.classes && log.classes.filter(function (cls) {
+            return cls.code === logClassEnum.Sport;
+        }).length > 0;
+    }
 
     day.time = time;
     day.count = count;

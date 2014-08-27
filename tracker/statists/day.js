@@ -21,7 +21,7 @@ exports.dispose = function (options, scanResult) {
         try {
             perspective = require('./perspectives/' + perspectiveName);
         } catch (e) {
-            msg.warn('Perspective ' + perspectiveName + 'is Not Exsit');
+            msg.warn('Perspective ' + perspectiveName + ' is Not Exsit');
         }
         if (perspective) {
             //use name like sportPerspective to save the stat result
