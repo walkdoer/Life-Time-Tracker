@@ -28,7 +28,8 @@ exports.dispose = function(options, scanResult) {
      * record sleep period
      */
     days = days.map(function (d) {
-        d = dayStat.dispose(null, d);
+        var dayOptions = extend({}, d, {dateStr: d.date});
+        d = dayStat.dispose(dayOptions, d);
         recordSleepPeriod(d);
         recordUnTrackedTime(d);
         return d;

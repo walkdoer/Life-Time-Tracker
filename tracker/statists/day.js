@@ -6,17 +6,28 @@
  */
 'use strict';
 var logClassEnum = require('../enum/logClass'),
+    util = require('../util'),
     overviewPerspective = require('./perspectives/overview');
 var msg = require('../message');
 var perspectiveCache = {};
+var logClassMap = util.inversObj(logClassEnum);
 /**
  * dispose the scan result of the scanner
  * @param scanResult
  */
 exports.dispose = function (options, scanResult) {
-    var date = options ? (options.date || scanResult.date) : scanResult.date;
-    var statResult = overviewPerspective.focus(date, scanResult);
-    Object.keys(logClassEnum).forEach(function (key) {
+    var date = options.dateStr,
+        statResult = {},
+        perspective,
+        perspectives;
+    if (options.logClass) {
+        perspective = logClassMap[options.logClass];
+        perspectives = [perspective];
+    } else {
+        statResult = overviewPerspective.focus(date, scanResult);
+        perspectives = ['sport'];
+    }
+    perspectives.forEach(function (key) {
         var perspectiveName = key.toLowerCase(),
             perspective;
         try {
