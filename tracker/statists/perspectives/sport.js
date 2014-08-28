@@ -21,14 +21,18 @@
 
 
 var extend = require('node.extend'),
+    dateTypeEnum = require('../../enum/dateType'),
     msg = require('../../message'),
     logClassEnum = require('../../enum/logClass'),
     sportType = require('../../conf/sportType');
 
-exports.focus = function (date, scanResult) {
+exports.focus = function (options, scanResult) {
     var statResult = null;
-
-    processSportLog(scanResult);
+    if (options.dateType === dateTypeEnum.Month) {
+        scanResult.days.forEach(processSportLog);
+    } else {
+        processSportLog(scanResult);
+    }
     statResult = stat(scanResult);
     return statResult;
 };

@@ -43,7 +43,7 @@ exports.dispose = function (options, scanResult) {
         if (perspective) {
             //use name like sportPerspective to save the stat result
             var name = perspectiveName + 'Perspective';
-            statResult[name] = perspective.focus(date, scanResult);
+            statResult[name] = perspective.focus(options, scanResult);
         }
     });
     //save the raw data of log;
