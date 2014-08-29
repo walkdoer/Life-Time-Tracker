@@ -11,10 +11,7 @@
 'use strict';
 
 
-var util = require('../util');
-var logClassEnum = require('../enum/logClass');
-var logClassMap = util.inversObj(logClassEnum);
-var overviewPerspective = require('./perspectives/monthOverview');
+var overviewPerspective = require('./perspectives/month.overview');
 var dayStat = require('./day');
 var extend = require('node.extend');
 var msg = require('../message');
@@ -23,7 +20,6 @@ var dateTypeEnum = require('../enum/dateType');
 var perspectiveCache = {};
 exports.dispose = function(options, scanResult) {
     var statResult = {},
-        perspective,
         perspectives;
 
     scanResult.days = scanResult.days.map(function (d) {
@@ -34,12 +30,11 @@ exports.dispose = function(options, scanResult) {
         var statResult = dayStat.dispose(dayOptions, d);
         return extend(d, statResult);
     });
-    if (options.logClass) {
-        perspective = logClassMap[options.logClass];
-        perspectives = [perspective];
+    if (options.perspective) {
+        perspectives = [options.perspective];
     } else {
         statResult = overviewPerspective.focus(scanResult);
-        perspectives = ['sport'];
+        perspectives = ['sport', 'sit'];
     }
     perspectives.forEach(function (key) {
         var perspectiveName = key.toLowerCase(),
@@ -47,7 +42,7 @@ exports.dispose = function(options, scanResult) {
         try {
             perspective = perspectiveCache[perspectiveName];
             if (perspective === undefined) {
-                perspective = require('./perspectives/' + perspectiveName);
+                perspective = require('./perspectives/month.' + perspectiveName);
                 perspectiveCache[perspectiveName] = perspective;
             }
         } catch (e) {

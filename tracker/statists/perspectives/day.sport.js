@@ -21,19 +21,13 @@
 
 
 var extend = require('node.extend'),
-    dateTypeEnum = require('../../enum/dateType'),
     msg = require('../../message'),
     logClassEnum = require('../../enum/logClass'),
     sportType = require('../../conf/sportType');
 
 exports.focus = function (options, scanResult) {
-    var statResult = null;
-    if (options.dateType === dateTypeEnum.Month) {
-        scanResult.days.forEach(processSportLog);
-    } else {
-        processSportLog(scanResult);
-    }
-    statResult = stat(scanResult);
+    processSportLog(scanResult);
+    var statResult = stat(scanResult);
     return statResult;
 };
 
@@ -118,6 +112,7 @@ function processSportLog(day) {
     }
 }
 
+exports.processSportLog = processSportLog;
 
 function stat(scanResult) {
     var datas = scanResult.days || [scanResult];
@@ -178,3 +173,5 @@ function stat(scanResult) {
 
     return result;
 }
+
+exports.stat = stat;

@@ -5,7 +5,7 @@
  * sleep, study and so on.
  */
 'use strict';
-var overviewPerspective = require('./perspectives/overview');
+var overviewPerspective = require('./perspectives/day.overview');
 var msg = require('../message');
 var perspectiveCache = {};
 /**
@@ -28,7 +28,7 @@ exports.dispose = function (options, scanResult) {
         try {
             perspective = perspectiveCache[perspectiveName];
             if (perspective === undefined) {
-                perspective = require('./perspectives/' + perspectiveName);
+                perspective = require('./perspectives/day.' + perspectiveName);
                 perspectiveCache[perspectiveName] = perspective;
             }
         } catch (e) {
