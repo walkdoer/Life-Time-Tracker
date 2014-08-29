@@ -9,12 +9,18 @@ var logClassEnum = require('../../enum/logClass');
 
 exports.focus = function (options, scanResult) {
     var logs = scanResult.logs;
-
+    var standTime = 0,
+        total = 0;
     logs.forEach(function (log) {
+        total += log.len;
         if (isStandLog(log)) {
-            console.log('');
+            standTime += log.len;
         }
     });
+    return {
+        standTime: standTime,
+        sitTime: total - standTime
+    };
 };
 
 function isStandLog(log) {

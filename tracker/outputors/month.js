@@ -5,17 +5,14 @@
 
 var display = require('../dislpay_data');
 var moment = require('moment');
-var util = require('../util');
-var logClassEnum = require('../enum/logClass');
 var outputHelper = require('./helper');
-var logClassMap = util.inversObj(logClassEnum);
 
 exports.dispose = function (statResult, options) {
-    if (options.logClass) {
-        outputHelper.outputPerspectives(statResult, logClassMap[options.logClass].toLowerCase());
+    if (options.perspective) {
+        outputHelper.outputPerspectives(statResult, options.perspective.toLowerCase());
     } else {
-        outputMain(statResult, options);
-        outputHelper.outputPerspectives(statResult);
+        outputMain(statResult);
+        outputHelper.outputPerspectives(statResult, ['sport', 'sit']);
     }
     return statResult;
 };

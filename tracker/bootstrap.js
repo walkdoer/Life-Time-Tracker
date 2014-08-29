@@ -16,7 +16,8 @@ var argv = process.argv;
 var dateStr = argv[2];
 
 var userOptions = {};
-argv.slice(3).forEach(function (val) {
+var userArguments = argv.slice(3);
+userArguments.forEach(function (val, index) {
     userOptions.showOriginLogs = ['--origin', '-o'].indexOf(val) >= 0;
     userOptions.updateDatabase = ['--updateDb', '-udb'].indexOf(val) >= 0;
     if (['--sport', '-spr'].indexOf(val) >= 0) {
@@ -25,6 +26,13 @@ argv.slice(3).forEach(function (val) {
         userOptions.logClass = logClassEnum.Think;
     } else if (['--break', '-brk'].indexOf(val) >= 0) {
         userOptions.logClass = logClassEnum.Break;
+    } else if (['--perspective', '-p'].indexOf(val) >= 0) {
+        var perspective = userArguments[index + 1];
+        if (!perspective) {
+            msg.error('should have a perspective.');
+            process.exit(1);
+        }
+        userOptions.perspective = perspective;
     }
 });
 

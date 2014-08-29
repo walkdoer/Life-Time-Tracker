@@ -5,12 +5,9 @@
  * sleep, study and so on.
  */
 'use strict';
-var logClassEnum = require('../enum/logClass'),
-    util = require('../util'),
-    overviewPerspective = require('./perspectives/overview');
+var overviewPerspective = require('./perspectives/overview');
 var msg = require('../message');
 var perspectiveCache = {};
-var logClassMap = util.inversObj(logClassEnum);
 /**
  * dispose the scan result of the scanner
  * @param scanResult
@@ -18,14 +15,12 @@ var logClassMap = util.inversObj(logClassEnum);
 exports.dispose = function (options, scanResult) {
     var date = options.dateStr,
         statResult = {},
-        perspective,
-        perspectives;
-    if (options.logClass) {
-        perspective = logClassMap[options.logClass];
-        perspectives = [perspective];
+        perspectives = [];
+    if (options.perspective) {
+        perspectives.push(options.perspective);
     } else {
         statResult = overviewPerspective.focus(date, scanResult);
-        perspectives = ['sport'];
+        perspectives = perspectives.concat(['sport', 'sit']);
     }
     perspectives.forEach(function (key) {
         var perspectiveName = key.toLowerCase(),

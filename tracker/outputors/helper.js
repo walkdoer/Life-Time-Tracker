@@ -1,11 +1,8 @@
 'use strict';
 var msg = require('../message');
-function outputPerspectives(statResult, perspective) {
-    var perspectives;
-    if (perspective) {
-        perspectives = [perspective];
-    } else {
-        perspectives = ['sport'];
+function outputPerspectives(statResult, perspectives) {
+    if (typeof perspectives === 'string') {
+        perspectives = [perspectives];
     }
     perspectives.forEach(function (key) {
         var perspectiveName = key.toLowerCase(),
