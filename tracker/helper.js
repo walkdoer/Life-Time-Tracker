@@ -115,8 +115,8 @@ function getLogClasses(data, unique) {
         function (value) {
             var name = logClassName[value];
             if (!name) {
-                name = 'UNKNOW CLASS NAME';
-                msg.error(data + ' className is not right');
+                name = 'UNKNOW LOGCLASS NAME';
+                throw new Error(name + ': "' + data + '" className is not right');
             }
             return new LogClass(name, value);
         });
@@ -127,27 +127,6 @@ function getLogClasses(data, unique) {
         });
     }
     return result;
-    /*
-    var result = data.match(/\{.*?\}/g);
-    var classes = [];
-    if (!result) {
-        return null;
-    }
-    result.forEach(function(classStr) {
-        var classArr;
-        classes = classes.concat(classArr);
-    });
-    return classes.reduce(function(result, cv) {
-        var target = result.filter(function(val) {
-            return val.code === cv;
-        });
-        if (target && target.length > 0) {
-            target[0].frequence++;
-        } else {
-        }
-        return result;
-    }, []);
-    */
 }
 
 function getTags(data) {
@@ -285,18 +264,23 @@ function getTimeSpanFromLog(log, config) {
  * @param index
  */
 function getLogInfo(config) {
-    var log = config.logStr;
-    var logInfo = {
-        content: getLogContent(log),
-        classes: getLogClasses(log),
-        tags: getSimpleTags(log),
-        projects: getProjects(log),
-        sign: getSigns(log),
-        index: config.index,
-        origin: log
-    };
-    var timeSpan = getTimeSpanFromLog(log, config);
-    return extend(logInfo, timeSpan);
+    try {
+        var log = config.logStr;
+        var logInfo = {
+            content: getLogContent(log),
+            classes: getLogClasses(log),
+            tags: getSimpleTags(log),
+            projects: getProjects(log),
+            sign: getSigns(log),
+            index: config.index,
+            origin: log
+        };
+        var timeSpan = getTimeSpanFromLog(log, config);
+        return extend(logInfo, timeSpan);
+    } catch (e) {
+        e.message = config.date + ' ' + e.message;
+        throw e;
+    }
 }
 
 function getLogContent(logStr) {

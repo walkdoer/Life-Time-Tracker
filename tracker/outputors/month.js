@@ -11,7 +11,7 @@ exports.dispose = function (statResult, options) {
     if (options.perspective) {
         outputHelper.outputPerspectives(statResult, options.perspective.toLowerCase());
     } else {
-        outputMain(statResult);
+        outputMain(statResult, options);
         outputHelper.outputPerspectives(statResult, ['sport', 'sit']);
     }
     return statResult;
