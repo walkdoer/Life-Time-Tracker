@@ -38,7 +38,7 @@ function hasLogClass(logClasses, targetCls) {
 }
 
 function hasTag(tags, targetTag) {
-    return tags.filter(function (tag) {
+    return tags && tags.filter(function (tag) {
         return tag === targetTag;
     }).length > 0;
 }
