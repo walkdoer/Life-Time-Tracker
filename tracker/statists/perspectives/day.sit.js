@@ -27,7 +27,7 @@ function isStandLog(log) {
     var classes = log.classes,
         tags = log.tags;
     return hasLogClass(classes, logClassEnum.Sport) ||
-        (hasLogClass(classes, logClassEnum.NormalThing) && hasTag(tags, '信息漫游'));
+        (hasLogClass(classes, logClassEnum.NormalThing) && hasTag(tags, ['交通', '准备食物', '洗澡']));
 }
 
 
@@ -37,8 +37,11 @@ function hasLogClass(logClasses, targetCls) {
     }).length > 0;
 }
 
-function hasTag(tags, targetTag) {
+function hasTag(tags, targetTags) {
+    if (typeof targetTags === 'string') {
+        targetTags = [targetTags];
+    }
     return tags && tags.filter(function (tag) {
-        return tag === targetTag;
+        return targetTags.indexOf(tag) >= 0;
     }).length > 0;
 }
