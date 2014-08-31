@@ -23,10 +23,41 @@ function getLogs(data, date) {
     var logStrArr = data.split('\n').filter(isEmpty);
     var lastIndex = logStrArr.length - 1;
     var logs = [];
+    var periodsArr = [];
     logStrArr.forEach(function(logStr, index) {
+        var hour = getHourFromLog(logStr);
+        var startPeriod, endPeriod, startNextDay, endNextDay;
+        var startHour = hour.start,
+            endHour = hour.end;
+        if (startHour >= 0 && startHour < 12) {
+            startPeriod = 'am';
+            if (periodsArr.filter(function (p) {
+                return p === 'pm';
+            }).length > 0) {
+                startNextDay = true;
+            }
+        } else if(startHour > 12 && startHour < 24){
+            startPeriod = 'pm';
+        }
+        if (endHour >= 0 && endHour < 12) {
+            if (periodsArr.filter(function (p) {
+                return p === 'pm';
+            }).length > 0) {
+                endNextDay = true;
+            }
+            endPeriod = 'am';
+        } else if(endHour > 12 && endHour < 24){
+            endPeriod = 'pm';
+        }
+        periodsArr.push(startPeriod);
+        periodsArr.push(endPeriod);
         var logInfo = getLogInfo({
             logStr: logStr,
             date: date,
+            startPeriod: startPeriod,
+            endPeriod: endPeriod,
+            startNextDay: startNextDay,
+            endNextDay: endNextDay,
             index: index,
             isFirst: index === 0,
             isLast: index === lastIndex
@@ -48,7 +79,7 @@ function getLogs(data, date) {
                 logInfo.time = logInfo.start;
             }
             if (logInfo.len < 0) {
-                msg.error(date + '\'s ' + logStr + '\'s time length is less that 0');
+                msg.error(date + '\'s ' + logStr + '\'s time length is less then 0');
             }
             if (logInfo.len === undefined || logInfo.len < 0) {
                 logInfo.len = 0;
@@ -69,8 +100,10 @@ function getLogs(data, date) {
 
 function alignTime(date, time, config) {
     var newDate;
-    var hour = parseInt(getHourFromDateStr(time), 10);
-    if (hour === 0 || (hour > 0 && hour < 5 && config.moment && config.isLast)) {
+    //var hour = parseInt(getHourFromDateStr(time), 10);
+    //if ((config.period === 'pm' && hour > 0 && hour < 12) ||
+            //(hour > 0 && hour < 12 && config.moment && config.isLast)) {
+    if (config.nextDay) {
         newDate = nextDay(date) + ' ' + time;
     } else {
         newDate = date + ' ' + time;
@@ -204,10 +237,11 @@ function getSigns(data) {
     return signs;
 }
 
+
+
 function getTimeSpanFromLog(log, config) {
     var date = config.date;
-    var timeSpan = null,
-        plusOneDay = false;
+    var timeSpan = null;
     var result = log.match(timeSpanRegexp);
     if (result && result.length === 1) {
         timeSpan = {};
@@ -216,35 +250,28 @@ function getTimeSpanFromLog(log, config) {
             return val.trim();
         });
         var startTime, endTime,
-            startHour, endHour, start, end;
+            startHour, endHour, start, end,
+            alignedStart, alignedEnd, alignConfig;
         start = timeArr[0];
         end = timeArr[1];
         if (start) {
-            var alignConfig = extend({}, config, { moment: !end });
-            var algTime = alignTime(date, start, alignConfig);
-            startTime = new moment(algTime, dateFormat);
+            alignConfig = extend({}, config, {
+                moment: !end,
+                nextDay: config.startNextDay
+            });
+            alignedStart = alignTime(date, start, alignConfig);
+            startTime = new moment(alignedStart, dateFormat);
             startHour = parseInt(start.split(timeSplitter)[0], 10);
             timeSpan.start = startTime.format(dateFormat);
         }
         if (end) {
             endHour = parseInt(end.split(timeSplitter)[0], 10);
-        }
-        //endHour should greater than startHour, except 23: 47 ~ 00:00
-        if (endHour !== undefined && startHour !== undefined && endHour < startHour) {
-            if (endHour !== 0) {
-                msg.warn('make sure the time of is right of '+ date + '\'s log: ' + log);
-            } else {
-                plusOneDay = true;
-            }
-        }
-        if (startHour === 0) {
-            plusOneDay = true;
-        }
-        if (end) {
-            endTime = new moment(date + ' ' + end, dateFormat);
-            if (plusOneDay) {
-                endTime.add(1, 'd');
-            }
+            alignConfig = extend({}, config, {
+                moment: !end,
+                nextDay: config.endNextDay
+            });
+            alignedEnd = alignTime(date, end, alignConfig);
+            endTime = new moment(alignedEnd, dateFormat);
             timeSpan.end = endTime.format(dateFormat);
         }
         if (end && start) {
@@ -256,6 +283,31 @@ function getTimeSpanFromLog(log, config) {
     }
     return timeSpan;
 }
+
+
+function getHourFromLog (log) {
+    var result = log.match(timeSpanRegexp);
+    if (result && result.length === 1) {
+        var timeStr = result[0];
+        var timeArr = timeStr.split(/[~-]/).map(function(val) {
+            return val.trim();
+        });
+        var startHour, endHour, start, end;
+        start = timeArr[0];
+        end = timeArr[1];
+        if (start) {
+            startHour = parseInt(start.split(timeSplitter)[0], 10);
+        }
+        if (end) {
+            endHour = parseInt(end.split(timeSplitter)[0], 10);
+        }
+        return {
+            start: startHour,
+            end: endHour
+        };
+    }
+}
+
 
 /**
  * get the detail log info
