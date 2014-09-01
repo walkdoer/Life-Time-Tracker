@@ -9,6 +9,8 @@ var util = require('./util'),
     scanner = require('./scanner'),
     //output the stat result
     outputor = require('./outputor'),
+    //calendar
+    calendar = require('./calendar'),
     db = require('./model/db');
 
 //get the date that want to stat, it can be year or month or day
@@ -26,7 +28,15 @@ userArguments.forEach(function (val, index) {
         userOptions.logClass = logClassEnum.Think;
     } else if (['--break', '-brk'].indexOf(val) >= 0) {
         userOptions.logClass = logClassEnum.Break;
-    } else if (['--perspective', '-p'].indexOf(val) >= 0) {
+    } else if (['--calendar', '-caln'].indexOf(val) >= 0) {
+        var calendarType = userArguments[index + 1];
+        if (!calendarType) {
+            msg.error('should have a calendar type.');
+            process.exit(1);
+        }
+        userOptions.calendar = calendarType;
+    } else if (['--break', '-brk'].indexOf(val) >= 0) {
+        userOptions.logClass = logClassEnum.Break;
         var perspective = userArguments[index + 1];
         if (!perspective) {
             msg.error('should have a perspective.');
@@ -70,6 +80,15 @@ function dispatch(dateStr) {
         dateStr: dateStr,
         dateArr: dateArr
     });
+
+    //get activity calendar,like sport calendar, or read calendar etc.
+    if (options.calendar) {
+        calendar.generate(options);
+        return;
+    }
+
+
+    //get the corresponding statist of specific type, type can be `day` and `month` for now
     var statist = getStatist(dateType, options);
 
     /**
