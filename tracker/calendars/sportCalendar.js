@@ -5,6 +5,7 @@
 'use strict';
 
 var scanner = require('../scanner');
+var fileHelper = require('../fileHelper');
 
 var logClassEnum = require('../enum/logClass');
 exports.generate = function(options) {
@@ -28,6 +29,8 @@ function generateCalendar(options, scanResult) {
         });
     });
     console.log(result);
+    var fileName = '../statResult/calendar/2014.json';
+    fileHelper.json(fileName, result);
 }
 
 
