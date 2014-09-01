@@ -19,37 +19,28 @@
         stroke-width: 2px;
     }
     .RdYlGn .q0-11 {
-        fill: rgb(165, 0, 38)
+        fill: rgb(255, 255, 255)
     }
     .RdYlGn .q1-11 {
-        fill: rgb(215, 48, 39)
+        fill: rgb(248, 255, 210);
     }
     .RdYlGn .q2-11 {
-        fill: rgb(244, 109, 67)
+        fill: rgb(207, 236, 155);
     }
     .RdYlGn .q3-11 {
-        fill: rgb(253, 174, 97)
+        fill: rgb(115, 193, 62);
     }
     .RdYlGn .q4-11 {
-        fill: rgb(254, 224, 139)
+        fill: rgb(70, 163, 76);
     }
     .RdYlGn .q5-11 {
-        fill: rgb(255, 255, 191)
+        fill: rgb(56, 131, 83);
     }
     .RdYlGn .q6-11 {
-        fill: rgb(217, 239, 139)
+        fill: rgb(19, 94, 57);
     }
     .RdYlGn .q7-11 {
-        fill: rgb(166, 217, 106)
-    }
-    .RdYlGn .q8-11 {
-        fill: rgb(102, 189, 99)
-    }
-    .RdYlGn .q9-11 {
-        fill: rgb(26, 152, 80)
-    }
-    .RdYlGn .q10-11 {
-        fill: rgb(0, 104, 55)
+        fill: rgb(5,71,39);
     }
 </style>
 
@@ -66,8 +57,8 @@
             format = d3.time.format("%Y-%m-%d");
 
         var color = d3.scale.quantize()
-            .domain([-.05, .05])
-            .range(d3.range(11).map(function(d)
+            .domain([0, 100])
+            .range(d3.range(8).map(function(d)
             {
                 return "q" + d + "-11";
             }));
@@ -122,16 +113,14 @@
             .attr("class", "month")
             .attr("d", monthPath);
 
-        d3.csv("./statResult/calendar/2014.json", function(error, csv)
+        d3.json("./statResult/calendar/2014.json", function(error, csv)
         {
             var data = d3.nest()
-                .key(function(d)
-                {
-                    return d.Date;
+                .key(function(d) {
+                    return new Date(d.date).toJSON().split('T')[0];
                 })
-                .rollup(function(d)
-                {
-                    return (d[0].Close - d[0].Open) / d[0].Open;
+                .rollup(function (d){
+                    return d[0].sportTime;
                 })
                 .map(csv);
 
@@ -146,7 +135,7 @@
                 .select("title")
                 .text(function(d)
                 {
-                    return d + ": " + percent(data[d]);
+                    return d + ' ' + data[d] + ' Mins';
                 });
         });
 
