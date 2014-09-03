@@ -28,6 +28,13 @@ userArguments.forEach(function (val, index) {
         userOptions.logClass = logClassEnum.Think;
     } else if (['--break', '-brk'].indexOf(val) >= 0) {
         userOptions.logClass = logClassEnum.Break;
+    } else if (['--perspective', '-p'].indexOf(val) >= 0) {
+        var perspective = userArguments[index + 1];
+        if (!perspective) {
+            msg.error('should have a perspective.');
+            process.exit(1);
+        }
+        userOptions.perspective = perspective;
     } else if (['--calendar', '-caln'].indexOf(val) >= 0) {
         var calendarType = userArguments[index + 1];
         if (!calendarType) {
@@ -35,14 +42,6 @@ userArguments.forEach(function (val, index) {
             process.exit(1);
         }
         userOptions.calendar = calendarType;
-    } else if (['--break', '-brk'].indexOf(val) >= 0) {
-        userOptions.logClass = logClassEnum.Break;
-        var perspective = userArguments[index + 1];
-        if (!perspective) {
-            msg.error('should have a perspective.');
-            process.exit(1);
-        }
-        userOptions.perspective = perspective;
     }
 });
 

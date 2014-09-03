@@ -3,13 +3,10 @@
  */
 'use strict';
 
-var growl = require('growl');
-growl('You have mail!');
-growl('5 new messages', { sticky: true });
-growl('5 new emails', { title: 'Email Client', image: 'Safari', sticky: true });
-
 
 var Notification = require('node-notifier');
+
+
 
 var notifier = new Notification();
 notifier.notify({
