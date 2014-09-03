@@ -158,6 +158,6 @@ function mean(data, len, logClass) {
     var total = data.filter(function (d) {
         return d.code === logClass;
     })[0];
-
+    //total can be undefined if there is no activity of this logClass
     return total === undefined ? 0 : total.count / len;
 }

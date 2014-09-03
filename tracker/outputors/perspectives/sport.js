@@ -4,7 +4,7 @@
  */
 'use strict';
 
-var display = require('../dislpay_data');
+var display = require('../../dislpay_data');
 
 exports.dispose = function (result) {
     preprocessResult(result);

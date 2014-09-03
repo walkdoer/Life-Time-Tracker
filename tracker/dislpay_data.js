@@ -43,9 +43,35 @@ function displayBar(data, config) {
     });
 }
 
+function getBar(data, config) {
+    config = config || {};
+    var color = config.color;
+    var total = 0, dataNew = [];
+    if (Object.prototype.toString.call(data) === '[object Object]') {
+        var keys = Object.keys(data);
+        keys.forEach(function (key) {
+            dataNew.push({
+                label: key,
+                count: data[key]
+            });
+        });
+        data = dataNew;
+    }
+    data.forEach(function (l) {
+        total += l.count;
+    });
+    var maxBarLen = config.maxLen;
+    data.forEach(function (l) {
+        l.percent = l.count / total;
+        l.bar = bar(l.percent, maxBarLen)[color || 'blue'];
+    });
+    return data;
+}
 
-function bar(percent) {
-    var barLen = parseInt(percent * MAX_BAR_LEN, 10);
+
+function bar(percent, maxBarLen) {
+    maxBarLen = maxBarLen || MAX_BAR_LEN;
+    var barLen = parseInt(percent * maxBarLen, 10);
     var barStr = '';
     while(barLen > 0) {
         barStr += '▋';
@@ -103,3 +129,4 @@ function displayTable(config) {
 
 exports.bar = displayBar;
 exports.table = displayTable;
+exports.getBar = getBar;

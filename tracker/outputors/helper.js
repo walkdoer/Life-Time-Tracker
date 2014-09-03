@@ -1,5 +1,4 @@
 'use strict';
-var msg = require('../message');
 function outputPerspectives(statResult, perspectives) {
     if (typeof perspectives === 'string') {
         perspectives = [perspectives];
@@ -8,9 +7,10 @@ function outputPerspectives(statResult, perspectives) {
         var perspectiveName = key.toLowerCase(),
             outputor;
         try {
-            outputor = require('./' + perspectiveName);
+            outputor = require('./perspectives/' + perspectiveName);
         } catch (e) {
-            msg.warn('Outputor for Perspective ' + perspectiveName + ' is Not Exsit');
+            throw e;
+            outputor = require('./default');
         }
         if (outputor) {
             //use name like sportPerspective to save the stat result
