@@ -159,5 +159,5 @@ function mean(data, len, logClass) {
         return d.code === logClass;
     })[0];
 
-    return total.count / len;
+    return total === undefined ? 0 : total.count / len;
 }
