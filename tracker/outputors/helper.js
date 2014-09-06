@@ -9,7 +9,6 @@ function outputPerspectives(statResult, perspectives) {
         try {
             outputor = require('./perspectives/' + perspectiveName);
         } catch (e) {
-            throw e;
             outputor = require('./default');
         }
         if (outputor) {

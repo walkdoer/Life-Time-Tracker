@@ -25,7 +25,7 @@ exports.focus = function (options, scanResult) {
         } else if (isSecondClass(log)) {
             time.second += log.len;
         } else if (isThirdClass(log)) {
-            time.third = log.len;
+            time.third += log.len;
         }
     });
     return {
