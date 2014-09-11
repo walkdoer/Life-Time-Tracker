@@ -26,9 +26,18 @@ function getLogs(data, date) {
     var periodsArr = [];
     logStrArr.forEach(function(logStr, index) {
         var hour = getHourFromLog(logStr);
+        //if has no hour Object, than this log is not valid
+        if (!hour) {
+            msg.error('[' + date + '] log "' + logStr + '" is not valid');
+            return;
+        }
         var startPeriod, endPeriod, startNextDay, endNextDay;
         var startHour = hour.start,
-            endHour = hour.end;
+            endHour = hour.end,
+            hourSpan = startHour - endHour;
+        if (startHour > 12 && endHour < 12 && hourSpan >= 8 && hourSpan <= 18) {
+            msg.warn('[' + date + '] log "' + logStr + '" maybe is not right');
+        }
         if (startHour >= 0 && startHour < 12) {
             startPeriod = 'am';
             if (periodsArr.filter(function (p) {
