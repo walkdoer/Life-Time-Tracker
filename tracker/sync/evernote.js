@@ -8,11 +8,12 @@ var msg = require('../message');
 var dateTypeEnum = require('../enum/dateType');
 var ProgressBar = require('progress');
 var authToken = config.evernoteAuthToken;
+var path = require('path');
 
 
 var EVERNOTE_SERVER_ERROR = '同步evernote服务器发生故障';
-
-var logsPath = '../../logs/',
+var config = require('../conf/config.json');
+var logsPath = path.resolve(__dirname, '../' + config.logDir) + '/',
     ext = 'md';
 
 
