@@ -4,19 +4,20 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 var Evernote = require('evernote').Evernote;
 var config = require('../conf/config.json');
+var msg = require('../message');
 var dateTypeEnum = require('../enum/dateType');
-
+var ProgressBar = require('progress');
 var authToken = config.evernoteAuthToken;
 
 
-
+var EVERNOTE_SERVER_ERROR = '同步evernote服务器发生故障';
 
 var logsPath = '../../logs/',
     ext = 'md';
 
 
 
-exports.sync = function (options) {
+exports.sync = function(options) {
     var dateArr = options.dateArr;
     var client = new Evernote.Client({
         token: authToken,
@@ -31,7 +32,8 @@ exports.sync = function (options) {
         Evernote.EDAM_VERSION_MINOR,
         function(err, versionOk) {
             if (err) {
-                throw err;
+                msg.error(EVERNOTE_SERVER_ERROR);
+                return;
             }
             console.log("Is my Evernote API version up to date? " + versionOk);
             if (!versionOk) {
@@ -44,13 +46,18 @@ exports.sync = function (options) {
 
     // List all of the notebooks in the user's account
     noteStore.listNotebooks(function(err, notebooks) {
-        notebooks.forEach(function (note) {
+        if (err) {
+            msg.error(EVERNOTE_SERVER_ERROR + ' 访问限制:' + err.rateLimitDuration);
+            return;
+        }
+        notebooks.forEach(function(note) {
             if (note.name === 'Event Log') {
                 console.log('notebook exsit guid = ' + note.guid);
                 findEventLog(note);
             }
         });
     });
+
     function findEventLog(note) {
         var filter = new Evernote.NoteFilter(),
             spec = new Evernote.NotesMetadataResultSpec();
@@ -58,46 +65,58 @@ exports.sync = function (options) {
         spec.includeCreated = true;
         spec.includeUpdated = true;
         filter.notebookGuid = note.guid || '1d2a83f0-a9ab-4fd8-9bcb-eee562a27ff7';
-        noteStore.findNotesMetadata(filter, 0, 35600, spec, function (err, result) {
+        noteStore.findNotesMetadata(filter, 0, 35600, spec, function(err, result) {
             if (err) {
+                msg.error(EVERNOTE_SERVER_ERROR);
                 throw err;
             }
 
             var notes = result.notes;
-            var noteCount = 0;
-            notes.forEach(function (note) {
-                if (note.title && needDownload(note.title)) {
-                    noteCount ++;
-                    noteStore.getNote(authToken, note.guid, true, false, false, false, function (err, result) {
+            var downloadNotes = notes.filter(function(note) {
+                return note.title && needDownload(note.title);
+            });
+            //result.totalNotes
+            console.log('一共找到' + downloadNotes.length + '个笔记符合同步条件.');
+            var bar = new ProgressBar('Downloading [:bar] :percent', {
+                complete: '=',
+                incomplete: ' ',
+                total: downloadNotes.length
+            });
+            var downloadFailNotes = [],
+                loadedCount = 0,
+                totalNotes = downloadNotes.length;
+            downloadNotes.forEach(function(note) {
+                noteStore.getNote(authToken, note.guid, true, false, false, false, function(err, result) {
+                    if (err) {
+                        downloadFailNotes.push(note);
+                    }
+                    var noteTitle = note.title;
+                    var content = stripENML(result.content);
+                    var dateArr = noteTitle.split('-').map(function(val) {
+                        return parseInt(val);
+                    });
+                    var path = logsPath + dateArr.slice(0, 2).join('/');
+                    //mkdir is the directory is not exist;
+                    mkdirp(path, function(err) {
                         if (err) {
                             throw err;
                         }
-                        var noteTitle = note.title;
-                        var content = stripENML(result.content);
-                        var dateArr = noteTitle.split('-').map(function (val) {
-                            return parseInt(val);
-                        });
-                        var path = logsPath + dateArr.slice(0, 2).join('/');
-                        //mkdir is the directory is not exist;
-                        mkdirp(path, function (err) {
+                        var file = path + '/' + dateArr[2] + '.' + ext;
+                        fs.writeFile(file, content, function(err) {
                             if (err) {
                                 throw err;
                             }
-                            var file = path + '/' + dateArr[2] + '.' + ext;
-                            fs.writeFile(file, content, function (err) {
-                                if (err) {
-                                    throw err;
-                                }
-                                console.log(noteTitle + '已同步');
-                            });
                         });
                     });
-                }
+                    bar.tick(1);
+                    if (downloadFailNotes.length + loadedCount === totalNotes) {
+                        console.log('下载完成'.green);
+                        console.log(downloadFailNotes);
+                    }
+                });
             });
-            //result.totalNotes
-            console.log('一共找到' + noteCount + '个笔记符合同步条件.');
 
-            function needDownload (noteTitle) {
+            function needDownload(noteTitle) {
                 var matchResult = noteTitle.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s*$/);
                 if (matchResult) {
                     if (options.dateStr) {
@@ -113,11 +132,11 @@ exports.sync = function (options) {
 
                         if (options.dateType === dateTypeEnum.Day) {
                             return targetYear === year &&
-                               targetMonth === month &&
-                               targetDay === day;
-                        } else if (options.dateType === dateTypeEnum.Month){
+                                targetMonth === month &&
+                                targetDay === day;
+                        } else if (options.dateType === dateTypeEnum.Month) {
                             return targetYear === year &&
-                               targetMonth === month;
+                                targetMonth === month;
                         } else if (options.dateType === dateTypeEnum.Year) {
                             return targetYear === year;
                         }
