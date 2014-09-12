@@ -5,7 +5,7 @@ var fs = require('fs'),
     moment = require('moment'),
     extend = require('node.extend'),
     when = require('when');
-var config = require('./config.json');
+var config = require('./conf/config.json');
 
 //const
 var DATA_FILE_PRIFIX = config.logDir;

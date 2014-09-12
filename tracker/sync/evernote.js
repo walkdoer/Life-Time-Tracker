@@ -3,8 +3,10 @@
 var fs = require('fs');
 var mkdirp = require('mkdirp');
 var Evernote = require('evernote').Evernote;
+var config = require('../conf/config.json');
+var dateTypeEnum = require('../enum/dateType');
 
-var authToken = "S=s36:U=3c1621:E=14f2c2730a3:C=147d4760490:P=1cd:A=en-devtoken:V=2:H=285c74e67428520b8057bdc485f8bdb5";
+var authToken = config.evernoteAuthToken;
 
 
 
@@ -14,7 +16,8 @@ var logsPath = '../../logs/',
 
 
 
-exports.sync = function () {
+exports.sync = function (options) {
+    var dateArr = options.dateArr;
     var client = new Evernote.Client({
         token: authToken,
         sandbox: false
@@ -52,17 +55,19 @@ exports.sync = function () {
         var filter = new Evernote.NoteFilter(),
             spec = new Evernote.NotesMetadataResultSpec();
         spec.includeTitle = true;
+        spec.includeCreated = true;
+        spec.includeUpdated = true;
         filter.notebookGuid = note.guid || '1d2a83f0-a9ab-4fd8-9bcb-eee562a27ff7';
-        noteStore.findNotesMetadata(filter, 0, 100, spec, function (err, result) {
+        noteStore.findNotesMetadata(filter, 0, 35600, spec, function (err, result) {
             if (err) {
                 throw err;
             }
 
-            console.log('一共找到' + result.totalNotes + '个笔记');
             var notes = result.notes;
-
+            var noteCount = 0;
             notes.forEach(function (note) {
-                if (note.title && note.title.match(/^\d{4}-\d{1,2}-\d{1,2}\s*$/)) {
+                if (note.title && needDownload(note.title)) {
+                    noteCount ++;
                     noteStore.getNote(authToken, note.guid, true, false, false, false, function (err, result) {
                         if (err) {
                             throw err;
@@ -89,6 +94,39 @@ exports.sync = function () {
                     });
                 }
             });
+            //result.totalNotes
+            console.log('一共找到' + noteCount + '个笔记符合同步条件.');
+
+            function needDownload (noteTitle) {
+                var matchResult = noteTitle.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s*$/);
+                if (matchResult) {
+                    if (options.dateStr) {
+                        var targetYear = dateArr[0],
+                            targetMonth = dateArr[1],
+                            targetDay = dateArr[2];
+                        matchResult = matchResult.slice(1).map(function(v) {
+                            return parseInt(v, 10);
+                        });
+                        var year = matchResult[0],
+                            month = matchResult[1],
+                            day = matchResult[2];
+
+                        if (options.dateType === dateTypeEnum.Day) {
+                            return targetYear === year &&
+                               targetMonth === month &&
+                               targetDay === day;
+                        } else if (options.dateType === dateTypeEnum.Month){
+                            return targetYear === year &&
+                               targetMonth === month;
+                        } else if (options.dateType === dateTypeEnum.Year) {
+                            return targetYear === year;
+                        }
+                    } else {
+                        return true;
+                    }
+                }
+                return false;
+            }
         });
     }
 

@@ -85,7 +85,23 @@ function dispatch(dateStr) {
 
 
 function syncLogs(dateStr) {
-    evernoteSync.sync(dateStr);
+    var userOptions = getUserOptions(),
+        dateOptions;
+    if (dateStr) {
+        //standardlize the date 2014-08-01 to 2014-8-1
+        dateStr = standardizeDate(dateStr);
+        var dateArr = dateStr.split('-').map(function (val){
+            return parseInt(val, 10);
+        });
+        var dateType = [null, 'year', 'month', 'day'][dateArr.length];
+        dateOptions = {
+            dateType: dateType,
+            dateStr: dateStr,
+            dateArr: dateArr
+        };
+    }
+    var options = extend({}, userOptions, dateOptions);
+    evernoteSync.sync(options);
 }
 
 
