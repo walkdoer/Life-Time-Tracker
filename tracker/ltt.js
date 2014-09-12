@@ -4,7 +4,6 @@
 var util = require('./util'),
     msg = require('./message'),
     moment = require('moment'),
-    logClassEnum = require('./enum/logClass'),
     extend = require('node.extend'),
     //normal life scanner
     scanner = require('./scanner'),
@@ -14,66 +13,42 @@ var util = require('./util'),
     calendar = require('./calendar'),
     db = require('./model/db');
 //get the date that want to stat, it can be year or month or day
-var argv = process.argv;
-var dateStr = argv[2];
 
-var userOptions = {};
-var userArguments = argv.slice(3);
-userArguments.forEach(function (val, index) {
-    userOptions.showOriginLogs = ['--origin', '-o'].indexOf(val) >= 0;
-    userOptions.updateDatabase = ['--updateDb', '-udb'].indexOf(val) >= 0;
-    if (['--sport', '-spr'].indexOf(val) >= 0) {
-        userOptions.logClass = logClassEnum.Sport;
-    } else if (['--think', '-tk'].indexOf(val) >= 0) {
-        userOptions.logClass = logClassEnum.Think;
-    } else if (['--break', '-brk'].indexOf(val) >= 0) {
-        userOptions.logClass = logClassEnum.Break;
-    } else if (['--perspective', '-p'].indexOf(val) >= 0) {
-        var perspective = userArguments[index + 1];
-        if (!perspective) {
-            msg.error('should have a perspective.');
-            process.exit(1);
-        }
-        userOptions.perspective = perspective;
-    } else if (['--calendar', '-caln'].indexOf(val) >= 0) {
-        var calendarType = userArguments[index + 1];
-        if (!calendarType) {
-            msg.error('should have a calendar type.');
-            process.exit(1);
-        }
-        userOptions.calendar = calendarType;
-    }
-});
+var program = require('commander');
 
-if (!dateStr) {
-    return msg.error('should have a date arguments.');
-}
+program
+    .version('0.1.0')
+    .option('-ol, --originLogs', 'show origin logs')
+    .option('-p, --perspective <s>', 'choose an perspective')
+    .option('-f, --filter <s>', 'use to filter logs')
+    .option('-c, --calandar <date>', 'see activity calandar');
 
-//standardlize the date 2014-08-01 to 2014-8-1
-dateStr = standardizeDate(dateStr);
-var date = new Date(dateStr);
-if (!util.isValidDate(date)) {
-    return msg.error('the date is not right!');
-}
+program
+    .command('stat <date>')
+    .description('对所选日期进行统计')
+    .action(dispatch);
 
-db.connect()
-    .then(function() {
-        dispatch(dateStr);
-    })
-    .catch(function () {
-        msg.warn('数据库连接失败，统计结果将无法保存');
-        dispatch(dateStr);
-    });
+program.parse(process.argv);
+
 
 
 
 function dispatch(dateStr) {
+    if (!dateStr) {
+        return msg.error('should have a date arguments.');
+    }
+    var date = new Date(dateStr);
+    if (!util.isValidDate(date)) {
+        return msg.error('the date is not right!');
+    }
+    //standardlize the date 2014-08-01 to 2014-8-1
+    dateStr = standardizeDate(dateStr);
+    db.connect();
     var dateArr = dateStr.split('-').map(function (val){
         return parseInt(val, 10);
     });
-    var dateType = [null, 'year', 'month', 'day'][dateArr.length];
-
-
+    var dateType = [null, 'year', 'month', 'day'][dateArr.length],
+        userOptions = getUserOptions();
     var options = extend({}, userOptions, {
         dateType: dateType,
         dateStr: dateStr,
@@ -106,6 +81,23 @@ function dispatch(dateStr) {
 function getStatist(type) {
     var statistPath = './statists/' + type ;
     return require(statistPath);
+}
+
+function getUserOptions() {
+    var userOptions = {};
+    if (program.perspective) {
+        userOptions.perspective = program.perspective;
+        msg.info('set perspective: ' + program.perspective);
+    }
+    if (program.filter) {
+        userOptions.filter = program.filter;
+        msg.info('set filter: ' + program.perspective);
+    }
+    if (program.calandar) {
+        userOptions.calandar = program.calandar;
+        msg.info('set calandar: ' + program.calandar);
+    }
+    return userOptions;
 }
 
 
