@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "my life time tracker",
   "main": "index.js",
+  "bin": { "ltt": "tracker/ltt.js" },
   "dependencies": {
     "colors": "~0.6.2",
     "when": "~3.4.3",

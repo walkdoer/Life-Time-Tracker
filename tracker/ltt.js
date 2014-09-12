@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict';
 //dependencies
 var util = require('./util'),
@@ -12,7 +13,6 @@ var util = require('./util'),
     //calendar
     calendar = require('./calendar'),
     db = require('./model/db');
-
 //get the date that want to stat, it can be year or month or day
 var argv = process.argv;
 var dateStr = argv[2];

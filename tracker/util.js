@@ -1,12 +1,14 @@
 'use strict';
 
 var fs = require('fs'),
+    path = require('path'),
     moment = require('moment'),
     extend = require('node.extend'),
     when = require('when');
+var config = require('./config.json');
 
 //const
-var DATA_FILE_PRIFIX = '../logs';
+var DATA_FILE_PRIFIX = config.logDir;
 
 function isValidDate(date) {
     if (Object.prototype.toString.call(date) === '[object Date]') {
@@ -22,7 +24,7 @@ function readLogFiles(date) {
     });
     var fileName = dateArr.join('/') + '.md';
     var deferred = when.defer(),
-        filePath = [DATA_FILE_PRIFIX, fileName].join('/');
+        filePath = path.resolve(__dirname, [DATA_FILE_PRIFIX, fileName].join('/'));
     fs.readFile(filePath, 'utf8', function (err, data) {
         if (err) {
             return deferred.reject(err, filePath);
@@ -40,8 +42,8 @@ function readLogFiles(date) {
 function readLogFilesSync(date) {
 
     var dateArr = date.split('-');
-    var fileName = dateArr.join('/') + '.md';
-    var filePath = [DATA_FILE_PRIFIX, fileName].join('/');
+    var fileName = dateArr.join('/') + '.md',
+        filePath = path.resolve(__dirname, [DATA_FILE_PRIFIX, fileName].join('/'));
     var fileData = fs.readFileSync(filePath, 'utf8');
     return {
         data: fileData,
