@@ -3,6 +3,7 @@
 //dependencies
 var util = require('./util'),
     msg = require('./message'),
+    program = require('commander'),
     moment = require('moment'),
     extend = require('node.extend'),
     //normal life scanner
@@ -11,22 +12,33 @@ var util = require('./util'),
     outputor = require('./outputor'),
     //calendar
     calendar = require('./calendar'),
+    //sync evernote
+    evernoteSync = require('./sync/evernote'),
     db = require('./model/db');
-//get the date that want to stat, it can be year or month or day
 
-var program = require('commander');
 
 program
     .version('0.1.0')
-    .option('-ol, --originLogs', 'show origin logs')
-    .option('-p, --perspective <s>', 'choose an perspective')
-    .option('-f, --filter <s>', 'use to filter logs')
-    .option('-c, --calandar <date>', 'see activity calandar');
+    .option('-ol, --originLogs', 'show origin logs');
 
 program
+    .option('-p, --perspective <s>', 'choose an perspective')
+    .option('-c, --calandar <date>', 'see activity calandar')
     .command('stat <date>')
     .description('对所选日期进行统计')
     .action(dispatch);
+
+program
+    .option('-f, --filter <s>', 'use to filter logs')
+    .command('logs <date>')
+    .description('按日期查询日志')
+    .action(dispatch);
+
+program
+    .command('sync [date]')
+    .description('同步日志')
+    .action(syncLogs);
+
 
 program.parse(process.argv);
 
@@ -34,16 +46,9 @@ program.parse(process.argv);
 
 
 function dispatch(dateStr) {
-    if (!dateStr) {
-        return msg.error('should have a date arguments.');
-    }
-    var date = new Date(dateStr);
-    if (!util.isValidDate(date)) {
-        return msg.error('the date is not right!');
-    }
+    if (!isDateValid(dateStr)) { return; }
     //standardlize the date 2014-08-01 to 2014-8-1
     dateStr = standardizeDate(dateStr);
-    db.connect();
     var dateArr = dateStr.split('-').map(function (val){
         return parseInt(val, 10);
     });
@@ -78,10 +83,31 @@ function dispatch(dateStr) {
            .then(outputor.dispose.bind(outputor, options));
 }
 
+
+function syncLogs(dateStr) {
+    evernoteSync.sync(dateStr);
+}
+
+
+function isDateValid(dateStr) {
+    if (!dateStr) {
+        msg.error('should have a date arguments.');
+        return false;
+    }
+    var date = new Date(dateStr);
+    if (!util.isValidDate(date)) {
+        msg.error('the date is not right!');
+        return false;
+    }
+    return true;
+}
+
+
 function getStatist(type) {
     var statistPath = './statists/' + type ;
     return require(statistPath);
 }
+
 
 function getUserOptions() {
     var userOptions = {};
