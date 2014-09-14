@@ -31,10 +31,10 @@ exports.dispose = function(options, scanResult) {
         var statResult = dayStat.dispose(dayOptions, d);
         return extend(d, statResult);
     });
+    statResult = overviewPerspective.focus(options, scanResult);
     if (options.perspective) {
         perspectives = [options.perspective];
     } else {
-        statResult = overviewPerspective.focus(options, scanResult);
         perspectives = globalConfig.defaultPerspectives;
     }
     perspectives.forEach(function (key) {
@@ -53,7 +53,7 @@ exports.dispose = function(options, scanResult) {
         if (perspective) {
             //use name like sportPerspective to save the stat result
             var name = perspectiveName + 'Perspective';
-            statResult[name] = perspective.focus(options, scanResult);
+            statResult[name] = perspective.focus(options, scanResult, statResult);
         }
     });
     statResult.scanResult = scanResult;

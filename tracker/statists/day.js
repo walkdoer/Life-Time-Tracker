@@ -15,9 +15,8 @@ var globalConfig = require('../conf/config.json');
  * @param scanResult
  */
 exports.dispose = function (options, scanResult) {
-    var statResult = {},
+    var statResult = overviewPerspective.focus(options, scanResult),
         perspectives = [];
-    statResult = overviewPerspective.focus(options, scanResult);
     if (options.perspective) {
         perspectives.push(options.perspective);
     } else {
@@ -39,7 +38,7 @@ exports.dispose = function (options, scanResult) {
         if (perspective) {
             //use name like sportPerspective to save the stat result
             var name = perspectiveName + 'Perspective';
-            statResult[name] = perspective.focus(options, scanResult);
+            statResult[name] = perspective.focus(options, scanResult, statResult);
         }
     });
     //save the raw data of log;
