@@ -16,6 +16,7 @@ var dayStat = require('./day');
 var extend = require('node.extend');
 var msg = require('../message');
 var dateTypeEnum = require('../enum/dateType');
+var globalConfig = require('../conf/config.json');
 
 var perspectiveCache = {};
 exports.dispose = function(options, scanResult) {
@@ -33,8 +34,8 @@ exports.dispose = function(options, scanResult) {
     if (options.perspective) {
         perspectives = [options.perspective];
     } else {
-        statResult = overviewPerspective.focus(scanResult);
-        perspectives = ['sport', 'sit'];
+        statResult = overviewPerspective.focus(options, scanResult);
+        perspectives = globalConfig.defaultPerspectives;
     }
     perspectives.forEach(function (key) {
         var perspectiveName = key.toLowerCase(),

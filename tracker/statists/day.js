@@ -8,19 +8,20 @@
 var overviewPerspective = require('./perspectives/day.overview');
 var msg = require('../message');
 var perspectiveCache = {};
+var globalConfig = require('../conf/config.json');
+
 /**
  * dispose the scan result of the scanner
  * @param scanResult
  */
 exports.dispose = function (options, scanResult) {
-    var date = options.dateStr,
-        statResult = {},
+    var statResult = {},
         perspectives = [];
+    statResult = overviewPerspective.focus(options, scanResult);
     if (options.perspective) {
         perspectives.push(options.perspective);
     } else {
-        statResult = overviewPerspective.focus(date, scanResult);
-        perspectives = perspectives.concat(['sport', 'sit']);
+        perspectives = perspectives.concat(globalConfig.defaultPerspectives);
     }
     perspectives.forEach(function (key) {
         var perspectiveName = key.toLowerCase(),

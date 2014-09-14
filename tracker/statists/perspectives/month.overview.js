@@ -9,7 +9,7 @@ var util = require('../../util');
 var msg = require('../../message');
 var logClassEnum = require('../../enum/logClass');
 var extend = require('node.extend');
-exports.focus = function (scanResult) {
+exports.focus = function (options, scanResult) {
 
     var days = scanResult.days,
         dayNum = days.length,

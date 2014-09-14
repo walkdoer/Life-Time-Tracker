@@ -8,13 +8,14 @@ var msg = require('../message'),
     util = require('../util'),
     display = require('../dislpay_data');
 var outputHelper = require('./helper');
+var globalConfig = require('../conf/config.json');
 
 exports.dispose = function (statResult, options) {
     if (options.perspective) {
         outputHelper.outputPerspectives(statResult, options.perspective.toLowerCase());
     } else {
         outputMain(statResult);
-        outputHelper.outputPerspectives(statResult, ['sport', 'sit']);
+        outputHelper.outputPerspectives(statResult, globalConfig.defaultPerspectives);
     }
     return statResult;
 };

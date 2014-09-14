@@ -7,8 +7,9 @@ var msg = require('../../message');
 var util = require('../../util');
 var helper = require('../../helper');
 
-exports.focus = function (date, scanResult) {
-    var fileContent = scanResult.fileContent,
+exports.focus = function (options, scanResult) {
+    var date = options.dateStr,
+        fileContent = scanResult.fileContent,
         logs = scanResult.logs,
         trackedTime = 0,
         wakeMoment,
