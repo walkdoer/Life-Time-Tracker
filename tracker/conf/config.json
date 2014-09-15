@@ -1,5 +1,11 @@
 {
     "logDir": "../logs",
     "evernoteAuthToken": "S=s36:U=3c1621:E=14f2c2730a3:C=147d4760490:P=1cd:A=en-devtoken:V=2:H=285c74e67428520b8057bdc485f8bdb5",
-    "defaultPerspectives": ["sport", "sit", "category", "mean"]
+    "defaultPerspectives": ["sport", "sit", "category", "mean"],
+    "watcher": {
+        "plan": {
+            "ahead": 40,
+            "step": 5
+        }
+    }
 }
