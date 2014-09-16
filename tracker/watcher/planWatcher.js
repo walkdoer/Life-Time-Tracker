@@ -17,6 +17,9 @@ exports.watch = function () {
     var planWatchCfg = globalConfig.watcher.plan;
     var ahead = planWatchCfg.ahead;
     var step = planWatchCfg.step;
+    /**
+     * check if there is available task
+     */
     setInterval(function () {
         var now = new moment();
         var tasks = getNextTask(now, ahead, step);
@@ -36,11 +39,15 @@ function getNextTask(now, ahead, step) {
         } else {
             fromLastNotified = Number.MAX_VALUE;
         }
-        /* notify every [step] minutes
-         * and notify ahead of [ahead] minutes before task begin*/
-        if (timeSpan >= 0 && timeSpan <= ahead && fromLastNotified >= step) {
+         /*notify ahead of [ahead] minutes before task begin, and notify every [step] minutes since then.*/
+        if (timeSpan > 0 && timeSpan <= ahead && fromLastNotified >= step) {
             log.beforeStart = start.diff(now);
             log.lastNotified = now;
+            return true;
+        } else if (timeSpan === 0 && !log.started) {
+            log.beforeStart = 0;
+            log.lastNotified = now;
+            log.started = true;
             return true;
         }
     });
@@ -67,8 +74,13 @@ function generateMsg(tasks) {
         }
         content += (task.content || '');
         content += '预估耗时: ' + getReadableTime(task.len, 'minute');
-        var subTitle = '开始时间:' + startMoment.format('HH:mm') +
+        var subTitle;
+        if (beforeStart === 0) {
+            subTitle = '任务应该要开始了';
+        } else {
+            subTitle = '开始时间:' + startMoment.format('HH:mm') +
             '，还有' + getReadableTime((beforeStart / 60000), 'minute');
+        }
         messages.push({
             title: title,
             subTitle: subTitle,
