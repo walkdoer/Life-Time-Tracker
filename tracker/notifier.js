@@ -18,7 +18,7 @@ exports.notify = function (messages) {
             sound: 'Submarine',
             open: msg.open,
             appIcon: __dirname + '/resources/me.jpg',
-            contentImage: __dirname + '/resources/computer_guy.gif'
+            //contentImage: __dirname + '/resources/computer_guy.gif'
         }, function (err, response) {
             console.log(response);
         });
