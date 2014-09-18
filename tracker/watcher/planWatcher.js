@@ -9,18 +9,24 @@ var workdayPlanFile = fs.readFileSync(
         path.resolve(__dirname, '../plan/workday.md'), 'utf8');
 var globalConfig = require('../conf/config.json');
 
+
 var todayStr = moment().format('YYYY-MM-DD');
 var planLogs = helper.getLogs(workdayPlanFile, todayStr);
-
 
 exports.watch = function () {
     var planWatchCfg = globalConfig.watcher.plan;
     var ahead = planWatchCfg.ahead;
     var step = planWatchCfg.step;
+
     /**
      * check if there is available task
      */
     setInterval(function () {
+        //if comes to midnight, then need to read the new plan
+        if (isMidnight()) {
+            todayStr = moment().format('YYYY-MM-DD');
+            planLogs = helper.getLogs(workdayPlanFile, todayStr);
+        }
         var now = new moment();
         var tasks = getNextTask(now, ahead, step);
         if (tasks && tasks.length > 0) {
@@ -28,6 +34,11 @@ exports.watch = function () {
         }
     }, 1000);
 };
+
+
+function isMidnight() {
+    return moment().hour() === 0;
+}
 
 function getNextTask(now, ahead, step) {
     return planLogs.filter(function (log) {

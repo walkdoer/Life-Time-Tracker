@@ -5,6 +5,7 @@
 
 
 var Notification = require('node-notifier');
+var Message = require('./message');
 
 
 
@@ -20,7 +21,10 @@ exports.notify = function (messages) {
             appIcon: __dirname + '/resources/me.jpg',
             //contentImage: __dirname + '/resources/computer_guy.gif'
         }, function (err, response) {
-            console.log(response);
+            if (err) {
+                Message.error('Notify Error' + err);
+            }
+            Message.info('Remind:' + msg.title + ' ' + msg.subTitle + '. content:' + msg.content);
         });
     });
 };
