@@ -3,19 +3,25 @@ var fs = require('fs'),
     path = require('path'),
     moment = require('moment'),
     notifier = require('../notifier');
+var _ = require('lodash');
 
 var helper = require('../helper');
 var workdayPlanFile = fs.readFileSync(
         path.resolve(__dirname, '../plan/workday.md'), 'utf8');
 var globalConfig = require('../conf/config.json');
 
+//defaul config
+var planWatchCfg = _.extend({
+    ahead: 5,
+    aheadOfDone: 0
+}, globalConfig.watcher.plan);
 
 var todayStr = moment().format('YYYY-MM-DD');
 var planLogs = helper.getLogs(workdayPlanFile, todayStr);
 
 exports.watch = function () {
-    var planWatchCfg = globalConfig.watcher.plan;
-    var ahead = planWatchCfg.ahead;
+    var ahead = planWatchCfg.ahead,
+        aheadOfDone = planWatchCfg.aheadOfDone;
     var step = planWatchCfg.step;
 
     /**
@@ -30,9 +36,14 @@ exports.watch = function () {
         var now = new moment();
         var tasks = getNextTask(now, ahead, step);
         if (tasks && tasks.length > 0) {
-            notifier.notify(generateMsg(tasks), {
+            notifier.notify(generateStartMsg(tasks), {
                 execute: 'mkdir ~/testhometest'
             });
+        }
+        //if there is any task that almost done, remind ahead of [aheadOfDone] mins
+        var almostDoneTasks = getAlmostDoneTask(now, aheadOfDone);
+        if (almostDoneTasks && almostDoneTasks.length > 0) {
+            notifier.notify(generateEndMsg(almostDoneTasks));
         }
     }, 1000);
 };
@@ -66,8 +77,20 @@ function getNextTask(now, ahead, step) {
     });
 }
 
+function getAlmostDoneTask(now, ahead) {
+    return planLogs.filter(function (log) {
+        var end = new moment(log.end);
+        var timeSpan = end.diff(now, 'minute');
+        if (timeSpan >= 0 && timeSpan <= ahead && !log.notified) {
+            log.beforeEnd = timeSpan;
+            log.notified = true;
+            return true;
+        }
+    });
+}
 
-function generateMsg(tasks) {
+
+function generateStartMsg(tasks) {
     var messages = [];
     tasks.forEach(function (task) {
         var logClass = task.classes[0],
@@ -78,12 +101,12 @@ function generateMsg(tasks) {
 
         var title = '';
         if(logClass) {
-            title += logClass.name + '提醒';
+            title += logClass.name + '开始提醒';
         } else {
-            title = '日程提醒';
+            title = '开始提醒';
         }
         if (tags && tags.length > 0) {
-            title += ' ' + tags.join(' ');
+            title += ' ' + tags.join(',');
         }
         content += (task.content || '');
         content += '预估耗时: ' + getReadableTime(task.len, 'minute');
@@ -94,6 +117,36 @@ function generateMsg(tasks) {
             subTitle = '开始时间:' + startMoment.format('HH:mm') +
             '，还有' + getReadableTime((beforeStart / 60000), 'minute');
         }
+        messages.push({
+            title: title,
+            subTitle: subTitle,
+            content: content
+        });
+    });
+    return messages;
+}
+
+function generateEndMsg(tasks) {
+    var messages = [];
+    tasks.forEach(function (task) {
+        var logClass = task.classes[0],
+            tags = task.tags,
+            endMoment = new moment(task.end),
+            content = '';
+
+        var title = '';
+        if(logClass) {
+            title += logClass.name + '结束提醒';
+        } else {
+            title = '结束提醒';
+        }
+        if (tags && tags.length > 0) {
+            title += ' ' + tags.join(',');
+        }
+        content += (task.content || '');
+        content += '持续时间: ' + getReadableTime(task.len - task.beforeEnd, 'minute');
+        var subTitle = '结束时间:' + endMoment.format('HH:mm') +
+            '，剩下' + getReadableTime(task.beforeEnd, 'minute');
         messages.push({
             title: title,
             subTitle: subTitle,

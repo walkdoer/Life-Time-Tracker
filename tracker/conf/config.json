@@ -4,8 +4,9 @@
     "defaultPerspectives": ["sport", "sit", "category", "mean"],
     "watcher": {
         "plan": {
-            "ahead": 30,
-            "step": 4
+            "ahead": 10,
+            "step": 4,
+            "aheadOfDone": 20
         }
     }
 }

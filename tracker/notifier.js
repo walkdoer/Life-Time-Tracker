@@ -17,7 +17,7 @@ exports.notify = function (messages, options) {
             title: msg.title || 'Life Time Tracker',
             subtitle: msg.subTitle,
             message: msg.content,
-            sound: 'Submarine',
+            sound: 'Glass',
             //open: msg.open,
             appIcon: __dirname + '/resources/me.jpg',
             execute: options.execute
