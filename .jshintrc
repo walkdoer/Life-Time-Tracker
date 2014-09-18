@@ -94,10 +94,6 @@
         "waitsFor": false,
         "runs": false,
         "require": false,
-        "define": false,
-        "Wa": false,
-        "Backbone": false,
-        "_": false,
-        "d3": false
+        "define": false
     }        // additional predefined global variables
 }

@@ -30,7 +30,9 @@ exports.watch = function () {
         var now = new moment();
         var tasks = getNextTask(now, ahead, step);
         if (tasks && tasks.length > 0) {
-            notifier.notify(generateMsg(tasks));
+            notifier.notify(generateMsg(tasks), {
+                execute: 'mkdir ~/testhometest'
+            });
         }
     }, 1000);
 };
