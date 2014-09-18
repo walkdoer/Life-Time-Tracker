@@ -144,7 +144,7 @@ function generateEndMsg(tasks) {
             title += ' ' + tags.join(',');
         }
         content += (task.content || '');
-        content += '持续时间: ' + getReadableTime(task.len - task.beforeEnd, 'minute');
+        content += '已坚持了 ' + getReadableTime(task.len - task.beforeEnd, 'minute');
         var subTitle = '结束时间:' + endMoment.format('HH:mm') +
             '，剩下' + getReadableTime(task.beforeEnd, 'minute');
         messages.push({

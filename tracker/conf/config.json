@@ -5,8 +5,8 @@
     "watcher": {
         "plan": {
             "ahead": 10,
-            "step": 4,
-            "aheadOfDone": 20
+            "step": 6,
+            "aheadOfDone": 5
         }
     }
 }

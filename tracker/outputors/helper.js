@@ -1,4 +1,7 @@
 'use strict';
+
+var Message = require('../message');
+
 function outputPerspectives(statResult, perspectives) {
     if (typeof perspectives === 'string') {
         perspectives = [perspectives];
@@ -13,8 +16,12 @@ function outputPerspectives(statResult, perspectives) {
         }
         if (outputor) {
             //use name like sportPerspective to save the stat result
-            var name = perspectiveName + 'Perspective';
-            outputor.dispose(statResult[name]);
+            var result = statResult[perspectiveName + 'Perspective'];
+            if (result) {
+                outputor.dispose(result);
+            } else {
+                Message.warn('the result has no perspective ' + perspectiveName);
+            }
         }
     });
 

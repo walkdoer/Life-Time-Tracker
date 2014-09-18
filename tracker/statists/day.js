@@ -32,7 +32,7 @@ exports.dispose = function (options, scanResult) {
                 perspectiveCache[perspectiveName] = perspective;
             }
         } catch (e) {
-            msg.warn('Perspective ' + perspectiveName + ' is Not Exsit');
+            msg.warn('Perspective ' + perspectiveName + ' for day stat is Not Exsit');
             perspectiveCache[perspectiveName] = false;
         }
         if (perspective) {
