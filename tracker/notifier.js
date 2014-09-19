@@ -10,6 +10,9 @@ var _ = require('lodash');
 
 
 exports.notify = function (messages, options) {
+    if (!_.isArray(messages)) {
+        messages = [messages];
+    }
     options = _.extend({}, options);
     messages.forEach(function (msg){
         var notifier = new Notification();

@@ -7,6 +7,9 @@
             "ahead": 10,
             "step": 6,
             "aheadOfDone": 5
+        },
+        "drinkWater": {
+            "logPath": "../logs/drankWater.log"
         }
     }
 }

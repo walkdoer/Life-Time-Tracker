@@ -14,7 +14,8 @@ var util = require('./util'),
     calendar = require('./calendar'),
     //sync evernote
     evernoteSync = require('./sync/evernote'),
-    db = require('./model/db');
+    db = require('./model/db'),
+    Watcher = require('./watcher');
 
 
 program
@@ -38,6 +39,13 @@ program
     .command('sync [date]')
     .description('同步日志')
     .action(syncLogs);
+
+program
+    .option('-cups, --cups <s>', 'set the cups of watch should drink one day')
+    .option('-i, --interval <s>', 'remind interval')
+    .command('watch <type>')
+    .description('对某一个行为进行观察，并适当提醒，例如喝水提醒，日程提醒')
+    .action(watch);
 
 
 program.parse(process.argv);
@@ -139,6 +147,14 @@ function getUserOptions() {
         userOptions.calandar = program.calandar;
         msg.info('set calandar: ' + program.calandar);
     }
+    if (program.cups) {
+        userOptions.cups = program.cups;
+        msg.info('set cups: ' + program.cups);
+    }
+    if (program.interval) {
+        userOptions.interval = program.interval;
+        msg.info('set interval: ' + program.interval);
+    }
     return userOptions;
 }
 
@@ -148,4 +164,13 @@ function standardizeDate(dateStr) {
     var dateFormat = ['YYYY', 'YYYY-MM', 'YYYY-MM-DD'][length - 1];
     var tmpMoment = new moment(dateStr, dateFormat);
     return tmpMoment.format(dateFormat);
+}
+
+
+function watch(type) {
+    var options = getUserOptions();
+    var watcher = Watcher.get(type, options);
+    if (watcher) {
+        watcher.watch();
+    }
 }

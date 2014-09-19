@@ -38,6 +38,23 @@ function readLogFiles(date) {
     return deferred.promise;
 }
 
+function readFile(filePath, encode) {
+    var deferred = when.defer();
+    filePath = path.resolve(__dirname, filePath);
+    fs.readFile(filePath, encode || 'utf8', function (err, data) {
+        if (err) {
+            return deferred.reject(err, filePath);
+        }
+        deferred.resolve(data);
+    });
+    return deferred.promise;
+}
+
+function readFileSync(filePath, encode) {
+    filePath = path.resolve(__dirname, filePath);
+    return fs.readFileSync(filePath, encode || 'utf8');
+}
+
 
 function readLogFilesSync(date) {
 
@@ -117,6 +134,8 @@ function inversObj(obj) {
 
 module.exports = {
     isValidDate: isValidDate,
+    readFile: readFile,
+    readFileSync: readFileSync,
     readLogFiles: readLogFiles,
     readLogFilesSync: readLogFilesSync,
     getDayNumInMonth: getDayNumInMonth,
