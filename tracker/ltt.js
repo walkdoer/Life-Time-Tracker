@@ -55,6 +55,13 @@ program
     .action(takeAction);
 
 
+program
+    .command('server')
+    .option('-p --port <port>', 'server listen port')
+    .description('开启服务器')
+    .action(startServer);
+
+
 program.parse(process.argv);
 
 
@@ -190,4 +197,11 @@ function takeAction(actionName) {
     if (action) {
         action.execute(options);
     }
+}
+
+
+function startServer() {
+    var options = getUserOptions();
+    var server = require('./server/main');
+    server.run(options);
 }

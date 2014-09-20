@@ -33,7 +33,8 @@ DrinkWaterWatcher.prototype.watch = function () {
             message: getEncourageMsg(that.drankCups, that.cups),
             // execute: 'ltt action drink --cups 1'
         }, {
-            execute: 'ltt action drink --cups 1'
+            open: 'http://localhost:3333/actions/drink',
+            execute: 'curl http://localhost:3333/actions/drink'
         });
 
     }, this.interval || drinkWaterConfig.interval);
