@@ -186,8 +186,8 @@ function watch(type) {
 
 function takeAction(actionName) {
     var options = getUserOptions();
-    var action = Action.get(actionName, options);
+    var action = Action.get(actionName);
     if (action) {
-        action.execute();
+        action.execute(options);
     }
 }

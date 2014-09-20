@@ -30,8 +30,9 @@ DrinkWaterWatcher.prototype.watch = function () {
         notifier.notify({
             title: '喝杯水休息一下',
             subTitle:subTitle,
-            content: getEncourageMsg(that.drankCups, that.cups),
-            execute: 'ltt action drink'
+            message: getEncourageMsg(that.drankCups, that.cups),
+            // execute: 'ltt action drink --cups 1'
+            execute: 'open ~/Pictures'
         });
 
     }, this.interval || drinkWaterConfig.interval);

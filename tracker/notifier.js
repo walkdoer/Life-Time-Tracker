@@ -20,19 +20,13 @@ exports.notify = function (messages, options) {
             title: 'Life Time Tracker',
             sound: 'Glass',
             appIcon: __dirname + '/resources/me.jpg',
-        }, {
-            title: msg.title,
-            subtitle: msg.subTitle,
-            message: msg.content || ' ',
-            //open: msg.open,
-            execute: options.execute
-            //contentImage: __dirname + '/resources/computer_guy.gif'
-        });
+        }, options, msg);
+        console.log(msg);
         notifier.notify(msg, function (err, response) {
             if (err) {
                 Message.error('Notify Error' + err);
             } else {
-                Message.info('Remind:' + msg.title + ' ' + msg.subTitle + '. content:' + msg.content);
+                Message.info('Remind:' + msg.title + ' ' + msg.subTitle + '. content:' + msg.message);
             }
         });
     });

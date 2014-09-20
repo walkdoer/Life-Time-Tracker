@@ -37,7 +37,7 @@ exports.watch = function () {
         var tasks = getNextTask(now, ahead, step);
         if (tasks && tasks.length > 0) {
             notifier.notify(generateStartMsg(tasks), {
-                execute: 'mkdir ~/testhometest'
+                execute: 'open ~/testhometest'
             });
         }
         //if there is any task that almost done, remind ahead of [aheadOfDone] mins
@@ -120,7 +120,7 @@ function generateStartMsg(tasks) {
         messages.push({
             title: title,
             subTitle: subTitle,
-            content: content
+            message: content
         });
     });
     return messages;
@@ -150,7 +150,7 @@ function generateEndMsg(tasks) {
         messages.push({
             title: title,
             subTitle: subTitle,
-            content: content
+            message: content
         });
     });
     return messages;
