@@ -15,7 +15,9 @@ var util = require('./util'),
     //sync evernote
     evernoteSync = require('./sync/evernote'),
     db = require('./model/db'),
-    Watcher = require('./watcher');
+    Msg = require('./message'),
+    Watcher = require('./watcher'),
+    Action = require('./action');
 
 
 program
@@ -46,6 +48,11 @@ program
     .command('watch <type>')
     .description('对某一个行为进行观察，并适当提醒，例如喝水提醒，日程提醒')
     .action(watch);
+
+program
+    .command('action <action>')
+    .description('执行某一个动作,例如喝水drink')
+    .action(takeAction);
 
 
 program.parse(process.argv);
@@ -172,5 +179,15 @@ function watch(type) {
     var watcher = Watcher.get(type, options);
     if (watcher) {
         watcher.watch();
+    } else {
+        Msg.error('unknow watcher ' + type);
+    }
+}
+
+function takeAction(actionName) {
+    var options = getUserOptions();
+    var action = Action.get(actionName, options);
+    if (action) {
+        action.execute();
     }
 }

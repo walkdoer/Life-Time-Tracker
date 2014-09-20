@@ -55,6 +55,17 @@ function readFileSync(filePath, encode) {
     return fs.readFileSync(filePath, encode || 'utf8');
 }
 
+function appendFile(filePath, data) {
+    var deferred = when.defer();
+    filePath = path.resolve(__dirname, filePath);
+    fs.appendFile(filePath, data, function (err) {
+        if (err) {
+            return deferred.reject(err, filePath);
+        }
+        deferred.resolve(data);
+    });
+    return deferred.promise;
+}
 
 function readLogFilesSync(date) {
 
@@ -136,6 +147,7 @@ module.exports = {
     isValidDate: isValidDate,
     readFile: readFile,
     readFileSync: readFileSync,
+    appendFile: appendFile,
     readLogFiles: readLogFiles,
     readLogFilesSync: readLogFilesSync,
     getDayNumInMonth: getDayNumInMonth,
