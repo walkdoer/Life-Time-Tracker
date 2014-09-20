@@ -32,7 +32,8 @@ DrinkWaterWatcher.prototype.watch = function () {
             subTitle:subTitle,
             message: getEncourageMsg(that.drankCups, that.cups),
             // execute: 'ltt action drink --cups 1'
-            execute: 'open ~/Pictures'
+        }, {
+            execute: 'ltt action drink --cups 1'
         });
 
     }, this.interval || drinkWaterConfig.interval);
