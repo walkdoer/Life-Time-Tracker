@@ -16,16 +16,19 @@ exports.notify = function (messages, options) {
     options = _.extend({}, options);
     messages.forEach(function (msg){
         var notifier = new Notification();
-        notifier.notify({
-            title: msg.title || 'Life Time Tracker',
-            subtitle: msg.subTitle,
-            message: msg.content,
+        msg = _.extend({
+            title: 'Life Time Tracker',
             sound: 'Glass',
-            //open: msg.open,
             appIcon: __dirname + '/resources/me.jpg',
+        }, {
+            title: msg.title,
+            subtitle: msg.subTitle,
+            message: msg.content || ' ',
+            //open: msg.open,
             execute: options.execute
             //contentImage: __dirname + '/resources/computer_guy.gif'
-        }, function (err, response) {
+        });
+        notifier.notify(msg, function (err, response) {
             if (err) {
                 Message.error('Notify Error' + err);
             } else {

@@ -9,7 +9,8 @@
             "aheadOfDone": 5
         },
         "drinkWater": {
-            "logPath": "../logs/drankWater.log"
+            "logPath": "../logs/drankWater.log",
+            "interval": 5000
         }
     }
 }
