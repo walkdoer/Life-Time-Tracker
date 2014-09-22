@@ -45,4 +45,4 @@ vendor
 *.pid
 
 conf/token.json
-logs/
+logs
