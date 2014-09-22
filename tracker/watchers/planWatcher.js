@@ -19,10 +19,17 @@ var planWatchCfg = _.extend({
 var todayStr = moment().format('YYYY-MM-DD');
 var planLogs = helper.getLogs(workdayPlanFile, todayStr);
 
-exports.watch = function () {
-    var ahead = planWatchCfg.ahead,
-        aheadOfDone = planWatchCfg.aheadOfDone;
-    var step = planWatchCfg.step;
+var PlanWatcher = function (options) {
+    this.ahead = parseInt(options.ahead || planWatchCfg.ahead, 10);
+    this.aheadOfDone = parseInt(options.aheadOfDone || planWatchCfg.aheadOfDone, 10);
+    this.interval = parseInt(options.interval || planWatchCfg.interval, 10);
+    this.name = '任务监控';
+};
+
+PlanWatcher.prototype.watch = function () {
+    var ahead = this.ahead,
+        aheadOfDone = this.aheadOfDone;
+    var interval = this.interval;
 
     /**
      * check if there is available task
@@ -34,7 +41,7 @@ exports.watch = function () {
             planLogs = helper.getLogs(workdayPlanFile, todayStr);
         }
         var now = new moment();
-        var tasks = getNextTask(now, ahead, step);
+        var tasks = getNextTask(now, ahead, interval);
         if (tasks && tasks.length > 0) {
             notifier.notify(generateStartMsg(tasks), {
                 execute: 'open ~/testhometest'
@@ -53,7 +60,7 @@ function isMidnight() {
     return moment().hour() === 0;
 }
 
-function getNextTask(now, ahead, step) {
+function getNextTask(now, ahead, interval) {
     return planLogs.filter(function (log) {
         var start = new moment(log.start);
         var timeSpan = start.diff(now, 'minute');
@@ -63,8 +70,8 @@ function getNextTask(now, ahead, step) {
         } else {
             fromLastNotified = Number.MAX_VALUE;
         }
-         /*notify ahead of [ahead] minutes before task begin, and notify every [step] minutes since then.*/
-        if (timeSpan > 0 && timeSpan <= ahead && fromLastNotified >= step) {
+         /*notify ahead of [ahead] minutes before task begin, and notify every [interval] minutes since then.*/
+        if (timeSpan > 0 && timeSpan <= ahead && fromLastNotified >= interval) {
             log.beforeStart = start.diff(now);
             log.lastNotified = now;
             return true;
@@ -110,16 +117,16 @@ function generateStartMsg(tasks) {
         }
         content += (task.content || '');
         content += '预估耗时: ' + getReadableTime(task.len, 'minute');
-        var subTitle;
+        var subtitle;
         if (beforeStart === 0) {
-            subTitle = '任务应该要开始了';
+            subtitle = '任务应该要开始了';
         } else {
-            subTitle = '开始时间:' + startMoment.format('HH:mm') +
+            subtitle = '开始时间:' + startMoment.format('HH:mm') +
             '，还有' + getReadableTime((beforeStart / 60000), 'minute');
         }
         messages.push({
             title: title,
-            subTitle: subTitle,
+            subtitle: subtitle,
             message: content
         });
     });
@@ -145,11 +152,11 @@ function generateEndMsg(tasks) {
         }
         content += (task.content || '');
         content += '已坚持了 ' + getReadableTime(task.len - task.beforeEnd, 'minute');
-        var subTitle = '结束时间:' + endMoment.format('HH:mm') +
+        var subtitle = '结束时间:' + endMoment.format('HH:mm') +
             '，剩下' + getReadableTime(task.beforeEnd, 'minute');
         messages.push({
             title: title,
-            subTitle: subTitle,
+            subtitle: subtitle,
             message: content
         });
     });
@@ -168,4 +175,4 @@ function getReadableTime(time, type) {
     return readableTime;
 }
 
-exports.watch();
+module.exports = PlanWatcher;

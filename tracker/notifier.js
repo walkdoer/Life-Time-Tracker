@@ -26,7 +26,7 @@ exports.notify = function (messages, options) {
             if (err) {
                 Message.error('Notify Error' + err);
             } else {
-                Message.info('Remind:' + msg.title + ' ' + msg.subTitle + '. content:' + msg.message);
+                Message.info('Remind:' + msg.title + ' ' + msg.subtitle + '. content:' + msg.message);
             }
         });
     });

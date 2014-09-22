@@ -12,6 +12,7 @@ var DrinkWaterWatcher = function (options) {
     this.cups = options.cups;
     //remind interval the unit is milliseconds
     this.interval = options.interval;
+    this.name = '饮水监控';
 };
 
 
@@ -26,15 +27,15 @@ DrinkWaterWatcher.prototype.watch = function () {
             drankInfo = that.getDrankInfoFromLog(Date.now());
             that.drankCups = drankInfo.cups;
         }
-        var subTitle = '已喝:' + that.drankCups + '杯, 剩下' + that.cups + '杯';
+        var subtitle = '已喝:' + that.drankCups + '杯, 剩下' + that.cups + '杯';
         notifier.notify({
             title: '喝杯水休息一下',
-            subTitle:subTitle,
+            subtitle: subtitle,
             message: getEncourageMsg(that.drankCups, that.cups),
             // execute: 'ltt action drink --cups 1'
         }, {
-            open: 'http://localhost:3333/actions/drink',
-            execute: 'curl http://localhost:3333/actions/drink'
+            open: 'http://localhost:3333/actions/drink'
+            //execute: 'curl http://localhost:3333/actions/drink'
         });
 
     }, this.interval || drinkWaterConfig.interval);

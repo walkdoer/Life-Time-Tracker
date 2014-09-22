@@ -45,6 +45,7 @@ program
 program
     .option('-cups, --cups <s>', 'set the cups of watch should drink one day')
     .option('-i, --interval <s>', 'remind interval')
+    .option('-ahead, --ahead <s>', 'ahead of time')
     .command('watch <type>')
     .description('对某一个行为进行观察，并适当提醒，例如喝水提醒，日程提醒')
     .action(watch);
@@ -150,26 +151,29 @@ function getStatist(type) {
 function getUserOptions() {
     var userOptions = {};
     if (program.perspective) {
-        userOptions.perspective = program.perspective;
-        msg.info('set perspective: ' + program.perspective);
+        setOption('perspective');
     }
     if (program.filter) {
-        userOptions.filter = program.filter;
-        msg.info('set filter: ' + program.perspective);
+        setOption('filter');
     }
     if (program.calandar) {
-        userOptions.calandar = program.calandar;
-        msg.info('set calandar: ' + program.calandar);
+        setOption('calandar');
     }
     if (program.cups) {
-        userOptions.cups = program.cups;
-        msg.info('set cups: ' + program.cups);
+        setOption('cups');
     }
     if (program.interval) {
-        userOptions.interval = program.interval;
-        msg.info('set interval: ' + program.interval);
+        setOption('interval');
+    }
+    if (program.ahead) {
+        setOption('ahead');
     }
     return userOptions;
+    function setOption(name) {
+        var value = program[name];
+        userOptions[name] = value;
+        msg.info('set ' + name + ' = ' + value);
+    }
 }
 
 
@@ -186,6 +190,7 @@ function watch(type) {
     var watcher = Watcher.get(type, options);
     if (watcher) {
         watcher.watch();
+        Msg.info('已启动' + watcher.name);
     } else {
         Msg.error('unknow watcher ' + type);
     }

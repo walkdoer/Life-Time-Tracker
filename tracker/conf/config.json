@@ -4,8 +4,8 @@
     "defaultPerspectives": ["sport", "sit", "category", "mean"],
     "watcher": {
         "plan": {
-            "ahead": 50,
-            "step": 6,
+            "ahead": 10,
+            "interval": 6,
             "aheadOfDone": 5
         },
         "drinkWater": {
