@@ -44,5 +44,5 @@ vendor
 *.swp
 *.pid
 
-conf/token.json
+tracker/conf/token.json
 logs
