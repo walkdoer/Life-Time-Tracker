@@ -19,14 +19,14 @@ exports.notify = function (messages, options) {
         msg = _.extend({
             title: 'Life Time Tracker',
             sound: 'Glass',
-            appIcon: __dirname + '/resources/me.jpg',
+            appIcon: __dirname + '/resources/me.jpg'
         }, options, msg);
         console.log(msg);
         notifier.notify(msg, function (err, response) {
             if (err) {
                 Message.error('Notify Error' + err);
             } else {
-                Message.info('Remind:' + msg.title + ' ' + msg.subtitle + '. content:' + msg.message);
+                Message.info('Remind:' + msg.title + ' ' + msg.subtitle + '. message:' + msg.message);
             }
         });
     });

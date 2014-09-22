@@ -11,7 +11,7 @@ var DrinkWaterWatcher = function (options) {
     //how many cups of water that should drink one day.
     this.cups = options.cups;
     //remind interval the unit is milliseconds
-    this.interval = options.interval;
+    this.interval = parseInt(options.interval || drinkWaterConfig.interval, 10);
     this.name = '饮水监控';
 };
 
@@ -31,14 +31,16 @@ DrinkWaterWatcher.prototype.watch = function () {
         notifier.notify({
             title: '喝杯水休息一下',
             subtitle: subtitle,
-            message: getEncourageMsg(that.drankCups, that.cups),
-            // execute: 'ltt action drink --cups 1'
+            message: getEncourageMsg(that.drankCups, that.cups)
+            //execute: 'ltt action drink --cups 1'
         }, {
-            open: 'http://localhost:3333/actions/drink'
-            //execute: 'curl http://localhost:3333/actions/drink'
+            //open: 'http://localhost:3333/actions/drink'
+            //open: 'http://www.baidu.com'
+            execute: 'curl http://localhost:3333/actions/drink'
+            //execute: 'mkdir ~/testtesttest'
         });
 
-    }, this.interval || drinkWaterConfig.interval);
+    }, this.interval);
 };
 
 function getEncourageMsg(achieve, goal) {
