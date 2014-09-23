@@ -94,9 +94,12 @@ function syncNote(client, options) {
                         });
                     });
                     bar.tick(1);
+                    loadedCount++;
                     if (downloadFailNotes.length + loadedCount === totalNotes) {
                         console.log('下载完成'.green);
-                        console.log(downloadFailNotes);
+                        if (downloadFailNotes.length > 0) {
+                            Msg.error(downloadFailNotes.join(','));
+                        }
                         status.finished = true;
                     }
                 });
@@ -209,7 +212,6 @@ noteStore.createNote(note, function(err, createdNote) {
 */
 
 exports.sync = function (options) {
-    var syncCount = 0;
     var client = new Evernote.Client({
         token: authToken,
         sandbox: false
@@ -222,27 +224,30 @@ exports.sync = function (options) {
         Evernote.EDAM_VERSION_MAJOR,
         Evernote.EDAM_VERSION_MINOR,
         function(err, versionOk) {
+            var status;
+            var syncCount = 0;
             if (err) {
                 Msg.error(EVERNOTE_SERVER_ERROR);
                 return;
             }
-            console.log("Is my Evernote API version up to date? " + versionOk);
+            Msg.info("Is my Evernote API version up to date? " + versionOk);
             if (!versionOk) {
                 process.exit(1);
             }
             if (options.interval !== undefined) {
-                var status;
-                setInterval(function () {
-                    if (!status || status.finished) {
-                        status = syncNote(client, options);
-                    } else {
-                        Msg.info('Last sync is not Finish yet, this round will not start');
-                    }
-                    syncCount++;
-                    Msg.info('同步序号:' + syncCount + '同步时间: ' + moment().format('YYYY-MM-DD hh-mm-ss'));
-                }, options.interval);
+                syncIntervaly();
+                setInterval(syncIntervaly, options.interval);
             } else {
                 syncNote(client, options);
+            }
+            function syncIntervaly() {
+                if (!status || status.finished) {
+                    status = syncNote(client, options);
+                    syncCount++;
+                    Msg.info('同步序号:' + syncCount + '同步时间: ' + moment().format('YYYY-MM-DD hh-mm-ss'));
+                } else {
+                    Msg.info('\nLast sync is not Finish yet, this round will not start');
+                }
             }
         }
     );
