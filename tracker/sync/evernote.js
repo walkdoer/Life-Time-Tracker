@@ -4,10 +4,12 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 var Evernote = require('evernote').Evernote;
 var config = require('../conf/config.json');
-var msg = require('../message');
+var evernoteSyncConfig = config.sync.evernote;
+var Msg = require('../message');
 var dateTypeEnum = require('../enum/dateType');
 var ProgressBar = require('progress');
 var path = require('path');
+var moment = require('moment');
 
 
 var EVERNOTE_SERVER_ERROR = '同步evernote服务器发生故障';
@@ -17,37 +19,18 @@ var logsPath = path.resolve(__dirname, '../' + config.logDir) + '/',
 
 
 
-exports.sync = function(options) {
+function syncNote(client, options) {
     var dateArr = options.dateArr;
-    var client = new Evernote.Client({
-        token: authToken,
-        sandbox: false
-    });
-
-    var userStore = client.getUserStore();
-
-    userStore.checkVersion(
-        "Evernote EDAMTest (Node.js)",
-        Evernote.EDAM_VERSION_MAJOR,
-        Evernote.EDAM_VERSION_MINOR,
-        function(err, versionOk) {
-            if (err) {
-                msg.error(EVERNOTE_SERVER_ERROR);
-                return;
-            }
-            console.log("Is my Evernote API version up to date? " + versionOk);
-            if (!versionOk) {
-                process.exit(1);
-            }
-        }
-    );
 
     var noteStore = client.getNoteStore();
+    var status = {
+        finished: false
+    };
 
     // List all of the notebooks in the user's account
     noteStore.listNotebooks(function(err, notebooks) {
         if (err) {
-            msg.error(EVERNOTE_SERVER_ERROR + ' 访问限制:' + err.rateLimitDuration);
+            Msg.error(EVERNOTE_SERVER_ERROR + ' 访问限制:' + err.rateLimitDuration);
             return;
         }
         notebooks.forEach(function(note) {
@@ -58,6 +41,8 @@ exports.sync = function(options) {
         });
     });
 
+    return status;
+
     function findEventLog(note) {
         var filter = new Evernote.NoteFilter(),
             spec = new Evernote.NotesMetadataResultSpec();
@@ -67,7 +52,7 @@ exports.sync = function(options) {
         filter.notebookGuid = note.guid || '1d2a83f0-a9ab-4fd8-9bcb-eee562a27ff7';
         noteStore.findNotesMetadata(filter, 0, 35600, spec, function(err, result) {
             if (err) {
-                msg.error(EVERNOTE_SERVER_ERROR);
+                Msg.error(EVERNOTE_SERVER_ERROR);
                 throw err;
             }
 
@@ -112,6 +97,7 @@ exports.sync = function(options) {
                     if (downloadFailNotes.length + loadedCount === totalNotes) {
                         console.log('下载完成'.green);
                         console.log(downloadFailNotes);
+                        status.finished = true;
                     }
                 });
             });
@@ -149,7 +135,7 @@ exports.sync = function(options) {
         });
     }
 
-};
+}
 
 
 function stripENML(content) {
@@ -221,3 +207,43 @@ noteStore.createNote(note, function(err, createdNote) {
 
 
 */
+
+exports.sync = function (options) {
+    var syncCount = 0;
+    var client = new Evernote.Client({
+        token: authToken,
+        sandbox: false
+    });
+
+    var userStore = client.getUserStore();
+
+    userStore.checkVersion(
+        "Evernote EDAMTest (Node.js)",
+        Evernote.EDAM_VERSION_MAJOR,
+        Evernote.EDAM_VERSION_MINOR,
+        function(err, versionOk) {
+            if (err) {
+                Msg.error(EVERNOTE_SERVER_ERROR);
+                return;
+            }
+            console.log("Is my Evernote API version up to date? " + versionOk);
+            if (!versionOk) {
+                process.exit(1);
+            }
+            if (options.interval !== undefined) {
+                var status;
+                setInterval(function () {
+                    if (!status || status.finished) {
+                        status = syncNote(client, options);
+                    } else {
+                        Msg.info('Last sync is not Finish yet, this round will not start');
+                    }
+                    syncCount++;
+                    Msg.info('同步序号:' + syncCount + '同步时间: ' + moment().format('YYYY-MM-DD hh-mm-ss'));
+                }, options.interval);
+            } else {
+                syncNote(client, options);
+            }
+        }
+    );
+};

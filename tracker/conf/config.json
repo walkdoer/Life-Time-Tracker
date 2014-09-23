@@ -11,5 +11,11 @@
             "logPath": "../logs/drankWater.log",
             "interval": 2400000
         }
+    },
+    "sync": {
+        "evernote": {
+            "interval": 3600000,
+            "auto": true
+        }
     }
 }
