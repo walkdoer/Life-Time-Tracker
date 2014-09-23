@@ -105,12 +105,23 @@ function generateStartMsg(tasks) {
             beforeStart = task.beforeStart,
             startMoment = new moment(task.start),
             content = '';
+        var emojis = {
+            'SPR': '💪',
+            'WK': '🔨',
+            'BRK': '💤',
+            'TK': '🙇',
+            'STU': '📚'
+        };
 
         var title = '';
         if(logClass) {
             title += logClass.name + '开始提醒';
         } else {
             title = '开始提醒';
+        }
+        var emoji = emojis[logClass.code];
+        if (emoji) {
+            title = emoji + title;
         }
         if (tags && tags.length > 0) {
             title += ' ' + tags.join(',');
@@ -127,6 +138,7 @@ function generateStartMsg(tasks) {
         messages.push({
             title: title,
             subtitle: subtitle,
+            //appIcon: emoji,
             message: content
         });
     });

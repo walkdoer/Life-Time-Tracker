@@ -21,6 +21,7 @@ DrinkWaterWatcher.prototype.watch = function () {
     //get today's drinkInfo
     var drankInfo = this.getDrankInfoFromLog(Date.now());
     this.drankCups = drankInfo.cups;
+    var cupEmoji = '🍵';
     setInterval(function () {
         //pass midnight then read the new day's drinkInfo
         if (moment().hour() === 0) {
@@ -29,7 +30,7 @@ DrinkWaterWatcher.prototype.watch = function () {
         }
         var subtitle = '已喝:' + that.drankCups + '杯, 剩下' + that.cups + '杯';
         notifier.notify({
-            title: '喝杯水休息一下',
+            title: cupEmoji + '喝杯水休息一下',
             subtitle: subtitle,
             message: getEncourageMsg(that.drankCups, that.cups)
             //execute: 'ltt action drink --cups 1'
