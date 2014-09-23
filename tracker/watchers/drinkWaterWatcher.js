@@ -6,6 +6,7 @@ var moment = require('moment');
 var util = require('../util');
 var drinkWaterConfig = require('../conf/config.json').watcher.drinkWater;
 var Message = require('../message');
+var nodeWatch = require('node-watch');
 
 var DrinkWaterWatcher = function (options) {
     //how many cups of water that should drink one day.
@@ -17,17 +18,21 @@ var DrinkWaterWatcher = function (options) {
 
 
 DrinkWaterWatcher.prototype.watch = function () {
-    var that = this;
+    var that = this,
+        drankInfo = this.getDrankInfoFromLog(Date.now());
+    //watch log file, when file change, update drink info
+    nodeWatch(util.resolvePath(drinkWaterConfig.logPath), function (filename) {
+        console.log(filename, 'changed');
+        drankInfo = that.getDrankInfoFromLog(Date.now());
+    });
     //get today's drinkInfo
-    var drankInfo = this.getDrankInfoFromLog(Date.now());
-    this.drankCups = drankInfo.cups;
     var cupEmoji = '🍵';
     setInterval(function () {
         //pass midnight then read the new day's drinkInfo
         if (moment().hour() === 0) {
             drankInfo = that.getDrankInfoFromLog(Date.now());
-            that.drankCups = drankInfo.cups;
         }
+        that.drankCups = drankInfo.cups;
         var subtitle = '已喝:' + that.drankCups + '杯, 剩下' + that.cups + '杯';
         notifier.notify({
             title: cupEmoji + '喝杯水休息一下',

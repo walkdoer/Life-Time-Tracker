@@ -143,12 +143,18 @@ function inversObj(obj) {
     return result;
 }
 
+
+function resolvePath(p) {
+    return path.resolve(__dirname, p);
+}
+
 module.exports = {
     isValidDate: isValidDate,
     readFile: readFile,
     readFileSync: readFileSync,
     appendFile: appendFile,
     readLogFiles: readLogFiles,
+    resolvePath: resolvePath,
     readLogFilesSync: readLogFilesSync,
     getDayNumInMonth: getDayNumInMonth,
     isDayValid: isDayValid,
