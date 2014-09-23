@@ -33,7 +33,15 @@ DrinkWaterWatcher.prototype.watch = function () {
             drankInfo = that.getDrankInfoFromLog(Date.now());
         }
         that.drankCups = drankInfo.cups;
-        var subtitle = '已喝:' + that.drankCups + '杯, 剩下' + that.cups + '杯';
+        var remainCups = that.cups - that.drankCups;
+        var subtitle;
+        if (remainCups > 0) {
+            subtitle = '已喝:' + that.drankCups + '杯, 剩下' + remainCups + '杯';
+        } else if (remainCups === 0){
+            subtitle = '喝完全部' + that.cups + '杯啦';
+        } else {
+            subtitle = '超出今日预期' + Math.abs(remainCups) + '杯!';
+        }
         notifier.notify({
             title: cupEmoji + '喝杯水休息一下',
             subtitle: subtitle,

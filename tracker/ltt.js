@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 'use strict';
 //dependencies
 var util = require('./util'),
@@ -15,6 +16,7 @@ var util = require('./util'),
     //sync evernote
     evernoteSync = require('./sync/evernote'),
     db = require('./model/db'),
+    _ = require('lodash'),
     Msg = require('./message'),
     Watcher = require('./watcher'),
     Action = require('./action');
@@ -32,6 +34,7 @@ program
     .action(dispatch);
 
 program
+    .option('--auto', 'auto sync logs')
     .option('-f, --filter <s>', 'use to filter logs')
     .command('logs <date>')
     .description('按日期查询日志')
@@ -69,10 +72,12 @@ program.parse(process.argv);
 
 
 function dispatch(dateStr) {
-    if (!isDateValid(dateStr)) { return; }
+    if (!isDateValid(dateStr)) {
+        return;
+    }
     //standardlize the date 2014-08-01 to 2014-8-1
     dateStr = standardizeDate(dateStr);
-    var dateArr = dateStr.split('-').map(function (val){
+    var dateArr = dateStr.split('-').map(function(val) {
         return parseInt(val, 10);
     });
     var dateType = [null, 'year', 'month', 'day'][dateArr.length],
@@ -102,8 +107,8 @@ function dispatch(dateStr) {
      *     3. output
      */
     scanner.scan(options)
-           .then(statist.dispose.bind(statist, options))
-           .then(outputor.dispose.bind(outputor, options));
+        .then(statist.dispose.bind(statist, options))
+        .then(outputor.dispose.bind(outputor, options));
 }
 
 
@@ -113,7 +118,7 @@ function syncLogs(dateStr) {
     if (dateStr) {
         //standardlize the date 2014-08-01 to 2014-8-1
         dateStr = standardizeDate(dateStr);
-        var dateArr = dateStr.split('-').map(function (val){
+        var dateArr = dateStr.split('-').map(function(val) {
             return parseInt(val, 10);
         });
         var dateType = [null, 'year', 'month', 'day'][dateArr.length];
@@ -143,36 +148,36 @@ function isDateValid(dateStr) {
 
 
 function getStatist(type) {
-    var statistPath = './statists/' + type ;
+    var statistPath = './statists/' + type;
     return require(statistPath);
 }
 
 
 function getUserOptions() {
     var userOptions = {};
-    if (program.perspective) {
-        setOption('perspective');
-    }
-    if (program.filter) {
-        setOption('filter');
-    }
-    if (program.calandar) {
-        setOption('calandar');
-    }
-    if (program.cups) {
-        setOption('cups');
-    }
-    if (program.interval) {
-        setOption('interval');
-    }
-    if (program.ahead) {
-        setOption('ahead');
-    }
+    setOption([
+        'perspective',
+        'filter',
+        'calandar',
+        'cups',
+        'interval',
+        'ahead',
+        'auto'
+    ]);
     return userOptions;
-    function setOption(name) {
-        var value = program[name];
-        userOptions[name] = value;
-        msg.info('set ' + name + ' = ' + value);
+
+    function setOption(names) {
+        if (_.isString(names)) {
+            names = [names];
+        }
+        names.forEach(function(name) {
+            if (program[name] === undefined) {
+                return;
+            }
+            var value = program[name];
+            userOptions[name] = value;
+            msg.info('set ' + name + ' = ' + value);
+        });
     }
 }
 
