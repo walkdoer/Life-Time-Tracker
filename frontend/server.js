@@ -40,7 +40,7 @@
 var express = require('express');
 var path = require('path');
 var http = require('http');
-var exphbs  = require('express3-handlebars');
+var exphbs = require('express3-handlebars');
 var morgan = require('morgan');
 
 var dashboardRouter = require('./routers/dashboard'),
@@ -50,7 +50,9 @@ var dashboardRouter = require('./routers/dashboard'),
 var app = express();
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
-app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+app.engine('handlebars', exphbs({
+    defaultLayout: 'main'
+}));
 app.set('view engine', 'handlebars');
 app.use(morgan('combined'));
 //static resources
@@ -60,6 +62,22 @@ app.get('/', dashboardRouter);
 app.get('/logs/:year', logsRouter);
 app.get('/stats/:year', statsRouter);
 
-http.createServer(app).listen(app.get('port'), function(){
+app.get('/calendars/:type/:year/:month', function(req, res) {
+    var data = '';
+    http.get('http://localhost:3333' + req.path, function (response) {
+        console.log('STATUS: ' + response.statusCode);
+        response.on('data', function(chunk) {
+            data += chunk;
+        });
+        response.on('end', function (){
+            //the api's response content is json string,so need to parse to object
+            res.send(JSON.parse(data));
+        });
+    }).on('error', function(e) {
+        console.log('problem with request: ' + e.message);
+        res.status(500).send('Server Error');
+    });
+});
+http.createServer(app).listen(app.get('port'), function() {
     console.log("Express server listening on port " + app.get('port'));
 });
