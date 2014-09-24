@@ -7,9 +7,9 @@
 'use strict';
 
 exports.generate = function (options) {
-    var calendarType = options.calendar,
+    var calendarType = options.type,
         path = './calendars/',
         moduleName = calendarType.toLowerCase() + 'Calendar';
     var calendar = require(path + moduleName);
-    calendar.generate(options);
+    return calendar.generate(options);
 };
