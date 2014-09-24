@@ -14,6 +14,8 @@ exports.scan = function (options) {
         scanner = require('./scanners/dayLifeScanner');
     } else if (options.dateType === dateTypeEnum.Month){
         scanner = require('./scanners/monthLifeScanner');
+    } else if (options.dateType === dateTypeEnum.Year) {
+        scanner = require('./scanners/yearLifeScanner');
     }
     if (scanner) {
         return scanner.scan(options);

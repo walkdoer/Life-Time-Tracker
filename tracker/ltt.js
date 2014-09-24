@@ -88,13 +88,6 @@ function dispatch(dateStr) {
         dateArr: dateArr
     });
 
-    //get activity calendar,like sport calendar, or read calendar etc.
-    if (options.calendar) {
-        calendar.generate(options);
-        return;
-    }
-
-
     //get the corresponding statist of specific type, type can be `day` and `month` for now
     var statist = getStatist(dateType, options);
 
@@ -106,9 +99,13 @@ function dispatch(dateStr) {
      *     2. stat
      *     3. output
      */
-    scanner.scan(options)
-        .then(statist.dispose.bind(statist, options))
-        .then(outputor.dispose.bind(outputor, options));
+    var promise = scanner.scan(options);
+    if (statist && statist.dispose) {
+        promise.then(statist.dispose.bind(statist, options));
+    }
+    if (outputor && outputor.dispose) {
+        promise.then(outputor.dispose.bind(outputor, options));
+    }
 }
 
 

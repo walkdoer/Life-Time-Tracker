@@ -59,7 +59,7 @@ svg.selectAll(".month")
     .attr("class", "month")
     .attr("d", monthPath);
 
-d3.json("./statResult/calendar/2014.json", function(error, csv) {
+d3.json("/calendars/sport/2014", function(error, csv) {
     var data = d3.nest()
         .key(function(d) {
             return new Date(d.date).toJSON().split('T')[0];

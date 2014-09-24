@@ -23,6 +23,8 @@ function readLogFile(options) {
         promise = readOneDayLog(year, month, day);
     } else if (dateType === dateTypeEnum.Month){
         promise = readOneMonthLog(year, month);
+    } else if (dateType === dateTypeEnum.Year) {
+        promise = readOneYearLog(year);
     }
 
     return promise.then(preprocessFileData.bind(null, options));
@@ -55,11 +57,45 @@ function readOneMonthLog(year, month) {
     return when.settle(queue);
 }
 
+
+function readOneYearLog(year) {
+    var month = 1;
+    var queue = [];
+    while (month <= 12) {
+        queue.push(readOneMonthLog(year, month));
+        month++;
+    }
+    //use when.settle: because some file may not exist
+    //so when.all is not appropriate
+    return when.settle(queue);
+}
+
 function preprocessFileData(options, fileData) {
     var dateStr = options.dateStr,
         unTrackedDays = [];
     if (options.dateType === dateTypeEnum.Month) {
-        fileData = fileData.filter(function (d, index) {
+        return transformMonth(fileData);
+    } else if (options.dateType === dateTypeEnum.Year) {
+        var allDays = [],
+            allUntrackedDay = [];
+        fileData.forEach(function(monthData, index) {
+            var month = index + 1;
+            var transformResult = transformMonth(monthData.value);
+            allDays = allDays.concat(transformResult.days);
+            var unTrackedDays = transformResult.unTrackedDays.map(function (val) {
+                return [month, val].join('-');
+            });
+            allUntrackedDay = allDays.concat(unTrackedDays);
+        });
+        return {
+            days: allDays,
+            unTrackedDays: allUntrackedDay
+        };
+    }
+    return fileData;
+
+    function transformMonth(monthData) {
+        monthData = monthData.filter(function (d, index) {
             var day = index + 1,
                 date = [dateStr, day].join('-');
             if (d.state === 'rejected') {
@@ -78,11 +114,10 @@ function preprocessFileData(options, fileData) {
             return d <= today;
         });
         return {
-            days: fileData,
+            days: monthData,
             unTrackedDays: unTrackedDays
         };
     }
-    return fileData;
 }
 
 function filterClass(logs, options) {

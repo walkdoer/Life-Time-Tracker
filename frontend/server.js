@@ -62,7 +62,7 @@ app.get('/', dashboardRouter);
 app.get('/logs/:year', logsRouter);
 app.get('/stats/:year', statsRouter);
 
-app.get('/calendars/:type/:year/:month', function(req, res) {
+app.get('/calendars/:type/:year/:month?', function(req, res) {
     var data = '';
     http.get('http://localhost:3333' + req.path, function (response) {
         console.log('STATUS: ' + response.statusCode);

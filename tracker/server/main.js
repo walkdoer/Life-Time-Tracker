@@ -16,15 +16,23 @@ app.get('/actions/:actionName', function (req, res) {
     res.send('done');
 });
 
-app.get('/calendars/:type/:year/:month', function (req, res){
+app.get('/calendars/:type/:year/:month?', function (req, res){
     var params = req.params,
         year = params.year,
-        month = params.month;
-    var dateArr = [year, month].map(function (val) {
+        month = params.month,
+        dateType;
+    var dateArr = [year, month].filter(notEmpty).map(function (val) {
         return parseInt(val, 10);
     });
+    if (!month) {
+        dateType = dateTypeEnum.Year;
+    } else {
+        dateType = dateTypeEnum.Month;
+    }
+
+    function notEmpty(val) { return val !== undefined;}
     calandar.generate({
-        dateType: dateTypeEnum.Month,
+        dateType: dateType,
         dateStr: dateArr.join('-'),
         dateArr: dateArr,
         type: params.type
