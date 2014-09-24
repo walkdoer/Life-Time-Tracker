@@ -11,18 +11,18 @@ var workdayPlanFile = fs.readFileSync(
 var globalConfig = require('../conf/config.json');
 
 //defaul config
-var planWatchCfg = _.extend({
+var planReminderConfig = _.extend({
     ahead: 5,
     aheadOfDone: 0
-}, globalConfig.watcher.plan);
+}, globalConfig.reminders.plan);
 
 var todayStr = moment().format('YYYY-MM-DD');
 var planLogs = helper.getLogs(workdayPlanFile, todayStr);
 
 var PlanReminder = function (options) {
-    this.ahead = parseInt(options.ahead || planWatchCfg.ahead, 10);
-    this.aheadOfDone = parseInt(options.aheadOfDone || planWatchCfg.aheadOfDone, 10);
-    this.interval = parseInt(options.interval || planWatchCfg.interval, 10);
+    this.ahead = parseInt(options.ahead || planReminderConfig.ahead, 10);
+    this.aheadOfDone = parseInt(options.aheadOfDone || planReminderConfig.aheadOfDone, 10);
+    this.interval = parseInt(options.interval || planReminderConfig.interval, 10);
     this.name = '任务提醒';
 };
 
@@ -104,13 +104,15 @@ function generateStartMsg(tasks) {
             tags = task.tags,
             beforeStart = task.beforeStart,
             startMoment = new moment(task.start),
-            content = '';
+            content = '',
+            emoji;
         var emojis = {
             'SPR': '💪',
             'WK': '🔨',
             'BRK': '💤',
             'TK': '🙇',
-            'STU': '📚'
+            'STU': '📚',
+            'NT': '📅'
         };
 
         var title = '';
@@ -119,7 +121,9 @@ function generateStartMsg(tasks) {
         } else {
             title = '开始提醒';
         }
-        var emoji = emojis[logClass.code];
+        if (logClass) {
+            emoji = emojis[logClass.code];
+        }
         if (emoji) {
             title = emoji + title;
         }

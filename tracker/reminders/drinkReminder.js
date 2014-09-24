@@ -4,13 +4,13 @@
 var notifier = require('../notifier');
 var moment = require('moment');
 var util = require('../util');
-var drinkWaterConfig = require('../conf/config.json').watcher.drinkWater;
+var drinkWaterConfig = require('../conf/config.json').reminders.drinkWater;
 var Message = require('../message');
 var nodeWatch = require('node-watch');
 
 var DrinkWaterReminder = function (options) {
     //how many cups of water that should drink one day.
-    this.cups = options.cups;
+    this.cups = options.cups || drinkWaterConfig.cupsOfOneDay;
     //remind interval the unit is milliseconds
     this.interval = parseInt(options.interval || drinkWaterConfig.interval, 10);
     this.name = '饮水提醒';
@@ -21,6 +21,7 @@ DrinkWaterReminder.prototype.watch = function () {
     var that = this,
         drankInfo = this.getDrankInfoFromLog(Date.now());
     //watch log file, when file change, update drink info
+    console.log(util.resolvePath(drinkWaterConfig.logPath));
     nodeWatch(util.resolvePath(drinkWaterConfig.logPath), function (filename) {
         console.log(filename, 'changed');
         drankInfo = that.getDrankInfoFromLog(Date.now());

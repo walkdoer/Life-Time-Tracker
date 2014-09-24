@@ -1,7 +1,7 @@
 {
     "logDir": "../logs",
     "defaultPerspectives": ["sport", "sit", "category", "mean"],
-    "watcher": {
+    "reminders": {
         "plan": {
             "ahead": 10,
             "interval": 6,
@@ -9,6 +9,7 @@
         },
         "drinkWater": {
             "logPath": "../logs/drankWater.log",
+            "cupsOfOneDay": 8,
             "interval": 2400000
         }
     },

@@ -3,7 +3,7 @@
  */
 'use strict';
 var util = require('../util');
-var drinkWaterConfig = require('../conf/config.json').watcher.drinkWater;
+var drinkWaterConfig = require('../conf/config.json').reminders.drinkWater;
 var Msg = require('../message');
 var moment = require('moment');
 exports.execute = function (options) {

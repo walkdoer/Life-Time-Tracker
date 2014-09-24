@@ -244,7 +244,7 @@ exports.sync = function (options) {
                 if (!status || status.finished) {
                     status = syncNote(client, options);
                     syncCount++;
-                    Msg.info('同步序号:' + syncCount + '同步时间: ' + moment().format('YYYY-MM-DD hh-mm-ss'));
+                    Msg.info('同步序号:' + syncCount + '同步时间: ' + moment().format('YYYY-MM-DD HH:mm:ss'));
                 } else {
                     Msg.info('\nLast sync is not Finish yet, this round will not start');
                 }
