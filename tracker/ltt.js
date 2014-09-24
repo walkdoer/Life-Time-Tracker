@@ -18,7 +18,7 @@ var util = require('./util'),
     db = require('./model/db'),
     _ = require('lodash'),
     Msg = require('./message'),
-    Watcher = require('./watcher'),
+    Remind = require('./remind'),
     Action = require('./action');
 
 
@@ -46,12 +46,12 @@ program
     .action(syncLogs);
 
 program
-    .option('-cups, --cups <s>', 'set the cups of watch should drink one day')
+    .option('-cups, --cups <s>', 'set the cups of water should drink one day')
     .option('-i, --interval <s>', 'remind interval')
     .option('-ahead, --ahead <s>', 'ahead of time')
-    .command('watch <type>')
-    .description('对某一个行为进行观察，并适当提醒，例如喝水提醒，日程提醒')
-    .action(watch);
+    .command('remind <type>')
+    .description('对某一个行为进行提醒，例如喝水提醒，日程提醒')
+    .action(remind);
 
 program
     .command('action <action>')
@@ -190,14 +190,14 @@ function standardizeDate(dateStr) {
 }
 
 
-function watch(type) {
+function remind(type) {
     var options = getUserOptions();
-    var watcher = Watcher.get(type, options);
-    if (watcher) {
-        watcher.watch();
-        Msg.info('已启动' + watcher.name);
+    var reminder = Remind.get(type, options);
+    if (reminder) {
+        reminder.watch();
+        Msg.info('已启动' + reminder.name);
     } else {
-        Msg.error('unknow watcher ' + type);
+        Msg.error('unknow reminder ' + type);
     }
 }
 

@@ -8,16 +8,16 @@ var drinkWaterConfig = require('../conf/config.json').watcher.drinkWater;
 var Message = require('../message');
 var nodeWatch = require('node-watch');
 
-var DrinkWaterWatcher = function (options) {
+var DrinkWaterReminder = function (options) {
     //how many cups of water that should drink one day.
     this.cups = options.cups;
     //remind interval the unit is milliseconds
     this.interval = parseInt(options.interval || drinkWaterConfig.interval, 10);
-    this.name = '饮水监控';
+    this.name = '饮水提醒';
 };
 
 
-DrinkWaterWatcher.prototype.watch = function () {
+DrinkWaterReminder.prototype.watch = function () {
     var that = this,
         drankInfo = this.getDrankInfoFromLog(Date.now());
     //watch log file, when file change, update drink info
@@ -78,7 +78,7 @@ function getEncourageMsg(achieve, goal) {
  * get drunk information of a specific date range
  * information contain cups
  */
-DrinkWaterWatcher.prototype.getDrankInfoFromLog= function (from, to) {
+DrinkWaterReminder.prototype.getDrankInfoFromLog= function (from, to) {
     var fileData = util.readFileSync(drinkWaterConfig.logPath);
     var lines = fileData.split('\n').filter(function (line) {
         return line.trim().length > 0;
@@ -108,4 +108,4 @@ DrinkWaterWatcher.prototype.getDrankInfoFromLog= function (from, to) {
     };
 };
 
-module.exports = DrinkWaterWatcher;
+module.exports = DrinkWaterReminder;

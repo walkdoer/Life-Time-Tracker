@@ -19,14 +19,14 @@ var planWatchCfg = _.extend({
 var todayStr = moment().format('YYYY-MM-DD');
 var planLogs = helper.getLogs(workdayPlanFile, todayStr);
 
-var PlanWatcher = function (options) {
+var PlanReminder = function (options) {
     this.ahead = parseInt(options.ahead || planWatchCfg.ahead, 10);
     this.aheadOfDone = parseInt(options.aheadOfDone || planWatchCfg.aheadOfDone, 10);
     this.interval = parseInt(options.interval || planWatchCfg.interval, 10);
-    this.name = '任务监控';
+    this.name = '任务提醒';
 };
 
-PlanWatcher.prototype.watch = function () {
+PlanReminder.prototype.watch = function () {
     var ahead = this.ahead,
         aheadOfDone = this.aheadOfDone;
     var interval = this.interval;
@@ -187,4 +187,4 @@ function getReadableTime(time, type) {
     return readableTime;
 }
 
-module.exports = PlanWatcher;
+module.exports = PlanReminder;
