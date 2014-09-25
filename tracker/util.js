@@ -19,9 +19,7 @@ function isValidDate(date) {
 }
 
 function readLogFiles(date) {
-    var dateArr = date.split('-').map(function (val) {
-        return parseInt(val, 10);
-    });
+    var dateArr = parseDate(date);
     var fileName = dateArr.join('/') + '.md';
     var deferred = when.defer(),
         filePath = path.resolve(__dirname, [DATA_FILE_PRIFIX, fileName].join('/'));
@@ -36,6 +34,12 @@ function readLogFiles(date) {
     });
 
     return deferred.promise;
+}
+
+function parseDate(date) {
+    return date.split('-').map(function (val) {
+        return parseInt(val, 10);
+    });
 }
 
 function readFile(filePath, encode) {
@@ -69,7 +73,7 @@ function appendFile(filePath, data) {
 
 function readLogFilesSync(date) {
 
-    var dateArr = date.split('-');
+    var dateArr = parseDate(date);
     var fileName = dateArr.join('/') + '.md',
         filePath = path.resolve(__dirname, [DATA_FILE_PRIFIX, fileName].join('/'));
     var fileData = fs.readFileSync(filePath, 'utf8');

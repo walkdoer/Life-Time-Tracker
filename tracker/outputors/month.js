@@ -36,9 +36,13 @@ function outputOverivew(statResult, options) {
         total = unTrackedDaysLen + trackedDaysLen,
         trackedRate = trackedDaysLen / total;
     console.log("======= " + options.dateStr + "的概括 ========");
-    console.log("一共记录了" + trackedDaysLen + '天,占' + (trackedRate * 100).toFixed(2) +
-            '% 但是有' + unTrackedDays.length + '天没有记录, 分别是:\n' +
-        '\t' + unTrackedDays.join(', '));
+    if (unTrackedDaysLen > 0) {
+        console.log("一共记录了" + trackedDaysLen + '天,占' + (trackedRate * 100).toFixed(2) +
+                '% 但是有' + unTrackedDays.length + '天没有记录, 分别是:\n' +
+            '\t' + unTrackedDays.join(', '));
+    } else {
+        console.log('这个月全部有记录，太厉害了');
+    }
     display.bar({
         '平均睡眠时间': statResult.meanSleepTime,
         '平均工作时间': statResult.meanWorkTime,

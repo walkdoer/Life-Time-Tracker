@@ -61,7 +61,11 @@ function syncNote(client, options) {
                 return note.title && needDownload(note.title);
             });
             //result.totalNotes
-            console.log('一共找到' + downloadNotes.length + '个笔记符合同步条件.');
+            if (downloadNotes.length > 0) {
+                console.log('一共找到' + downloadNotes.length + '个笔记符合同步条件.');
+            } else {
+                console.log('没有找到符合条件的笔记.');
+            }
             var bar = new ProgressBar('Downloading [:bar] :percent', {
                 complete: '=',
                 incomplete: ' ',

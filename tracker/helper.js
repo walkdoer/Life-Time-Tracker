@@ -11,7 +11,8 @@ var LogClass = require('./model/fundament/logClass'),
 var logClassName = require('./conf/logClassName');
 var msg = require('./message');
 var extend = require('node.extend');
-var dateFormat = 'YYYY-MM-DD HH:mm';
+var timeFormat = 'YYYY-MM-DD HH:mm',
+    dateFormat = 'YYYY-MM-DD';
 var timeSplitter = ':';
 
 var tagReplaceRegexp = /[\[\]]/ig,
@@ -271,9 +272,9 @@ function getTimeSpanFromLog(log, config) {
                 nextDay: config.startNextDay
             });
             alignedStart = alignTime(date, start, alignConfig);
-            startTime = new moment(alignedStart, dateFormat);
+            startTime = new moment(alignedStart, timeFormat);
             startHour = parseInt(start.split(timeSplitter)[0], 10);
-            timeSpan.start = startTime.format(dateFormat);
+            timeSpan.start = startTime.format(timeFormat);
         }
         if (end) {
             endHour = parseInt(end.split(timeSplitter)[0], 10);
@@ -282,8 +283,8 @@ function getTimeSpanFromLog(log, config) {
                 nextDay: config.endNextDay
             });
             alignedEnd = alignTime(date, end, alignConfig);
-            endTime = new moment(alignedEnd, dateFormat);
-            timeSpan.end = endTime.format(dateFormat);
+            endTime = new moment(alignedEnd, timeFormat);
+            timeSpan.end = endTime.format(timeFormat);
         }
         if (end && start) {
             timeSpan.len = endTime.diff(startTime, 'minutes');
@@ -359,9 +360,8 @@ function getLogContent(logStr) {
 function getTimeSpan(start, end) {
     var diff = -1;
     if (end && start) {
-        var dateFomate = 'YYYY-MM-DD HH:mm';
-        var startTime = new moment(start, dateFomate),
-            endTime = new moment(end, dateFomate);
+        var startTime = new moment(start, timeFormat),
+            endTime = new moment(end, timeFormat);
         diff = endTime.diff(startTime, 'minutes');
     }
     return diff;
@@ -387,12 +387,7 @@ function onlyUnique(value, index, self) {
 }
 
 function nextDay(date) {
-    var dateArr = date.split('-'),
-        year = parseInt(dateArr[0], 10),
-        month = parseInt(dateArr[1], 10),
-        day = parseInt(dateArr[2], 10),
-        nextDateStr = [year, month, day + 1].join('-');
-    return nextDateStr;
+    return moment(date).add(1, 'days').format(dateFormat);
 }
 
 function groupTimeByTag (logs) {
@@ -578,11 +573,11 @@ function checkLogSequence(logs) {
         return true;
     }
     logs.reduce(function (pv, cv) {
-        var pvEnd = new moment(pv.end, dateFormat),
-            cvStart = new moment(cv.start, dateFormat);
+        var pvEnd = new moment(pv.end, timeFormat),
+            cvStart = new moment(cv.start, timeFormat);
         if (cvStart.diff(pvEnd, 'minute') < 0) {
             checkResult = false;
-            msg.warn('The sequence of "' + pv.origin + '" and "' + cv.origin + '" of  ' +  pvEnd.format('YYYY-MM-DD') + ' is not right.');
+            msg.warn('The sequence of "' + pv.origin + '" and "' + cv.origin + '" of  ' +  pvEnd.format(dateFormat) + ' is not right.');
         }
         return cv;
     });
