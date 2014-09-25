@@ -101,10 +101,10 @@ function dispatch(dateStr) {
      */
     var promise = scanner.scan(options);
     if (statist && statist.dispose) {
-        promise.then(statist.dispose.bind(statist, options));
+        promise = promise.then(statist.dispose.bind(statist, options));
     }
     if (outputor && outputor.dispose) {
-        promise.then(outputor.dispose.bind(outputor, options));
+        promise = promise.then(outputor.dispose.bind(outputor, options));
     }
 }
 
