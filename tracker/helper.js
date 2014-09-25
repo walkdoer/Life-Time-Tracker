@@ -218,8 +218,10 @@ function getSimpleTags(data) {
                 //tag不区分大小写
                 return val.trim().toLowerCase();
             });
+            tags = tags.concat(tagArr);
+        } else {
+            msg.warn('no tag in this log: ' + data);
         }
-        tags = tags.concat(tagArr);
     });
     //unique the tags array
     return tags.filter(onlyUnique);

@@ -33,7 +33,7 @@ function displayBar(data, config) {
         total += l.count;
     });
     var maxStringLen = getMaxStringLen(data, function (d) {
-        return getStrLen(d.label);
+        return getStrLen(d.label || '');
     });
     data.forEach(function (l) {
         var percent = l.count / total;
