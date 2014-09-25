@@ -28,11 +28,13 @@ DrinkWaterReminder.prototype.watch = function () {
     });
     //get today's drinkInfo
     var cupEmoji = '🍵';
+    var lastUpdated = new Date();
     setInterval(function () {
         //pass midnight then read the new day's drinkInfo
-        if (moment().hour() === 0) {
+        if (isNewDay()) {
             drankInfo = that.getDrankInfoFromLog(Date.now());
         }
+        lastUpdated = new Date();
         that.drankCups = drankInfo.cups;
         var remainCups = that.cups - that.drankCups;
         var subtitle;
@@ -56,6 +58,11 @@ DrinkWaterReminder.prototype.watch = function () {
         });
 
     }, this.interval);
+
+    function isNewDay () {
+        var now = new Date();
+        return now.getDate() !== lastUpdated.getDate();
+    }
 };
 
 function getEncourageMsg(achieve, goal) {
