@@ -18,7 +18,8 @@
     "q": "~2.0.2",
     "requirejs": "~2.1.15",
     "requirejs-text": "~2.0.12",
-    "d3": "~3.4.11"
+    "d3": "~3.4.11",
+    "highstock": "~3.0.1"
   },
   "devDependencies": {},
   "keywords": [

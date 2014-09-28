@@ -9,6 +9,7 @@ var app = express();
 var execute = require('../execute');
 var calandar = require('../calendar');
 var dateTypeEnum = require('../enum/dateType');
+var sleepPeriod = require('./components/sleepPeriod');
 
 app.get('/actions/:actionName', function (req, res) {
     var actionName = req.params.actionName;
@@ -17,26 +18,15 @@ app.get('/actions/:actionName', function (req, res) {
 });
 
 app.get('/calendars/:type/:year/:month?', function (req, res){
-    var params = req.params,
-        year = params.year,
-        month = params.month,
-        dateType;
-    var dateArr = [year, month].filter(notEmpty).map(function (val) {
-        return parseInt(val, 10);
+    var params = getCommonRequestParams(req.params);
+    calandar.generate(params).then(function (result) {
+        res.send(result);
     });
-    if (!month) {
-        dateType = dateTypeEnum.Year;
-    } else {
-        dateType = dateTypeEnum.Month;
-    }
+});
 
-    function notEmpty(val) { return val !== undefined;}
-    calandar.generate({
-        dateType: dateType,
-        dateStr: dateArr.join('-'),
-        dateArr: dateArr,
-        type: params.type
-    }).then(function (result) {
+app.get('/sleepPeriods/:year/:month?', function (req, res) {
+    var params = getCommonRequestParams(req.params);
+    sleepPeriod.generate(params).then(function (result){
         res.send(result);
     });
 });
@@ -49,3 +39,24 @@ exports.run = function (options) {
     });
 };
 
+
+function getCommonRequestParams(params) {
+    var year = params.year,
+        month = params.month,
+        dateType;
+    var dateArr = [year, month].filter(notEmpty).map(function (val) {
+        return parseInt(val, 10);
+    });
+    if (!month) {
+        dateType = dateTypeEnum.Year;
+    } else {
+        dateType = dateTypeEnum.Month;
+    }
+    function notEmpty(val) { return val !== undefined;}
+    return {
+        dateType: dateType,
+        dateStr: dateArr.join('-'),
+        dateArr: dateArr,
+        type: params.type
+    };
+}

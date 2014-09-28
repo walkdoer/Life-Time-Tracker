@@ -5,7 +5,7 @@
 'use strict';
 
 var scanner = require('../scanner');
-var fileHelper = require('../fileHelper');
+//var fileHelper = require('../fileHelper');
 var Q = require('q');
 
 var logClassEnum = require('../enum/logClass');
