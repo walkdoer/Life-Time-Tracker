@@ -45,4 +45,5 @@ vendor
 *.pid
 
 tracker/conf/token.json
+frontend/resources/vendors
 logs

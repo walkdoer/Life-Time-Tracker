@@ -1,0 +1,27 @@
+{
+  "name": "life-time-tracker",
+  "version": "0.1.0",
+  "ignore": [
+    "**/.*",
+    "build",
+    "test",
+    "*.md",
+    "package.json",
+    "bower.json"
+  ],
+  "dependencies": {
+    "underscore": "*",
+    "jquery": "~2.1.1",
+    "bootstrap": "~3.2.0",
+    "highcharts": "~4.0.4",
+    "moment": "~2.8.3",
+    "q": "~2.0.2",
+    "requirejs": "~2.1.15",
+    "requirejs-text": "~2.0.12",
+    "d3": "~3.4.11"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "javascript"
+  ]
+}
