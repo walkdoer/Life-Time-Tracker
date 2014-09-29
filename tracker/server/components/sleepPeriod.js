@@ -13,6 +13,7 @@ var Moment = require('moment');
 var dayStat = require('../../statists/day');
 var dateTypeEnum = require('../../enum/dateType');
 var extend = require('node.extend');
+var timeFormat = 'YYYY-MM-DD HH:mm:ss';
 exports.generate = function (options) {
     var deferred = Q.defer();
     scanner.scan(options)
@@ -32,8 +33,8 @@ exports.generate = function (options) {
                 }
                 result.push({
                     date: day.date,
-                    sleepMoment: new Moment(statResult.sleepMoment),
-                    wakeMoment: new Moment(statResult.wakeMoment),
+                    sleepMoment: new Moment(statResult.sleepMoment).format(timeFormat),
+                    wakeMoment: new Moment(statResult.wakeMoment).format(timeFormat),
                     sleepTime: day.sleepTime
                 });
             });

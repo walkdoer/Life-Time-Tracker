@@ -78,6 +78,24 @@ app.get('/calendars/:type/:year/:month?', function(req, res) {
         res.status(500).send('Server Error');
     });
 });
+
+app.get('/sleepPeriods/:year/:month?', function(req, res) {
+    var data = '';
+    http.get('http://localhost:3333' + req.path, function (response) {
+        console.log('STATUS: ' + response.statusCode);
+        response.on('data', function(chunk) {
+            data += chunk;
+        });
+        response.on('end', function (){
+            //the api's response content is json string,so need to parse to object
+            res.send(JSON.parse(data));
+        });
+    }).on('error', function(e) {
+        console.log('problem with request: ' + e.message);
+        res.status(500).send('Server Error');
+    });
+});
+
 http.createServer(app).listen(app.get('port'), function() {
     console.log("Express server listening on port " + app.get('port'));
 });
