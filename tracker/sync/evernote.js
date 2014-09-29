@@ -4,7 +4,6 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 var Evernote = require('evernote').Evernote;
 var config = require('../conf/config.json');
-var evernoteSyncConfig = config.sync.evernote;
 var Msg = require('../message');
 var dateTypeEnum = require('../enum/dateType');
 var ProgressBar = require('progress');
@@ -49,7 +48,7 @@ function syncNote(client, options) {
         spec.includeTitle = true;
         spec.includeCreated = true;
         spec.includeUpdated = true;
-        filter.notebookGuid = note.guid || '1d2a83f0-a9ab-4fd8-9bcb-eee562a27ff7';
+        filter.notebookGuid = note.guid;
         noteStore.findNotesMetadata(filter, 0, 35600, spec, function(err, result) {
             if (err) {
                 Msg.error(EVERNOTE_SERVER_ERROR);

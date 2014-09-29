@@ -42,7 +42,7 @@ program
 
 program
     .command('sync [date]')
-    .description('同步日志')
+    .description('同步日志 the date can be today month week yesterday or a date string')
     .action(syncLogs);
 
 program

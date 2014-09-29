@@ -62,16 +62,24 @@ define(function(require, exports) {
                 name: 'sleep',
                 data: []
             };
+            var sleepTime = {
+                name: '睡眠长度',
+                type: 'column',
+                yAxis: 1,
+                data: []
+            };
+            var wakeData = wakeLine.data;
+            var sleepData = sleepLine.data;
+            var sleepTimeData = sleepTime.data;
             var midnight = moment().startOf('day').unix() * 1000;
             rawData.forEach(function (day) {
                 var dateTS = moment(day.date).unix() * 1000;
-                var wakeData = wakeLine.data;
-                var sleepData = sleepLine.data;
                 var wakeMoment = new moment(day.wakeMoment);
                 var sleepMoment = new moment(day.sleepMoment);
                 console.log(day.date, sleepMoment.hours(), sleepMoment.minutes());
                 wakeData.push([dateTS, getYAxisValue(wakeMoment)]);
                 sleepData.push([dateTS, getYAxisValue(sleepMoment)]);
+                sleepTimeData.push([dateTS, day.sleepTime]);
 
 
                 function getYAxisValue(m) {
@@ -85,15 +93,12 @@ define(function(require, exports) {
                 }
             });
             return {
-                series: [wakeLine, sleepLine]
+                series: [wakeLine, sleepLine, sleepTime]
             };
         }
 
         function drawLine(data, options) {
             var highchartsOptions = {
-                chart: {
-                    type: 'spline'
-                },
                 title: {
                     text: '睡眠曲线'
                 },
@@ -117,10 +122,20 @@ define(function(require, exports) {
                         hour: '%H:%M',
                         day: '%H:%M'
                     }
+                }, {
+                    title: '长度',
+                    opposite: true,
+                    min: 0,
+                    labels: {
+                        format: '{value} m',
+                    }
                 }],
                 tooltip: {
-                    headerFormat: '<b>{series.name}</b><br>',
-                    pointFormat: '{point.x:%Y-%m-%e}: {point.y:%H:%m}'
+                    //headerFormat: '<b>{series.name}</b><br>',
+                    //pointFormat: '{point.x:%m-%e}: {point.y:%H:%m}',
+                    pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y:%H:%m}</b><br/>',
+                    crosshairs: true,
+                    shared: true
                 },
 
                 legend: {

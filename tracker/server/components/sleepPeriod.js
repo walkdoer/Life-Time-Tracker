@@ -35,7 +35,7 @@ exports.generate = function (options) {
                     date: day.date,
                     sleepMoment: new Moment(statResult.sleepMoment).format(timeFormat),
                     wakeMoment: new Moment(statResult.wakeMoment).format(timeFormat),
-                    sleepTime: day.sleepTime
+                    sleepTime: statResult.sleepTime
                 });
             });
             deferred.resolve(result);
