@@ -12,7 +12,7 @@ define(function(require, exports) {
         },
         plotOptions: {
             series: {
-               // animation: false
+                // animation: false
             }
         }
     });
@@ -30,16 +30,26 @@ define(function(require, exports) {
             var renderData = {};
             data.forEach(function(val) {
                 var seconds = new Date(val.date).getTime() / 1000;
-                renderData[seconds] = val.sportTime;
+                if (val.sportTime > 0) {
+                    renderData[seconds] = val.sportTime;
+                }
             });
             calendar.init({
-                id: 'sport-calendar',
                 data: renderData,
                 start: new Date(2014, 0),
                 domain: "month",
                 subDomain: "day",
-                cellSize: 10,
-                cellPadding: 2
+                //subDomainTextFormat: "%d",
+                cellSize: 15,
+                cellPadding: 2,
+                tooltip: true,
+                subDomainTitleFormat: {
+                    empty: '没有运动数据',
+                    filled: '{date} 运动时间 {count}分钟'
+                },
+                subDomainDateFormat: function(date) {
+                    return moment(date).format('D号 dddd');
+                }
             });
         });
     }
@@ -65,21 +75,26 @@ define(function(require, exports) {
             var sleepTime = {
                 name: '睡眠长度',
                 type: 'column',
+                color: 'rgba(165,170,217,0.5)',
                 yAxis: 1,
+                tooltip: {
+                    valueSuffix: 'hours',
+                    pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y:.1f}</b><br/>'
+                },
                 data: []
             };
             var wakeData = wakeLine.data;
             var sleepData = sleepLine.data;
             var sleepTimeData = sleepTime.data;
             var midnight = moment().startOf('day').unix() * 1000;
-            rawData.forEach(function (day) {
+            rawData.forEach(function(day) {
                 var dateTS = moment(day.date).unix() * 1000;
                 var wakeMoment = new moment(day.wakeMoment);
                 var sleepMoment = new moment(day.sleepMoment);
                 console.log(day.date, sleepMoment.hours(), sleepMoment.minutes());
                 wakeData.push([dateTS, getYAxisValue(wakeMoment)]);
                 sleepData.push([dateTS, getYAxisValue(sleepMoment)]);
-                sleepTimeData.push([dateTS, day.sleepTime]);
+                sleepTimeData.push([dateTS, day.sleepTime / 60]);
 
 
                 function getYAxisValue(m) {
@@ -127,7 +142,7 @@ define(function(require, exports) {
                     opposite: true,
                     min: 0,
                     labels: {
-                        format: '{value} m',
+                        format: '{value} hours',
                     }
                 }],
                 tooltip: {
