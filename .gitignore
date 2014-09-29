@@ -43,6 +43,7 @@ vendor
 *.pid
 *.swp
 *.pid
+*.swo
 
 tracker/conf/token.json
 frontend/resources/vendors

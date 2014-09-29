@@ -64,15 +64,25 @@ define(function(require, exports) {
             };
             var midnight = moment().startOf('day').unix() * 1000;
             rawData.forEach(function (day) {
+                var dateTS = moment(day.date).unix() * 1000;
                 var wakeData = wakeLine.data;
                 var sleepData = sleepLine.data;
                 var wakeMoment = new moment(day.wakeMoment);
                 var sleepMoment = new moment(day.sleepMoment);
-                var wakeTS = wakeMoment.unix() * 1000;
-                var sleepTS = sleepMoment.unix() * 1000;
-                console.log(day.date, wakeMoment.hours(), wakeMoment.minutes());
-                wakeData.push([wakeTS, midnight + wakeMoment.hours() * 3600 * 1000 + wakeMoment.minutes() * 60 * 1000]);
-                sleepData.push([sleepTS, midnight + sleepMoment.hours() * 3600 * 1000 + sleepMoment.minutes() * 60 * 1000]);
+                console.log(day.date, sleepMoment.hours(), sleepMoment.minutes());
+                wakeData.push([dateTS, getYAxisValue(wakeMoment)]);
+                sleepData.push([dateTS, getYAxisValue(sleepMoment)]);
+
+
+                function getYAxisValue(m) {
+                    var hours = m.hours();
+                    if (hours >= 0 && hours <= 12) {
+                        //next midnight
+                        return midnight + m.hours() * 3600000 + m.minutes() * 60000 + 3600000 * 24;
+                    } else {
+                        return midnight + m.hours() * 3600000 + m.minutes() * 60000;
+                    }
+                }
             });
             return {
                 series: [wakeLine, sleepLine]
@@ -105,12 +115,12 @@ define(function(require, exports) {
                     type: 'datetime',
                     dateTimeLabelFormats: { // don't display the dummy year
                         hour: '%H:%M',
-                        day: '%H-%M'
+                        day: '%H:%M'
                     }
                 }],
                 tooltip: {
                     headerFormat: '<b>{series.name}</b><br>',
-                    pointFormat: '{point.x:%Y-%m-%e}: {point.y:.2f}'
+                    pointFormat: '{point.x:%Y-%m-%e}: {point.y:%H:%m}'
                 },
 
                 legend: {
