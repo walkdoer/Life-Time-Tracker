@@ -114,19 +114,39 @@ function syncLogs(dateStr) {
         dateOptions;
     if (dateStr) {
         //standardlize the date 2014-08-01 to 2014-8-1
+        dateStr = preprocessDate(dateStr);
         dateStr = standardizeDate(dateStr);
-        var dateArr = dateStr.split('-').map(function(val) {
-            return parseInt(val, 10);
-        });
-        var dateType = [null, 'year', 'month', 'day'][dateArr.length];
-        dateOptions = {
-            dateType: dateType,
-            dateStr: dateStr,
-            dateArr: dateArr
-        };
+    } else {
+        //if the command is `ltt sync`, then have no dateStr
+        //then use the month as default
+        dateStr = moment().format('YYYY-MM');
     }
+    Msg.info('正在同步' + dateStr + '的日志');
+    var dateArr = dateStr.split('-').map(function(val) {
+        return parseInt(val, 10);
+    });
+    var dateType = [null, 'year', 'month', 'day'][dateArr.length];
+    dateOptions = {
+        dateType: dateType,
+        dateStr: dateStr,
+        dateArr: dateArr
+    };
     var options = extend({}, userOptions, dateOptions);
     evernoteSync.sync(options);
+
+    function preprocessDate(dateStr) {
+        var result,
+            dateFormat = 'YYYY-MM-DD';
+        dateStr = dateStr.toLowerCase(dateFormat);
+        if (dateStr === 'today') {
+            result = moment().format();
+        } else if (dateStr === 'yesterday') {
+            result = moment().subtract(1, 'days').format(dateFormat);
+        } else {
+            result = dateStr;
+        }
+        return result;
+    }
 }
 
 
