@@ -19,7 +19,8 @@ var logsPath = path.resolve(__dirname, '../' + config.logDir) + '/',
 
 
 function syncNote(client, options) {
-    var dateArr = options.dateArr;
+    var dateRange = options.dateRange,
+        dateItems = options.dateItems;
 
     var noteStore = client.getNoteStore();
     var status = {
@@ -109,34 +110,59 @@ function syncNote(client, options) {
             });
 
             function needDownload(noteTitle) {
+                var needFlag = false;
                 var matchResult = noteTitle.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s*$/);
-                if (matchResult) {
-                    if (options.dateStr) {
-                        var targetYear = dateArr[0],
-                            targetMonth = dateArr[1],
-                            targetDay = dateArr[2];
-                        matchResult = matchResult.slice(1).map(function(v) {
-                            return parseInt(v, 10);
-                        });
-                        var year = matchResult[0],
-                            month = matchResult[1],
-                            day = matchResult[2];
 
-                        if (options.dateType === dateTypeEnum.Day) {
-                            return targetYear === year &&
-                                targetMonth === month &&
-                                targetDay === day;
-                        } else if (options.dateType === dateTypeEnum.Month) {
-                            return targetYear === year &&
-                                targetMonth === month;
-                        } else if (options.dateType === dateTypeEnum.Year) {
-                            return targetYear === year;
-                        }
-                    } else {
-                        return true;
+                if (matchResult) {
+                    var matchResultArr = matchResult.slice(1).map(function(v) {
+                        return parseInt(v, 10);
+                    });
+                    var matchDate = matchResultArr.join('-');
+                    if (dateRange) {
+                        needFlag = isDateInDateRange(matchDate, dateRange);
+                    }
+                    if (dateItems) {
+                        needFlag = dateItems.some(function (dateItem) {
+                            return isDateInDateItem(matchResultArr, dateItem);
+                        });
                     }
                 }
-                return false;
+                return needFlag;
+                function isDateInDateItem(targetDateArr, dateItem) {
+                    var dateStr = dateItem.value,
+                        dateType = dateItem.type;
+                    var targetYear = targetDateArr[0],
+                        targetMonth = targetDateArr[1],
+                        targetDay = targetDateArr[2];
+                    var dateStrArr = dateStr.split('-').map(function(v) {
+                        return parseInt(v, 10);
+                    });
+                    var year = dateStrArr[0],
+                        month = dateStrArr[1],
+                        day = dateStrArr[2];
+                    if (dateType === dateTypeEnum.Day) {
+                        return targetYear === year &&
+                            targetMonth === month &&
+                            targetDay === day;
+                    } else if (dateType === dateTypeEnum.Month) {
+                        return targetYear === year &&
+                            targetMonth === month;
+                    } else if (dateType === dateTypeEnum.Year) {
+                        return targetYear === year;
+                    }
+                }
+
+                function isDateInDateRange(targetDate, dateRange) {
+                    var midTime = ' 00:00:00';
+                    var from = dateRange.from,
+                        to = dateRange.to;
+                    var fromMoment = new moment(from.value + midTime),
+                        toMoment = new moment(to.value + midTime).endOf(from.type);
+
+                    var targetMoment = new moment(targetDate + midTime);
+                    return targetMoment.diff(fromMoment) >= 0 &&
+                            targetMoment.diff(toMoment) <= 0;
+                }
             }
         });
     }
