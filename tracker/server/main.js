@@ -10,6 +10,7 @@ var execute = require('../execute');
 var calandar = require('../calendar');
 var dateTypeEnum = require('../enum/dateType');
 var sleepPeriod = require('./components/sleepPeriod');
+var classes = require('./components/classes');
 
 app.get('/actions/:actionName', function (req, res) {
     var actionName = req.params.actionName;
@@ -27,6 +28,13 @@ app.get('/calendars/:type/:year/:month?', function (req, res){
 app.get('/sleepPeriods/:year/:month?', function (req, res) {
     var params = getCommonRequestParams(req.params);
     sleepPeriod.generate(params).then(function (result){
+        res.send(result);
+    });
+});
+
+app.get('/classes/:year/:month?/:day?', function (req, res) {
+    var params = getCommonRequestParams(req.params);
+    classes.generate(params).then(function (result){
         res.send(result);
     });
 });

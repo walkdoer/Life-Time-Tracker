@@ -11,7 +11,8 @@ require.config({
         'text': 'vendors/requirejs-text/text',
         'moment': 'vendors/moment/moment',
         'highcharts': 'vendors/highcharts/highcharts.src',
-        'd3': 'vendors/d3/d3'
+        'd3': 'vendors/d3/d3',
+        'q': 'vendors/q/q'
     },
     shim: {
         'bootstrap': {

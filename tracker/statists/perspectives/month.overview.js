@@ -161,3 +161,6 @@ function mean(data, len, logClass) {
     //total can be undefined if there is no activity of this logClass
     return total === undefined ? 0 : total.count / len;
 }
+
+exports.groupTimeByClass = groupTimeByClass;
+exports.groupTimeByTag = groupTimeByTag;

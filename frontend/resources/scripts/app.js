@@ -148,7 +148,7 @@ define(function(require, exports) {
                 tooltip: {
                     //headerFormat: '<b>{series.name}</b><br>',
                     //pointFormat: '{point.x:%m-%e}: {point.y:%H:%m}',
-                    pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y:%H:%m}</b><br/>',
+                    pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y:%H:%M}</b><br/>',
                     crosshairs: true,
                     shared: true
                 },
