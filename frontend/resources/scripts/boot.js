@@ -12,7 +12,7 @@ require.config({
         'moment': 'vendors/moment/moment',
         'highcharts': 'vendors/highcharts/highcharts.src',
         'd3': 'vendors/d3/d3',
-        'q': 'vendors/q/q'
+        'q': 'scripts/libs/q'
     },
     shim: {
         'bootstrap': {
@@ -26,7 +26,7 @@ require.config({
     include: ['requireLib', 'text', 'd3']
 });
 
-require(['./scripts/app', 'd3'], function (app) {
+require(['./scripts/app', 'd3', 'bootstrap'], function (app) {
     'use strict';
     app.initialize();
 });

@@ -5,6 +5,10 @@ define(function(require, exports) {
     var Highcharts = require('highcharts');
     var $ = require('jquery');
     var moment = require('moment');
+    var remoteStorage = require('./components/storage.remote');
+    var chart = require('./components/chart');
+    var sleepPeriodConvertor = require('./components/convertors/sleepPeriod');
+    var classesConvertor = require('./components/convertors/classes');
     //在这里添加highchart的全局设置
     Highcharts.setOptions({
         global: {
@@ -22,6 +26,7 @@ define(function(require, exports) {
         //create calendar heatmap for sport time
         createSportCalendarHeatMap();
         createSleepPeriodLine();
+        createClassesPie();
     };
 
     function createSportCalendarHeatMap() {
@@ -55,116 +60,37 @@ define(function(require, exports) {
     }
 
     function createSleepPeriodLine() {
-        $.get('/sleepPeriods/2014')
-            .done(function(result) {
-                var data = toHighchartsData(result);
-                drawLine(data, {
-                    $el: $('#sleepPeriod')
+        remoteStorage.get('/sleepPeriods/2014')
+            .then(function(result) {
+                chart.timeline({
+                    title: '睡眠曲线',
+                    $el: $('#sleepPeriod'),
+                    data: sleepPeriodConvertor.dispose(result)
                 });
             });
+    }
 
-        function toHighchartsData(rawData) {
-            var wakeLine = {
-                name: 'wake',
-                data: []
-            };
-            var sleepLine = {
-                name: 'sleep',
-                data: []
-            };
-            var sleepTime = {
-                name: '睡眠长度',
-                type: 'column',
-                color: 'rgba(165,170,217,0.5)',
-                yAxis: 1,
-                tooltip: {
-                    valueSuffix: 'hours',
-                    pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y:.1f}</b><br/>'
-                },
-                data: []
-            };
-            var wakeData = wakeLine.data;
-            var sleepData = sleepLine.data;
-            var sleepTimeData = sleepTime.data;
-            var midnight = moment().startOf('day').unix() * 1000;
-            rawData.forEach(function(day) {
-                var dateTS = moment(day.date).unix() * 1000;
-                var wakeMoment = new moment(day.wakeMoment);
-                var sleepMoment = new moment(day.sleepMoment);
-                console.log(day.date, sleepMoment.hours(), sleepMoment.minutes());
-                wakeData.push([dateTS, getYAxisValue(wakeMoment)]);
-                sleepData.push([dateTS, getYAxisValue(sleepMoment)]);
-                sleepTimeData.push([dateTS, day.sleepTime / 60]);
-
-
-                function getYAxisValue(m) {
-                    var hours = m.hours();
-                    if (hours >= 0 && hours <= 12) {
-                        //next midnight
-                        return midnight + m.hours() * 3600000 + m.minutes() * 60000 + 3600000 * 24;
-                    } else {
-                        return midnight + m.hours() * 3600000 + m.minutes() * 60000;
-                    }
-                }
+    function createClassesPie() {
+        var today = new moment();
+        var year = today.year(),
+            month = today.month() + 1,
+            prevMonth = month - 1,
+            lastTwoMonth = month - 2;
+        remoteStorage.get(['/classes', year, lastTwoMonth].join('/'))
+            .then(function(result) {
+                chart.pie({
+                    title: lastTwoMonth + '月份时间分类',
+                    $el: $('#classes-1'),
+                    data: classesConvertor.dispose(result)
+                });
             });
-            return {
-                series: [wakeLine, sleepLine, sleepTime]
-            };
-        }
-
-        function drawLine(data, options) {
-            var highchartsOptions = {
-                title: {
-                    text: '睡眠曲线'
-                },
-                xAxis: {
-                    type: 'datetime',
-                    dateTimeLabelFormats: { // don't display the dummy year
-                        millisecond: '%H:%M:%S.%L',
-                        second: '%H:%M:%S',
-                        minute: '%H:%M',
-                        hour: '%H:%M',
-                        day: '%m-%e',
-                        week: '%e. %b',
-                        month: '%b \'%y',
-                        year: '%Y'
-                    }
-                },
-                yAxis: [{
-                    title: '', //不需要标题
-                    type: 'datetime',
-                    dateTimeLabelFormats: { // don't display the dummy year
-                        hour: '%H:%M',
-                        day: '%H:%M'
-                    }
-                }, {
-                    title: '长度',
-                    opposite: true,
-                    min: 0,
-                    labels: {
-                        format: '{value} hours',
-                    }
-                }],
-                tooltip: {
-                    //headerFormat: '<b>{series.name}</b><br>',
-                    //pointFormat: '{point.x:%m-%e}: {point.y:%H:%m}',
-                    pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y:%H:%M}</b><br/>',
-                    crosshairs: true,
-                    shared: true
-                },
-
-                legend: {
-                    itemStyle: {
-                        fontFamily: '微软雅黑'
-                    }
-                },
-                series: data.series
-            };
-            /*
-            if (options.granularity === 'day') {
-                highchartsOptions.xAxis.tickInterval = 24 * 3600 * 1000;
-            }*/
-            options.$el.highcharts(highchartsOptions);
-        }
+        remoteStorage.get(['/classes', year, prevMonth].join('/'))
+            .then(function(result) {
+                chart.pie({
+                    title: prevMonth + '月份时间分类',
+                    $el: $('#classes-2'),
+                    data: classesConvertor.dispose(result)
+                });
+            });
     }
 });
