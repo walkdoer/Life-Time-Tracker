@@ -29,7 +29,6 @@ define(function (require, exports) {
             var dateTS = moment(day.date).unix() * 1000;
             var wakeMoment = new moment(day.wakeMoment);
             var sleepMoment = new moment(day.sleepMoment);
-            console.log(day.date, sleepMoment.hours(), sleepMoment.minutes());
             wakeData.push([dateTS, getYAxisValue(wakeMoment)]);
             sleepData.push([dateTS, getYAxisValue(sleepMoment)]);
             sleepTimeData.push([dateTS, day.sleepTime / 60]);

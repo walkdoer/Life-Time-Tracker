@@ -25,6 +25,8 @@ function getLogs(data, date) {
     var lastIndex = logStrArr.length - 1;
     var logs = [];
     var periodsArr = [];
+    var prevEndHour = null;
+    var prevEndNextDay = false;
     logStrArr.forEach(function(logStr, index) {
         var hour = getHourFromLog(logStr);
         //if has no hour Object, than this log is not valid
@@ -43,7 +45,7 @@ function getLogs(data, date) {
             startPeriod = 'am';
             if (periodsArr.filter(function (p) {
                 return p === 'pm';
-            }).length > 0) {
+            }).length > 0 || prevEndNextDay) {
                 startNextDay = true;
             }
         } else if(startHour > 12 && startHour < 24){
@@ -52,7 +54,7 @@ function getLogs(data, date) {
         if (endHour >= 0 && endHour < 12) {
             if (periodsArr.filter(function (p) {
                 return p === 'pm';
-            }).length > 0) {
+            }).length > 0 || (endHour < startHour && startPeriod === 'am')) {
                 endNextDay = true;
             }
             endPeriod = 'am';
@@ -96,13 +98,15 @@ function getLogs(data, date) {
             }
             logs.push(logInfo);
         }
+        prevEndHour = endHour;
+        prevEndNextDay = endNextDay;
     });
     function isGetUpLog(log) {
-        return log.start && !log.end && log.index === 0;
+        return log.start === log.end && log.index === 0;
     }
 
     function isSleepTime(log, lastIndex) {
-        return log.start && !log.end && log.index === lastIndex;
+        return log.start === log.end && log.index === lastIndex;
     }
     return logs;
 }
@@ -266,6 +270,9 @@ function getTimeSpanFromLog(log, config) {
             alignedStart, alignedEnd, alignConfig;
         start = timeArr[0];
         end = timeArr[1];
+        if (!start) {
+            msg.error('log "' + log+ '"\'s time is wrong');
+        }
         if (start) {
             alignConfig = extend({}, config, {
                 moment: !end,
@@ -284,6 +291,10 @@ function getTimeSpanFromLog(log, config) {
             });
             alignedEnd = alignTime(date, end, alignConfig);
             endTime = new moment(alignedEnd, timeFormat);
+            timeSpan.end = endTime.format(timeFormat);
+        } else {
+            end = start;
+            endTime = startTime;
             timeSpan.end = endTime.format(timeFormat);
         }
         if (end && start) {
@@ -312,6 +323,8 @@ function getHourFromLog (log) {
         }
         if (end) {
             endHour = parseInt(end.split(timeSplitter)[0], 10);
+        } else {
+            endHour = startHour;
         }
         return {
             start: startHour,

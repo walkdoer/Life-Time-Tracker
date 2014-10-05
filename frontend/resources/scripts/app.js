@@ -5,10 +5,12 @@ define(function(require, exports) {
     var Highcharts = require('highcharts');
     var $ = require('jquery');
     var moment = require('moment');
+    var Q = require('q');
     var remoteStorage = require('./components/storage.remote');
     var chart = require('./components/chart');
     var sleepPeriodConvertor = require('./components/convertors/sleepPeriod');
     var classesConvertor = require('./components/convertors/classes');
+    var _ = require('underscore');
     //在这里添加highchart的全局设置
     Highcharts.setOptions({
         global: {
@@ -65,7 +67,7 @@ define(function(require, exports) {
                 chart.timeline({
                     title: '睡眠曲线',
                     $el: $('#sleepPeriod'),
-                    data: sleepPeriodConvertor.dispose(result)
+                    data: sleepPeriodConvertor.dispose(result.data)
                 });
             });
     }
@@ -76,21 +78,78 @@ define(function(require, exports) {
             month = today.month() + 1,
             prevMonth = month - 1,
             lastTwoMonth = month - 2;
-        remoteStorage.get(['/classes', year, lastTwoMonth].join('/'))
-            .then(function(result) {
-                chart.pie({
-                    title: lastTwoMonth + '月份时间分类',
-                    $el: $('#classes-1'),
-                    data: classesConvertor.dispose(result)
-                });
+        Q.allSettled([
+            remoteStorage.get(['/classes', year, lastTwoMonth].join('/'), {month: lastTwoMonth}),
+            remoteStorage.get(['/classes', year, prevMonth].join('/'), {month: prevMonth})
+        ]).then(function(results) {
+            var datas = [];
+            results.forEach(function(result, index) {
+                if (result.state === 'fulfilled') {
+                    var resp = result.value;
+                    chart.pie({
+                        title: resp.params.month + '月份时间分类',
+                        $el: $('.classesPie').eq(index),
+                        data: classesConvertor.dispose(resp.data)
+                    });
+                    datas.push({name: resp.params.month + '月份', data: resp.data});
+                }
             });
-        remoteStorage.get(['/classes', year, prevMonth].join('/'))
-            .then(function(result) {
-                chart.pie({
-                    title: prevMonth + '月份时间分类',
-                    $el: $('#classes-2'),
-                    data: classesConvertor.dispose(result)
-                });
+            return datas;
+        }).then(function (datas) {
+            //get compare group from the classed time.
+            var compareGroup = [];
+            var categories = [];
+            var allClasses = getAllClasses(datas);
+            allClasses.forEach(function (cls) {
+                categories.push(cls.label);
             });
+            datas.forEach(function (data) {
+                var classTimeArr = data.data;
+                var groupData = [];
+                allClasses.forEach(function (cls) {
+                    var result = _.find(classTimeArr, function (classTime) {
+                        return classTime.code === cls.code;
+                    });
+                    if (!result) {
+                        groupData.push(0);
+                    } else {
+                        groupData.push(result.count);
+                    }
+                });
+                compareGroup.push({data: groupData, name: data.name});
+            });
+            return {
+                categories: categories,
+                data: compareGroup
+            };
+
+            function getAllClasses (datas) {
+                var classes = [];
+                datas.forEach(function (data) {
+                    data.data.forEach(function (classTime) {
+                        var result = _.find(classes, function (cls) {
+                            return cls.code === classTime.code;
+                        });
+                        if (!result) {
+                            classes.push(classTime);
+                        }
+                    });
+                });
+
+                return classes;
+            }
+        }).then(function(compareGroup) {
+            chart.column({
+                title: '对比数据',
+                $el: $('.classesCompared'),
+                data: compareGroup.data
+            }, {
+                xAxis: {
+                    categories: compareGroup.categories
+                }
+            });
+        }).catch(function (e) {
+            throw e;
+        });
     }
 });

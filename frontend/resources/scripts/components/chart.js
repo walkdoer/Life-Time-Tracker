@@ -1,6 +1,22 @@
 define(function(require, exports) {
     'use strict';
     var _ = require('underscore');
+    var Highcharts = require('highcharts');
+
+    // Make monochrome colors and set them as default for all pies
+    /*Highcharts.getOptions().plotOptions.pie.colors = (function () {
+        var colors = [],
+            base = Highcharts.getOptions().colors[0],
+            i;
+
+        for (i = 0; i < 10; i += 1) {
+            // Start out with a darkened base color (negative brighten), and end
+            // up with a much brighter color
+            colors.push(Highcharts.Color(base).brighten((i - 3) / 7).get());
+        }
+        return colors;
+    }());*/
+
     exports.timeline = function(options) {
         var data = options.data;
         var highchartsOptions = {
@@ -85,5 +101,24 @@ define(function(require, exports) {
         pieOptions = _.extend(pieOptions, highchartOptions);
 
         options.$el.highcharts(pieOptions);
+    };
+
+
+    exports.column = function (options, highchartOptions) {
+        var columnOptions = {
+            chart: {
+                type: 'column'
+                //plotBackgroundColor: null,
+                //plotShadow: false
+            },
+            title: {
+                text: options.title
+            },
+            series: options.data
+        };
+
+        columnOptions = _.extend(columnOptions, highchartOptions);
+
+        options.$el.highcharts(columnOptions);
     };
 });
