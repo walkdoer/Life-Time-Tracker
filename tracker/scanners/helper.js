@@ -8,25 +8,33 @@ var dateTypeEnum = require('../enum/dateType'),
     logClassEnum = require('../enum/logClass');
 var util = require('../util');
 var when = require('when');
-var msg = require('../message');
+var Msg = require('../message');
+var moment = require('moment');
 
 
 function readLogFile(options) {
-    var dateType = options.dateType,
-        dateArr = options.dateArr,
-        year = dateArr[0],
-        month = dateArr[1],
-        day = dateArr[2];
-
     var promise;
-    if (dateType === dateTypeEnum.Day) {
-        promise = readOneDayLog(year, month, day);
-    } else if (dateType === dateTypeEnum.Month){
-        promise = readOneMonthLog(year, month);
-    } else if (dateType === dateTypeEnum.Year) {
-        promise = readOneYearLog(year);
+    var readQueue = [];
+    if (options.dateItems) {
+        options.dateItems.forEach(function (date) {
+            var m = new moment(date.value);
+            if (date.type === dateTypeEnum.Day) {
+                readQueue.push(readOneDayLog(m.year(), m.month(), m.date()));
+            } else if (date.type === dateTypeEnum.Month){
+                readQueue = readQueue.concat(readOneMonthLog(m.year(), m.month()));
+            } else if (date.type === dateTypeEnum.Year) {
+                promise = readOneYearLog(m.year());
+            }
+        });
+        //use when.settle: because some file may not exist
+        //so when.all is not appropriate
+        promise = when.settle(readQueue);
+    } else {
+        var dateRange = options.dateRange;
+        readQueue = readLogByDateRange(dateRange.from, dateRange.to);
     }
 
+    promise = when.settle(readQueue);
     return promise.then(preprocessFileData.bind(null, options));
 }
 
@@ -52,54 +60,47 @@ function readOneMonthLog(year, month) {
         queue.push(readOneDayLog(year, month, day));
         day++;
     }
-    //use when.settle: because some file may not exist
-    //so when.all is not appropriate
-    return when.settle(queue);
+    return queue;
 }
 
+
+function readLogByDateRange(from, to) {
+    var toMoment = new moment(to.value),
+        fromMoment = new moment(from.value);
+    if (toMoment.diff(fromMoment, 'days') < 0) {
+        var error = 'Wrong date range';
+        Msg.error(error);
+        throw new Error(error);
+    }
+    var queue = [];
+    while (fromMoment.diff(toMoment, 'days') <= 0) {
+        var date = fromMoment.format('YYYY-MM-DD');
+        queue.push(util.readLogFiles(date));
+        fromMoment.add(1, 'days');
+    }
+    return queue;
+}
 
 function readOneYearLog(year) {
     var month = 1;
     var queue = [];
     while (month <= 12) {
-        queue.push(readOneMonthLog(year, month));
+        queue = queue.concat(readOneMonthLog([year, month].join('-')));
         month++;
     }
-    //use when.settle: because some file may not exist
-    //so when.all is not appropriate
-    return when.settle(queue);
+    return queue;
 }
 
 function preprocessFileData(options, fileData) {
     var dateStr = options.dateStr,
         unTrackedDays = [];
-    if (options.dateType === dateTypeEnum.Month) {
-        return transformMonth(fileData);
-    } else if (options.dateType === dateTypeEnum.Year) {
-        var allDays = [],
-            allUntrackedDay = [];
-        fileData.forEach(function(monthData, index) {
-            var month = index + 1;
-            var transformResult = transformMonth(monthData.value);
-            allDays = allDays.concat(transformResult.days);
-            var unTrackedDays = transformResult.unTrackedDays.map(function (val) {
-                return [month, val].join('-');
-            });
-            allUntrackedDay = allDays.concat(unTrackedDays);
-        });
-        return {
-            days: allDays,
-            unTrackedDays: allUntrackedDay
-        };
-    }
-    return fileData;
-
-    function transformMonth(monthData) {
-        monthData = monthData.filter(function (d, index) {
+    return transformMultipleDays(fileData);
+    function transformMultipleDays(days) {
+        days = days.filter(function (d, index) {
             var day = index + 1,
                 date = [dateStr, day].join('-');
             if (d.state === 'rejected') {
-                msg.warn(date + ' calculate fail');
+                Msg.warn(date + ' calculate fail');
                 unTrackedDays.push(day);
                 return false;
             } else if (d.state === 'fulfilled'){
@@ -114,7 +115,7 @@ function preprocessFileData(options, fileData) {
             return d <= today;
         });
         return {
-            days: monthData,
+            days: days,
             unTrackedDays: unTrackedDays
         };
     }
@@ -135,5 +136,7 @@ function filterClass(logs, options) {
 
 exports.readLogFile = readLogFile;
 exports.readOneDayLog = readOneDayLog;
-exports.readOneMonthLog = readOneMonthLog;
+exports.readOneMonthLog = function (year, month) {
+    return when.settle(readOneMonthLog(year, month));
+};
 exports.filterClass = filterClass;

@@ -31,7 +31,7 @@ program
     .option('-c, --calandar <date>', 'see activity calandar')
     .command('stat <date>')
     .description('对所选日期进行统计')
-    .action(dispatch);
+    .action(stat);
 
 program
     .option('--auto', 'auto sync logs')
@@ -109,6 +109,29 @@ function dispatch(dateStr) {
 }
 
 
+function stat(dateStr) {
+    var userOptions = getUserOptions(),
+        dateOptions;
+    Msg.info('统计' + dateStr + '的日志');
+    dateOptions = getDateOptions(dateStr);
+    var options = extend({}, userOptions, dateOptions);
+
+    /**
+     * the statist is used to stat the log data the then scanner have scan
+     *
+     * process step
+     *     1. scan
+     *     2. stat
+     *     3. output
+     */
+    var promise = scanner.scan(options)
+        .then(function(result) {
+            return result;
+        });
+    return promise;
+}
+
+
 function syncLogs(dateStr) {
     var userOptions = getUserOptions(),
         dateOptions;
@@ -143,7 +166,7 @@ function getDateOptions(dateStr) {
     };
 }
 
-function toDate (dateStr) {
+function toDate(dateStr) {
     var date,
         dateFormat = 'YYYY-MM-DD';
     dateStr = dateStr.toLowerCase(dateFormat);

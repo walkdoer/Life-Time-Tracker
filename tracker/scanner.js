@@ -10,6 +10,9 @@ var dateTypeEnum = require('./enum/dateType');
  */
 exports.scan = function (options) {
     var scanner = null;
+    if (options.dateRange) {
+        scanner = require('./scanners/lifeScanner');
+    }
     if (options.dateType === dateTypeEnum.Day) {
         scanner = require('./scanners/dayLifeScanner');
     } else if (options.dateType === dateTypeEnum.Month){
