@@ -17,6 +17,7 @@ var util = require('./util'),
     evernoteSync = require('./sync/evernote'),
     db = require('./model/db'),
     _ = require('lodash'),
+    statist = require('./statist'),
     Msg = require('./message'),
     Remind = require('./remind'),
     Action = require('./action');
@@ -125,8 +126,9 @@ function stat(dateStr) {
      *     3. output
      */
     var promise = scanner.scan(options)
-        .then(function(result) {
-            return result;
+        .then(statist.dispose.bind(statist, options))
+        .then(function (statResult) {
+            return outputor.dispose(statResult, options);
         });
     return promise;
 }

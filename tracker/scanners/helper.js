@@ -92,16 +92,14 @@ function readOneYearLog(year) {
 }
 
 function preprocessFileData(options, fileData) {
-    var dateStr = options.dateStr,
-        unTrackedDays = [];
+    var unTrackedDays = [];
     return transformMultipleDays(fileData);
     function transformMultipleDays(days) {
-        days = days.filter(function (d, index) {
-            var day = index + 1,
-                date = [dateStr, day].join('-');
+        days = days.filter(function (d) {
             if (d.state === 'rejected') {
-                Msg.warn(date + ' calculate fail');
-                unTrackedDays.push(day);
+                var reason = d.reason;
+                Msg.warn(reason.date + ' calculate fail');
+                unTrackedDays.push(reason.date);
                 return false;
             } else if (d.state === 'fulfilled'){
                 return true;
@@ -109,10 +107,9 @@ function preprocessFileData(options, fileData) {
         }).map(function (d) {
             return d.value;
         });
-        var today = new Date().getDate();
+        var today = new moment();
         unTrackedDays = unTrackedDays.filter(function (d) {
-            //future is not count;
-            return d <= today;
+            return today.diff(new moment(d), 'days') <= 0;
         });
         return {
             days: days,

@@ -25,7 +25,10 @@ function readLogFiles(date) {
         filePath = path.resolve(__dirname, [DATA_FILE_PRIFIX, fileName].join('/'));
     fs.readFile(filePath, 'utf8', function (err, data) {
         if (err) {
-            return deferred.reject(err, filePath);
+            return deferred.reject({
+                err: err,
+                date: date
+            });
         }
         deferred.resolve({
             fileContent: data,
