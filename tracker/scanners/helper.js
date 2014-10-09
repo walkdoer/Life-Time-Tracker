@@ -19,9 +19,9 @@ function readLogFile(options) {
         options.dateItems.forEach(function (date) {
             var m = new moment(date.value);
             if (date.type === dateTypeEnum.Day) {
-                readQueue.push(readOneDayLog(m.year(), m.month(), m.date()));
+                readQueue.push(readOneDayLog(m.year(), m.month() + 1, m.date()));
             } else if (date.type === dateTypeEnum.Month){
-                readQueue = readQueue.concat(readOneMonthLog(m.year(), m.month()));
+                readQueue = readQueue.concat(readOneMonthLog(m.year(), m.month() + 1));
             } else if (date.type === dateTypeEnum.Year) {
                 promise = readOneYearLog(m.year());
             }
@@ -132,8 +132,4 @@ function filterClass(logs, options) {
 }
 
 exports.readLogFile = readLogFile;
-exports.readOneDayLog = readOneDayLog;
-exports.readOneMonthLog = function (year, month) {
-    return when.settle(readOneMonthLog(year, month));
-};
 exports.filterClass = filterClass;

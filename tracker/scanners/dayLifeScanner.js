@@ -33,9 +33,11 @@ exports.scan = function (options) {
 
 
 function extractLogs(options, fileData) {
-    var date = fileData.date;
-    var fileContent = fileData.fileContent;
-    fileData.logs = helper.getLogs(fileContent, date);
-    fileData.logs = scannerHelper.filterClass(fileData.logs, options);
-    return fileData;
+    var day = fileData.days[0],
+        fileContent = day.fileContent,
+        date = day.date;
+
+    day.logs = helper.getLogs(fileContent, date);
+    day.logs = scannerHelper.filterClass(day.logs, options);
+    return day;
 }
