@@ -11,7 +11,6 @@ var when = require('when');
 var Msg = require('../message');
 var moment = require('moment');
 
-
 function readLogFile(options) {
     var promise;
     var readQueue = [];
@@ -23,7 +22,7 @@ function readLogFile(options) {
             } else if (date.type === dateTypeEnum.Month){
                 readQueue = readQueue.concat(readOneMonthLog(m.year(), m.month() + 1));
             } else if (date.type === dateTypeEnum.Year) {
-                promise = readOneYearLog(m.year());
+                readQueue = readOneYearLog(m.year());
             }
         });
         //use when.settle: because some file may not exist
@@ -35,7 +34,9 @@ function readLogFile(options) {
     }
 
     promise = when.settle(readQueue);
-    return promise.then(preprocessFileData.bind(null, options));
+    return promise.then(preprocessFileData.bind(null, options)).catch(function() {
+        console.log('读取过程有错误');
+    });
 }
 
 
@@ -43,7 +44,8 @@ function readLogFile(options) {
  * read only the log of one specific day
  */
 function readOneDayLog(year, month, day) {
-    return util.readLogFiles([year, month, day].join('-'));
+    var date = [year, month, day].join('-');
+    return util.readLogFiles(date);
 }
 
 
@@ -65,27 +67,44 @@ function readOneMonthLog(year, month) {
 
 
 function readLogByDateRange(from, to) {
-    var toMoment = new moment(to.value),
-        fromMoment = new moment(from.value);
+    var fromMoment = getMoment(from, true, false),
+        toMoment = getMoment(to, false, true);
     if (toMoment.diff(fromMoment, 'days') < 0) {
         var error = 'Wrong date range';
         Msg.error(error);
         throw new Error(error);
     }
     var queue = [];
-    while (fromMoment.diff(toMoment, 'days') <= 0) {
+    while (fromMoment.diff(toMoment) < 0) {
         var date = fromMoment.format('YYYY-MM-DD');
         queue.push(util.readLogFiles(date));
         fromMoment.add(1, 'days');
     }
     return queue;
+
+    function getMoment(dateObj, isStart, isEnd) {
+        var dateType = dateObj.type,
+            dateValue = dateObj.value,
+            m;
+        var operator;
+        if (isStart) { operator = 'startOf'; }
+        if (isEnd) { operator = 'endOf'; }
+        if (dateType === dateTypeEnum.Day) {
+            m = new moment(dateValue);
+        } else if (dateType === dateTypeEnum.Month) {
+            m = new moment(dateValue)[operator]('month');
+        } else if (dateType === dateTypeEnum.Year) {
+            m = new moment(dateValue)[operator]('year');
+        }
+        return m;
+    }
 }
 
 function readOneYearLog(year) {
     var month = 1;
     var queue = [];
     while (month <= 12) {
-        queue = queue.concat(readOneMonthLog([year, month].join('-')));
+        queue = queue.concat(readOneMonthLog(year, month));
         month++;
     }
     return queue;

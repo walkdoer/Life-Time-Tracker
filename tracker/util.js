@@ -27,6 +27,7 @@ function readLogFiles(date) {
         if (err) {
             return deferred.reject({
                 err: err,
+                msg: date + '\'s log file is not exist',
                 date: date
             });
         }
