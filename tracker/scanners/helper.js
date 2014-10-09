@@ -109,7 +109,7 @@ function preprocessFileData(options, fileData) {
         });
         var today = new moment();
         unTrackedDays = unTrackedDays.filter(function (d) {
-            return today.diff(new moment(d), 'days') <= 0;
+            return today.diff(new moment(d), 'days') >= 0;
         });
         return {
             days: days,
