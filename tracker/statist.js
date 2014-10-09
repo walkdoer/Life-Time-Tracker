@@ -7,7 +7,7 @@ exports.dispose = function (options, scanResult) {
     if (statist) {
         return statist.dispose(options, scanResult);
     } else {
-        Msg.error('can find statist for you');
+        Msg.error('can find corresponding statist for you');
     }
 };
 
@@ -23,8 +23,10 @@ function getStatist(options) {
         var dateType = dateItems[0].type;
         if (dateType === dateTypeEnum.Day) {
             return require(getStatModuleName('day'));
-        } else if (options.dateType === dateTypeEnum.Month) {
+        } else if (dateType === dateTypeEnum.Month) {
             return require(getStatModuleName('month'));
+        } else if (dateType === dateTypeEnum.Year) {
+            return require(getStatModuleName('multipleDays'));
         }
     } else if (dateItemLen > 1){
         return require(getStatModuleName('multipleDays'));

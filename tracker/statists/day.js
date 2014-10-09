@@ -1,6 +1,6 @@
 /**
  * day statist
- * the responsibility of day statist is to analyse the life the the master
+ * the responsibility of day statist is to analyse daily life of a person
  * for example, stat all the aspect of everyday life,such as sport, work,
  * sleep, study and so on.
  */

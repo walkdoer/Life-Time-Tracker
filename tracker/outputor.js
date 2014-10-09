@@ -8,8 +8,20 @@ var dateTypeEnum = require('./enum/dateType');
 var dayOutput = require('./outputors/day');
 var monthOutput = require('./outputors/month');
 var multipleDaysOutput = require('./outputors/multipleDays');
+var Msg = require('./message');
 
 exports.dispose = function (statResult, options) {
+    var outputor = getOutputer(options);
+    if (outputor) {
+        outputor.dispose(statResult, options);
+    } else {
+        Msg.error('can find corresponding outputor');
+    }
+};
+
+
+function getOutputer(options) {
+
     var dateItems = options.dateItems;
     var dateItemLen;
     if (!dateItems) {
@@ -20,15 +32,18 @@ exports.dispose = function (statResult, options) {
     if (dateItemLen === 1 ) {
         var dateType = dateItems[0].type;
         if (dateType === dateTypeEnum.Day) {
-            dayOutput.dispose(statResult, options);
-        } else if (options.dateType === dateTypeEnum.Month) {
-            monthOutput.dispose(statResult, options);
+            return dayOutput;
+        } else if (dateType === dateTypeEnum.Month) {
+            return monthOutput;
+        } else if (dateType === dateTypeEnum.Year) {
+            return multipleDaysOutput;
         }
     } else if (dateItemLen > 1){
-        multipleDaysOutput.dispose(statResult, options);
+        return multipleDaysOutput;
     }
 
     if (options.dateRange) {
-        multipleDaysOutput.dispose(statResult, options);
+        return multipleDaysOutput;
     }
-};
+    return null;
+}
