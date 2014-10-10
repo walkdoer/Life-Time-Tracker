@@ -1,4 +1,3 @@
-
 'use strict';
 
 var express = require('express');
@@ -8,63 +7,58 @@ var http = require('http');
 var app = express();
 var execute = require('../execute');
 var calandar = require('../calendar');
-var dateTypeEnum = require('../enum/dateType');
+var extend = require('node.extend');
+var Param = require('../param');
 var sleepPeriod = require('./components/sleepPeriod');
 var classes = require('./components/classes');
 
-app.get('/actions/:actionName', function (req, res) {
+app.get('/actions/:actionName', function(req, res) {
     var actionName = req.params.actionName;
     execute.exec('ltt action ' + actionName + ' --cups 1');
     res.send('done');
 });
 
-app.get('/calendars/:type/:year/:month?', function (req, res){
+app.get('/calendars/:type/:year/:month?', function(req, res) {
     var params = getCommonRequestParams(req.params);
-    calandar.generate(params).then(function (result) {
+    calandar.generate(params).then(function(result) {
         res.send(result);
     });
 });
 
-app.get('/sleepPeriods/:year/:month?', function (req, res) {
+app.get('/sleepPeriods/:year/:month?', function(req, res) {
     var params = getCommonRequestParams(req.params);
-    sleepPeriod.generate(params).then(function (result){
+    sleepPeriod.generate(params).then(function(result) {
         res.send(result);
     });
 });
 
-app.get('/classes/:year/:month?/:day?', function (req, res) {
+app.get('/classes/:year/:month?/:day?', function(req, res) {
     var params = getCommonRequestParams(req.params);
-    classes.generate(params).then(function (result){
+    classes.generate(params).then(function(result) {
         res.send(result);
     });
 });
 
 
-exports.run = function (options) {
+exports.run = function(options) {
     var port = options.port || 3333;
-    http.createServer(app).listen(port, function(){
+    http.createServer(app).listen(port, function() {
         console.log("Server listening on port " + port);
     });
 };
 
 
 function getCommonRequestParams(params) {
-    var year = params.year,
-        month = params.month,
-        dateType;
-    var dateArr = [year, month].filter(notEmpty).map(function (val) {
-        return parseInt(val, 10);
-    });
-    if (!month) {
-        dateType = dateTypeEnum.Year;
-    } else {
-        dateType = dateTypeEnum.Month;
-    }
-    function notEmpty(val) { return val !== undefined;}
-    return {
-        dateType: dateType,
-        dateStr: dateArr.join('-'),
-        dateArr: dateArr,
+    var dateStr = [
+        params.year,
+        params.month,
+        params.day
+    ].filter(function(val) {
+        return !!val;
+    }).join('-');
+
+    return extend({}, {
         type: params.type
-    };
+    }, Param.getDateParams(dateStr));
+
 }

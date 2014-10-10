@@ -22,6 +22,8 @@ var util = require('./util'),
     _ = require('lodash'),
     statist = require('./statist'),
     Msg = require('./message'),
+    Param = require('./param'),
+    getDateParams = Param.getDateParams,
     Remind = require('./remind'),
     Action = require('./action');
 
@@ -106,7 +108,7 @@ function wrapDateProcess(func) {
     return function (dateStr) {
         var userOptions = getUserOptions(),
             dateOptions;
-        dateOptions = getDateOptions(dateStr);
+        dateOptions = getDateParams(dateStr);
         var options = extend({}, userOptions, dateOptions);
         var args = _.toArray(arguments);
         args.splice(args.length - 1, 0, options);
@@ -157,7 +159,7 @@ function stat(dateStr) {
     var userOptions = getUserOptions(),
         dateOptions;
     Msg.info('统计' + dateStr + '的日志');
-    dateOptions = getDateOptions(dateStr);
+    dateOptions = getDateParams(dateStr);
     var options = extend({}, userOptions, dateOptions);
 
     /**
@@ -181,54 +183,12 @@ function syncLogs(dateStr) {
     var userOptions = getUserOptions(),
         dateOptions;
     Msg.info('正在同步' + dateStr + '的日志');
-    dateOptions = getDateOptions(dateStr);
+    dateOptions = getDateParams(dateStr);
     var options = extend({}, userOptions, dateOptions);
     evernoteSync.sync(options);
 }
 
-function getDateOptions(dateStr) {
-    if (!dateStr) {
-        dateStr = moment().format('YYYY-MM');
-    }
-    var dateRangeSplitter = '~',
-        dateItemSplitter = ',';
-    var dateRange,
-        dateItems;
-    //Date Range
-    if (dateStr.indexOf(dateRangeSplitter) >= 0) {
-        dateRange = {};
-        var dateRangeArr = dateStr.split(dateRangeSplitter);
-        dateRange.from = toDate(dateRangeArr[0]);
-        dateRange.to = toDate(dateRangeArr[1]);
-    } else {
-        //Date Items
-        dateItems = dateStr.split(dateItemSplitter).map(toDate);
-    }
-    return {
-        dateRange: dateRange,
-        dateItems: dateItems,
-        dateStr: dateStr
-    };
-}
 
-function toDate(dateStr) {
-    var date,
-        dateFormat = 'YYYY-MM-DD';
-    dateStr = dateStr.toLowerCase(dateFormat);
-    if (dateStr === 'today') {
-        date = moment().format();
-    } else if (dateStr === 'yesterday') {
-        date = moment().subtract(1, 'days').format(dateFormat);
-    } else {
-        date = dateStr;
-    }
-    var dateType = [null, 'year', 'month', 'day'][date.split('-').length];
-
-    return {
-        value: date,
-        type: dateType
-    };
-}
 
 
 function isDateValid(dateStr) {
