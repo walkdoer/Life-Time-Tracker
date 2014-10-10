@@ -8,6 +8,7 @@ var moment = require('moment'),
     util = require('./util');
 var LogClass = require('./model/fundament/logClass'),
     Project = require('./model/fundament/Project');
+var _ = require('lodash');
 var logClassName = require('./conf/logClassName');
 var msg = require('./message');
 var extend = require('node.extend');
@@ -43,22 +44,22 @@ function getLogs(data, date) {
         }
         if (startHour >= 0 && startHour < 12) {
             startPeriod = 'am';
-            if (periodsArr.filter(function (p) {
+            if (periodsArr.filter(function(p) {
                 return p === 'pm';
             }).length > 0 || prevEndNextDay) {
                 startNextDay = true;
             }
-        } else if(startHour > 12 && startHour < 24){
+        } else if (startHour > 12 && startHour < 24) {
             startPeriod = 'pm';
         }
         if (endHour >= 0 && endHour < 12) {
-            if (periodsArr.filter(function (p) {
+            if (periodsArr.filter(function(p) {
                 return p === 'pm';
             }).length > 0 || (endHour < startHour && startPeriod === 'am')) {
                 endNextDay = true;
             }
             endPeriod = 'am';
-        } else if(endHour > 12 && endHour < 24){
+        } else if (endHour > 12 && endHour < 24) {
             endPeriod = 'pm';
         }
         periodsArr.push(startPeriod);
@@ -79,7 +80,7 @@ function getLogs(data, date) {
                 logInfo.wake = true;
                 logInfo.end = logInfo.start;
                 logInfo.time = logInfo.start;
-            } else if (isSleepTime(logInfo, lastIndex)){
+            } else if (isSleepTime(logInfo, lastIndex)) {
                 logInfo.sleep = true;
                 logInfo.end = logInfo.start;
                 //需要校准，有可能凌晨之后睡觉
@@ -101,6 +102,7 @@ function getLogs(data, date) {
         prevEndHour = endHour;
         prevEndNextDay = endNextDay;
     });
+
     function isGetUpLog(log) {
         return log.start === log.end && log.index === 0;
     }
@@ -116,7 +118,7 @@ function alignTime(date, time, config) {
     var newDate;
     //var hour = parseInt(getHourFromDateStr(time), 10);
     //if ((config.period === 'pm' && hour > 0 && hour < 12) ||
-            //(hour > 0 && hour < 12 && config.moment && config.isLast)) {
+    //(hour > 0 && hour < 12 && config.moment && config.isLast)) {
     if (config.nextDay) {
         newDate = nextDay(date) + ' ' + time;
     } else {
@@ -127,7 +129,7 @@ function alignTime(date, time, config) {
 
 function getWakeTime(logData, date) {
     var wakeTime = null;
-    var getUpLog = getLogs(logData, date).filter(function (log) {
+    var getUpLog = getLogs(logData, date).filter(function(log) {
         return log.wake === true;
     })[0];
     if (getUpLog) {
@@ -159,7 +161,7 @@ function getSimpleClasses(data) {
 function getLogClasses(data, unique) {
     var result = getItem(data, /\{.*?\}/g, logClassReplaceRegexp, LogClass,
         null, /*no processor*/
-        function (value) {
+        function(value) {
             var name = logClassName[value];
             if (!name) {
                 name = 'UNKNOW LOGCLASS NAME';
@@ -169,7 +171,7 @@ function getLogClasses(data, unique) {
         });
 
     if (unique === true) {
-        result = util.frequence(result, function (val, target) {
+        result = util.frequence(result, function(val, target) {
             return val.name === target.name;
         });
     }
@@ -271,7 +273,7 @@ function getTimeSpanFromLog(log, config) {
         start = timeArr[0];
         end = timeArr[1];
         if (!start) {
-            msg.error('log "' + log+ '"\'s time is wrong');
+            msg.error('log "' + log + '"\'s time is wrong');
         }
         if (start) {
             alignConfig = extend({}, config, {
@@ -302,13 +304,13 @@ function getTimeSpanFromLog(log, config) {
         }
     } else {
         //console.log(result);
-        msg.warn('make sure the time is right of ' + date +'\'s log: ' + log);
+        msg.warn('make sure the time is right of ' + date + '\'s log: ' + log);
     }
     return timeSpan;
 }
 
 
-function getHourFromLog (log) {
+function getHourFromLog(log) {
     var result = log.match(timeSpanRegexp);
     if (result && result.length === 1) {
         var timeStr = result[0];
@@ -365,9 +367,9 @@ function getLogContent(logStr) {
         projectReplaceRegexp = /<.*?>/g,
         logClassReplaceRegexp = /\{.*?\}/g;
     return logStr.replace(tagReplaceRegexp, '')
-          .replace(timeSpanRegexp, '')
-          .replace(projectReplaceRegexp, '')
-          .replace(logClassReplaceRegexp, '').trim();
+        .replace(timeSpanRegexp, '')
+        .replace(projectReplaceRegexp, '')
+        .replace(logClassReplaceRegexp, '').trim();
 }
 
 function getTimeSpan(start, end) {
@@ -391,7 +393,7 @@ function isEmpty(val) {
     return !!val.trim();
 }
 
-function trim (val) {
+function trim(val) {
     return val.trim();
 }
 
@@ -403,13 +405,13 @@ function nextDay(date) {
     return moment(date).add(1, 'days').format(dateFormat);
 }
 
-function groupTimeByTag (logs) {
+function groupTimeByTag(logs) {
     var result = [];
-    logs.forEach(function (log) {
+    logs.forEach(function(log) {
         var tags = log.tags;
         if (tags && tags.length) {
-            tags.forEach(function (tag) {
-                var target = result.filter(function (tagTime) {
+            tags.forEach(function(tag) {
+                var target = result.filter(function(tagTime) {
                     return tagTime.label === tag;
                 });
                 if (target && target.length) {
@@ -429,6 +431,7 @@ function groupTimeByTag (logs) {
 
 function groupTimeByLogClass(logs, classes) {
     var classesTime = [];
+
     function calculateClassesTimeConsume(logs, cls) {
         var totalTime = 0;
         logs.forEach(function(log) {
@@ -436,9 +439,10 @@ function groupTimeByLogClass(logs, classes) {
             if (classes && hasClass(cls)) {
                 totalTime += log.len;
             }
+
             function hasClass(targetCls) {
                 var clsCode = targetCls.code;
-                return classes.filter(function (cls) {
+                return classes.filter(function(cls) {
                     return cls.code === clsCode;
                 }).length > 0;
             }
@@ -458,22 +462,22 @@ function groupTimeByLogClass(logs, classes) {
 
 
 function groupTimeByProject(logs) {
-    return groupTimeBy(logs, 'projects', function (project) {
+    return groupTimeBy(logs, 'projects', function(project) {
         return project.name;
-    }, function (project, groupItem) {
+    }, function(project, groupItem) {
         return groupItem.label === project.name;
     });
 }
 
-function groupTimeBy (logs, condition, process, filter) {
+function groupTimeBy(logs, condition, process, filter) {
     var result = [];
-    filter = filter || function (item, groupItem) {
+    filter = filter || function(item, groupItem) {
         return groupItem.label === item;
     };
-    logs.forEach(function (log) {
+    logs.forEach(function(log) {
         var items = log[condition];
         if (items && items.length) {
-            items.forEach(function (item) {
+            items.forEach(function(item) {
                 var target = result.filter(filter.bind(null, item));
                 if (target && target.length) {
                     target[0].count += log.len;
@@ -494,7 +498,7 @@ function groupTimeBy (logs, condition, process, filter) {
 
 
 function getProjects(log) {
-    return getItem(log, /<.*?>/g, projectReplaceRegexp, Project, function (projStr) {
+    return getItem(log, /<.*?>/g, projectReplaceRegexp, Project, function(projStr) {
         var nameRegexp = /^(.*?):/,
             name;
         projStr = projStr.trim();
@@ -510,7 +514,7 @@ function getProjects(log) {
         }
         //delete the project name string and the rest is attrs;
         if (attrs) {
-            attrs = attrs.trim().split(/\s+/g).map(function (val) {
+            attrs = attrs.trim().split(/\s+/g).map(function(val) {
                 var result = val.match(/(.+)\s*=\s*"(.+)"|(.+)\s*=\s*(.+)/);
                 if (result) {
                     var key = result[1] || result[3];
@@ -522,13 +526,15 @@ function getProjects(log) {
                 }
             });
         }
-        if (!name) { msg.error('project has no name. origin:' + projStr); }
+        if (!name) {
+            msg.error('project has no name. origin:' + projStr);
+        }
         return {
             name: name,
             attributes: attrs,
             origin: projStr
         };
-    }, function (value) {
+    }, function(value) {
         var proj = new Project(value.name, value.attributes);
         proj.origin = value.origin;
         return proj;
@@ -540,7 +546,7 @@ function getSimpleProjects(log) {
 }
 
 
-function getItem(data, regexp, replace, type, processor, creator){
+function getItem(data, regexp, replace, type, processor, creator) {
 
     var result = data.match(regexp);
     if (!result) {
@@ -556,7 +562,7 @@ function getItem(data, regexp, replace, type, processor, creator){
     if (type === String) {
         result = result.filter(onlyUnique);
     } else {
-        result = result.filter(function (item) {
+        result = result.filter(function(item) {
             return !!item;
         }).reduce(function(items, item) {
             items.push(creator(item));
@@ -585,17 +591,119 @@ function checkLogSequence(logs) {
     if (logs && logs.length === 0) {
         return true;
     }
-    logs.reduce(function (pv, cv) {
+    logs.reduce(function(pv, cv) {
         var pvEnd = new moment(pv.end, timeFormat),
             cvStart = new moment(cv.start, timeFormat);
         if (cvStart.diff(pvEnd, 'minute') < 0) {
             checkResult = false;
-            msg.warn('The sequence of "' + pv.origin + '" and "' + cv.origin + '" of  ' +  pvEnd.format(dateFormat) + ' is not right.');
+            msg.warn('The sequence of "' + pv.origin + '" and "' + cv.origin + '" of  ' + pvEnd.format(dateFormat) + ' is not right.');
         }
         return cv;
     });
     return checkResult;
 }
+
+
+function extractInfoFromMultipleDays(item, days, options) {
+    var funcMap = {
+        'projects': getProjectsFromDays,
+        'project': getProjectsFromDays,
+        'tags': getTagsFromDays,
+        'tag': getTagsFromDays
+
+    };
+    var result = funcMap[item](days);
+    if (options.order) {
+        var orderMap = {
+            'asc': asc,
+            'ASC': asc,
+            'desc': desc,
+            'DESC': desc
+        };
+        var orderFunc = orderMap[options.order];
+        if (orderFunc) {
+            result = result.sort(orderFunc);
+        }
+    }
+    if (options.top > 0) {
+        result = result.slice(0, options.top);
+    }
+    return result;
+
+    function asc(a, b) {
+        return a.time - b.time;
+    }
+
+    function desc(a, b) {
+        return b.time - a.time;
+    }
+}
+
+function getProjectsFromDays(days) {
+    var result = [];
+    //extract projects from the logs
+    days.forEach(function(day) {
+        var logs = day.logs;
+        logs.forEach(function(log) {
+            var projects = log.projects;
+            if (!_.isEmpty(projects)) {
+                projects.forEach(function(project) {
+                    result.push({
+                        name: project.name,
+                        time: log.len
+                    });
+                });
+            }
+        });
+    });
+
+    result = result.reduce(function(uniqueResult, project) {
+        var target = uniqueResult.filter(function(val) {
+            return val.name === project.name;
+        });
+        if (!_.isEmpty(target)) {
+            target[0].time += project.time;
+        } else {
+            uniqueResult.push(project);
+        }
+        return uniqueResult;
+    }, []);
+    return result;
+}
+
+
+function getTagsFromDays(days) {
+    var result = [];
+    //extract tags from the logs
+    days.forEach(function(day) {
+        var logs = day.logs;
+        logs.forEach(function(log) {
+            var tags = log.tags;
+            if (!_.isEmpty(tags)) {
+                tags.forEach(function(tag) {
+                    result.push({
+                        name: tag,
+                        time: log.len
+                    });
+                });
+            }
+        });
+    });
+
+    result = result.reduce(function(uniqueResult, tag) {
+        var target = uniqueResult.filter(function(val) {
+            return val.name === tag.name;
+        });
+        if (!_.isEmpty(target)) {
+            target[0].time += tag.time;
+        } else {
+            uniqueResult.push(tag);
+        }
+        return uniqueResult;
+    }, []);
+    return result;
+}
+
 
 exports.getLogClasses = getLogClasses;
 exports.getSimpleClasses = getSimpleClasses;
@@ -615,3 +723,4 @@ exports.getSigns = getSigns;
 exports.getProjects = getProjects;
 exports.getSimpleProjects = getSimpleProjects;
 exports.checkLogSequence = checkLogSequence;
+exports.extract = extractInfoFromMultipleDays;

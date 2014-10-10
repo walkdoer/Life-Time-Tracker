@@ -7,6 +7,7 @@ var MAX_BAR_LEN = 100;
 
 function displayBar(data, config) {
     config = config || {};
+    processData(data, config);
     var color = config.color;
     var total = 0, dataNew = [];
     var order = config.order;
@@ -41,6 +42,18 @@ function displayBar(data, config) {
         var output = formatLabel(l.label, maxStringLen).bold + '  ' + bar(percent)[color || 'blue'] + ' ' + (hours+'h').cyan;
         console.log(output);
     });
+}
+
+function processData(data, config) {
+    var label = config.label;
+    var count = config.count;
+    if (label || count) {
+        data.forEach(function (d) {
+            if (count) { d.count = d[count]; }
+            if (label) { d.label = d[label]; }
+        });
+    }
+    return data;
 }
 
 function getBar(data, config) {

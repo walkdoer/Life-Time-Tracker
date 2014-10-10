@@ -11,11 +11,14 @@ var util = require('./util'),
     scanner = require('./scanner'),
     //output the stat result
     outputor = require('./outputor'),
-    //calendar
-    calendar = require('./calendar'),
     //sync evernote
     evernoteSync = require('./sync/evernote'),
-    db = require('./model/db'),
+    //Tag
+    Tag = require('./tag'),
+    tagOutputor = require('./outputors/tag'),
+    Project = require('./project'),
+    projectOutputor = require('./outputors/project'),
+    //db = require('./model/db'),
     _ = require('lodash'),
     statist = require('./statist'),
     Msg = require('./message'),
@@ -47,9 +50,9 @@ program
     .action(syncLogs);
 
 program
-    .option('-cups, --cups <s>', 'set the cups of water should drink one day')
-    .option('-i, --interval <s>', 'remind interval')
-    .option('-ahead, --ahead <s>', 'ahead of time')
+    .option('-cups, --cups <s>', 'set the cups of water should drink one day', number)
+    .option('-i, --interval <s>', 'remind interval', number)
+    .option('-ahead, --ahead <s>', 'ahead of time', number)
     .command('remind <type>')
     .description('对某一个行为进行提醒，例如喝水提醒，日程提醒')
     .action(remind);
@@ -59,6 +62,19 @@ program
     .description('执行某一个动作,例如喝水drink')
     .action(takeAction);
 
+program
+    .option('-t, --top <n>', 'top N of a list', number)
+    .option('-o, --order <order>', 'desc or asc')
+    .command('tags <date>')
+    .description('列出某段时间的tags')
+    .action(wrapDateProcess(listTags));
+
+program
+    .option('-t, --top <n>', 'top N of a list', number)
+    .option('-o, --order <order>', 'desc or asc')
+    .command('projects <date>')
+    .description('列出某段时间的进行的项目')
+    .action(wrapDateProcess(listProjects));
 
 program
     .command('server')
@@ -70,6 +86,33 @@ program
 program.parse(process.argv);
 
 
+function listTags (dateStr, options) {
+    Tag.get(options)
+        .then(function (tags) {
+            tagOutputor.dispose(tags);
+        });
+}
+
+
+function listProjects (dateStr, options) {
+    Project.get(options)
+        .then(function (projects) {
+            projectOutputor.dispose(projects);
+        });
+}
+
+
+function wrapDateProcess(func) {
+    return function (dateStr) {
+        var userOptions = getUserOptions(),
+            dateOptions;
+        dateOptions = getDateOptions(dateStr);
+        var options = extend({}, userOptions, dateOptions);
+        var args = _.toArray(arguments);
+        args.splice(args.length - 1, 0, options);
+        return func.apply(null, args);
+    };
+}
 
 
 function dispatch(dateStr) {
@@ -217,7 +260,9 @@ function getUserOptions() {
         'cups',
         'interval',
         'ahead',
-        'auto'
+        'auto',
+        'order',
+        'top'
     ]);
     return userOptions;
 
@@ -269,4 +314,8 @@ function startServer() {
     var options = getUserOptions();
     var server = require('./server/main');
     server.run(options);
+}
+
+function number(val) {
+    return parseInt(val, 10);
 }
