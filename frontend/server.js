@@ -57,19 +57,20 @@ app.set('view engine', 'handlebars');
 app.use(morgan('combined'));
 //static resources
 app.use('/resources', express.static(path.join(__dirname, '/resources')));
-
 app.get('/', dashboardRouter);
+app.get('/api/*', redirect);
 app.get('/logs/:year', logsRouter);
 app.get('/stats/:year', statsRouter);
 
-app.get('/calendars/:type/:year/:month?', redirect);
-app.get('/sleepPeriods/:year/:month?', redirect);
-app.get('/classes/:year/:month?/:day?', redirect);
 
 
 function redirect(req, res) {
-    var data = '';
-    http.get('http://localhost:3333' + req.path, function (response) {
+    var data = '',
+        path = req.url;
+    var apiHost = 'http://localhost:3333/';
+    var apiUrl = path.slice(5);
+    console.log('[Request]' + apiHost + apiUrl);
+    http.get(apiHost + apiUrl, function (response) {
         console.log('STATUS: ' + response.statusCode);
         response.on('data', function(chunk) {
             data += chunk;

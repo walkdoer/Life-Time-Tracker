@@ -9,8 +9,6 @@ var execute = require('../execute');
 var calandar = require('../calendar');
 var extend = require('node.extend');
 var Param = require('../param');
-var sleepPeriod = require('./components/sleepPeriod');
-var classes = require('./components/classes');
 
 app.get('/actions/:actionName', function(req, res) {
     var actionName = req.params.actionName;
@@ -18,27 +16,23 @@ app.get('/actions/:actionName', function(req, res) {
     res.send('done');
 });
 
-app.get('/calendars/:type/:year/:month?', function(req, res) {
-    var params = getCommonRequestParams(req.params);
-    calandar.generate(params).then(function(result) {
-        res.send(result);
-    });
-});
+useHandler('calendars', '/:type/:year/:month?/:day?', calandar);
+useHandler('sleepPeriods');
+useHandler('classes');
+useHandler('projects');
+useHandler('tags');
 
-app.get('/sleepPeriods/:year/:month?', function(req, res) {
-    var params = getCommonRequestParams(req.params);
-    sleepPeriod.generate(params).then(function(result) {
-        res.send(result);
-    });
-});
 
-app.get('/classes/:year/:month?/:day?', function(req, res) {
-    var params = getCommonRequestParams(req.params);
-    classes.generate(params).then(function(result) {
-        res.send(result);
+function useHandler(type, url, handler) {
+    handler = handler || require('./components/' + type);
+    url = url || '/:year/:month?/:day?';
+    app.get('/' + type + url, function(req, res) {
+        var params = getCommonRequestParams(req.params, req.query);
+        handler.generate(params).then(function(result) {
+            res.send(result);
+        });
     });
-});
-
+}
 
 exports.run = function(options) {
     var port = options.port || 3333;
@@ -48,7 +42,7 @@ exports.run = function(options) {
 };
 
 
-function getCommonRequestParams(params) {
+function getCommonRequestParams(params, query) {
     var dateStr = [
         params.year,
         params.month,
@@ -59,6 +53,6 @@ function getCommonRequestParams(params) {
 
     return extend({}, {
         type: params.type
-    }, Param.getDateParams(dateStr));
+    }, Param.getDateParams(dateStr), query);
 
 }

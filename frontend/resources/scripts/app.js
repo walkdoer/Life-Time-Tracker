@@ -3,14 +3,18 @@ define(function(require, exports) {
     var d3 = require('d3');
     var CalHeatMap = require('./libs/cal-heatmap');
     var Highcharts = require('highcharts');
+    var _ = require('underscore');
     var $ = require('jquery');
     var moment = require('moment');
     var Q = require('q');
     var remoteStorage = require('./components/storage.remote');
     var chart = require('./components/chart');
+
+    //convertors
     var sleepPeriodConvertor = require('./components/convertors/sleepPeriod');
     var classesConvertor = require('./components/convertors/classes');
-    var _ = require('underscore');
+    var nameTimeConvertor = require('./components/convertors/nameTime');
+
     //在这里添加highchart的全局设置
     Highcharts.setOptions({
         global: {
@@ -29,11 +33,13 @@ define(function(require, exports) {
         createSportCalendarHeatMap();
         createSleepPeriodLine();
         createClassesPie();
+        createProjects();
+        createTags();
     };
 
     function createSportCalendarHeatMap() {
         var calendar = new CalHeatMap();
-        d3.json("/calendars/sport/2014", function(error, data) {
+        d3.json("/api/calendars/sport/2014", function(error, data) {
             var renderData = {};
             data.forEach(function(val) {
                 var seconds = new Date(val.date).getTime() / 1000;
@@ -62,7 +68,7 @@ define(function(require, exports) {
     }
 
     function createSleepPeriodLine() {
-        remoteStorage.get('/sleepPeriods/2014')
+        remoteStorage.get('/api/sleepPeriods/2014')
             .then(function(result) {
                 chart.timeline({
                     title: '睡眠曲线',
@@ -79,8 +85,8 @@ define(function(require, exports) {
             prevMonth = month - 1,
             lastTwoMonth = month - 2;
         Q.allSettled([
-            remoteStorage.get(['/classes', year, lastTwoMonth].join('/'), {month: lastTwoMonth}),
-            remoteStorage.get(['/classes', year, prevMonth].join('/'), {month: prevMonth})
+            remoteStorage.get(['/api/classes', year, lastTwoMonth].join('/'), {month: lastTwoMonth}),
+            remoteStorage.get(['/api/classes', year, prevMonth].join('/'), {month: prevMonth})
         ]).then(function(results) {
             var datas = [];
             results.forEach(function(result, index) {
@@ -151,5 +157,47 @@ define(function(require, exports) {
         }).catch(function (e) {
             throw e;
         });
+    }
+
+    function createTags() {
+        remoteStorage.get('/api/tags/2014', {top: 20, order: 'desc'})
+            .then(function(result) {
+                chart.column({
+                    title: 'top20标签',
+                    $el: $('#tags'),
+                    data: nameTimeConvertor.dispose(result.data)
+                }, {
+                    xAxis: {
+                        categories: _.pluck(result.data, 'name')
+                    },
+                    legend: {
+                        enabled: false
+                    }
+                });
+            });
+    }
+    function createProjects() {
+        remoteStorage.get('/api/projects/2014', { top: 20, order: 'desc' })
+            .then(function(result) {
+                chart.column({
+                    title: 'top20项目',
+                    $el: $('#projects'),
+                    data: nameTimeConvertor.dispose(result.data)
+                }, {
+                    xAxis: {
+                        categories: _.pluck(result.data, 'name'),
+                        labels: {
+                            rotation: -45,
+                            style: {
+                                fontSize: '13px',
+                                fontFamily: 'Verdana, sans-serif'
+                            }
+                        }
+                    },
+                    legend: {
+                        enabled: false
+                    }
+                });
+            });
     }
 });
