@@ -603,14 +603,29 @@ function checkLogSequence(logs) {
     return checkResult;
 }
 
+var getLogClassesFromDays = getItemFromDays('classes', function(item, log) {
+    return extend({}, item, {time: log.len});
+}), getTagsFromDays = getItemFromDays('tags', function (item, log) {
+    return { name: item, time: log.len };
+}), getProjectsFromDays = getItemFromDays('projects', function(item, log) {
+    return { name: item.name, time: log.len };
+});
 
+/**
+ * extract information from multiple days log
+ * @item 'project' or 'tag' or 'class'
+ * @param options.order 'desc' or 'asc'
+ * @param options.top  top N
+ *
+ */
 function extractInfoFromMultipleDays(item, days, options) {
     var funcMap = {
         'projects': getProjectsFromDays,
         'project': getProjectsFromDays,
         'tags': getTagsFromDays,
-        'tag': getTagsFromDays
-
+        'tag': getTagsFromDays,
+        'class': getLogClassesFromDays,
+        'classes': getLogClassesFromDays
     };
     var result = funcMap[item](days);
     if (options.order) {
@@ -639,69 +654,39 @@ function extractInfoFromMultipleDays(item, days, options) {
     }
 }
 
-function getProjectsFromDays(days) {
-    var result = [];
-    //extract projects from the logs
-    days.forEach(function(day) {
-        var logs = day.logs;
-        logs.forEach(function(log) {
-            var projects = log.projects;
-            if (!_.isEmpty(projects)) {
-                projects.forEach(function(project) {
-                    result.push({
-                        name: project.name,
-                        time: log.len
+
+function getItemFromDays(itemName, getItem) {
+    return function (days) {
+        getItem = getItem || function (item) { return item; };
+
+        var result = [];
+        //extract tags from the logs
+        days.forEach(function(day) {
+            var logs = day.logs;
+            logs.forEach(function(log) {
+                var items = log[itemName];
+                if (!_.isEmpty(items)) {
+                    items.forEach(function(itm) {
+                        itm = getItem(itm, log);
+                        result.push(itm);
                     });
-                });
+                }
+            });
+        });
+
+        result = result.reduce(function(uniqueResult, itm) {
+            var target = uniqueResult.filter(function(val) {
+                return val.name === itm.name;
+            });
+            if (!_.isEmpty(target)) {
+                target[0].time += itm.time;
+            } else {
+                uniqueResult.push(itm);
             }
-        });
-    });
-
-    result = result.reduce(function(uniqueResult, project) {
-        var target = uniqueResult.filter(function(val) {
-            return val.name === project.name;
-        });
-        if (!_.isEmpty(target)) {
-            target[0].time += project.time;
-        } else {
-            uniqueResult.push(project);
-        }
-        return uniqueResult;
-    }, []);
-    return result;
-}
-
-
-function getTagsFromDays(days) {
-    var result = [];
-    //extract tags from the logs
-    days.forEach(function(day) {
-        var logs = day.logs;
-        logs.forEach(function(log) {
-            var tags = log.tags;
-            if (!_.isEmpty(tags)) {
-                tags.forEach(function(tag) {
-                    result.push({
-                        name: tag,
-                        time: log.len
-                    });
-                });
-            }
-        });
-    });
-
-    result = result.reduce(function(uniqueResult, tag) {
-        var target = uniqueResult.filter(function(val) {
-            return val.name === tag.name;
-        });
-        if (!_.isEmpty(target)) {
-            target[0].time += tag.time;
-        } else {
-            uniqueResult.push(tag);
-        }
-        return uniqueResult;
-    }, []);
-    return result;
+            return uniqueResult;
+        }, []);
+        return result;
+    };
 }
 
 

@@ -2,6 +2,7 @@
 
 var express = require('express');
 var http = require('http');
+var _ = require('lodash');
 
 
 var app = express();
@@ -9,6 +10,7 @@ var execute = require('../execute');
 var calandar = require('../calendar');
 var extend = require('node.extend');
 var Param = require('../param');
+var logAttr = require('./components/logAttribute');
 
 app.get('/actions/:actionName', function(req, res) {
     var actionName = req.params.actionName;
@@ -18,17 +20,26 @@ app.get('/actions/:actionName', function(req, res) {
 
 useHandler('calendars', '/:type/:year/:month?/:day?', calandar);
 useHandler('sleepPeriods');
-useHandler('classes');
-useHandler('projects');
-useHandler('tags');
+useHandler('classes', null, getLogAttr);
+useHandler('projects', null, getLogAttr);
+useHandler('tags', null, getLogAttr);
 
+function getLogAttr(params, type) {
+    return logAttr.get(type, params);
+}
 
 function useHandler(type, url, handler) {
     handler = handler || require('./components/' + type);
     url = url || '/:year/:month?/:day?';
     app.get('/' + type + url, function(req, res) {
         var params = getCommonRequestParams(req.params, req.query);
-        handler.generate(params).then(function(result) {
+        var promise;
+        if (_.isFunction(handler)) {
+            promise = handler(params, type);
+        } else {
+            promise = handler.generate(params);
+        }
+        promise.then(function(result) {
             res.send(result);
         });
     });
