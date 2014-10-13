@@ -18,14 +18,20 @@ var util = require('./util'),
     tagOutputor = require('./outputors/tag'),
     Project = require('./project'),
     projectOutputor = require('./outputors/project'),
-    //db = require('./model/db'),
     _ = require('lodash'),
     statist = require('./statist'),
     Msg = require('./message'),
     Param = require('./param'),
     getDateParams = Param.getDateParams,
     Remind = require('./remind'),
-    Action = require('./action');
+    importer = require('./importer'),
+    Action = require('./action'),
+    Search = require('./search/search');
+
+
+//connect to database
+var db = require('./model/db');
+db.connect();
 
 
 program
@@ -83,7 +89,15 @@ program
     .option('-p --port <port>', 'server listen port')
     .description('开启服务器')
     .action(startServer);
+program
+    .command('import <date>')
+    .description('导入某一段时间的日志')
+    .action(wrapDateProcess(importLogs));
 
+program
+    .command('query <date>')
+    .description('导入某一段时间的日志')
+    .action(wrapDateProcess(query));
 
 program.parse(process.argv);
 
@@ -278,4 +292,16 @@ function startServer() {
 
 function number(val) {
     return parseInt(val, 10);
+}
+
+function importLogs(dateStr, options) {
+    importer.importFromLogFile(options);
+}
+
+
+function query(dateStr, options) {
+    Search.query(options).then(function (result) {
+        console.log('一共找到' + result.length + '条日志.');
+        console.log(result);
+    });
 }

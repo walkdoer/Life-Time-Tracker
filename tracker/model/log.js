@@ -2,17 +2,12 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
 var Log = Schema({
-    /**
-     * 日志类型
-     * Normal, Fitness, Book
-     */
-    type: String,
     //日期
-    date: Date,
+    date: {type: Date},
     //开始时间
-    start: Date,
+    start: {type: Date},
     //结束时间
-    end: Date,
+    end: {type: Date},
     //备注
     note: String,
     //时间类别

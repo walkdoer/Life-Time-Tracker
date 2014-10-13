@@ -11,6 +11,7 @@ var calandar = require('../calendar');
 var extend = require('node.extend');
 var Param = require('../param');
 var logAttr = require('./components/logAttribute');
+var Search = require('../search/search');
 
 app.get('/actions/:actionName', function(req, res) {
     var actionName = req.params.actionName;
@@ -23,9 +24,14 @@ useHandler('sleepPeriods');
 useHandler('classes', null, getLogAttr);
 useHandler('projects', null, getLogAttr);
 useHandler('tags', null, getLogAttr);
+useHandler('logs', null, queryLogs);
 
 function getLogAttr(params, type) {
     return logAttr.get(type, params);
+}
+
+function queryLogs(params) {
+    return Search.query(params);
 }
 
 function useHandler(type, url, handler) {
