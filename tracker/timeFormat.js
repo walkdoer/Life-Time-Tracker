@@ -4,6 +4,6 @@ var dateFormat = 'YYYY-MM-DD',
     fullTimeFormat = dateFormat + ' ' + timeFormat;
 
 
-exports.DateFormat = dateFormat;
-exports.TimeFormat = timeFormat;
-exports.FullTimeFormat = fullTimeFormat;
+exports.date = dateFormat;
+exports.time = timeFormat;
+exports.fullTime = fullTimeFormat;

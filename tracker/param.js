@@ -1,5 +1,6 @@
 'use strict';
 var moment = require('moment');
+var dateFormat = require('./timeFormat').date;
 
 exports.getDateParams = function (dateStr) {
     if (!dateStr) {
@@ -27,18 +28,23 @@ exports.getDateParams = function (dateStr) {
 };
 
 function toDate(dateStr) {
-    var date,
-        dateFormat = 'YYYY-MM-DD';
+    var date, dateType;
     dateStr = dateStr.toLowerCase(dateFormat);
     if (dateStr === 'today') {
-        date = moment().format();
+        date = new moment().format();
     } else if (dateStr === 'yesterday') {
-        date = moment().subtract(1, 'days').format(dateFormat);
+        date = new moment().subtract(1, 'days').format(dateFormat);
     } else {
-        date = dateStr;
+        dateType = [null, 'year', 'month', 'day'][dateStr.split('-').length];
+        var format = {
+            year: 'YYYY',
+            month: 'YYYY-MM',
+            day: 'YYYY-MM-DD'
+        };
+        date = new moment(dateStr).format(format[dateType]);
     }
-    var dateType = [null, 'year', 'month', 'day'][date.split('-').length];
 
+    dateType = [null, 'year', 'month', 'day'][date.split('-').length];
     return {
         value: date,
         type: dateType
