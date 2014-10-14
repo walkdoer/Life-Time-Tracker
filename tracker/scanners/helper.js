@@ -90,7 +90,7 @@ function readLogByDateRange(from, to) {
         if (isStart) { operator = 'startOf'; }
         if (isEnd) { operator = 'endOf'; }
         if (dateType === dateTypeEnum.Day) {
-            m = new moment(dateValue);
+            m = new moment(dateValue)[operator]('day');
         } else if (dateType === dateTypeEnum.Month) {
             m = new moment(dateValue)[operator]('month');
         } else if (dateType === dateTypeEnum.Year) {
