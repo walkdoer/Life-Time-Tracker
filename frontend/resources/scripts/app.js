@@ -107,7 +107,7 @@ define(function(require, exports) {
             var categories = [];
             var allClasses = getAllClasses(datas);
             allClasses.forEach(function (cls) {
-                categories.push(cls.label);
+                categories.push(cls.name);
             });
             datas.forEach(function (data) {
                 var classTimeArr = data.data;
@@ -119,7 +119,7 @@ define(function(require, exports) {
                     if (!result) {
                         groupData.push(0);
                     } else {
-                        groupData.push(result.count);
+                        groupData.push(result.time);
                     }
                 });
                 compareGroup.push({data: groupData, name: data.name});

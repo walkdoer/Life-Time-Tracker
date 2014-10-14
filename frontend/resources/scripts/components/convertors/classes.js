@@ -7,11 +7,11 @@ define(function (require, exports) {
         };
         var pieData = [], total = 0;
         _.each(rawData, function (d) {
-            total += d.count;
+            total += d.time;
         });
 
         _.each(rawData, function (d) {
-            pieData.push([d.label, d.count / total * 100]);
+            pieData.push([d.name, d.time / total * 100]);
         });
 
         result.data = pieData;
