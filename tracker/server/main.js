@@ -67,9 +67,22 @@ function getCommonRequestParams(params, query) {
     ].filter(function(val) {
         return !!val;
     }).join('-');
+    preprocessQuery(query, ['projects', 'tags']);
 
     return extend({}, {
         type: params.type
     }, Param.getDateParams(dateStr), query);
 
+    function preprocessQuery(query, attrs) {
+        if (_.isEmpty(attrs)) {
+            attrs = [];
+        }
+        Object.keys(query).forEach(function (key) {
+            if (attrs.indexOf(key) >= 0) {
+                var val = query[key],
+                    arr = val.split(',');
+                query[key] = arr;
+            }
+        });
+    }
 }

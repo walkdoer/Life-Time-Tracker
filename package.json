@@ -20,7 +20,8 @@
     "lodash": "~2.4.1",
     "node-watch": "~0.3.4",
     "q": "~1.0.1",
-    "NodObjC": "~1.0.0"
+    "NodObjC": "~1.0.0",
+    "extend": "~2.0.0"
   },
   "devDependencies": {},
   "scripts": {

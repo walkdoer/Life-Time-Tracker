@@ -11,6 +11,8 @@ var Log = require('../model/log');
 var TimeFormat = require('../timeFormat');
 var dateTypeEnum = require('../enum/dateType');
 var Moment = require('moment');
+var _ = require('lodash');
+var extend = require('extend');
 
 exports.query = function(options) {
     var deferred = Q.defer();
@@ -44,8 +46,11 @@ function createQueryCondition(options) {
     if (dateCondition) {
         queryCondition.date = dateCondition;
     }
+    var otherCondition = getOtherCondition(options);
+    extend(queryCondition, otherCondition);
     return queryCondition;
 }
+
 
 function getDateCondition(options) {
     var condition,
@@ -65,5 +70,23 @@ function getDateCondition(options) {
         }
     }
 
+
+    return condition;
+}
+
+function getOtherCondition(options) {
+    var condition = {};
+    var projects = options.projects;
+    if (!_.isEmpty(projects)) {
+        if (projects.length === 1) {
+            condition.projects = {
+                $elemMatch: {name: options.projects[0]}
+            };
+        } else {
+            condition.projects = {
+                $elemMatch: {name: {$in: options.projects}}
+            };
+        }
+    }
     return condition;
 }
