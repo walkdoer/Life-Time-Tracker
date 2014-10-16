@@ -29,26 +29,34 @@ exports.query = function(options) {
 
 function queryLog(options, onSuccess, onError) {
     var condition = createQueryCondition(options);
-    var args = [condition, function(err, result) {
-        if (err) {
-            onError(err);
-        } else {
-            onSuccess(result);
+    var args = [condition,
+        function(err, result) {
+            if (err) {
+                onError(err);
+            } else {
+                onSuccess(result);
+            }
         }
-    }].filter(function (val) { return !!val;});
+    ].filter(function(val) {
+        return !!val;
+    });
     Log.find.apply(Log, args);
 }
 
 
 function createQueryCondition(options) {
-    var queryCondition = {};
+    var $and = [];
     var dateCondition = getDateCondition(options);
     if (dateCondition) {
-        queryCondition.date = dateCondition;
+        $and.push(dateCondition);
     }
-    var otherCondition = getOtherCondition(options);
-    extend(queryCondition, otherCondition);
-    return queryCondition;
+    var filters = getFilters(options);
+    if (!_.isEmpty(filters)) {
+        $and = $and.concat(filters);
+    }
+    return {
+        $and: $and
+    };
 }
 
 
@@ -60,33 +68,63 @@ function getDateCondition(options) {
         if (date.type === dateTypeEnum.Day) {
             condition = new Date(date.value + zero);
         } else if (date.type === dateTypeEnum.Month) {
-            var m = new Moment(date.value);
-            var startDate = m.startOf('month').format(TimeFormat.date),
-                endDate = m.endOf('month').format(TimeFormat.date);
-            condition = {
-                $gte: new Date(startDate + zero),
-                $lt: new Date(endDate + zero)
-            };
+            condition = to$Operator(date, 'month');
+        } else if (date.type === dateTypeEnum.Year) {
+            condition = to$Operator(date, 'year');
         }
     }
 
-
-    return condition;
+    function to$Operator(date, dateType) {
+        var m = new Moment(date.value);
+        var startDate = m.startOf(dateType).format(TimeFormat.date),
+            endDate = m.endOf(dateType).format(TimeFormat.date);
+        return  {
+            $gte: new Date(startDate + zero),
+            $lt: new Date(endDate + zero)
+        };
+    }
+    return {date: condition};
 }
 
-function getOtherCondition(options) {
-    var condition = {};
-    var projects = options.projects;
+
+
+
+function getFilters(options) {
+    var filters = [];
+    var projects = options.projects,
+        tags = options.tags;
     if (!_.isEmpty(projects)) {
         if (projects.length === 1) {
-            condition.projects = {
-                $elemMatch: {name: options.projects[0]}
-            };
+            filters.push({
+                projects: {
+                    $elemMatch: {
+                        name: options.projects[0]
+                    }
+                }
+            });
         } else {
-            condition.projects = {
-                $elemMatch: {name: {$in: options.projects}}
-            };
+            filters.push({
+                projects: {
+                    $elemMatch: {
+                        name: {
+                            $in: options.projects
+                        }
+                    }
+                }
+            });
         }
     }
-    return condition;
+
+    if (!_.isEmpty(tags)) {
+        if (tags.length === 1) {
+            filters.push({
+                tags: tags[0]
+            });
+        } else {
+            filters.push({
+                tags: { $in: tags }
+            });
+        }
+    }
+    return filters;
 }
