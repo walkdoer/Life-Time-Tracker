@@ -7,6 +7,7 @@
 var scanner = require('./scanner');
 var Q = require('q');
 var Log = require('./model/log');
+var Moment = require('moment');
 var syncNoteSig = require('./globalSignals').syncNote;
 var Msg = require('./message');
 var _ = require('lodash');
@@ -69,6 +70,7 @@ function importDay(day) {
 
 
 function toLogModel(date, log) {
+    date = new Moment(date).format('YYYY-MM-DD');
     return new Log({
         date: date,
         start: log.start,

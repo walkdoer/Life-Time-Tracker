@@ -31,7 +31,7 @@ function toDate(dateStr) {
     var date, dateType;
     dateStr = dateStr.toLowerCase(dateFormat);
     if (dateStr === 'today') {
-        date = new moment().format();
+        date = new moment().format(dateFormat);
     } else if (dateStr === 'yesterday') {
         date = new moment().subtract(1, 'days').format(dateFormat);
     } else {

@@ -12,7 +12,6 @@ var TimeFormat = require('../timeFormat');
 var dateTypeEnum = require('../enum/dateType');
 var Moment = require('moment');
 var _ = require('lodash');
-var extend = require('extend');
 
 exports.query = function(options) {
     var deferred = Q.defer();
@@ -62,11 +61,10 @@ function createQueryCondition(options) {
 
 function getDateCondition(options) {
     var condition,
-        zero = ' 00:00:00',
         date = options.dateItems[0];
     if (date) {
         if (date.type === dateTypeEnum.Day) {
-            condition = new Date(date.value + zero);
+            condition = new Date(date.value);
         } else if (date.type === dateTypeEnum.Month) {
             condition = to$Operator(date, 'month');
         } else if (date.type === dateTypeEnum.Year) {
@@ -79,10 +77,11 @@ function getDateCondition(options) {
         var startDate = m.startOf(dateType).format(TimeFormat.date),
             endDate = m.endOf(dateType).format(TimeFormat.date);
         return {
-            $gte: new Date(startDate + zero),
-            $lt: new Date(endDate + zero)
+            $gte: new Date(startDate),
+            $lt: new Date(endDate)
         };
     }
+
     return {
         date: condition
     };
