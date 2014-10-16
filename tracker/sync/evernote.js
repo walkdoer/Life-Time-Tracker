@@ -9,6 +9,7 @@ var dateTypeEnum = require('../enum/dateType');
 var ProgressBar = require('progress');
 var path = require('path');
 var moment = require('moment');
+var syncNoteSig = require('../globalSignals').syncNote;
 
 
 var EVERNOTE_SERVER_ERROR = '同步evernote服务器发生故障';
@@ -72,6 +73,7 @@ function syncNote(client, options) {
                 total: downloadNotes.length
             });
             var downloadFailNotes = [],
+                downloadSuccessNotes = [],
                 loadedCount = 0,
                 totalNotes = downloadNotes.length;
             downloadNotes.forEach(function(note) {
@@ -98,13 +100,16 @@ function syncNote(client, options) {
                         });
                     });
                     bar.tick(1);
+                    downloadSuccessNotes.push(noteTitle);
                     loadedCount++;
-                    if (downloadFailNotes.length + loadedCount === totalNotes) {
+                    var failLoadCount = downloadFailNotes.length;
+                    if (failLoadCount + loadedCount === totalNotes) {
                         console.log('下载完成'.green);
-                        if (downloadFailNotes.length > 0) {
+                        if (failLoadCount > 0) {
                             Msg.error(downloadFailNotes.join(','));
                         }
                         status.finished = true;
+                        syncNoteSig.dispatch(downloadSuccessNotes, downloadFailNotes);
                     }
                 });
             });
@@ -273,9 +278,7 @@ exports.sync = function (options) {
                 if (!status || status.finished) {
                     status = syncNote(client, options);
                     syncCount++;
-                    Msg.info('同步序号:' + syncCount + '同步时间: ' + moment().format('YYYY-MM-DD HH:mm:ss'));
-                } else {
-                    Msg.info('\nLast sync is not Finish yet, this round will not start');
+                    Msg.info('同步序号:' + syncCount + ', 同步时间: ' + moment().format('YYYY-MM-DD HH:mm:ss'));
                 }
             }
         }

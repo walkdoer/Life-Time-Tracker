@@ -6,6 +6,7 @@ var fs = require('fs'),
     extend = require('node.extend'),
     when = require('when');
 var config = require('./conf/config.json');
+var Msg = require('./message');
 
 //const
 var DATA_FILE_PRIFIX = config.logDir;
@@ -30,6 +31,9 @@ function readLogFiles(date) {
                 msg: date + '\'s log file is not exist',
                 date: date
             });
+        }
+        if (!data) {
+            Msg.warn(date + '\'s log file ' + filePath +' is exist, but the content is empty');
         }
         deferred.resolve({
             fileContent: data,

@@ -9,7 +9,7 @@ var dateTypeEnum = require('./enum/dateType');
  * dispatch the scan task to the corresponding scanner
  */
 exports.scan = function(options) {
-    var scanner = null;
+    var scanner = require('./scanners/lifeScanner');
     var dateItems = options.dateItems;
     var dateItemLen;
     if (!dateItems) {
@@ -27,10 +27,6 @@ exports.scan = function(options) {
             scanner = require('./scanners/yearLifeScanner');
         }
     } else if (dateItemLen > 1) {
-        scanner = require('./scanners/lifeScanner');
-    }
-
-    if (options.dateRange) {
         scanner = require('./scanners/lifeScanner');
     }
 

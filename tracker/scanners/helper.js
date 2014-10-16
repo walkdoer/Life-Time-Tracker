@@ -14,7 +14,13 @@ var moment = require('moment');
 function readLogFile(options) {
     var promise;
     var readQueue = [];
-    if (options.dateItems) {
+
+    //if have the files options, then just load the appointed files
+    if (options.files) {
+        options.files.forEach(function (fileName) {
+            readQueue.push(util.readLogFiles(fileName));
+        });
+    } else if (options.dateItems) {
         options.dateItems.forEach(function (date) {
             var m = new moment(date.value);
             if (date.type === dateTypeEnum.Day) {
