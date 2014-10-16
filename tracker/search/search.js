@@ -78,12 +78,14 @@ function getDateCondition(options) {
         var m = new Moment(date.value);
         var startDate = m.startOf(dateType).format(TimeFormat.date),
             endDate = m.endOf(dateType).format(TimeFormat.date);
-        return  {
+        return {
             $gte: new Date(startDate + zero),
             $lt: new Date(endDate + zero)
         };
     }
-    return {date: condition};
+    return {
+        date: condition
+    };
 }
 
 
@@ -92,27 +94,13 @@ function getDateCondition(options) {
 function getFilters(options) {
     var filters = [];
     var projects = options.projects,
+        classes = options.classes,
         tags = options.tags;
     if (!_.isEmpty(projects)) {
-        if (projects.length === 1) {
-            filters.push({
-                projects: {
-                    $elemMatch: {
-                        name: options.projects[0]
-                    }
-                }
-            });
-        } else {
-            filters.push({
-                projects: {
-                    $elemMatch: {
-                        name: {
-                            $in: options.projects
-                        }
-                    }
-                }
-            });
-        }
+        filters.push(getArrayOperator('projects', projects, 'name'));
+    }
+    if (!_.isEmpty(classes)) {
+        filters.push(getArrayOperator('classes', classes, 'code'));
     }
 
     if (!_.isEmpty(tags)) {
@@ -122,9 +110,29 @@ function getFilters(options) {
             });
         } else {
             filters.push({
-                tags: { $in: tags }
+                tags: {
+                    $in: tags
+                }
             });
         }
     }
     return filters;
+}
+
+
+function getArrayOperator(name, arr, identity) {
+    var operator = {},
+        $elemMatch = {};
+    if (arr.length === 1) {
+        $elemMatch[identity] = arr[0];
+        operator[name] = {
+            $elemMatch: $elemMatch
+        };
+    } else {
+        $elemMatch[identity] = { $in: arr };
+        operator[name] = {
+            $elemMatch: $elemMatch
+        };
+    }
+    return operator;
 }

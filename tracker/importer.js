@@ -53,6 +53,7 @@ function toLogModel(date, log) {
     return new Log({
         date: date,
         start: log.start,
+        classes: log.classes,
         end: log.end,
         tags: log.tags,
         projects: log.projects,

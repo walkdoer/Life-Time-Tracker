@@ -67,7 +67,7 @@ function getCommonRequestParams(params, query) {
     ].filter(function(val) {
         return !!val;
     }).join('-');
-    preprocessQuery(query, ['projects', 'tags']);
+    preprocessQuery(query, ['projects', 'tags', 'classes']);
 
     return extend({}, {
         type: params.type
@@ -80,7 +80,7 @@ function getCommonRequestParams(params, query) {
         Object.keys(query).forEach(function (key) {
             if (attrs.indexOf(key) >= 0) {
                 var val = query[key],
-                    arr = val.split(',');
+                    arr = !val ? [] : val.split(',');
                 query[key] = arr;
             }
         });
