@@ -27,8 +27,12 @@ exports.query = function(options) {
 
 
 function queryLog(options, onSuccess, onError) {
-    var condition = createQueryCondition(options);
-    var args = [condition,
+    var conditions = getQueryConditions(options);
+    var queryOptions = getQueryOptions(options);
+    var args = [
+        conditions,
+        options.fields || null,
+        queryOptions,
         function(err, result) {
             if (err) {
                 onError(err);
@@ -36,14 +40,12 @@ function queryLog(options, onSuccess, onError) {
                 onSuccess(result);
             }
         }
-    ].filter(function(val) {
-        return !!val;
-    });
+    ];
     Log.find.apply(Log, args);
 }
 
 
-function createQueryCondition(options) {
+function getQueryConditions(options) {
     var $and = [];
     var dateCondition = getDateCondition(options);
     if (dateCondition) {
@@ -56,6 +58,13 @@ function createQueryCondition(options) {
     return {
         $and: $and
     };
+}
+
+
+function getQueryOptions(usrOptions) {
+    var queryOptions = _.pick(usrOptions, ['limit', 'skip']);
+    queryOptions.sort = {date: 1, start: 1};
+    return queryOptions;
 }
 
 
