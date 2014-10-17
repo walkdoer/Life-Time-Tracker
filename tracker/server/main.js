@@ -47,6 +47,9 @@ function useHandler(type, url, handler) {
         }
         promise.then(function(result) {
             res.send(result);
+        }).catch(function(err) {
+            console.error(err.stack || err);
+            res.status(500).send('Server Error');
         });
     });
 }

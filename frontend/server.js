@@ -42,8 +42,7 @@ var path = require('path');
 var http = require('http');
 var exphbs = require('express3-handlebars');
 var morgan = require('morgan');
-var _ = require('lodash');
-var Err = require('../tracker/err');
+var serverErr = require('../tracker/err').serverErr;
 
 var appRouter = require('./routers/app');
 
@@ -78,12 +77,12 @@ function redirect(req, res) {
             try {
                 res.send(JSON.parse(data));
             } catch (e) {
-                res.status(500).send(serverError('代理解析结果错误'));
+                res.status(500).send(serverErr('Ltt服务器发生错误'));
             }
         });
     }).on('error', function(e) {
         console.log('problem with request: ' + e.message);
-        res.status(500).send(serverError(e));
+        res.status(500).send(serverErr(e));
     });
 }
 
@@ -92,16 +91,3 @@ http.createServer(app).listen(app.get('port'), function() {
 });
 
 
-function serverError(e) {
-    var prefix = 'Server Error';
-    var title;
-    if (_.isString(e)) {
-        title = e;
-    } else {
-        title = Err.getErrDesc(e);
-    }
-    var msg = prefix + ' : ' + title;
-    return {
-        msg: msg
-    };
-}
