@@ -42,6 +42,8 @@ var path = require('path');
 var http = require('http');
 var exphbs = require('express3-handlebars');
 var morgan = require('morgan');
+var _ = require('lodash');
+var Err = require('../tracker/err');
 
 var dashboardRouter = require('./routers/dashboard'),
     logsRouter = require('./routers/logs'),
@@ -77,14 +79,33 @@ function redirect(req, res) {
         });
         response.on('end', function (){
             //the api's response content is json string,so need to parse to object
-            res.send(JSON.parse(data));
+            try {
+                res.send(JSON.parse(data));
+            } catch (e) {
+                res.status(500).send(serverError('代理解析结果错误'));
+            }
         });
     }).on('error', function(e) {
         console.log('problem with request: ' + e.message);
-        res.status(500).send('Server Error');
+        res.status(500).send(serverError(e));
     });
 }
 
 http.createServer(app).listen(app.get('port'), function() {
     console.log("Express server listening on port " + app.get('port'));
 });
+
+
+function serverError(e) {
+    var prefix = 'Server Error';
+    var title;
+    if (_.isString(e)) {
+        title = e;
+    } else {
+        title = Err.getErrDesc(e);
+    }
+    var msg = prefix + ' : ' + title;
+    return {
+        msg: msg
+    };
+}
