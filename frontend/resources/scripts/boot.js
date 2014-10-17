@@ -2,7 +2,7 @@
  * 启动引导
  */
 require.config({
-    baseUrl: './resources/',
+    baseUrl: '/resources/',
     paths: {
         'requireLib': 'vendors/requirejs/require',
         'react': 'vendors/react_min/react',
@@ -30,7 +30,7 @@ require.config({
     include: ['requireLib', 'text', 'd3']
 });
 
-require(['./scripts/app', 'd3', 'bootstrap'], function (app) {
+require(['scripts/app', 'd3', 'bootstrap'], function (app) {
     'use strict';
     app.initialize();
 });
