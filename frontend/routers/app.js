@@ -5,5 +5,5 @@
 
 
 module.exports = function (req, res) {
-    res.render('dashboard', {title: 'Life-Time-Tracker'});
+    res.render('app', {title: 'Life-Time-Tracker'});
 };

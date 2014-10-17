@@ -45,9 +45,7 @@ var morgan = require('morgan');
 var _ = require('lodash');
 var Err = require('../tracker/err');
 
-var dashboardRouter = require('./routers/dashboard'),
-    logsRouter = require('./routers/logs'),
-    statsRouter = require('./routers/stats');
+var appRouter = require('./routers/app');
 
 var app = express();
 app.set('port', process.env.PORT || 3000);
@@ -58,11 +56,9 @@ app.engine('handlebars', exphbs({
 app.set('view engine', 'handlebars');
 app.use(morgan('combined'));
 //static resources
+app.get('/logs', appRouter);
 app.use('/resources', express.static(path.join(__dirname, '/resources')));
-app.get('/', dashboardRouter);
 app.get('/api/*', redirect);
-app.get('/logs/:year', logsRouter);
-app.get('/stats/:year', statsRouter);
 
 
 
