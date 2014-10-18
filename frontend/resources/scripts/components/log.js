@@ -50,17 +50,54 @@ define(function(require) {
         displayName: 'log',
 
         render: function() {
+
+            var baseClassName = 'ltt_c-log',
+                classCode = getLogClassCode(this.props.classes),
+                className = [baseClassName, inheritClassName(baseClassName, classCode)].join(' ');
             return R.div(
-                { className: 'ltt_c-log' },
+                { className: className, style: getLogInlineStyle(this.props)},
                 Time({ value: this.props.start, type: 'date'}),
                 Time({ value: this.props.start, type: 'time'}),
                 Time({ value: this.props.end, type: 'time'}),
                 LogClass({value: this.props.classes}),
                 Origin({value: this.props.origin})
             );
+
+            function inheritClassName (base, prop) {
+                return base + '__' + prop;
+            }
+
+            function getLogClassCode(classes) {
+                if (!_.isEmpty(classes)) {
+                    return classes[0].code
+                } else {
+                    return '';
+                }
+            }
         }
 
     });
 
+    function getLogInlineStyle(log) {
+        return {
+            height: getHeightByTimeRange(log.start, log.end)
+        };
+
+        function getHeightByTimeRange(start, end) {
+            var minHeight = 28,
+                minPerHeight = 3; //1 minute = 5px
+            var mStart = new Moment(start),
+                mEnd = new Moment(end);
+
+            var time = mEnd.diff(mStart, 'minute');
+            if (time > 0) {
+                return (time - 1) * minPerHeight + minHeight;
+            } else if (time === 0) {
+                return minHeight;
+            } else {
+                return 0;
+            }
+        }
+    }
     return Log;
 });
