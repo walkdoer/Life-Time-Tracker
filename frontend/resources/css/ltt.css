@@ -2,3 +2,12 @@
     background: #f3f1ee;
     padding:20px;
 }
+
+
+.ltt_c-dashboard .ltt_c-sleepPeriod {
+	height: 300px;
+}
+
+.ltt_c-dashboard .ltt_c-calendarHeatMap {
+	height: 100px;
+}

@@ -2,39 +2,36 @@ define(function(require, exports) {
     'use strict';
     var d3 = require('d3');
     var CalHeatMap = require('scripts/libs/cal-heatmap');
-    var Highcharts = require('highcharts');
     var _ = require('underscore');
     var $ = require('jquery');
     var moment = require('moment');
     var Q = require('q');
     var remoteStorage = require('../../storage.remote');
     var chart = require('../../chart');
+    var React = require('react');
+    var R = React.DOM;
 
     //convertors
     var sleepPeriodConvertor = require('../../convertors/sleepPeriod');
     var classesConvertor = require('../../convertors/classes');
     var nameTimeConvertor = require('../../convertors/nameTime');
+    var layoutHTML = require('!text!./dashboard.html');
 
-    //在这里添加highchart的全局设置
-    Highcharts.setOptions({
-        global: {
-            useUTC: false
-        },
-        plotOptions: {
-            series: {
-                // animation: false
-            }
-        }
-    });
+    
 
 
     exports.initialize = function() {
         //create calendar heatmap for sport time
-        createSportCalendarHeatMap();
-        createSleepPeriodLine();
-        createClassesPie();
-        createProjects();
-        createTags();
+        React.renderComponent(R.div({
+            className: 'ltt_c-dashboard'
+        }), $('.container')[0], function () {
+            $(this.getDOMNode()).append(layoutHTML);
+            createSportCalendarHeatMap();
+            createSleepPeriodLine();
+            createClassesPie();
+            createProjects();
+            createTags();
+        });
     };
 
     function createSportCalendarHeatMap() {

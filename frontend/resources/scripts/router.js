@@ -6,13 +6,14 @@ define(function(require) {
     var Backbone = require('Backbone');
 
     var React = require('react');
-    var dashboard = require('./components/pages/dashboard/dashboard');
+    var Dashboard = require('./components/pages/dashboard/dashboard.r');
     var Logs = require('./components/pages/logs/logs');
     var remoteStorage = require('./components/storage.remote');
+    var container = $('.container')[0];
     var Router = Backbone.Router.extend({
         routes: {
             'dashboard': function() {
-                dashboard.initialize();
+                React.renderComponent(Dashboard(), container);
             },
             'logs(/:year)(/:month)(/:day)': function(year, month, day) {
                 var date = [year, month, day].filter(function (val) {

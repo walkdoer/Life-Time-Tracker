@@ -56,6 +56,7 @@ app.set('view engine', 'handlebars');
 app.use(morgan('combined'));
 //static resources
 app.get('/logs/*', appRouter);
+app.get('/dashboard*', appRouter);
 app.use('/resources', express.static(path.join(__dirname, '/resources')));
 app.get('/api/*', redirect);
 
