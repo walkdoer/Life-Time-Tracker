@@ -676,11 +676,13 @@ function getItemFromDays(itemName, getItem, targetFilter, withoutTime) {
         });
 
 
+        targetFilter = targetFilter || function(val, target) {
+            return val.name === target.name;
+        };
         result = result.reduce(function(uniqueResult, itm) {
-            targetFilter = targetFilter || function(val) {
-                return val.name === itm.name;
-            };
-            var target = uniqueResult.filter(targetFilter);
+            var target = uniqueResult.filter(function (val) {
+                return targetFilter(val, itm);
+            });
             if (!_.isEmpty(target)) {
                 if (!withoutTime) {
                     target[0].time += itm.time;
@@ -720,11 +722,6 @@ exports.getAllProjects = getItemFromDays('projects', function (item) {
     var itmVer = itm.version,
         targetVer = target.version,
         versionEqual;
-
-    if (!targetVer && !itmVer) {
-        versionEqual = false;
-    } else {
-        versionEqual = (targetVer === itmVer);
-    }
+    versionEqual = (targetVer === itmVer);
     return itm.name === target.name && versionEqual;
 }, true);
