@@ -513,16 +513,14 @@ function getProjects(log) {
             name = projStr.match(nameRegexp)[1].trim();
         }
         //delete the project name string and the rest is attrs;
+        var attributes = {};
         if (attrs) {
             attrs = attrs.trim().split(/\s+/g).map(function(val) {
                 var result = val.match(/(.+)\s*=\s*"(.+)"|(.+)\s*=\s*(.+)/);
                 if (result) {
                     var key = result[1] || result[3];
                     var value = result[2] || result[4];
-                    return {
-                        key: key,
-                        value: value
-                    };
+                    attributes[key] = value;
                 }
             });
         }
@@ -531,7 +529,7 @@ function getProjects(log) {
         }
         return {
             name: name,
-            attributes: attrs,
+            attributes: attributes,
             origin: projStr
         };
     }, function(value) {
@@ -608,7 +606,7 @@ var getLogClassesFromDays = getItemFromDays('classes', function(item, log) {
 }), getTagsFromDays = getItemFromDays('tags', function (item, log) {
     return { name: item, time: log.len };
 }), getProjectsFromDays = getItemFromDays('projects', function(item, log) {
-    return { name: item.name, time: log.len };
+    return item;
 });
 
 /**
@@ -655,7 +653,7 @@ function extractInfoFromMultipleDays(item, days, options) {
 }
 
 
-function getItemFromDays(itemName, getItem) {
+function getItemFromDays(itemName, getItem, targetFilter, withoutTime) {
     return function (days) {
         getItem = getItem || function (item) { return item; };
 
@@ -668,18 +666,25 @@ function getItemFromDays(itemName, getItem) {
                 if (!_.isEmpty(items)) {
                     items.forEach(function(itm) {
                         itm = getItem(itm, log);
+                        if (!withoutTime) {
+                            log.time = log.len;
+                        }
                         result.push(itm);
                     });
                 }
             });
         });
 
+
         result = result.reduce(function(uniqueResult, itm) {
-            var target = uniqueResult.filter(function(val) {
+            targetFilter = targetFilter || function(val) {
                 return val.name === itm.name;
-            });
+            };
+            var target = uniqueResult.filter(targetFilter);
             if (!_.isEmpty(target)) {
-                target[0].time += itm.time;
+                if (!withoutTime) {
+                    target[0].time += itm.time;
+                }
             } else {
                 uniqueResult.push(itm);
             }
@@ -709,3 +714,17 @@ exports.getProjects = getProjects;
 exports.getSimpleProjects = getSimpleProjects;
 exports.checkLogSequence = checkLogSequence;
 exports.extract = extractInfoFromMultipleDays;
+exports.getAllProjects = getItemFromDays('projects', function (item) {
+    return item;
+}, function (itm, target) {
+    var itmVer = itm.version,
+        targetVer = target.version,
+        versionEqual;
+
+    if (!targetVer && !itmVer) {
+        versionEqual = false;
+    } else {
+        versionEqual = (targetVer === itmVer);
+    }
+    return itm.name === target.name && versionEqual;
+}, true);

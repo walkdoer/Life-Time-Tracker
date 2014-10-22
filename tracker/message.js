@@ -22,6 +22,10 @@ function info(msg) {
     console.log(createMsg('Info', msg).white);
 }
 
+function debug(msg) {
+    console.log(createMsg('Debug', msg).grey);
+}
+
 function log(msg) {
     console.log(msg);
 }
@@ -33,5 +37,6 @@ module.exports = {
     info: info,
     success: success,
     warn: warn,
-    log: log
+    log: log,
+    debug: debug
 };
