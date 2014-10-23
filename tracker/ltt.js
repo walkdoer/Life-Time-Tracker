@@ -86,10 +86,11 @@ program
 
 program
     .command('server')
-    .option('-p --port <port>', 'server listen port')
+    .option('-p,--port <port>', 'server listen port')
     .description('开启服务器')
     .action(startServer);
 program
+    .option('--type <type>', '需要导入的类型,例如logs,projects')
     .command('import <date>')
     .description('导入某一段时间的日志')
     .action(wrapDateProcess(importLogs));
@@ -236,7 +237,8 @@ function getUserOptions() {
         'ahead',
         'auto',
         'order',
-        'top'
+        'top',
+        'type'
     ]);
     return userOptions;
 

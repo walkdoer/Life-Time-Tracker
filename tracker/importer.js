@@ -18,7 +18,7 @@ var helper = require('./helper');
 syncNoteSig.add(function (files) {
     importFromLogFile({
         files: files,
-        onlyLogs: true
+        type: 'logs'
     });
 });
 

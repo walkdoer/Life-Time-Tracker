@@ -32,16 +32,17 @@ function queryLog(options, onSuccess, onError) {
     var args = [
         conditions,
         options.fields || null,
-        queryOptions,
-        function(err, result) {
+        queryOptions
+    ];
+    Log.find.apply(Log, args)
+        .populate('project')
+        .exec(function(err, result) {
             if (err) {
                 onError(err);
             } else {
                 onSuccess(result);
             }
-        }
-    ];
-    Log.find.apply(Log, args);
+        });
 }
 
 

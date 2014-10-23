@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+    Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId;
 
 var Log = Schema({
     //日期
@@ -15,7 +16,7 @@ var Log = Schema({
     //标签
     tags: Array,
     //项目 /book movie music program
-    projects: Array,
+    project: {type: ObjectId, ref: 'Project'},
     //原始日志
     origin: String
 });
