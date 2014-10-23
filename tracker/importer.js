@@ -111,6 +111,9 @@ function toLogModel(date, log) {
                 if (err) {
                     deferred.reject(err);
                 }
+                if (queryCondition.name === 'WA' && !queryCondition.version) {
+                    console.log('WA', project.id);
+                }
                 deferred.resolve(new Log({
                     date: date,
                     start: log.start,
@@ -148,7 +151,7 @@ function importProjects(projects) {
 
 
 function saveProject(project) {
-    var queryCondition = getProjectQueryCondition(project);
+    var queryCondition = getProjectQueryCondition(project, true);
     //check the existence of project
     Project.count(queryCondition, function (err, count) {
         if (err) {
@@ -170,13 +173,15 @@ function saveProject(project) {
     });
 }
 
-function getProjectQueryCondition(project) {
+function getProjectQueryCondition(project, exceptVersion) {
     var version = project.version;
     var queryCondition = {
-        name: project.name
+        name: project.name,
     };
     if (version) {
         queryCondition.version = version;
+    } else if (exceptVersion) {
+        queryCondition.version = {$exists: false};
     } 
     return queryCondition;
 }
