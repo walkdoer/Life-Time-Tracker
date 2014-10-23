@@ -12,6 +12,9 @@ var TimeFormat = require('../timeFormat');
 var dateTypeEnum = require('../enum/dateType');
 var Moment = require('moment');
 var _ = require('lodash');
+var Project = require('../model/project');
+var Msg = require('../message');
+var ObjectId = require('mongoose').Types.ObjectId;
 
 exports.query = function(options) {
     var deferred = Q.defer();
@@ -27,38 +30,57 @@ exports.query = function(options) {
 
 
 function queryLog(options, onSuccess, onError) {
-    var conditions = getQueryConditions(options);
-    var queryOptions = getQueryOptions(options);
-    var args = [
-        conditions,
-        options.fields || null,
-        queryOptions
-    ];
-    Log.find.apply(Log, args)
-        .populate('project')
-        .exec(function(err, result) {
-            if (err) {
-                onError(err);
-            } else {
-                onSuccess(result);
-            }
+    getQueryConditions(options)
+        .then(function (conditions) {
+            var queryOptions = getQueryOptions(options);
+            var args = [
+                conditions,
+                options.fields || null,
+                queryOptions
+            ];
+            Log.find.apply(Log, args)
+                .populate({
+                    path: 'project',
+                })
+                .exec(function(err, result) {
+                    if (err) {
+                        onError(err);
+                    } else {
+                        onSuccess(result);
+                    }
+                });
         });
 }
 
 
 function getQueryConditions(options) {
+    var deferred = Q.defer();
     var $and = [];
-    var dateCondition = getDateCondition(options);
-    if (dateCondition) {
-        $and.push(dateCondition);
+    if (!_.isEmpty(options.projects)) {
+        getProjectIds(options.projects)
+            .then(function (projectIdsCondition) {
+                syncOptions();
+                $and.push(projectIdsCondition);
+                deferred.resolve({
+                    $and: $and
+                });
+            });
+    } else {
+        syncOptions();
+        deferred.resolve({$and: $and});
     }
-    var filters = getFilters(options);
-    if (!_.isEmpty(filters)) {
-        $and = $and.concat(filters);
+
+    function syncOptions() {
+        var dateCondition = getDateCondition(options);
+        if (dateCondition) {
+            $and.push(dateCondition);
+        }
+        var filters = getFilters(options);
+        if (!_.isEmpty(filters)) {
+            $and = $and.concat(filters);
+        }
     }
-    return {
-        $and: $and
-    };
+    return deferred.promise;
 }
 
 
@@ -101,13 +123,9 @@ function getDateCondition(options) {
 
 
 function getFilters(options) {
-    var filters = [];
-    var projects = options.projects,
+    var filters = [],
         classes = options.classes,
         tags = options.tags;
-    if (!_.isEmpty(projects)) {
-        filters.push(getArrayOperator('projects', projects, 'name'));
-    }
     if (!_.isEmpty(classes)) {
         filters.push(getArrayOperator('classes', classes, 'code'));
     }
@@ -144,4 +162,37 @@ function getArrayOperator(name, arr, identity) {
         };
     }
     return operator;
+}
+
+function getProjectIds(projects) {
+    var deferred = Q.defer();
+    var condition;
+    if (projects.length === 1) {
+        condition = {
+            name: projects[0]
+        };
+    } else {
+        condition = {
+            name: {$in: projects}
+        };
+    }
+    Project.find(condition, function (err, projects) {
+        var idCondition;
+        if (err) {
+            Msg.error('Error occur when search with projects' + JSON.stringify(condition), err);
+            deferred.reject(err);
+        }
+        var projectIds = projects.map(function (project) {
+            return new ObjectId(project.id);
+        });
+
+        if (projectIds.length > 0) {
+            idCondition = { project: projectIds[0]};
+        } else {
+            idCondition = {project: {$in: projectIds}};
+        }
+
+        deferred.resolve(idCondition);
+    });
+    return deferred.promise;
 }

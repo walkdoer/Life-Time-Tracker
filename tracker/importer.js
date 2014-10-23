@@ -23,6 +23,43 @@ syncNoteSig.add(function (files) {
 });
 
 
+
+
+
+function importFromLogFile(options) {
+    var deferred = Q.defer();
+    //scan the data
+    scanner.scan(options)
+        //ite to database
+        .then(function (scanResult) {
+            var days = scanResult.days || [scanResult];
+            switch (options.type) {
+                case 'projects':
+                    importProjects(helper.getAllProjects(days));
+                    break;
+                case 'logs':
+                    importLogs(days);
+                    break;
+                default:
+                    importProjects(helper.getAllProjects(days));
+                    importLogs(days);
+            }
+        }).then(function () {
+            Msg.success('logs have been imported into database successfully.');
+        }).catch(function (err) {
+            Msg.error('Something wrong happen when imported logs into database.');
+            throw err;
+        });
+    return deferred.promise;
+}
+
+
+function importLogs(days) {
+    days.forEach(function (day) {
+        importDay(day);
+    });
+}
+
 function importDay(day) {
     var logs = day.logs;
     var date = day.date;
@@ -41,54 +78,61 @@ function importDay(day) {
     });
 
     logs.forEach(function (log) {
-        var logModel = toLogModel(date, log);
-        logModel.save(function(err) {
-            if (err) {
-                console.error(err);
-            }
-        });
+        //transform to LogModel and then save
+        //async is because need to get the project's _id as referrence
+        toLogModel(date, log)
+            .then(function (logModel) {
+                logModel.save(function(err) {
+                    if (err) {
+                        console.error(err);
+                    }
+                });
+            }).catch(function (err) {
+                Msg.error('Error occur when persisting Log Object', err);
+            });
     });
 }
 
 
+/**
+ * transform log to LogModel
+ * @param  {String} date
+ * @param  {Object} log
+ * @return {Log}
+ */
 function toLogModel(date, log) {
-    date = new Moment(date).format('YYYY-MM-DD');
-    return new Log({
-        date: date,
-        start: log.start,
-        classes: log.classes,
-        end: log.end,
-        tags: log.tags,
-        projects: log.projects,
-        origin: log.origin
-    });
-}
-
-function importFromLogFile(options) {
     var deferred = Q.defer();
-    //scan the data
-    scanner.scan(options)
-        //ite to database
-        .then(function (scanResult) {
-            var days = scanResult.days || [scanResult];
-            if (!options.onlyLogs) {
-                importProjects(helper.getAllProjects(days));
-            }
-            importLogs(days);
-        }).then(function () {
-            Msg.success('logs have been imported into database successfully.');
-        }).catch(function (err) {
-            Msg.error('Something wrong happen when imported logs into database.');
-            throw err;
-        });
+    date = new Moment(date).format('YYYY-MM-DD');
+    var projects = log.projects;
+    var queryCondition;
+    if (!_.isEmpty(projects)) {
+        queryCondition = getProjectQueryCondition(projects[0]);
+        Project.findOne(queryCondition, function (err, project) {
+                if (err) {
+                    deferred.reject(err);
+                }
+                deferred.resolve(new Log({
+                    date: date,
+                    start: log.start,
+                    classes: log.classes,
+                    end: log.end,
+                    tags: log.tags,
+                    project: project.id,
+                    origin: log.origin
+                }));
+            });
+    } else {
+        deferred.resolve(new Log({
+            date: date,
+            start: log.start,
+            classes: log.classes,
+            end: log.end,
+            tags: log.tags,
+            origin: log.origin
+        }));
+    }
+
     return deferred.promise;
-}
-
-
-function importLogs(days) {
-    days.forEach(function (day) {
-        importDay(day);
-    });
 }
 
 /**
@@ -104,13 +148,7 @@ function importProjects(projects) {
 
 
 function saveProject(project) {
-    var version = project.version;
-    var queryCondition = {
-        name: project.name
-    };
-    if (version) {
-        queryCondition.version = version;
-    } 
+    var queryCondition = getProjectQueryCondition(project);
     //check the existence of project
     Project.count(queryCondition, function (err, count) {
         if (err) {
@@ -130,6 +168,17 @@ function saveProject(project) {
             Msg.debug('Project ' + project.name + ' exists');
         }
     });
+}
+
+function getProjectQueryCondition(project) {
+    var version = project.version;
+    var queryCondition = {
+        name: project.name
+    };
+    if (version) {
+        queryCondition.version = version;
+    } 
+    return queryCondition;
 }
 
 exports.importFromLogFile = importFromLogFile;
