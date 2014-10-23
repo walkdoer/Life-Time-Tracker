@@ -31,7 +31,7 @@ function syncNote(client, options) {
     // List all of the notebooks in the user's account
     noteStore.listNotebooks(function(err, notebooks) {
         if (err) {
-            Msg.error(EVERNOTE_SERVER_ERROR + ' 访问限制:' + err.rateLimitDuration);
+            Msg.error(EVERNOTE_SERVER_ERROR + ' 访问限制:' + err.rateLimitDuration, err);
             return;
         }
         notebooks.forEach(function(note) {
@@ -53,7 +53,7 @@ function syncNote(client, options) {
         filter.notebookGuid = note.guid;
         noteStore.findNotesMetadata(filter, 0, 35600, spec, function(err, result) {
             if (err) {
-                Msg.error(EVERNOTE_SERVER_ERROR);
+                Msg.error(EVERNOTE_SERVER_ERROR, err);
                 throw err;
             }
 
@@ -261,7 +261,7 @@ exports.sync = function (options) {
             var status;
             var syncCount = 0;
             if (err) {
-                Msg.error(EVERNOTE_SERVER_ERROR);
+                Msg.error(EVERNOTE_SERVER_ERROR, err);
                 return;
             }
             Msg.info("Is my Evernote API version up to date? " + versionOk);

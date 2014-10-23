@@ -6,8 +6,10 @@ function createMsg(level, msg) {
     return '[' + level + ']  ' + msg;
 }
 
-function error(msg) {
+function error(msg, err) {
     console.log(createMsg('Error', msg).red);
+    console.error(err);
+    console.error(err.stack);
 }
 
 function warn(msg) {

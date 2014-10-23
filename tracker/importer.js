@@ -17,7 +17,8 @@ var helper = require('./helper');
 //import note to database after sync success;
 syncNoteSig.add(function (files) {
     importFromLogFile({
-        files: files
+        files: files,
+        onlyLogs: true
     });
 });
 
@@ -63,9 +64,6 @@ function toLogModel(date, log) {
     });
 }
 
-
-
-
 function importFromLogFile(options) {
     var deferred = Q.defer();
     //scan the data
@@ -73,10 +71,10 @@ function importFromLogFile(options) {
         //ite to database
         .then(function (scanResult) {
             var days = scanResult.days || [scanResult];
-            importProjects(helper.getAllProjects(days));
-            days.forEach(function (day) {
-                importDay(day);
-            });
+            if (!options.onlyLogs) {
+                importProjects(helper.getAllProjects(days));
+            }
+            importLogs(days);
         }).then(function () {
             Msg.success('logs have been imported into database successfully.');
         }).catch(function (err) {
@@ -87,11 +85,23 @@ function importFromLogFile(options) {
 }
 
 
+function importLogs(days) {
+    days.forEach(function (day) {
+        importDay(day);
+    });
+}
+
+/**
+ * import project to database
+ * 
+ * @param  {Array[Project]} projects
+ */
 function importProjects(projects) {
     projects.forEach(function (project) {
         saveProject(project);
     });
 }
+
 
 function saveProject(project) {
     var version = project.version;
