@@ -57,10 +57,12 @@ function getQueryConditions(options) {
     var deferred = Q.defer();
     var $and = [];
     if (!_.isEmpty(options.projects)) {
-        getProjectIds(options.projects)
+        getProjectIds(options.projects, options.versions)
             .then(function (projectIdsCondition) {
                 syncOptions();
-                $and.push(projectIdsCondition);
+                if (projectIdsCondition) {
+                    $and.push(projectIdsCondition);
+                }
                 deferred.resolve({
                     $and: $and
                 });
@@ -164,17 +166,11 @@ function getArrayOperator(name, arr, identity) {
     return operator;
 }
 
-function getProjectIds(projects) {
+function getProjectIds(projects, versions) {
     var deferred = Q.defer();
-    var condition;
-    if (projects.length === 1) {
-        condition = {
-            name: projects[0]
-        };
-    } else {
-        condition = {
-            name: {$in: projects}
-        };
+    var condition = _CD(projects, 'name');
+    if (!_.isEmpty(versions)) {
+        _.extend(condition, _CD(versions, 'version'));
     }
     Project.find(condition, function (err, projects) {
         var idCondition;
@@ -182,17 +178,29 @@ function getProjectIds(projects) {
             Msg.error('Error occur when search with projects' + JSON.stringify(condition), err);
             deferred.reject(err);
         }
-        var projectIds = projects.map(function (project) {
-            return new ObjectId(project.id);
-        });
-
-        if (projectIds.length > 0) {
-            idCondition = { project: projectIds[0]};
+        var projectIds = null;
+        if (projects) {
+            projectIds = projects.map(function (project) {
+                return new ObjectId(project.id);
+            });
+            idCondition = _CD(projectIds, 'project');
         } else {
-            idCondition = {project: {$in: projectIds}};
+            idCondition = null;
         }
 
         deferred.resolve(idCondition);
     });
     return deferred.promise;
+}
+
+
+function _CD(items, name) {
+    var condition = {};
+    var length = items.length;
+    if (length === 1) {
+        condition[name] = items[0];
+    } else if (length > 1){
+        condition[name] = {$in: items};
+    }
+    return condition;
 }
