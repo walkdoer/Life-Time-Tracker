@@ -20,6 +20,7 @@ function isValidDate(date) {
 }
 
 function readLogFiles(date) {
+    date = new moment(date).format('YYYY-MM-DD');
     var dateArr = parseDate(date);
     var fileName = dateArr.join('/') + '.md';
     var deferred = when.defer(),

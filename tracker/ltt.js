@@ -100,6 +100,10 @@ program
     .description('导入某一段时间的日志')
     .action(wrapDateProcess(query));
 
+program
+    .command('resetDB')
+    .description('reset Database')
+    .action(resetDatabase);
 program.parse(process.argv);
 
 
@@ -306,4 +310,8 @@ function query(dateStr, options) {
         console.log('一共找到' + result.length + '条日志.');
         console.log(result);
     });
+}
+
+function resetDatabase() {
+    db.reset();
 }

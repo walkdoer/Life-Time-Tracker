@@ -14,7 +14,6 @@ var syncNoteSig = require('./globalSignals').syncNote;
 var Msg = require('./message');
 var _ = require('lodash');
 var helper = require('./helper');
-var ObjectId = require('mongoose').Types.ObjectId;
 
 //import note to database after sync success;
 syncNoteSig.add(function (files) {
@@ -24,15 +23,18 @@ syncNoteSig.add(function (files) {
     });
 });
 
+var importedLogCount = 0;
 
 
-
-
+/**
+ * import data from log file into database
+ * @param  {Object} options
+ * @return {Promise}
+ */
 function importFromLogFile(options) {
     var deferred = Q.defer();
     //scan the data
     scanner.scan(options)
-        //ite to database
         .then(function (scanResult) {
             var days = scanResult.days || [scanResult];
             switch (options.type) {
@@ -56,10 +58,16 @@ function importFromLogFile(options) {
 }
 
 
+var waitToImportedLogCount = 0,
+    totalNumberRemoved = 0;
 function importLogs(days) {
+    waitToImportedLogCount = 0;
+    totalNumberRemoved = 0;
     days.forEach(function (day) {
+        waitToImportedLogCount += day.logs.length;
         importDay(day);
     });
+    Msg.info('Import Logs Count:' + waitToImportedLogCount);
 }
 
 function importDay(day) {
@@ -73,10 +81,16 @@ function importDay(day) {
     //remove the same day's log before import
     Log.remove({
         date: new Date(day.date)
-    }, function (err) {
+    }, function (err, numberRemoved) {
         if (err) {
-            console.error(err);
+            Msg.error('清空失败' + date, err);
         }
+        if (!numberRemoved) {
+            Msg.error('清空失败:' + date);
+        } else {
+            Msg.debug('已清空' + date + '的数据' + numberRemoved);
+        }
+        totalNumberRemoved += numberRemoved;
     });
 
     logs.forEach(function (log) {
@@ -88,11 +102,20 @@ function importDay(day) {
                 .then(function (logModel) {
                     logModel.save(function(err) {
                         if (err) {
-                            console.error(err);
+                            Msg.error('Save Log failed!', err);
+                        } else {
+                            importedLogCount++;
+                        }
+                        if (importedLogCount === waitToImportedLogCount) {
+                            Msg.success('Import Logs Success, count:' + importedLogCount);
                         }
                     });
                 }).catch(function (err) {
-                    Msg.error('Error occur when persisting Log Object', err);
+                    var msg = 'persisting Log Object' + log.origin;
+                    if (!err) {
+                        msg += ' project is not exist';
+                    }
+                    Msg.error(msg, err);
                 });
         }).catch(function (err) {
             Msg.error('import task of log failed!');
@@ -115,11 +138,9 @@ function toLogModel(date, log, refer) {
     if (!_.isEmpty(projects)) {
         queryCondition = getProjectQueryCondition(projects[0]);
         Project.findOne(queryCondition, function (err, project) {
-                if (err) {
+                if (err || !project) {
                     deferred.reject(err);
-                }
-                if (queryCondition.name === 'WA' && !queryCondition.version) {
-                    console.log('WA', project.id);
+                    return;
                 }
                 deferred.resolve(new Log({
                     date: date,
@@ -211,7 +232,7 @@ function importTask(taskObj) {
                         Msg.error('Import Task' + taskObj.name, err);
                         deferred.reject(err);
                     }
-                    Msg.log(result.name + ' import success ' + result.id);
+                    Msg.debug(result.name + ' import success. _id:' + result.id);
                     deferred.resolve(result.id);
                 });
             }

@@ -547,7 +547,8 @@ function getNameAndAttributes(itemStr) {
     var attributes = {};
     if (attrs) {
         attrs = attrs.trim().split(/\s+/g).map(function(val) {
-            var result = val.match(/(.+)\s*=\s*"(.+)"|(.+)\s*=\s*(.+)/);
+            // a = b or a = 'b' or a = "b" is all good format
+            var result = val.match(/(.+)\s*=\s*['"](.+)['"]|(.+)\s*=\s*(.+)/);
             if (result) {
                 var key = result[1] || result[3];
                 var value = result[2] || result[4];

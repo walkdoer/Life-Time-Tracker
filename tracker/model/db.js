@@ -5,7 +5,8 @@
 'use strict';
 var mongoose = require('mongoose'),
     when = require('when'),
-    msg = require('../message');
+    _ = require('lodash'),
+    Msg = require('../message');
 var conn = null;
 
 module.exports = {
@@ -16,15 +17,29 @@ module.exports = {
         conn = mongoose.connection;
 
         conn.on('error', function (err) {
-            msg.error('Database connect error.');
+            Msg.error('Database connect error.');
             deferred.reject(err);
             throw err;
         });
         conn.once('open', function () {
-            msg.info('Database connect success.');
+            Msg.info('Database connect success.');
             deferred.resolve();
         });
         return deferred.promise;
+    },
+
+    reset: function () {
+        _.pairs(mongoose.connection.collections).forEach(function (pair) {
+            var name = pair[0],
+                collection = pair[1];
+            collection.drop( function(err) {
+                if (err) {
+                    Msg.error('reset collection failed', err);
+                } else {
+                    Msg.success(name + ' collection dropped');
+                }
+            });
+        });
     },
 
 
