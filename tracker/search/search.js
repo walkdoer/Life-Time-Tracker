@@ -32,12 +32,13 @@ exports.query = function(options) {
 
 function queryLog(options, onSuccess, onError) {
     var conditions = getQueryConditions(options);
+    var hasFilterFlag = hasFilter(options, ['projects', 'tasks', 'versions']);
     Q.allSettled([
         getProjectIds(options.projects, options.versions),
         getTaskIds(options.tasks)
     ]).then(function (idsConditions) {
         idsConditions = _.compact(_.pluck(idsConditions, 'value'));
-        if (_.isEmpty(idsConditions)) {
+        if (hasFilterFlag && _.isEmpty(idsConditions)) {
             onSuccess([]);
             return;
         }
@@ -62,6 +63,9 @@ function queryLog(options, onSuccess, onError) {
                 }
             });
     });
+    function hasFilter(options, keys) {
+        return _.intersection(_.keys(options), keys).length > 0;
+    }
 }
 
 

@@ -111,13 +111,14 @@ function importLog(date, log) {
     importTask(log.task).then(function (taskId) {
         //transform to LogModel and then save
         //async is because need to get the project's _id as referrence
-        toLogModel(date, log, {taskId: taskId})
+        toLogModel(date, log, {task: taskId})
             .then(function (logModel) {
-                logModel.save(function(err) {
+                logModel.save(function(err, log) {
                     if (err) {
                         Msg.error('Save Log failed!', err);
                     } else {
                         importedLogCount++;
+                        Msg.success('Import Log Success' + JSON.stringify(log.toJSON()));
                         deferred.resolve();
                     }
                     if (importedLogCount === waitToImportedLogCount) {
@@ -154,28 +155,22 @@ function toLogModel(date, log, refer) {
                     deferred.reject(err);
                     return;
                 }
-                deferred.resolve(new Log({
-                    date: date,
-                    start: log.start,
-                    classes: log.classes,
-                    end: log.end,
-                    tags: log.tags,
-                    project: project.id,
-                    task: refer.taskId || null,
-                    origin: log.origin
-                }));
+                deferred.resolve(createLog(_.extend(refer, {project: project.id})));
             });
     } else {
-        deferred.resolve(new Log({
+        deferred.resolve(createLog(refer));
+    }
+
+    function createLog(extendOptions) {
+        return new Log(_.extend({
             date: date,
             start: log.start,
             classes: log.classes,
             end: log.end,
             tags: log.tags,
             origin: log.origin
-        }));
+        }, extendOptions));
     }
-
     return deferred.promise;
 }
 
