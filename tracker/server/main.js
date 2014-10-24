@@ -70,7 +70,7 @@ function getCommonRequestParams(params, query) {
     ].filter(function(val) {
         return !!val;
     }).join('-');
-    preprocessQuery(query, ['projects', 'tags', 'classes', 'versions']);
+    preprocessQuery(query, ['projects', 'tags', 'classes', 'versions', 'tasks']);
 
     return extend({}, {
         type: params.type

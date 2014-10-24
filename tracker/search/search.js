@@ -13,6 +13,7 @@ var dateTypeEnum = require('../enum/dateType');
 var Moment = require('moment');
 var _ = require('lodash');
 var Project = require('../model/project');
+var Task = require('../model/task');
 var Msg = require('../message');
 var ObjectId = require('mongoose').Types.ObjectId;
 
@@ -31,33 +32,36 @@ exports.query = function(options) {
 
 function queryLog(options, onSuccess, onError) {
     var conditions = getQueryConditions(options);
-    getProjectIds(options.projects, options.versions)
-        .then(function (projectIdsCondition) {
-            if (!projectIdsCondition) {
-                onSuccess([]);
-                return;
-            }
-            var queryOptions = getQueryOptions(options);
-            conditions.$and.push(projectIdsCondition);
-            var args = [
-                conditions,
-                options.fields || null,
-                queryOptions
-            ];
-            Log.find.apply(Log, args)
-                .populate([{
-                    path: 'project',
-                }, {
-                    path: 'task'
-                }])
-                .exec(function(err, result) {
-                    if (err) {
-                        onError(err);
-                    } else {
-                        onSuccess(result);
-                    }
-                });
-        });
+    Q.allSettled([
+        getProjectIds(options.projects, options.versions),
+        getTaskIds(options.tasks)
+    ]).then(function (idsConditions) {
+        idsConditions = _.compact(_.pluck(idsConditions, 'value'));
+        if (_.isEmpty(idsConditions)) {
+            onSuccess([]);
+            return;
+        }
+        var queryOptions = getQueryOptions(options);
+        conditions.$and = conditions.$and.concat(idsConditions);
+        var args = [
+            conditions,
+            options.fields || null,
+            queryOptions
+        ];
+        Log.find.apply(Log, args)
+            .populate([{
+                path: 'project',
+            }, {
+                path: 'task'
+            }])
+            .exec(function(err, result) {
+                if (err) {
+                    onError(err);
+                } else {
+                    onSuccess(result);
+                }
+            });
+    });
 }
 
 
@@ -159,29 +163,51 @@ function getArrayOperator(name, arr, identity) {
     return operator;
 }
 
+
 function getProjectIds(projects, versions) {
+    return getIds('project', Project, [
+        {value: projects, identity: 'name'},
+        {value: versions, identity: 'version'}
+    ]);
+}
+
+
+function getTaskIds(tasks) {
+    return getIds('task', Task, [
+        {value: tasks, identity: 'name'}
+    ]);
+}
+
+
+function getIds(typeName, model, userQuerys) {
     var deferred = Q.defer();
-    if (_.isEmpty(projects)) {
+    var empty  = _.isEmpty(userQuerys) || userQuerys.filter(function (userQuery) {
+        return !_.isEmpty(userQuery.value);
+    }).length === 0;
+    if (empty) {
         deferred.resolve(null);
         return;
     }
-    var condition = _CD(projects, 'name');
-    if (!_.isEmpty(versions)) {
-        _.extend(condition, _CD(versions, 'version'));
-    }
-    Project.find(condition, function (err, projects) {
+    var condition = {};
+    userQuerys.forEach(function (userQuery){
+        var query = userQuery.value; 
+        if (!_.isEmpty(query)) {
+            _.extend(condition, _CD(query, userQuery.identity));
+        }
+    });
+    model.find(condition, function (err, items) {
         var idCondition;
         if (err) {
-            Msg.error('Error occur when search with projects' + JSON.stringify(condition), err);
+            Msg.error('Error occur when search with items' + JSON.stringify(condition), err);
             deferred.reject(err);
             return;
         }
-        var projectIds = null;
-        if (!_.isEmpty(projects)) {
-            projectIds = projects.map(function (project) {
+        var ids = null;
+        if (!_.isEmpty(items)) {
+            ids = items.map(function (project) {
                 return new ObjectId(project.id);
             });
-            idCondition = _CD(projectIds, 'project');
+            idCondition = _CD(ids, typeName);
         } else {
             idCondition = null;
         }
@@ -190,7 +216,6 @@ function getProjectIds(projects, versions) {
     });
     return deferred.promise;
 }
-
 
 function _CD(items, name) {
     var condition = {};
