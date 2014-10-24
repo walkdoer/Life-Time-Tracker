@@ -30,18 +30,26 @@ exports.query = function(options) {
 
 
 function queryLog(options, onSuccess, onError) {
-    getQueryConditions(options)
-        .then(function (conditions) {
+    var conditions = getQueryConditions(options);
+    getProjectIds(options.projects, options.versions)
+        .then(function (projectIdsCondition) {
+            if (!projectIdsCondition) {
+                onSuccess([]);
+                return;
+            }
             var queryOptions = getQueryOptions(options);
+            conditions.$and.push(projectIdsCondition);
             var args = [
                 conditions,
                 options.fields || null,
                 queryOptions
             ];
             Log.find.apply(Log, args)
-                .populate({
+                .populate([{
                     path: 'project',
-                })
+                }, {
+                    path: 'task'
+                }])
                 .exec(function(err, result) {
                     if (err) {
                         onError(err);
@@ -54,23 +62,9 @@ function queryLog(options, onSuccess, onError) {
 
 
 function getQueryConditions(options) {
-    var deferred = Q.defer();
     var $and = [];
-    if (!_.isEmpty(options.projects)) {
-        getProjectIds(options.projects, options.versions)
-            .then(function (projectIdsCondition) {
-                syncOptions();
-                if (projectIdsCondition) {
-                    $and.push(projectIdsCondition);
-                }
-                deferred.resolve({
-                    $and: $and
-                });
-            });
-    } else {
-        syncOptions();
-        deferred.resolve({$and: $and});
-    }
+    syncOptions();
+    return {$and: $and};
 
     function syncOptions() {
         var dateCondition = getDateCondition(options);
@@ -82,7 +76,6 @@ function getQueryConditions(options) {
             $and = $and.concat(filters);
         }
     }
-    return deferred.promise;
 }
 
 
@@ -168,6 +161,10 @@ function getArrayOperator(name, arr, identity) {
 
 function getProjectIds(projects, versions) {
     var deferred = Q.defer();
+    if (_.isEmpty(projects)) {
+        deferred.resolve(null);
+        return;
+    }
     var condition = _CD(projects, 'name');
     if (!_.isEmpty(versions)) {
         _.extend(condition, _CD(versions, 'version'));
@@ -177,9 +174,10 @@ function getProjectIds(projects, versions) {
         if (err) {
             Msg.error('Error occur when search with projects' + JSON.stringify(condition), err);
             deferred.reject(err);
+            return;
         }
         var projectIds = null;
-        if (projects) {
+        if (!_.isEmpty(projects)) {
             projectIds = projects.map(function (project) {
                 return new ObjectId(project.id);
             });
