@@ -45,8 +45,10 @@ function importFromLogFile(options) {
                     importLogs(days);
                     break;
                 default:
-                    importProjects(helper.getAllProjects(days));
-                    importLogs(days);
+                    importProjects(helper.getAllProjects(days))
+                        .then(function () {
+                            importLogs(days);
+                        });
             }
         }).then(function () {
             Msg.success('logs have been imported into database successfully.');
@@ -173,13 +175,15 @@ function toLogModel(date, log, refer) {
  * @param  {Array[Project]} projects
  */
 function importProjects(projects) {
-    projects.forEach(function (project) {
-        saveProject(project);
+    var promises = projects.map(function (project) {
+        return saveProject(project);
     });
+    return Q.allSettled(promises);
 }
 
 
 function saveProject(project) {
+    var deferred = Q.defer();
     var queryCondition = getProjectQueryCondition(project, true);
     //check the existence of project
     Project.count(queryCondition, function (err, count) {
@@ -191,15 +195,17 @@ function saveProject(project) {
             //save to database
             projectModel.save(function (err) {
                 if (err) {
-                    Msg.error('Project' + ' save failed!' + JSON.stringify(project));
-                    console.error(err);
+                    Msg.error('Project' + ' save failed!' + JSON.stringify(project), err);
+                    deferred.reject(err);
                     return;
                 }
+                deferred.resolve();
             });
         } else {
             Msg.debug('Project ' + project.name + ' exists');
         }
     });
+    return deferred.promise;
 }
 
 function getProjectQueryCondition(project, exceptVersion) {

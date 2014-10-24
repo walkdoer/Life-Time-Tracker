@@ -34,7 +34,11 @@ module.exports = {
                 collection = pair[1];
             collection.drop( function(err) {
                 if (err) {
-                    Msg.error('reset collection failed', err);
+                    if (err.errmsg === 'ns not found') {
+                        Msg.info('collection ' + name + ' is not exists');
+                    } else {
+                        Msg.error('reset collection ' + name + ' failed', err);
+                    }
                 } else {
                     Msg.success(name + ' collection dropped');
                 }
