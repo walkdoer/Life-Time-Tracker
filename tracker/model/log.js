@@ -15,8 +15,10 @@ var Log = Schema({
     classes: Array,
     //标签
     tags: Array,
-    //项目 /book movie music program
+    //project refer
     project: {type: ObjectId, ref: 'Project'},
+    //project refer
+    task: {type: ObjectId, ref: 'Task'},
     //原始日志
     origin: String
 });

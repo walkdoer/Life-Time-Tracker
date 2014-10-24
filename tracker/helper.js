@@ -1,4 +1,4 @@
-/**
+/*
  * stat helper
  * define the common function that use by the statists here.
  */
@@ -7,6 +7,7 @@
 var moment = require('moment'),
     util = require('./util');
 var LogClass = require('./model/fundament/logClass'),
+    Task = require('./model/fundament/Task'),
     Project = require('./model/fundament/Project');
 var _ = require('lodash');
 var logClassName = require('./conf/logClassName');
@@ -350,6 +351,7 @@ function getLogInfo(config) {
             classes: getLogClasses(log),
             tags: getSimpleTags(log),
             projects: getProjects(log),
+            task: getTask(log),
             sign: getSigns(log),
             index: config.index,
             origin: log
@@ -497,46 +499,70 @@ function groupTimeBy(logs, condition, process, filter) {
 }
 
 
+/**
+ * get projects
+ * @param  {String} log 
+ * @return {Array[Project]}
+ */
 function getProjects(log) {
     return getItem(log, /<.*?>/g, projectReplaceRegexp, Project, function(projStr) {
-        var nameRegexp = /^(.*?):/,
-            name;
-        projStr = projStr.trim();
-        if (!projStr) {
-            return;
-        }
-        var attrs = projStr.replace(nameRegexp, '');
-        if (attrs === projStr) {
-            name = projStr;
-            attrs = null;
-        } else {
-            name = projStr.match(nameRegexp)[1].trim();
-        }
-        //delete the project name string and the rest is attrs;
-        var attributes = {};
-        if (attrs) {
-            attrs = attrs.trim().split(/\s+/g).map(function(val) {
-                var result = val.match(/(.+)\s*=\s*"(.+)"|(.+)\s*=\s*(.+)/);
-                if (result) {
-                    var key = result[1] || result[3];
-                    var value = result[2] || result[4];
-                    attributes[key] = value;
-                }
-            });
-        }
-        if (!name) {
-            msg.error('project has no name. origin:' + projStr);
-        }
-        return {
-            name: name,
-            attributes: attributes,
-            origin: projStr
-        };
+        return getNameAndAttributes(projStr);
     }, function(value) {
         var proj = new Project(value.name, value.attributes);
         proj.origin = value.origin;
         return proj;
     });
+}
+
+/**
+ * get tasks
+ * @param  {String} log 
+ * @return {Array[Task]} 
+ */
+function getTask(log) {
+    var items = getItem(log, /\(.*?\)/g, /[()]/g, Task, function(taskStr) {
+        return getNameAndAttributes(taskStr);
+    }, function(value) {
+        var task = new Task(value.name, value.attributes);
+        return task;
+    });
+    return _.isEmpty(items) ? null : items[0];
+}
+
+function getNameAndAttributes(itemStr) {
+    var nameRegexp = /^(.*?):/,
+        name;
+    itemStr = itemStr.trim();
+    if (!itemStr) {
+        return;
+    }
+    var attrs = itemStr.replace(nameRegexp, '');
+    if (attrs === itemStr) {
+        name = itemStr;
+        attrs = null;
+    } else {
+        name = itemStr.match(nameRegexp)[1].trim();
+    }
+    //delete the project name string and the rest is attrs;
+    var attributes = {};
+    if (attrs) {
+        attrs = attrs.trim().split(/\s+/g).map(function(val) {
+            var result = val.match(/(.+)\s*=\s*"(.+)"|(.+)\s*=\s*(.+)/);
+            if (result) {
+                var key = result[1] || result[3];
+                var value = result[2] || result[4];
+                attributes[key] = value;
+            }
+        });
+    }
+    if (!name) {
+        msg.error('project has no name. origin:' + itemStr);
+    }
+    return {
+        name: name,
+        attributes: attributes,
+        origin: itemStr
+    };
 }
 
 function getSimpleProjects(log) {
@@ -709,6 +735,7 @@ exports.nextDay = nextDay;
 exports.getLogs = getLogs;
 exports.getWakeTime = getWakeTime;
 exports.groupTimeByTag = groupTimeByTag;
+exports.getTask = getTask;
 exports.groupTimeByLogClass = groupTimeByLogClass;
 exports.groupTimeByProject = groupTimeByProject;
 exports.getSigns = getSigns;

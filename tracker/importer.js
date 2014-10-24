@@ -8,11 +8,13 @@ var scanner = require('./scanner');
 var Q = require('q');
 var Log = require('./model/log');
 var Project = require('./model/project');
+var Task = require('./model/task');
 var Moment = require('moment');
 var syncNoteSig = require('./globalSignals').syncNote;
 var Msg = require('./message');
 var _ = require('lodash');
 var helper = require('./helper');
+var ObjectId = require('mongoose').Types.ObjectId;
 
 //import note to database after sync success;
 syncNoteSig.add(function (files) {
@@ -78,18 +80,23 @@ function importDay(day) {
     });
 
     logs.forEach(function (log) {
-        //transform to LogModel and then save
-        //async is because need to get the project's _id as referrence
-        toLogModel(date, log)
-            .then(function (logModel) {
-                logModel.save(function(err) {
-                    if (err) {
-                        console.error(err);
-                    }
+        //import task;
+        importTask(log.task).then(function (taskId) {
+            //transform to LogModel and then save
+            //async is because need to get the project's _id as referrence
+            toLogModel(date, log, {taskId: taskId})
+                .then(function (logModel) {
+                    logModel.save(function(err) {
+                        if (err) {
+                            console.error(err);
+                        }
+                    });
+                }).catch(function (err) {
+                    Msg.error('Error occur when persisting Log Object', err);
                 });
-            }).catch(function (err) {
-                Msg.error('Error occur when persisting Log Object', err);
-            });
+        }).catch(function (err) {
+            Msg.error('import task of log failed!');
+        });
     });
 }
 
@@ -100,7 +107,7 @@ function importDay(day) {
  * @param  {Object} log
  * @return {Log}
  */
-function toLogModel(date, log) {
+function toLogModel(date, log, refer) {
     var deferred = Q.defer();
     date = new Moment(date).format('YYYY-MM-DD');
     var projects = log.projects;
@@ -121,6 +128,7 @@ function toLogModel(date, log) {
                     end: log.end,
                     tags: log.tags,
                     project: project.id,
+                    task: refer.taskId || null,
                     origin: log.origin
                 }));
             });
@@ -184,6 +192,32 @@ function getProjectQueryCondition(project, exceptVersion) {
         queryCondition.version = {$exists: false};
     } 
     return queryCondition;
+}
+
+function importTask(taskObj) {
+    var deferred = Q.defer();
+    if (!taskObj) {
+        deferred.resolve(null);
+    } else {
+        Task.findOne({name: taskObj.name}, function (err, task) {
+            //if task already exist
+            if (task) {
+                Msg.debug('Task ' + taskObj.name + ' exist ' + task.id);
+                deferred.resolve(task.id);
+            } else {
+                var taskModel = new Task(taskObj);
+                taskModel.save(function (err, result) {
+                    if (err) {
+                        Msg.error('Import Task' + taskObj.name, err);
+                        deferred.reject(err);
+                    }
+                    Msg.log(result.name + ' import success ' + result.id);
+                    deferred.resolve(result.id);
+                });
+            }
+        });
+    }
+    return deferred.promise;
 }
 
 exports.importFromLogFile = importFromLogFile;
