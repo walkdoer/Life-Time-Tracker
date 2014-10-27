@@ -32,13 +32,10 @@ exports.query = function(options) {
 
 function queryLog(options, onSuccess, onError) {
     var conditions = getQueryConditions(options);
-    var hasMatchIds = function (idConditions) {
+    var hasMatchIds = function (idConditions, userFilters) {
             if (_.isEmpty(idConditions)) {
                 return false;
             }
-            var userFilters = ['project', 'task', 'version'].filter(function (filterName) {
-                return options[filterName + 's'];//append 's' because options is plural, like projects;
-            });
             return userFilters.reduce(function (result, filterName) {
                 return result && idConditions.filter(function (condition) {
                     return !_.isEmpty(condition[filterName]);
@@ -49,10 +46,13 @@ function queryLog(options, onSuccess, onError) {
         getProjectIds(options.projects, options.versions),
         getTaskIds(options.tasks)
     ]).then(function (idsConditions) {
+        var userFilters = ['project', 'task', 'version'].filter(function (filterName) {
+            return options[filterName + 's'];//append 's' because options is plural, like projects;
+        });
         idsConditions = _.compact(_.pluck(idsConditions, 'value'));
         //if can't find any suit ids, then no need for logs query
         //return empty array immediately
-        if (!hasMatchIds(idsConditions)) {
+        if (!_.isEmpty(userFilters) && !hasMatchIds(idsConditions, userFilters)) {
             onSuccess([]);
             return;
         }
