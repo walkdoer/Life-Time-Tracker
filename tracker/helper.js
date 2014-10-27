@@ -352,6 +352,7 @@ function getLogInfo(config) {
             tags: getSimpleTags(log),
             projects: getProjects(log),
             task: getTask(log),
+            subTask: getSubTask(log),
             sign: getSigns(log),
             index: config.index,
             origin: log
@@ -521,6 +522,17 @@ function getProjects(log) {
  */
 function getTask(log) {
     var items = getItem(log, /\(.*?\)/g, /[()]/g, Task, function(taskStr) {
+        return getNameAndAttributes(taskStr);
+    }, function(value) {
+        var task = new Task(value.name, value.attributes);
+        return task;
+    });
+    return _.isEmpty(items) ? null : items[0];
+}
+
+
+function getSubTask(log) {
+    var items = getItem(log, /#.*?#/g, /#/g, Task, function(taskStr) {
         return getNameAndAttributes(taskStr);
     }, function(value) {
         var task = new Task(value.name, value.attributes);

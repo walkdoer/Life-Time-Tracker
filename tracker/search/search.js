@@ -32,13 +32,27 @@ exports.query = function(options) {
 
 function queryLog(options, onSuccess, onError) {
     var conditions = getQueryConditions(options);
-    var hasFilterFlag = hasFilter(options, ['projects', 'tasks', 'versions']);
+    var hasMatchIds = function (idConditions) {
+            if (_.isEmpty(idConditions)) {
+                return false;
+            }
+            var userFilters = ['project', 'task', 'version'].filter(function (filterName) {
+                return options[filterName + 's'];//append 's' because options is plural, like projects;
+            });
+            return userFilters.reduce(function (result, filterName) {
+                return result && idConditions.filter(function (condition) {
+                    return !_.isEmpty(condition[filterName]);
+                }).length > 0;
+            }, true);
+        };
     Q.allSettled([
         getProjectIds(options.projects, options.versions),
         getTaskIds(options.tasks)
     ]).then(function (idsConditions) {
         idsConditions = _.compact(_.pluck(idsConditions, 'value'));
-        if (hasFilterFlag && _.isEmpty(idsConditions)) {
+        //if can't find any suit ids, then no need for logs query
+        //return empty array immediately
+        if (!hasMatchIds(idsConditions)) {
             onSuccess([]);
             return;
         }
@@ -63,9 +77,6 @@ function queryLog(options, onSuccess, onError) {
                 }
             });
     });
-    function hasFilter(options, keys) {
-        return _.intersection(_.keys(options), keys).length > 0;
-    }
 }
 
 
@@ -208,16 +219,32 @@ function getIds(typeName, model, userQuerys) {
         }
         var ids = null;
         if (!_.isEmpty(items)) {
-            ids = items.map(function (project) {
-                return new ObjectId(project.id);
+            ids = items.map(getId);
+            getSubId(ids).then(function (subIds) {
+                ids = ids.concat(subIds);
+                idCondition = _CD(ids, typeName);
+                deferred.resolve(idCondition);
             });
-            idCondition = _CD(ids, typeName);
         } else {
-            idCondition = null;
+            deferred.resolve(null);
         }
-
-        deferred.resolve(idCondition);
     });
+
+    function getId(item) {
+        return item ? new ObjectId(item.id) : null;
+    }
+
+    function getSubId(parentId) {
+        var deferred = Q.defer();
+
+        model.find(_CD(parentId, 'parent'), function (err, result) {
+            if (err) {
+                throw err;
+            }
+            deferred.resolve(result.map(getId));
+        });
+        return deferred.promise;
+    }
     return deferred.promise;
 }
 

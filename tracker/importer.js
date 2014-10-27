@@ -18,8 +18,7 @@ var helper = require('./helper');
 //import note to database after sync success;
 syncNoteSig.add(function (files) {
     importFromLogFile({
-        files: files,
-        type: 'logs'
+        files: files
     });
 });
 
@@ -109,31 +108,41 @@ function importLog(date, log) {
     var deferred = Q.defer();
     //import task;
     importTask(log.task).then(function (taskId) {
-        //transform to LogModel and then save
-        //async is because need to get the project's _id as referrence
-        toLogModel(date, log, {task: taskId})
-            .then(function (logModel) {
-                logModel.save(function(err, log) {
-                    if (err) {
-                        Msg.error('Save Log failed!', err);
-                    } else {
-                        importedLogCount++;
-                        Msg.success('Import Log Success' + JSON.stringify(log.toJSON()));
-                        deferred.resolve();
+        //if have subTask, then save the subtask with parent task Id
+        if (log.subTask) {
+            log.subTask.parent = taskId;
+            importTask(log.subTask).then(saveLog);
+        } else {
+            saveLog(taskId);
+        }
+
+        function saveLog(taskId) {
+            //transform to LogModel and then save
+            //async is because need to get the project's _id as referrence
+            toLogModel(date, log, {task: taskId})
+                .then(function (logModel) {
+                    logModel.save(function(err, log) {
+                        if (err) {
+                            Msg.error('Save Log failed!', err);
+                        } else {
+                            importedLogCount++;
+                            Msg.success('Import Log Success' + JSON.stringify(log.toJSON()));
+                            deferred.resolve();
+                        }
+                        if (importedLogCount === waitToImportedLogCount) {
+                            Msg.success('Import Logs finished, count:' + importedLogCount);
+                        }
+                    });
+                }).catch(function (err) {
+                    var msg = 'persisting Log Object' + log.origin;
+                    if (!err) {
+                        msg += ' project is not exist';
                     }
-                    if (importedLogCount === waitToImportedLogCount) {
-                        Msg.success('Import Logs finished, count:' + importedLogCount);
-                    }
+                    Msg.error(msg, err);
                 });
-            }).catch(function (err) {
-                var msg = 'persisting Log Object' + log.origin;
-                if (!err) {
-                    msg += ' project is not exist';
-                }
-                Msg.error(msg, err);
-            });
+        }
     }).catch(function (err) {
-        Msg.error('import task of log failed!');
+        Msg.error('import task of log failed!', err);
     });
     return deferred.promise;
 }
