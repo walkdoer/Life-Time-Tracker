@@ -9,6 +9,7 @@ var app = express();
 var execute = require('../execute');
 var calandar = require('../calendar');
 var extend = require('node.extend');
+var stat  = require('./components/stat');
 var Param = require('../param');
 var logAttr = require('./components/logAttribute');
 var Search = require('../search/search');
@@ -20,6 +21,7 @@ app.get('/actions/:actionName', function(req, res) {
 });
 
 useHandler('calendars', '/:type/:year/:month?/:day?', calandar);
+useHandler('stat', '/:year/:month?/:day?', stat);
 useHandler('sleepPeriods');
 useHandler('classes', null, getLogAttr);
 useHandler('projects', null, getLogAttr);

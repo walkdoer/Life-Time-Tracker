@@ -644,9 +644,16 @@ var getLogClassesFromDays = getItemFromDays('classes', function(item, log) {
     return extend({}, item, {time: log.len});
 }), getTagsFromDays = getItemFromDays('tags', function (item, log) {
     return { name: item, time: log.len };
-}), getProjectsFromDays = getItemFromDays('projects', function(item, log) {
+}), getProjectsFromDays = getItemFromDays('projects', function (item) {
     return item;
-});
+}, function (itm, target) {
+    var itmVer = itm.version,
+        targetVer = target.version,
+        versionEqual;
+    versionEqual = (targetVer === itmVer);
+    return itm.name === target.name && versionEqual;
+}, true);
+
 
 /**
  * extract information from multiple days log
@@ -703,6 +710,9 @@ function getItemFromDays(itemName, getItem, targetFilter, withoutTime) {
             logs.forEach(function(log) {
                 var items = log[itemName];
                 if (!_.isEmpty(items)) {
+                    if (!_.isArray(items)) {
+                        items = [items];
+                    }
                     items.forEach(function(itm) {
                         itm = getItem(itm, log);
                         if (!withoutTime) {
@@ -756,12 +766,6 @@ exports.getProjects = getProjects;
 exports.getSimpleProjects = getSimpleProjects;
 exports.checkLogSequence = checkLogSequence;
 exports.extract = extractInfoFromMultipleDays;
-exports.getAllProjects = getItemFromDays('projects', function (item) {
-    return item;
-}, function (itm, target) {
-    var itmVer = itm.version,
-        targetVer = target.version,
-        versionEqual;
-    versionEqual = (targetVer === itmVer);
-    return itm.name === target.name && versionEqual;
-}, true);
+exports.getAllProjects = getProjectsFromDays;
+exports.getTagsFromDays = getTagsFromDays;
+exports.getLogClassesFromDays = getLogClassesFromDays;

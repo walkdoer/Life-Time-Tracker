@@ -185,7 +185,7 @@ function toLogModel(date, log, refer) {
 
 /**
  * import project to database
- * 
+ *
  * @param  {Array[Project]} projects
  */
 function importProjects(projects) {
@@ -232,7 +232,7 @@ function getProjectQueryCondition(project, exceptVersion) {
         queryCondition.version = version;
     } else if (exceptVersion) {
         queryCondition.version = {$exists: false};
-    } 
+    }
     return queryCondition;
 }
 

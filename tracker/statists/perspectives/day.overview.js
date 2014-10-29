@@ -9,7 +9,6 @@ var helper = require('../../helper');
 
 exports.focus = function (options, scanResult) {
     var date = options.dateStr,
-        fileContent = scanResult.fileContent,
         logs = scanResult.logs,
         trackedTime = 0,
         wakeMoment,
@@ -23,11 +22,12 @@ exports.focus = function (options, scanResult) {
 
     //check the correctness of time frequence for the logs
     helper.checkLogSequence(logs);
-    statResult.classes = helper.getLogClasses(fileContent, true/*unique*/).sort(frequenceDesc);
-    statResult.tags = helper.getTags(fileContent).sort(frequenceDesc);
-    statResult.projects = helper.getProjects(fileContent);
+    statResult.classes = helper.getLogClassesFromDays([scanResult]).sort(frequenceDesc);
+    statResult.tags = helper.getTagsFromDays([scanResult]).sort(frequenceDesc);
+    statResult.projects = helper.getAllProjects([scanResult]);
+
     statResult.projectsFrequence = util.frequence(statResult.projects, function (value, target) {
-        return value.name === target.name;
+        return value.name === target.name && value.version === target.version;
     });
 
     //last index of the logs
