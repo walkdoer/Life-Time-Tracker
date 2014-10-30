@@ -2,8 +2,8 @@ define(function(require) {
     'use strict';
     var React = require('react');
     var R = React.DOM;
-    var CalendarHeatMap = require('../../CalendarHeatMap');
-    var SleepPeriod = require('../../sleepPeriod');;
+    var CalendarHeatMap = require('../../charts/CalendarHeatMap');
+    var SleepPeriod = require('../../charts/sleepPeriod');;
 
     var LogPage = React.createClass({
         displayName: 'dashboard',

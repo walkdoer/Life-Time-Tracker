@@ -43,7 +43,6 @@ exports.dispose = function (options, scanResult) {
     });
     //save the raw data of log;
     statResult.scanResult = scanResult;
-    statResult.fileContent = scanResult.fileContent;
     return statResult;
 };
 

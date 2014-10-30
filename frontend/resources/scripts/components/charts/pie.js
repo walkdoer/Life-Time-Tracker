@@ -7,8 +7,9 @@ define(function(require) {
     var R = React.DOM;
     var chart = require('./chart');
     var className = 'ltt_c-sleepPeriod';
-    var remoteStorage = require('./storage.remote');
-    var LoadIndicator = require('./loadIndicator');
+    var remoteStorage = require('../storage.remote');
+    var LoadIndicator = require('../loadIndicator');
+    var classesConvertor = require('../convertors/classes');
     var Pie = React.createClass({
         displayName: 'pie',
         getInitialState: function () {
@@ -21,10 +22,10 @@ define(function(require) {
             remoteStorage.get(this.props.url)
                 .then(function(result) {
                     that.setState({msg: ''});
-                    chart.timeline({
+                    chart.pie({
                         title: that.props.title,
                         $el: $(that.getDOMNode()),
-                        data: pieConvertor.dispose(result.data)
+                        data: classesConvertor.dispose(result.data)
                     });
                 });
         },
@@ -32,9 +33,6 @@ define(function(require) {
             return R.div({className: className}, LoadIndicator());
         }
     });
-
-
-    
 
     return Pie;
 });
