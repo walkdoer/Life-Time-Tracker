@@ -7,7 +7,6 @@
 var Q = require('q');
 var Msg = require('../../message');
 var Moment = require('moment');
-var timeFormat = 'YYYY-MM-DD HH:mm:ss';
 var Search = require('../../search/search');
 var statist = require('../../statist');
 
@@ -17,7 +16,10 @@ exports.generate = function (options) {
     Search.query(options)
         .then(function (queryResult) {
             var data = adaptLogs(queryResult);
-            statist.dispose(options, data);
+            var result = statist.dispose(options, data);
+            deferred.resolve(result);
+        }).catch(function (err) {
+            deferred.reject(err);
         });
     return deferred.promise;
 };

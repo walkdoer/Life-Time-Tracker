@@ -285,6 +285,9 @@ function getTimeSpanFromLog(log, config) {
         //console.log(result);
         msg.warn('make sure the time is right of ' + date + '\'s log: ' + log);
     }
+    if (!timeSpan.start) {
+        timeSpan.end = timeSpan.start;
+    }
     return timeSpan;
 }
 

@@ -21,7 +21,7 @@ app.get('/actions/:actionName', function(req, res) {
 });
 
 useHandler('calendars', '/:type/:year/:month?/:day?', calandar);
-useHandler('stat', '/:year/:month?/:day?', stat);
+useHandler('stats', '/:year/:month?/:day?', stat);
 useHandler('sleepPeriods');
 useHandler('classes', null, getLogAttr);
 useHandler('projects', null, getLogAttr);
