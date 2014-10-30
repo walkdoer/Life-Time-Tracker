@@ -4,9 +4,9 @@ define(function(require) {
     var R = React.DOM;
     var chart = require('./chart');
     var className = 'ltt_c-sleepPeriod';
-    var remoteStorage = require('./storage.remote');
-    var sleepPeriodConvertor = require('./convertors/sleepPeriod');
-    var LoadIndicator = require('./loadIndicator');
+    var remoteStorage = require('app/components/storage.remote');
+    var sleepPeriodConvertor = require('app/components/convertors/sleepPeriod');
+    var LoadIndicator = require('app/components/loadIndicator');
     var CalendarHeatMap = React.createClass({
         displayName: 'sleepPeriod',
         getInitialState: function () {

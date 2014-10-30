@@ -3,12 +3,12 @@ define(function(require) {
     var React = require('react');
     var d3 = require('d3');
     var moment = require('moment');
-    var CalHeatMap = require('scripts/libs/cal-heatmap');
+    var CalHeatMap = require('app/libs/cal-heatmap');
     var R = React.DOM;
     var Q = require('q');
     var className = 'ltt_c-calendarHeapMap';
     var _ = require('underscore');
-    var LoadIndicator = require('./loadIndicator');
+    var LoadIndicator = require('../loadIndicator');
 
     var CalendarHeatMap = React.createClass({
         displayName: 'calendarHeatMap',

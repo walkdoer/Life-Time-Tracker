@@ -4,6 +4,7 @@
 require.config({
     baseUrl: '/resources/',
     paths: {
+        'app': 'scripts/',
         'requireLib': 'vendors/requirejs/require',
         'react': 'vendors/react_min/react',
         'jsx': 'scripts/libs/jsx',

@@ -40,11 +40,7 @@ define(function(require) {
                     Report = YearReport;
                 }
                 React.renderComponent(Report({
-                    options: {
-                        year: year,
-                        month: month,
-                        day: day
-                    }
+                    date: [year, month, day].join('-')
                 }), $('.container')[0]);
             },
         },
