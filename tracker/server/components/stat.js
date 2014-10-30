@@ -31,6 +31,11 @@ function adaptLogs(logs) {
             Msg.error(log.origin + ' doesn\'t have logs');
             return;
         }
+        if (log.project) {
+            log.projects = [log.project];
+        } else {
+            log.projects = [];
+        }
         var date = new Moment(log.date).format('YYYY-MM-DD');
         var day = getDay(date);
         if (day) {

@@ -77,21 +77,6 @@ function getLogs(data, date) {
             isLast: index === lastIndex
         });
         if (logInfo) {
-            if (isGetUpLog(logInfo)) {
-                logInfo.wake = true;
-                logInfo.end = logInfo.start;
-                logInfo.time = logInfo.start;
-            } else if (isSleepTime(logInfo, lastIndex)) {
-                logInfo.sleep = true;
-                logInfo.end = logInfo.start;
-                //需要校准，有可能凌晨之后睡觉
-                logInfo.time = logInfo.start;
-            } else if (logInfo.sign.indexOf('off') >= 0) {
-                logInfo.offDuty = true;
-                logInfo.end = logInfo.start;
-                //需要校准，是有可能存在加班到凌晨之后
-                logInfo.time = logInfo.start;
-            }
             if (logInfo.len < 0) {
                 msg.error(date + '\'s ' + logStr + '\'s time length is less then 0');
             }
@@ -104,13 +89,6 @@ function getLogs(data, date) {
         prevEndNextDay = endNextDay;
     });
 
-    function isGetUpLog(log) {
-        return log.start === log.end && log.index === 0;
-    }
-
-    function isSleepTime(log, lastIndex) {
-        return log.start === log.end && log.index === lastIndex;
-    }
     return logs;
 }
 

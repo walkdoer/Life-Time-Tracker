@@ -33,12 +33,12 @@ exports.focus = function (options, scanResult) {
     //last index of the logs
     var lastIndex = logs.length - 1;
     logs.forEach(function(log, index) {
-        if (log.wake) {
-            wakeMoment = log.time;
-        } else if (log.sleep){
-            sleepMoment = log.time;
-        } else if (log.offDuty) {
-            statResult.offDutyMoment = log.time;
+        if (isGetUpLog(log)) {
+            wakeMoment = log.start;
+        } else if (isSleepTime(log, lastIndex)){
+            sleepMoment = log.start;
+        } else if (log.sign.indexOf('off') >= 0) {
+            statResult.offDutyMoment = log.start;
         }
         if (log.len !== undefined) {
             trackedTime += log.len;
@@ -47,6 +47,13 @@ exports.focus = function (options, scanResult) {
             lastMoment = log.end;
         }
     });
+    function isGetUpLog(log) {
+        return log.start === log.end && log.index === 0;
+    }
+
+    function isSleepTime(log, lastIndex) {
+        return log.start === log.end && log.index === lastIndex;
+    }
 
     //calculate the activeTime and unTrackedTime
     var activeTime = 0, unTrackedTime;

@@ -10,7 +10,7 @@ var Log = Schema({
     //结束时间
     end: {type: Date},
     //备注
-    note: String,
+    content: String,
     //时间类别
     classes: Array,
     //标签
@@ -19,8 +19,10 @@ var Log = Schema({
     project: {type: ObjectId, ref: 'Project'},
     //project refer
     task: {type: ObjectId, ref: 'Task'},
+    sign: Array,
     //原始日志
-    origin: String
+    origin: String,
+    len: Number
 });
 
 module.exports = mongoose.model('Log', Log);
