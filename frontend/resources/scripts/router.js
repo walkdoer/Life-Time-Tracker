@@ -9,10 +9,10 @@ define(function(require) {
     var Dashboard = require('./components/pages/dashboard/dashboard.r');
     var Logs = require('./components/pages/logs/logs');
     var remoteStorage = require('./components/storage.remote');
-    var container = $('.container')[0];
     var MonthReport = require('./components/pages/reports/monthReport');
     var DayReport = require('./components/pages/reports/dayReport');
     var YearReport = require('./components/pages/reports/yearReport');
+    var container = $('#ltt-container')[0];
     var Router = Backbone.Router.extend({
         routes: {
             'dashboard': function() {
@@ -27,7 +27,7 @@ define(function(require) {
                         var logs = result.data;
                         React.renderComponent(Logs({
                             logs: logs
-                        }), $('.container')[0]);
+                        }), container);
                     });
             },
             'reports(/:year)(/:month)(/:day)': function(year, month, day) {
@@ -41,7 +41,7 @@ define(function(require) {
                 }
                 React.renderComponent(Report({
                     date: [year, month, day].join('-')
-                }), $('.container')[0]);
+                }), container);
             },
         },
         start: function() {

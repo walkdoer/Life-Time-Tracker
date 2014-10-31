@@ -6,23 +6,27 @@ define(function(require) {
     var React = require('react');
     var R = React.DOM;
     var chart = require('./chart');
-    var className = 'ltt_c-sleepPeriod';
     var LoadIndicator = require('app/components/loadIndicator');
-    var classesConvertor = require('app/components/convertors/classes');
+    var pieConvertor = require('app/components/convertors/pie');
     var Pie = React.createClass({
         displayName: 'pie',
-        componentDidMount: function () {
-            var data = this.props.data;
+        render: function() {
+            var className = 'ltt_c-chart-pie';
+            if (this.props.className) {
+                className  = [className, this.props.className].join(' ');
+            }
+            return R.div({className: className}, LoadIndicator());
+        },
+
+        setData: function (data) {
+            this.props.data = data;
             if (data) {
                 chart.pie({
                     title: this.props.title,
                     $el: $(this.getDOMNode()),
-                    data: classesConvertor.dispose(data)
+                    data: pieConvertor.dispose(data)
                 });
             }
-        },
-        render: function() {
-            return R.div({className: className}, LoadIndicator());
         }
     });
 

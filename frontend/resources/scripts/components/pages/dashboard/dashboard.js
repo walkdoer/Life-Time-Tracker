@@ -17,7 +17,6 @@ define(function(require, exports) {
     var nameTimeConvertor = require('../../convertors/nameTime');
     var layoutHTML = require('!text!./dashboard.html');
 
-    
 
 
     exports.initialize = function() {
@@ -26,7 +25,6 @@ define(function(require, exports) {
             className: 'ltt_c-dashboard'
         }), $('.container')[0], function () {
             $(this.getDOMNode()).append(layoutHTML);
-            createSportCalendarHeatMap();
             createSleepPeriodLine();
             createClassesPie();
             createProjects();
@@ -34,35 +32,7 @@ define(function(require, exports) {
         });
     };
 
-    function createSportCalendarHeatMap() {
-        var calendar = new CalHeatMap();
-        d3.json("/api/calendars/sport/2014", function(error, data) {
-            var renderData = {};
-            data.forEach(function(val) {
-                var seconds = new Date(val.date).getTime() / 1000;
-                if (val.sportTime > 0) {
-                    renderData[seconds] = val.sportTime;
-                }
-            });
-            calendar.init({
-                data: renderData,
-                start: new Date(2014, 0),
-                domain: "month",
-                subDomain: "day",
-                //subDomainTextFormat: "%d",
-                cellSize: 15,
-                cellPadding: 2,
-                tooltip: true,
-                subDomainTitleFormat: {
-                    empty: '没有运动数据',
-                    filled: '{date} 运动时间 {count}分钟'
-                },
-                subDomainDateFormat: function(date) {
-                    return moment(date).format('D号 dddd');
-                }
-            });
-        });
-    }
+
 
     function createSleepPeriodLine() {
         remoteStorage.get('/api/sleepPeriods/2014')

@@ -1,17 +1,20 @@
 define(function (require, exports) {
     'use strict';
     var _ = require('underscore');
+    var helper = require('./helper');
     exports.dispose = function (rawData) {
         var result = {
             type: 'pie'
         };
-        var pieData = [], total = 0;
+        var valueKey = helper.getValueKey(rawData);
+        var pieData = [],
+            total = 0;
         _.each(rawData, function (d) {
-            total += d.time;
+            total += d[valueKey];
         });
 
         _.each(rawData, function (d) {
-            pieData.push([d.name, d.time / total * 100]);
+            pieData.push([d.name || d.label, d[valueKey] / total * 100]);
         });
 
         result.data = pieData;
