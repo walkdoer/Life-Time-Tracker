@@ -38,9 +38,13 @@ define(function(require) {
 
         getCategories: function(data) {
             var categories = [];
-            _.each(data, function(d) {
-                categories.push(d.name || d.label);
-            });
+            if (_.isArray(data)) {
+                _.each(data, function(d) {
+                    categories.push(d.name || d.label);
+                });
+            } else if (_.isObject(data)){
+                categories = _.keys(data);
+            }
             return categories;
         }
     });

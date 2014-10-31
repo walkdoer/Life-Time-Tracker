@@ -103,6 +103,23 @@ define(function(require, exports) {
         options.$el.highcharts(pieOptions);
     };
 
+    exports.bar = function (options, highchartOptions) {
+        var columnOptions = {
+            chart: {
+                type: 'bar'
+                //plotBackgroundColor: null,
+                //plotShadow: false
+            },
+            title: {
+                text: options.title
+            },
+            series: options.data
+        };
+
+        columnOptions = _.extend(columnOptions, highchartOptions);
+
+        options.$el.highcharts(columnOptions);
+    };
 
     exports.column = function (options, highchartOptions) {
         var columnOptions = {

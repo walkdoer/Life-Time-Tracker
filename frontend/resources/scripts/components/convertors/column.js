@@ -3,12 +3,16 @@ define(function (require, exports) {
     var _ = require('underscore');
     var helper = require('./helper');
     exports.dispose = function (rawData) {
-        var result = {name: '标签'};
+        var result = {};
         var data = [];
-        var valueKey = helper.getValueKey(rawData);
-        _.each(rawData, function (d) {
-            data.push([d.name || d.label, d[valueKey]]);
-        });
+        if (_.isArray(rawData)) {
+            var valueKey = helper.getValueKey(rawData);
+            _.each(rawData, function (d) {
+                data.push([d.name || d.label, d[valueKey]]);
+            });
+        } else if (_.isObject(rawData)) {
+            data = _.values(rawData);
+        }
         result.data = data;
         return [result];
     };
