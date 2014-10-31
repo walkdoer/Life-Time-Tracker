@@ -48,3 +48,5 @@ vendor
 tracker/conf/token.json
 frontend/resources/vendors
 logs
+client-browser/bower_components
+client-browser/node_modules

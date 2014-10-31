@@ -6,7 +6,6 @@ define(function(require) {
     var React = require('react');
     var R = React.DOM;
     var chart = require('./chart');
-    var LoadIndicator = require('app/components/loadIndicator');
     var pieConvertor = require('app/components/convertors/pie');
     var Pie = React.createClass({
         displayName: 'pie',
@@ -15,7 +14,7 @@ define(function(require) {
             if (this.props.className) {
                 className  = [className, this.props.className].join(' ');
             }
-            return R.div({className: className}, LoadIndicator());
+            return R.div({className: className});
         },
 
         setData: function (data) {

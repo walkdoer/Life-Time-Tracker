@@ -7,6 +7,8 @@ define(function(require) {
     var Column = require('../../charts/column');
     var Bar = require('../../charts/bar');
     var Moment = require('moment');
+    var LogList = require('../../logList');
+    var LoadIndicator = require('app/components/loadIndicator');
     var col4 = 'col-xs-6 col-md-4',
         col8 = 'col-xs-12 col-md-8',
         col3 = 'col-xs-6 col-md-3';
@@ -14,16 +16,26 @@ define(function(require) {
     var DayReport = React.createClass({
         displayName: 'dayReport',
 
+        getInitialState: function () {
+            return {
+                loading: true,
+                logs: [],
+
+            };
+        },
+
         render: function() {
             var layout = [
+                LoadIndicator({active: this.state.loading}),
                 R.div({className: 'row'}, [
-                    Pie({className: col4, ref: 'logClassTime'}),
-                    Column({title: '标签时间', className: col8, ref: 'tagTime'})
+                    Pie({className: col4, ref: 'logClassTime', data: this.state.classTime}),
+                    Column({title: '标签时间', className: col8, ref: 'tagTime', data: this.state.tagTime})
                 ]),
                 R.div({className: 'row'}, [
-                    Bar({className: col4, ref: 'projectTime'}),
-                    Bar({className: col4, ref: 'categoryTime'})
-                ])
+                    Bar({className: col4, ref: 'projectTime', data: this.state.projectTime}),
+                    Bar({className: col4, ref: 'categoryTime', data: this.state.categoryTime})
+                ]),
+                R.div({className: 'row'}, LogList({ref: 'logList'}))
             ];
             return R.div({className: 'ltt_c-report'}, layout);
         },

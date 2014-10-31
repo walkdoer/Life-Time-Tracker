@@ -18,7 +18,7 @@ define(function(require) {
             }
             return R.div({
                 className: className
-            }, LoadIndicator());
+            };
         },
 
         setData: function(data) {

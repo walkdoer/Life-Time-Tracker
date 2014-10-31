@@ -6,7 +6,6 @@ define(function(require) {
     var React = require('react');
     var R = React.DOM;
     var chart = require('./chart');
-    var LoadIndicator = require('app/components/loadIndicator');
     var convertor = require('app/components/convertors/column');
     var _ = require('underscore');
     var Bar = React.createClass({
@@ -18,7 +17,7 @@ define(function(require) {
             }
             return R.div({
                 className: className
-            }, LoadIndicator());
+            });
         },
 
         setData: function(data) {
