@@ -1,8 +1,18 @@
 .ltt_c-header{
-
+    height: 50px;
+    background: #f3f3f4;
+}
+.ltt_c-header .btn{
+    margin-top: 8px;
 }
 
-.ltt_c-header-cfg{
-    
+.ltt_c-header-cfgBtn{
+    margin-right:8px;
+    float: right;
+}
+
+.ltt_c-header-barBtn{
+    margin-left: 8px;
+    float:  left;
 }
 

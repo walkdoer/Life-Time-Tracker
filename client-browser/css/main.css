@@ -302,3 +302,7 @@ textarea {
         page-break-after: avoid;
     }
 }
+
+button {
+    outline: none !important;
+}

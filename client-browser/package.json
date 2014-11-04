@@ -43,9 +43,10 @@
       ]
     },
     "bootstrap": {
-      "depends": [
-        "jquery:$"
-      ]
+      "exports": "bootstrap",
+      "depends": {
+        "jquery": "$"
+      }
     },
     "nvd3": {
       "exports": "nv",

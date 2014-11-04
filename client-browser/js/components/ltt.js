@@ -15,8 +15,10 @@ var Ltt = React.createClass({
     render: function () {
         return (
             <div>
-                <Header/>
+                <Header />
             </div>
         );
     }
-})
+});
+
+module.exports = Ltt;

@@ -2,28 +2,20 @@
  * @jsx React.DOM
 */
 
-var _ = require('lodash');
-var $ = require('jquery');
-var Highcharts = require('highcharts');
-var d3 =require('d3');
-var moment = require('moment');
-var nv =require('nvd3');
-var bootstrap = require('bootstrap');
+// var _ = require('lodash');
+// var $ = require('jquery');window.jQuery = window.$ = $;
+// var Highcharts = require('highcharts');
+// var d3 =require('d3');
+// var moment = require('moment');
+// var nv =require('nvd3');
+// var bootstrap = require('bootstrap');
+var React = require('react');
 
 
-console.log('test');
-/**
- * application bootstrap
- * @jsx React.DOM
- */
+console.log('teest');
 
-
-
-// var React = require('react');
-
-// var Ltt = require('./components/ltt');
-
-// React.render(
-//   <Ltt/>,
-//   document.getElementById('ltt')
-// );
+var Ltt = require('./components/ltt');
+React.render(
+  <Ltt />,
+  document.getElementById('ltt')
+);
