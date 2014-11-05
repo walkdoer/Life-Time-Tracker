@@ -1,3 +1,27 @@
+
+.ltt{
+    display: flex;
+    height: 100%;
+}
+
+/** nav **/
+.ltt_c-nav{
+    width:220px;
+    display: none;
+    background-color: #191918;
+}
+.ltt__navOpen .ltt_c-nav{
+    display: block;
+}
+/** main **/
+.ltt_c-main {
+    flex:1;
+    background: #fff;
+    -webkit-transition: -webkit-transform 150ms cubic-bezier(.2, .3, .25, .9);
+    transition: transform 150ms cubic-bezier(.2, .3, .25, .9);
+}
+
+/** header **/
 .ltt_c-header{
     height: 50px;
     background: #f3f3f4;
@@ -15,4 +39,3 @@
     margin-left: 8px;
     float:  left;
 }
-

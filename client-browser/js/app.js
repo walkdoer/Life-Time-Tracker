@@ -14,7 +14,7 @@ var React = require('react');
 
 console.log('teest');
 
-var Ltt = require('./components/ltt');
+var Ltt = require('./components/Ltt');
 React.render(
   <Ltt />,
   document.getElementById('ltt')

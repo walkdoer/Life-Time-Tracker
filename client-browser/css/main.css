@@ -23,6 +23,10 @@ html {
     line-height: 1.4;
 }
 
+html,body{
+    height: 100%;
+}
+
 /*
  * Remove text-shadow in selection highlight: h5bp.com/i
  * These selection rule sets have to be separate.
