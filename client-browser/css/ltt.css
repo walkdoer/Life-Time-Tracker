@@ -8,7 +8,7 @@
 .ltt_c-nav{
     width:220px;
     display: none;
-    background-color: #191918;
+    background-color: #0E324B;
 }
 .ltt__navOpen .ltt_c-nav{
     display: block;
@@ -38,4 +38,50 @@
 .ltt_c-header-barBtn{
     margin-left: 8px;
     float:  left;
+}
+
+
+/**menu**/
+
+.ltt_c-menu{
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+.ltt_c-menu a,
+.ltt_c-menu a:hover{
+    color:#fff;
+    text-decoration:none;
+    cursor:pointer;
+}
+
+.ltt_c-menu-item {
+    display: flex;
+    padding: 10px 0 10px 0;
+    cursor:pointer;
+}
+
+.ltt_c-menu-item.active{
+    background: #328AB4;
+}
+
+.ltt_c-menu-item i{
+    font-size: 1.4rem;
+    margin-right: 10px;
+    margin-left: 10px;
+    width: 30px;
+}
+.ltt_c-menu-item a{
+    flex: 1;
+    display:block;
+}
+
+
+/** logo **/
+
+.ltt_c-logo{
+    color: #FFDA6B;
+    text-align: center;
+    padding: 30px 0;
 }

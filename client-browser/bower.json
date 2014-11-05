@@ -16,7 +16,8 @@
     "moment": "~2.8.3",
     "q": "~2.0.2",
     "d3": "~3.4.11",
-    "nvd3": "~1.1.15-beta"
+    "nvd3": "~1.1.15-beta",
+    "Buttons": "~1.1.1"
   },
   "devDependencies": {},
   "keywords": [

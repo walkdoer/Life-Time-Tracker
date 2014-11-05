@@ -310,3 +310,8 @@ textarea {
 button {
     outline: none !important;
 }
+
+
+#app-container {
+    height: 100%;
+}

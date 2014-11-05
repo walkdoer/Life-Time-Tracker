@@ -17,5 +17,5 @@ console.log('teest');
 var Ltt = require('./components/Ltt');
 React.render(
   <Ltt />,
-  document.getElementById('ltt')
+  document.getElementById('app-container')
 );
