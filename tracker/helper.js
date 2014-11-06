@@ -108,11 +108,11 @@ function alignTime(date, time, config) {
 
 function getWakeTime(logData, date) {
     var wakeTime = null;
-    var getUpLog = getLogs(logData, date).filter(function(log) {
-        return log.wake === true;
+    var getUpLog = getLogs(logData, date).filter(function(log, index) {
+        return log.start === log.end && index === 0;
     })[0];
     if (getUpLog) {
-        wakeTime = getUpLog.time;
+        wakeTime = getUpLog.start;
     }
     return wakeTime;
 }

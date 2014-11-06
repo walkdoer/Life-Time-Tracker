@@ -19,7 +19,6 @@ var MenuItem = React.createClass({
      * @return {object}
      */
     render: function() {
-        console.log(this.props);
         var cx = addons.classSet;
         var className = cx({
             'ltt_c-menu-item': true,
