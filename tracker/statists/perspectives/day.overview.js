@@ -26,10 +26,6 @@ exports.focus = function (options, scanResult) {
     statResult.tags = helper.getTagsFromDays([scanResult]).sort(frequenceDesc);
     statResult.projects = helper.getAllProjects([scanResult]);
 
-    statResult.projectsFrequence = util.frequence(statResult.projects, function (value, target) {
-        return value.name === target.name && value.version === target.version;
-    });
-
     //last index of the logs
     var lastIndex = logs.length - 1;
     logs.forEach(function(log, index) {

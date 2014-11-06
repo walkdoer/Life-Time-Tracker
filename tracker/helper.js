@@ -705,12 +705,14 @@ function getItemFromDays(itemName, getItem, targetFilter, withoutTime) {
         result = result.reduce(function(uniqueResult, itm) {
             var target = uniqueResult.filter(function (val) {
                 return targetFilter(val, itm);
-            });
-            if (!_.isEmpty(target)) {
+            })[0];
+            if (target) {
                 if (!withoutTime) {
-                    target[0].time += itm.time;
+                    target.time += itm.time;
                 }
+                target.frequence += 1;
             } else {
+                itm.frequence = 1;
                 uniqueResult.push(itm);
             }
             return uniqueResult;
