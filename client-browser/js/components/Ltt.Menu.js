@@ -6,28 +6,39 @@ var React = require('react');
 var MenuItem = require('./Ltt.Menu.Item');
 var Menu = React.createClass({
 
+    getInitialState: function () {
+        return {
+            currentMenuItem: this.props.active
+        };
+    },
+
     render: function () {
-        var activeMenuKey = this.props.active;
+        var currentMenuItem = this.state.currentMenuItem;
         var menuItems = this.props.items;
-        if (activeMenuKey) {
-            menuItems.forEach(function (item) {
-                item.active = item.key === activeMenuKey;
-            });
-        }
-        menuItems = menuItems.map(function (item) {
-            console.log(item);
+        var menu = this;
+        menuItems = menuItems.map(function (item, i) {
+            var active = item.key === currentMenuItem;
+            var boundClick = this.handleClick.bind(this, item.key);
             return (<MenuItem
-                active={item.active}
+                active={active}
                 text={item.text}
                 icon={item.icon}
+                onClick={boundClick}
                 key={item.key}/>);
-        });
+        }, this);
         return (
             <ul className="ltt_c-menu">
                 {menuItems}
             </ul>
         );
+    },
+
+    handleClick: function (menuKey) {
+        this.setState({
+            currentMenuItem: menuKey
+        });
     }
+
 });
 
 module.exports = Menu;
