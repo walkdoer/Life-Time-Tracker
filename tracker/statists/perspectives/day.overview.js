@@ -72,7 +72,7 @@ exports.focus = function (options, scanResult) {
     statResult.sleepMoment = sleepMoment;
     statResult.activeTime = activeTime;
     statResult.unTrackedTime = unTrackedTime;
-    statResult.sleepTime = calculateSleepLength(date, sleepMoment);
+    statResult.sleepTime = helper.calculateSleepTime(date, sleepMoment);
     statResult.classTime = helper.groupTimeByLogClass(logs, statResult.classes);
     statResult.tagTime = helper.groupTimeByTag(logs);
     statResult.projectTime = helper.groupTimeByProject(logs);
@@ -91,21 +91,3 @@ exports.focus = function (options, scanResult) {
 };
 
 
-function calculateSleepLength (date, sleepMoment) {
-    var nextDay = helper.nextDay(date),
-        timeSpan = -1,
-        file;
-    try {
-        file = util.readLogFilesSync(nextDay);
-        var wokeTime = helper.getWakeTime(file.data, nextDay);
-        timeSpan = helper.timeSpan(sleepMoment, wokeTime);
-    } catch (e) {
-        if (e.code === 'ENOENT') {
-            msg.warn('Do not have enough data to calculate sleep lenth of ' + date);
-        } else {
-            msg.error('error occur when calculate sleep time of ' + date);
-            throw e;
-        }
-    }
-    return timeSpan;
-}

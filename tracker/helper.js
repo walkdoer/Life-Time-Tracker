@@ -11,10 +11,13 @@ var LogClass = require('./model/fundament/logClass'),
     Project = require('./model/fundament/Project');
 var _ = require('lodash');
 var logClassName = require('./conf/logClassName');
-var msg = require('./message');
+var Msg = require('./message');
+var Q = require('q');
+var Search = require('./search/search');
 var extend = require('node.extend');
-var timeFormat = 'YYYY-MM-DD HH:mm',
-    dateFormat = 'YYYY-MM-DD';
+var timeFormat = 'YYYY-MM-DD HH:mm';
+var Param = require('./param');
+var dateFormat = 'YYYY-MM-DD';
 var timeSplitter = ':';
 
 var tagReplaceRegexp = /[\[\]]/ig,
@@ -33,7 +36,7 @@ function getLogs(data, date) {
         var hour = getHourFromLog(logStr);
         //if has no hour Object, than this log is not valid
         if (!hour) {
-            msg.error('[' + date + '] log "' + logStr + '" is not valid');
+            Msg.error('[' + date + '] log "' + logStr + '" is not valid');
             return;
         }
         var startPeriod, endPeriod, startNextDay, endNextDay;
@@ -41,7 +44,7 @@ function getLogs(data, date) {
             endHour = hour.end,
             hourSpan = startHour - endHour;
         if (startHour > 12 && endHour < 12 && hourSpan >= 8 && hourSpan <= 18) {
-            msg.warn('[' + date + '] log "' + logStr + '" maybe is not right');
+            Msg.warn('[' + date + '] log "' + logStr + '" maybe is not right');
         }
         if (startHour >= 0 && startHour < 12) {
             startPeriod = 'am';
@@ -78,7 +81,7 @@ function getLogs(data, date) {
         });
         if (logInfo) {
             if (logInfo.len < 0) {
-                msg.error(date + '\'s ' + logStr + '\'s time length is less then 0');
+                Msg.error(date + '\'s ' + logStr + '\'s time length is less then 0');
             }
             if (logInfo.len === undefined || logInfo.len < 0) {
                 logInfo.len = 0;
@@ -106,16 +109,6 @@ function alignTime(date, time, config) {
     return newDate;
 }
 
-function getWakeTime(logData, date) {
-    var wakeTime = null;
-    var getUpLog = getLogs(logData, date).filter(function(log, index) {
-        return log.start === log.end && index === 0;
-    })[0];
-    if (getUpLog) {
-        wakeTime = getUpLog.start;
-    }
-    return wakeTime;
-}
 
 function getSimpleClasses(data) {
     var result = data.match(/\{.*?\}/g);
@@ -206,7 +199,7 @@ function getSimpleTags(data) {
             });
             tags = tags.concat(tagArr);
         } else {
-            msg.warn('no tag in this log: ' + data);
+            Msg.warn('no tag in this log: ' + data);
         }
     });
     //unique the tags array
@@ -252,7 +245,7 @@ function getTimeSpanFromLog(log, config) {
         start = timeArr[0];
         end = timeArr[1];
         if (!start) {
-            msg.error('log "' + log + '"\'s time is wrong');
+            Msg.error('log "' + log + '"\'s time is wrong');
         }
         if (start) {
             alignConfig = extend({}, config, {
@@ -283,7 +276,7 @@ function getTimeSpanFromLog(log, config) {
         }
     } else {
         //console.log(result);
-        msg.warn('make sure the time is right of ' + date + '\'s log: ' + log);
+        Msg.warn('make sure the time is right of ' + date + '\'s log: ' + log);
     }
     if (!timeSpan.start) {
         timeSpan.end = timeSpan.start;
@@ -550,7 +543,7 @@ function getNameAndAttributes(itemStr) {
         });
     }
     if (!name) {
-        msg.error('project has no name. origin:' + itemStr);
+        Msg.error('project has no name. origin:' + itemStr);
     }
     return {
         name: name,
@@ -614,7 +607,7 @@ function checkLogSequence(logs) {
             cvStart = new moment(cv.start, timeFormat);
         if (cvStart.diff(pvEnd, 'minute') < 0) {
             checkResult = false;
-            msg.warn('The sequence of "' + pv.origin + '" and "' + cv.origin + '" of  ' + pvEnd.format(dateFormat) + ' is not right.');
+            Msg.warn('The sequence of "' + pv.origin + '" and "' + cv.origin + '" of  ' + pvEnd.format(dateFormat) + ' is not right.');
         }
         return cv;
     });
@@ -726,6 +719,104 @@ function getItemFromDays(itemName, getItem, targetFilter, withoutTime) {
     };
 }
 
+function calculateSleepTime(date, sleepMoment) {
+    var timeSpan = -1;
+    /**
+    readLogFromDB().then(function (data) {
+        var logs = data.logs;
+        if (data.logs.length === 0) {
+            logs = readLogFromFile(date);
+        }
+        return logs;
+    }).then(function (logs) {
+        var wokeTime = getWakeTime(logs);
+        timeSpan = getTimeSpan(sleepMoment, wokeTime);
+        return timeSpan;
+    });*/
+
+    var logs = readLogFromFile(date);
+    if (!_.isEmpty(logs)) {
+        var wokeTime = getWakeTime(logs);
+        timeSpan = getTimeSpan(sleepMoment, wokeTime);
+    }
+    return timeSpan;
+    function readLogFromFile() {
+        var nd = nextDay(date);
+        var file;
+        try {
+            file = util.readLogFilesSync(nd);
+            return getLogs(file.data);
+        } catch (e) {
+            if (e.code === 'ENOENT') {
+                Msg.warn('Do not have enough data to calculate sleep lenth of ' + date);
+            } else {
+                Msg.error('error occur when calculate sleep time of ' + date);
+                throw e;
+            }
+        }
+    }
+
+    function readLogFromDB(date) {
+        var deferred = Q.defer();
+        var options = Param.getDateParams(date);
+        Search.query(options)
+            .then(function (queryResult) {
+                var data = adaptSearchResult(queryResult);
+                deferred.resolve(data);
+            }).catch(function (err) {
+                deferred.reject(err);
+            });
+        return deferred.promise;
+    }
+}
+
+function getWakeTime(logs) {
+    var wakeTime = null;
+    var getUpLog = logs.filter(function(log, index) {
+        return log.start === log.end && index === 0;
+    })[0];
+    if (getUpLog) {
+        wakeTime = getUpLog.start;
+    }
+    return wakeTime;
+}
+
+function adaptSearchResult(logs) {
+    var days = [];
+
+    logs.forEach(function (log) {
+        if (!log.date) {
+            Msg.error(log.origin + ' doesn\'t have logs');
+            return;
+        }
+        if (log.project) {
+            log.projects = [log.project];
+        } else {
+            log.projects = [];
+        }
+        var date = new moment(log.date).format('YYYY-MM-DD');
+        var day = getDay(date);
+        if (day) {
+            day.logs.push(log);
+        } else {
+            //create day
+            days.push({
+                date: date,
+                logs: [log]
+            });
+        }
+    });
+
+    return {
+        days: days
+    };
+
+    function getDay(date) {
+        return days.filter(function (day) {
+            return day.date === date;
+        })[0] || null;
+    }
+}
 
 exports.getLogClasses = getLogClasses;
 exports.getSimpleClasses = getSimpleClasses;
@@ -750,3 +841,5 @@ exports.extract = extractInfoFromMultipleDays;
 exports.getAllProjects = getProjectsFromDays;
 exports.getTagsFromDays = getTagsFromDays;
 exports.getLogClassesFromDays = getLogClassesFromDays;
+exports.calculateSleepTime = calculateSleepTime;
+exports.adaptSearchResult = adaptSearchResult;
