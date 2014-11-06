@@ -36,7 +36,7 @@ function getLogs(data, date) {
         var hour = getHourFromLog(logStr);
         //if has no hour Object, than this log is not valid
         if (!hour) {
-            Msg.error('[' + date + '] log "' + logStr + '" is not valid');
+            Msg.warn('[' + date + '] log "' + logStr + '" is not valid');
             return;
         }
         var startPeriod, endPeriod, startNextDay, endNextDay;
@@ -59,7 +59,7 @@ function getLogs(data, date) {
         if (endHour >= 0 && endHour < 12) {
             if (periodsArr.filter(function(p) {
                 return p === 'pm';
-            }).length > 0 || (endHour < startHour && startPeriod === 'am')) {
+            }).length > 0 || (endHour < startHour && hourSpan > 5 && startPeriod === 'am')) {
                 endNextDay = true;
             }
             endPeriod = 'am';
@@ -742,12 +742,12 @@ function calculateSleepTime(date, sleepMoment) {
         timeSpan = getTimeSpan(sleepMoment, wokeTime);
     }
     return timeSpan;
-    function readLogFromFile() {
+    function readLogFromFile(date) {
         var nd = nextDay(date);
         var file;
         try {
             file = util.readLogFilesSync(nd);
-            return getLogs(file.data);
+            return getLogs(file.data, nd);
         } catch (e) {
             if (e.code === 'ENOENT') {
                 Msg.warn('Do not have enough data to calculate sleep lenth of ' + date);
