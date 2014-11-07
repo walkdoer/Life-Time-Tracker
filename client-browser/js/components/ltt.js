@@ -10,33 +10,45 @@ var React = require('react');
 var Header = require('./Ltt.Header');
 var Nav = require('./Ltt.Nav');
 var $ = require('jquery');
+var PageManager = require('./Ltt.PageManager');
 
 
 var NAV_OPEN = 'ltt__navOpen';
 var Ltt = React.createClass({
 
+    getInitialState: function () {
+        return {
+            page: 'dashboard'
+        };
+    },
+
     render: function () {
-        var that = this;
         return (
             <div className="ltt">
-                <Nav />
+                <Nav
+                    onMenuClick={this.renderContent}
+                />
                 <div className="ltt_c-main">
-                    <Header openNav={function (isOpen) {
-                        if (isOpen) {
-                            that.openNav();
-                        } else {
-                            that.closeNav();
-                        }
-                    }}/>
+                    <Header
+                        onConfigBtnClick={this.toggleNav}
+                    />
+                    <PageManager page={this.state.page}/>
                 </div>
             </div>
         );
     },
-    openNav: function () {
-        $(this.getDOMNode()).addClass(NAV_OPEN);
+    toggleNav: function (isOpen) {
+        var $el = $(this.getDOMNode());
+        if (isOpen) {
+            $el.addClass(NAV_OPEN);
+        } else {
+            $el.removeClass(NAV_OPEN);
+        }
     },
-    closeNav: function () {
-        $(this.getDOMNode()).removeClass(NAV_OPEN);
+    renderContent: function(menu) {
+        this.setState({
+            page: menu.key
+        });
     }
 });
 

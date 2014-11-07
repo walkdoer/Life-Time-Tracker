@@ -32,9 +32,17 @@ var Sidebar = React.createClass({
         return (
             <nav className="ltt_c-nav">
                 <Logo />
-                <Menu items={items} active="dashboard"/>
+                <Menu
+                    items={items}
+                    active="dashboard"
+                    onMenuClick={this.onMenuClick}
+                />
             </nav>
         );
+    },
+
+    onMenuClick: function (menuItem) {
+        this.props.onMenuClick(menuItem);
     }
 
 });

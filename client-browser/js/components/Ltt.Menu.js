@@ -18,7 +18,7 @@ var Menu = React.createClass({
         var menu = this;
         menuItems = menuItems.map(function (item, i) {
             var active = item.key === currentMenuItem;
-            var boundClick = this.handleClick.bind(this, item.key);
+            var boundClick = this.handleClick.bind(this, item);
             return (<MenuItem
                 active={active}
                 text={item.text}
@@ -33,10 +33,11 @@ var Menu = React.createClass({
         );
     },
 
-    handleClick: function (menuKey) {
+    handleClick: function (menuItem) {
         this.setState({
-            currentMenuItem: menuKey
+            currentMenuItem: menuItem.key
         });
+        this.props.onMenuClick(menuItem);
     }
 
 });
