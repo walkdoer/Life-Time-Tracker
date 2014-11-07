@@ -3,8 +3,11 @@ var pagePrefix = '../pages/';
 
 var Pages = {
     Dashboard: require('../pages/Dashboard'),
-    Logs: require('../pages/Logs')
+    Logs: require('../pages/Logs'),
+    Page404: require('../pages/Page404')
 };
+
+var PAGE_404 = 'Page404';
 var _pageCache_ = {};
 
 var PageManager = React.createClass({
@@ -25,7 +28,9 @@ var PageManager = React.createClass({
         var page = this.getPage();
         if (page === null) {
             var pageName = current.toUpperCase().slice(0,1) + current.slice(1);
-            var Page = Pages[pageName];
+            //can't find page then show 404
+            var Page = Pages[pageName] || Pages[PAGE_404];
+            current = PAGE_404;
             page = (<Page key={current}/>);
             this.setPage(page);
         }
