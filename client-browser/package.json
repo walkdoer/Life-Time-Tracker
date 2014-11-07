@@ -24,7 +24,8 @@
     "express": "~4.10.1",
     "express3-handlebars": "~0.5.2",
     "morgan": "~1.4.1",
-    "lodash": "~2.4.1"
+    "lodash": "~2.4.1",
+    "q": "~1.0.1"
   },
   "browser": {
     "d3": "./bower_components/d3/d3.min.js",
