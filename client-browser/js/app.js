@@ -16,6 +16,9 @@ console.log('teest');
 
 var Ltt = require('./components/Ltt');
 React.render(
-  <Ltt />,
-  document.getElementById('app-container')
+    <Ltt
+        initialPage="dashboard"
+        openNav={true}
+    />,
+    document.getElementById('app-container')
 );

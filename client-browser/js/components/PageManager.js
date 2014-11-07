@@ -23,6 +23,7 @@ var PageManager = React.createClass({
         });
     },
 
+
     render: function () {
         var current = this.state.current;
         var page = this.getPage();

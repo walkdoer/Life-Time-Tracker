@@ -3,8 +3,8 @@
  */
 
 var React = require('react');
-var Menu = require('./Ltt.Menu');
-var Logo = require('./Ltt.Logo');
+var Menu = require('./Menu');
+var Logo = require('./Logo');
 
 var Sidebar = React.createClass({
 
@@ -34,7 +34,7 @@ var Sidebar = React.createClass({
                 <Logo />
                 <Menu
                     items={items}
-                    active="dashboard"
+                    active={this.props.initialMenuItem}
                     onMenuClick={this.onMenuClick}
                 />
             </nav>

@@ -3,7 +3,7 @@
  */
 
 var React = require('react');
-var MenuItem = require('./Ltt.Menu.Item');
+var MenuItem = require('./Menu.Item');
 var Menu = React.createClass({
 
     getInitialState: function () {

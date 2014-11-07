@@ -20,8 +20,7 @@ var Header = React.createClass({
         );
     },
     handleConfigBtnClick: function () {
-        this.open = !this.open;
-        this.props.onConfigBtnClick(this.open);
+        this.props.onConfigBtnClick();
     }
 
 });

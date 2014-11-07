@@ -24,6 +24,7 @@ var MenuItem = React.createClass({
         );
     },
 
+
     handleClick: function (menuItem) {
         this.props.onClick(menuItem);
     }
