@@ -19,6 +19,7 @@
     flex:1;
     -webkit-transition: -webkit-transform 150ms cubic-bezier(.2, .3, .25, .9);
     transition: transform 150ms cubic-bezier(.2, .3, .25, .9);
+    overflow: scroll;
 }
 
 /** header **/

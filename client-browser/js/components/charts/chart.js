@@ -4,6 +4,17 @@ var $ = require('jquery');
 window.$ = window.jQuery = $;
 var Highcharts = require('highcharts-browserify');
 
+//在这里添加highchart的全局设置
+Highcharts.setOptions({
+    global: {
+        useUTC: false
+    },
+    plotOptions: {
+        series: {
+            // animation: false
+        }
+    }
+});
 // Make monochrome colors and set them as default for all pies
 /*Highcharts.getOptions().plotOptions.pie.colors = (function () {
     var colors = [],
@@ -23,6 +34,21 @@ exports.timeline = function(options) {
     var highchartsOptions = {
         title: {
             text: options.title
+        },
+        plotOptions: {
+            series: {
+                marker: {
+                    enabled: true,
+                    symbol: 'circle',
+                    radius: 2,
+                    // if you want to remove hover efect, add the following lines
+                    states: {
+                        hover: {
+                            radius: 3
+                        }
+                    }
+                }
+            }
         },
         xAxis: {
             type: 'datetime',

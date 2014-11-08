@@ -5,6 +5,7 @@ exports.dispose = function (rawData) {
         data: []
     };
     var sleepLine = {
+        type: 'spline',
         name: 'sleep',
         data: []
     };

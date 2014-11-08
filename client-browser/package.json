@@ -40,8 +40,7 @@
     "jquery": "$",
     "highcharts": {
       "depends": [
-        "highchartsAdapter:highchartsAdapter",
-        "jquery:$"
+        "highchartsAdapter:highchartsAdapter"
       ],
       "exports": "highcharts"
     },
