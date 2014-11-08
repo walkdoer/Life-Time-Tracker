@@ -25,18 +25,29 @@
     "express3-handlebars": "~0.5.2",
     "morgan": "~1.4.1",
     "lodash": "~2.4.1",
-    "q": "~1.0.1"
+    "q": "~1.0.1",
+    "highcharts-browserify": "~0.1.1-4.0.3"
   },
   "browser": {
     "d3": "./bower_components/d3/d3.min.js",
     "jquery": "./bower_components/jquery/dist/jquery.min.js",
     "nvd3": "./bower_components/nvd3/nv.d3.min.js",
-    "highcharts": "./bower_components/highcharts/highcharts.js",
+    "highcharts": "./bower_components/highcharts/highcharts.src.js",
+    "highchartsAdapter": "./bower_components/highcharts/adapters/standalone-framework.src.js",
     "bootstrap": "./bower_components/bootstrap/dist/js/bootstrap.js"
   },
   "browserify-shim": {
     "jquery": "$",
-    "highcharts": "highcharts",
+    "highcharts": {
+      "depends": [
+        "highchartsAdapter:highchartsAdapter",
+        "jquery:$"
+      ],
+      "exports": "highcharts"
+    },
+    "highchartsAdapter": {
+      "exports": "highchartsAdapter"
+    },
     "d3": {
       "exports": "d3",
       "depends": [

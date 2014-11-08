@@ -7,9 +7,7 @@ var Logo = React.createClass({
 
     render: function () {
         return (
-            <div className="ltt_c-logo">
-                <i className="fa fa-angellist fa-5x"></i>
-            </div>
+            <div className="ltt_c-logo"> </div>
         );
     }
 });

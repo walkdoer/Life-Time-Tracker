@@ -1,6 +1,8 @@
 'use strict';
 var _ = require('lodash');
-var Highcharts = require('highcharts');
+var $ = require('jquery');
+window.$ = window.jQuery = $;
+var Highcharts = require('highcharts-browserify');
 
 // Make monochrome colors and set them as default for all pies
 /*Highcharts.getOptions().plotOptions.pie.colors = (function () {

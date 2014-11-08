@@ -8,7 +8,8 @@
 .ltt_c-nav{
     width:220px;
     display: none;
-    background-color: #0E324B;
+    background-color: #383d40;
+    color: #e3e4e6;
 }
 .ltt__navOpen .ltt_c-nav{
     display: block;
@@ -16,7 +17,6 @@
 /** main **/
 .ltt_c-main {
     flex:1;
-    background: #fff;
     -webkit-transition: -webkit-transform 150ms cubic-bezier(.2, .3, .25, .9);
     transition: transform 150ms cubic-bezier(.2, .3, .25, .9);
 }
@@ -24,7 +24,7 @@
 /** header **/
 .ltt_c-header{
     height: 50px;
-    background: #f3f3f4;
+    background: linear-gradient(to bottom, #E1E1E1 0%, #D7D7D7 100%);
 }
 .ltt_c-header .btn{
     margin-top: 8px;
@@ -60,17 +60,23 @@
     display: flex;
     padding: 10px 0 10px 0;
     cursor:pointer;
+    border-left: 3px solid transparent;
 }
 
 .ltt_c-menu-item.active{
-    background: #328AB4;
+    background: #2c3031;
+    border-color: #73CEDA;
+}
+.ltt_c-menu-item.active .fa{
+    color: #72c0ca;
 }
 
-.ltt_c-menu-item i{
+.ltt_c-menu-item .fa{
     font-size: 1.4rem;
     margin-right: 10px;
     margin-left: 10px;
     width: 30px;
+    color: #D1E9F0;
 }
 .ltt_c-menu-item a{
     flex: 1;
@@ -84,4 +90,14 @@
     color: #FFDA6B;
     text-align: center;
     padding: 30px 0;
+    background-image: url(../images/youth.jpg);
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 200px;
+}
+
+
+.ltt_c-pageManager{
+    padding: 20px;
 }
