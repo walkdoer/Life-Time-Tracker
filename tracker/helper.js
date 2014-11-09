@@ -27,11 +27,20 @@ var tagReplaceRegexp = /[\[\]]/ig,
 
 function getLogs(data, date) {
     var logStrArr = data.split('\n').filter(isEmpty);
-    var lastIndex = logStrArr.length - 1;
     var logs = [];
     var periodsArr = [];
     var prevEndHour = null;
     var prevEndNextDay = false;
+    logStrArr = logStrArr.filter(function(logStr) {
+        var hour = getHourFromLog(logStr);
+        //if has no hour Object, than this log is not valid
+        if (!hour) {
+            Msg.warn('[' + date + '] log "' + logStr + '" is not valid');
+            return false;
+        }
+        return true;
+    });
+    var lastIndex = logStrArr.length - 1;
     logStrArr.forEach(function(logStr, index) {
         var hour = getHourFromLog(logStr);
         //if has no hour Object, than this log is not valid
