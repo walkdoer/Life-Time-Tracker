@@ -29,11 +29,12 @@ exports.focus = function (options, scanResult) {
     //last index of the logs
     var lastIndex = logs.length - 1;
     logs.forEach(function(log, index) {
-        if (isGetUpLog(log, index)) {
+        var signs = log.signs;
+        if (signs.indexOf('wake') >= 0) {
             wakeMoment = log.start;
-        } else if (isSleepTime(log, index, lastIndex)){
+        } else if (signs.indexOf('sleep') >= 0){
             sleepMoment = log.start;
-        } else if (log.sign.indexOf('off') >= 0) {
+        } else if (signs.indexOf('off') >= 0) {
             statResult.offDutyMoment = log.start;
         }
         if (log.len !== undefined) {
@@ -43,17 +44,6 @@ exports.focus = function (options, scanResult) {
             lastMoment = log.end;
         }
     });
-    function isGetUpLog(log, index) {
-        var startTS = new Date(log.start).getTime(),
-            endTS = new Date(log.end).getTime();
-        return endTS === startTS && index === 0;
-    }
-
-    function isSleepTime(log, index, lastIndex) {
-        var startTS = new Date(log.start).getTime(),
-            endTS = new Date(log.end).getTime();
-        return endTS === startTS && index === lastIndex;
-    }
 
     //calculate the activeTime and unTrackedTime
     var activeTime = 0, unTrackedTime;

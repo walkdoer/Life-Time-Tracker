@@ -27,7 +27,7 @@ var Logs = React.createClass({
         }).datepicker('setDate', today);
     },
     render: function () {
-        var logs = this.state.logs.map(function (log) {
+        var logs = this.state.logs.map(function (log, index) {
             return Log(log);
         });
         return (

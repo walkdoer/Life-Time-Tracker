@@ -86,6 +86,11 @@ function getLogs(data, date) {
             if (logInfo.len === undefined || logInfo.len < 0) {
                 logInfo.len = 0;
             }
+            if (isWakeLog(logInfo, index)) {
+                logInfo.signs.push('wake');
+            } else if (isSleepLog(logInfo, index, lastIndex)) {
+                logInfo.signs.push('sleep');
+            }
             logs.push(logInfo);
         }
         prevEndHour = endHour;
@@ -327,7 +332,7 @@ function getLogInfo(config) {
             projects: getProjects(log),
             task: getTask(log),
             subTask: getSubTask(log),
-            sign: getSigns(log),
+            signs: getSigns(log),
             index: config.index,
             origin: log
         };
@@ -819,7 +824,21 @@ function adaptSearchResult(logs) {
         })[0] || null;
     }
 }
+function isWakeLog(log, index) {
+    var startTS = new Date(log.start).getTime(),
+        endTS = new Date(log.end).getTime();
+    return endTS === startTS && index === 0;
+}
 
+function isSleepLog(log, index, lastIndex) {
+    var startTS = new Date(log.start).getTime(),
+        endTS = new Date(log.end).getTime();
+    return endTS === startTS && index === lastIndex;
+}
+
+
+exports.isWakeLog = isWakeLog;
+exports.isSleepLog = isSleepLog;
 exports.getLogClasses = getLogClasses;
 exports.getSimpleClasses = getSimpleClasses;
 exports.getTags = getTags;

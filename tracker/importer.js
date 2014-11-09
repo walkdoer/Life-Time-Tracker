@@ -174,7 +174,7 @@ function toLogModel(date, log, refer) {
         return new Log(_.extend({
             date: date,
             start: log.start,
-            sign: log.sign,
+            signs: log.signs,
             len: log.len,
             classes: log.classes,
             end: log.end,

@@ -2,7 +2,26 @@
     background:#FFF;
     margin: 10px auto;
     border-radius: 5px;
+    padding: 10px 0;
     border-left: 8px solid #FFFFFF;
+}
+
+.ltt_c-log__wake{
+    background: #4EC627;
+    border-color: #4EC627;
+}
+.ltt_c-log__sleep .ltt_c-log-date,
+.ltt_c-log__wake .ltt_c-log-date{
+    color:#fff;
+}
+.ltt_c-log__sleep .ltt_c-log-time{
+    background: #0007F9;
+    color: #fff;
+}
+
+.ltt_c-log__sleep{
+    background: #00048F;
+    border-color: #00048F;
 }
 
 .ltt_c-log__WK {
@@ -23,6 +42,7 @@
 
 .ltt_c-log__NT {
     border-color: #ccc;
+    padding: 10px 0;
 }
 
 .ltt_c-log__BRK {
@@ -38,6 +58,8 @@
 
 .ltt_c-log-origin {
     color:#ccc
+;
+    padding-left: 10px;
 }
 .ltt_c-log-time {
     display: inline-block;

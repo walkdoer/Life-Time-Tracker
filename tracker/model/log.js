@@ -19,7 +19,7 @@ var Log = Schema({
     project: {type: ObjectId, ref: 'Project'},
     //project refer
     task: {type: ObjectId, ref: 'Task'},
-    sign: Array,
+    signs: Array,
     //原始日志
     origin: String,
     len: Number

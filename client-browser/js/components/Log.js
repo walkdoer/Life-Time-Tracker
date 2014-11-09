@@ -2,7 +2,7 @@ var React = require('react');
 var R = React.DOM;
 var Moment = require('moment');
 var _ = require('lodash');
-
+var Tag = require('./Tag');
 var Time = React.createClass({
     displayName: 'time',
 
@@ -22,7 +22,7 @@ var Time = React.createClass({
 
 var Origin = React.createClass({
     render: function () {
-        return R.i({className: 'ltt_c-log-origin'}, this.props.value);
+        return (<p className='ltt_c-log-origin'>{this.props.value}</p>);
     }
 });
 
@@ -51,14 +51,33 @@ var Log = React.createClass({
 
         var baseClassName = 'ltt_c-log',
             classCode = getLogClassCode(this.props.classes),
-            className = [baseClassName, inheritClassName(baseClassName, classCode)].join(' ');
-        return R.div(
-            { className: className, style: getLogInlineStyle(this.props)},
-            Time({ value: this.props.start, type: 'date'}),
-            Time({ value: this.props.start, type: 'time'}),
-            Time({ value: this.props.end, type: 'time'}),
-            LogClass({value: this.props.classes}),
-            Origin({value: this.props.origin})
+            signs = this.props.signs;
+        var className = baseClassName;
+        if (classCode) {
+            className += ' ' + inheritClassName(baseClassName, classCode);
+        }
+        if (signs.indexOf('wake') >=0 ) {
+            className += ' ' + inheritClassName(baseClassName, 'wake');
+        }
+        if (signs.indexOf('sleep') >= 0) {
+            className += ' ' + inheritClassName(baseClassName, 'sleep');
+        }
+        var tags = this.props.tags;
+        if (!_.isEmpty(tags)) {
+            tags = tags.map(function (tag) {
+                return (<Tag>{tag}</Tag>);
+            });
+        }
+        return (
+            <div className={className}  style={getLogInlineStyle(this.props)}>
+                <Time value={this.props.start} type='date'/>
+                <Time value={this.props.start} type='time'/>
+                <Time value={this.props.end} type='time'/>
+                <span className="ltt_log-len">{getTimeLength(this.props.len)}</span>
+                <LogClass value={this.props.classes}/>
+                {tags}
+                <Origin value={this.props.origin}/>
+            </div>
         );
 
         function inheritClassName (base, prop) {
@@ -67,9 +86,16 @@ var Log = React.createClass({
 
         function getLogClassCode(classes) {
             if (!_.isEmpty(classes)) {
-                return classes[0].code
+                return classes[0].code;
             } else {
                 return '';
+            }
+        }
+        function getTimeLength(val) {
+            if (val < 60) {
+                return val + ' minutes';
+            } else {
+                return (val / 60).toFixed(1) + ' hours';
             }
         }
     }
