@@ -356,13 +356,13 @@ function getLogContent(logStr) {
         projectReplaceRegexp = /<.*?>/g,
         subTaskReplaceRegexp = /#.*?#/g,
         logClassReplaceRegexp = /\{.*?\}/g;
-    return logStr.replace(tagReplaceRegexp, '')
+    var tmp = logStr.replace(tagReplaceRegexp, '')
         .replace(timeSpanRegexp, '')
         .replace(projectReplaceRegexp, '')
         .replace(subTaskReplaceRegexp, '')
-        .replace(logClassReplaceRegexp, '')
-        .replace(/(?!@).\((.*?)\)/g, '')
-        .trim();
+        .replace(logClassReplaceRegexp, '');
+    tmp = ' ' + tmp;
+    return tmp.replace(/(?!@).\((.*?)\)/g, '').trim();
 }
 
 function getTimeSpan(start, end) {
