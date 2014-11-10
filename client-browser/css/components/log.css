@@ -108,3 +108,16 @@
     font-size: 0.8rem;
     color: #CEF4EC;
 }
+
+.ltt_c-log-task{
+    display: inline-block;
+    padding: 2px 8px;
+    color: #FFF;
+    background: #23c6c8;
+    margin: auto 2px;
+    border-radius: 10px;
+}
+.ltt_c-log-task .fa{
+    margin-right: 2px;
+    font-size: 0.8rem;
+}

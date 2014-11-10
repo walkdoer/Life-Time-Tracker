@@ -83,6 +83,12 @@ var Log = React.createClass({
                 </span>
             );
         }
+        var task = this.props.task;
+        if (task) {
+            task = (
+                <span className="ltt_c-log-task"><i className="fa fa-tasks"></i>{task.name}</span>
+            );
+        }
         return (
             <div className={className}  style={getLogInlineStyle(this.props)}>
                 <Time value={this.props.start} type='date'/>
@@ -91,6 +97,7 @@ var Log = React.createClass({
                 <span className="ltt_c-log-len">{getTimeLength(this.props.len)}</span>
                 <LogClass value={this.props.classes}/>
                 {project}
+                {task}
                 {tags}
                 <Origin value={this.props.content}/>
             </div>
