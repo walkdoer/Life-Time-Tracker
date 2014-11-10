@@ -121,7 +121,7 @@ function importLog(date, log) {
                         Msg.error('Save Log failed!', err);
                     } else {
                         importedLogCount++;
-                        Msg.success('Import Log Success' + JSON.stringify(log.toJSON()));
+                        Msg.success('Import Log Success' + log.origin);
                         deferred.resolve();
                     }
                     if (importedLogCount === waitToImportedLogCount) {
@@ -191,7 +191,11 @@ function importTask(taskObj, projectId) {
     if (!taskObj) {
         deferred.resolve(null);
     } else {
-        Task.findOne({name: taskObj.name}, function (err, task) {
+        var condition = {name: taskObj.name};
+        if (projectId) {
+            condition.projectId = projectId;
+        }
+        Task.findOne(condition, function (err, task) {
             //if task already exist
             if (task) {
                 Msg.debug('Task ' + taskObj.name + ' exist ' + task.id);
