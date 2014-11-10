@@ -21,9 +21,7 @@ var dateFormat = 'YYYY-MM-DD';
 var timeSplitter = ':';
 
 var tagReplaceRegexp = /[\[\]]/ig,
-    projectReplaceRegexp = /[<>]/g,
-    timeSpanRegexp = /\d{1,2}\s*[:]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:]\s*\d{1,2})*/ig,
-    logClassReplaceRegexp = /[\{\}]/g;
+    timeSpanRegexp = /\d{1,2}\s*[:]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:]\s*\d{1,2})*/ig;
 
 function getLogs(data, date) {
     var logStrArr = data.split('\n').filter(isEmpty);
@@ -356,11 +354,15 @@ function getLogInfo(config) {
 function getLogContent(logStr) {
     var tagReplaceRegexp = /\[.*?\](?!\()/ig,
         projectReplaceRegexp = /<.*?>/g,
+        subTaskReplaceRegexp = /#.*?#/g,
         logClassReplaceRegexp = /\{.*?\}/g;
     return logStr.replace(tagReplaceRegexp, '')
         .replace(timeSpanRegexp, '')
         .replace(projectReplaceRegexp, '')
-        .replace(logClassReplaceRegexp, '').trim();
+        .replace(subTaskReplaceRegexp, '')
+        .replace(logClassReplaceRegexp, '')
+        .replace(/(?!@).\((.*?)\)/g, '')
+        .trim();
 }
 
 function getTimeSpan(start, end) {
