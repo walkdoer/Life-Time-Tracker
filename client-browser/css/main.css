@@ -311,6 +311,9 @@ button {
     outline: none !important;
 }
 
+a:hover{
+    text-decoration: none;
+}
 
 #app-container {
     height: 100%;

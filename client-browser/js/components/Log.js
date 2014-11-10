@@ -68,13 +68,29 @@ var Log = React.createClass({
                 return (<Tag>{tag}</Tag>);
             });
         }
+        var project = this.props.project;
+        if (project) {
+            if (project.version) {
+                var version = (<span className="ltt_c-log-project-version">{project.version}</span>);
+            }
+            project = (
+                <span className="ltt_c-log-project">
+                    <a href="#">
+                        <i className="fa fa-rocket"></i>
+                        <span className="ltt_c-log-project-name">{project.name}</span>
+                        {version}
+                    </a>
+                </span>
+            );
+        }
         return (
             <div className={className}  style={getLogInlineStyle(this.props)}>
                 <Time value={this.props.start} type='date'/>
                 <Time value={this.props.start} type='time'/>
                 <Time value={this.props.end} type='time'/>
-                <span className="ltt_log-len">{getTimeLength(this.props.len)}</span>
+                <span className="ltt_c-log-len">{getTimeLength(this.props.len)}</span>
                 <LogClass value={this.props.classes}/>
+                {project}
                 {tags}
                 <Origin value={this.props.content}/>
             </div>

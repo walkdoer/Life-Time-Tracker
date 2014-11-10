@@ -83,3 +83,28 @@
     margin: 4px;
     display: inline-block;
 }
+
+
+.ltt_c-log-project{
+    display: inline-block;
+    padding: 2px 8px;
+    color: #FFF;
+    background: #1AB393;
+    margin: auto 2px;
+    border-radius: 10px;
+}
+.ltt_c-log-project-name{
+    margin-right: 2px;
+}
+.ltt_c-log-project-version{
+    color: #FEFEFE;
+}
+
+.ltt_c-log-project a{
+    color:#fff;
+}
+.ltt_c-log-project .fa{
+    margin-right: 4px;
+    font-size: 0.8rem;
+    color: #CEF4EC;
+}
