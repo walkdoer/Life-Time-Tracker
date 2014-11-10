@@ -9,11 +9,9 @@ var Q = require('q');
 var Log = require('./model/log');
 var Project = require('./model/project');
 var Task = require('./model/task');
-var Moment = require('moment');
 var syncNoteSig = require('./globalSignals').syncNote;
 var Msg = require('./message');
 var _ = require('lodash');
-var helper = require('./helper');
 
 //import note to database after sync success;
 syncNoteSig.add(function (files) {
@@ -36,19 +34,7 @@ function importFromLogFile(options) {
     scanner.scan(options)
         .then(function (scanResult) {
             var days = scanResult.days || [scanResult];
-            switch (options.type) {
-                case 'projects':
-                    importProjects(helper.getAllProjects(days));
-                    break;
-                case 'logs':
-                    importLogs(days);
-                    break;
-                default:
-                    importProjects(helper.getAllProjects(days))
-                        .then(function () {
-                            importLogs(days);
-                        });
-            }
+            importLogs(days);
         }).then(function () {
             Msg.success('logs have been imported into database successfully.');
         }).catch(function (err) {
@@ -95,6 +81,7 @@ function importDay(day) {
         }
         totalNumberRemoved += numberRemoved;
     });
+    //insert sequence, make sure that task will not repeat
     logs.reduce(function(promise, log) {
         return promise.then(importLog.bind(null, date, log));
     }, Q(1)).then(function () {
@@ -104,115 +91,80 @@ function importDay(day) {
     return deferred.promise;
 }
 
+
 function importLog(date, log) {
     var deferred = Q.defer();
-    //import task;
-    importTask(log.task).then(function (taskId) {
-        //if have subTask, then save the subtask with parent task Id
-        if (log.subTask) {
-            log.subTask.parent = taskId;
-            importTask(log.subTask).then(saveLog);
-        } else {
-            saveLog(taskId);
-        }
-
-        function saveLog(taskId) {
-            //transform to LogModel and then save
-            //async is because need to get the project's _id as referrence
-            toLogModel(date, log, {task: taskId})
-                .then(function (logModel) {
-                    logModel.save(function(err, log) {
-                        if (err) {
-                            Msg.error('Save Log failed!', err);
-                        } else {
-                            importedLogCount++;
-                            Msg.success('Import Log Success' + JSON.stringify(log.toJSON()));
-                            deferred.resolve();
-                        }
-                        if (importedLogCount === waitToImportedLogCount) {
-                            Msg.success('Import Logs finished, count:' + importedLogCount);
-                        }
+    //importProject
+    importProject(log.projects[0]).then(function (projectId) {
+        //import task;
+        importTask(log.task, projectId).then(function (taskId) {
+            //if have subTask, then save the subtask with parent task Id
+            if (log.subTask) {
+                log.subTask.parent = taskId;
+                importTask(log.subTask, projectId).then(function (taskId) {
+                    saveLog({
+                        project: projectId,
+                        task: taskId
                     });
-                }).catch(function (err) {
-                    var msg = 'persisting Log Object' + log.origin;
-                    if (!err) {
-                        msg += ' project is not exist';
-                    }
-                    Msg.error(msg, err);
                 });
-        }
+            } else {
+                saveLog({
+                    project: projectId,
+                    task: taskId
+                });
+            }
+
+            function saveLog(refer) {
+                var logModel = new Log(_.extend({date: date}, log, refer));
+                logModel.save(function(err, log) {
+                    if (err) {
+                        Msg.error('Save Log failed!', err);
+                    } else {
+                        importedLogCount++;
+                        Msg.success('Import Log Success' + JSON.stringify(log.toJSON()));
+                        deferred.resolve();
+                    }
+                    if (importedLogCount === waitToImportedLogCount) {
+                        Msg.success('Import Logs finished, count:' + importedLogCount);
+                    }
+                });
+            }
+        }).catch(function (err) {
+            Msg.error('import task of log failed!', err);
+        });
     }).catch(function (err) {
-        Msg.error('import task of log failed!', err);
+        Msg.error('import project fail', err);
     });
     return deferred.promise;
 }
-/**
- * transform log to LogModel
- * @param  {String} date
- * @param  {Object} log
- * @return {Log}
- */
-function toLogModel(date, log, refer) {
+
+function importProject(project) {
     var deferred = Q.defer();
-    date = new Moment(date).format('YYYY-MM-DD');
-    var projects = log.projects;
-    var queryCondition;
-    if (!_.isEmpty(projects)) {
-        queryCondition = getProjectQueryCondition(projects[0]);
-        Project.findOne(queryCondition, function (err, project) {
-                if (err || !project) {
-                    deferred.reject(err);
-                    return;
-                }
-                deferred.resolve(createLog(_.extend(refer, {project: project.id})));
-            });
-    } else {
-        deferred.resolve(createLog(refer));
+    if (!project) {
+        deferred.resolve(null);
+        return deferred.promise;
     }
-
-    function createLog(extendOptions) {
-        return new Log(_.extend({
-            date: date,
-        }, log, extendOptions));
-    }
-    return deferred.promise;
-}
-
-/**
- * import project to database
- *
- * @param  {Array[Project]} projects
- */
-function importProjects(projects) {
-    var promises = projects.map(function (project) {
-        return saveProject(project);
-    });
-    return Q.allSettled(promises);
-}
-
-
-function saveProject(project) {
-    var deferred = Q.defer();
-    var queryCondition = getProjectQueryCondition(project, true);
+    var queryCondition = getProjectQueryCondition(project);
     //check the existence of project
-    Project.count(queryCondition, function (err, count) {
+    Project.findOne(queryCondition, function (err, result) {
         if (err) {
             throw err;
         }
-        if (count === 0) {
+        if (!result) {
             var projectModel = new Project(project);
             //save to database
-            projectModel.save(function (err) {
+            projectModel.save(function (err, result) {
                 if (err) {
                     Msg.error('Project' + ' save failed!' + JSON.stringify(project), err);
                     deferred.reject(err);
                     return;
                 }
-                deferred.resolve();
+                Msg.success('Project ' + project.name + ' save success!');
+                deferred.resolve(result.id);
             });
         } else {
             Msg.debug('Project ' + project.name + ' exists');
-            deferred.resolve();
+            deferred.resolve(result.id);
         }
     });
     return deferred.promise;
@@ -231,7 +183,10 @@ function getProjectQueryCondition(project, exceptVersion) {
     return queryCondition;
 }
 
-function importTask(taskObj) {
+
+
+
+function importTask(taskObj, projectId) {
     var deferred = Q.defer();
     if (!taskObj) {
         deferred.resolve(null);
@@ -242,6 +197,7 @@ function importTask(taskObj) {
                 Msg.debug('Task ' + taskObj.name + ' exist ' + task.id);
                 deferred.resolve(task.id);
             } else {
+                taskObj.projectId = projectId;
                 var taskModel = new Task(taskObj);
                 taskModel.save(function (err, result) {
                     if (err) {
