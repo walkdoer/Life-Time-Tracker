@@ -34,14 +34,16 @@ var LoadIndicator= React.createClass({
         });
     },
     render: function() {
-        return R.div({
-            className: 'ltt_c-loadIndicator',
-            style: {
-                textAlign: 'center',
-                height: this.props.height || defaultHeight,
-                width: this.props.width || defaultWidth
-            }
-        }, this.state.msg);
+        return (
+            <div className='ltt_c-loadIndicator'
+                style={{
+                    textAlign: 'center',
+                    height: this.props.height || defaultHeight,
+                    width: this.props.width || defaultWidth
+                }}>
+                <i className="fa fa-spinner fa-spin"></i>
+                {this.state.msg}
+            </div>);
     },
     done: function () {
         this.setState({

@@ -173,14 +173,7 @@ function toLogModel(date, log, refer) {
     function createLog(extendOptions) {
         return new Log(_.extend({
             date: date,
-            start: log.start,
-            signs: log.signs,
-            len: log.len,
-            classes: log.classes,
-            end: log.end,
-            tags: log.tags,
-            origin: log.origin
-        }, extendOptions));
+        }, log, extendOptions));
     }
     return deferred.promise;
 }

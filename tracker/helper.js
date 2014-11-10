@@ -145,7 +145,7 @@ function getSimpleClasses(data) {
 }
 
 function getLogClasses(data, unique) {
-    var result = getItem(data, /\{.*?\}/g, logClassReplaceRegexp, LogClass,
+    var result = getItem(data, /\{(.*?)\}/g, LogClass,
         null, /*no processor*/
         function(value) {
             var name = logClassName[value];
@@ -494,7 +494,7 @@ function groupTimeBy(logs, condition, process, filter) {
  * @return {Array[Project]}
  */
 function getProjects(log) {
-    return getItem(log, /<.*?>/g, projectReplaceRegexp, Project, function(projStr) {
+    return getItem(log, /<(.*?)>/g, Project, function(projStr) {
         return getNameAndAttributes(projStr);
     }, function(value) {
         var proj = new Project(value.name, value.attributes);
@@ -509,7 +509,7 @@ function getProjects(log) {
  * @return {Array[Task]} 
  */
 function getTask(log) {
-    var items = getItem(log, /\(.*?\)/g, /[()]/g, Task, function(taskStr) {
+    var items = getItem(log, /(?!@).\((.*?)\)/g, Task, function(taskStr) {
         return getNameAndAttributes(taskStr);
     }, function(value) {
         var task = new Task(value.name, value.attributes);
@@ -520,7 +520,7 @@ function getTask(log) {
 
 
 function getSubTask(log) {
-    var items = getItem(log, /#.*?#/g, /#/g, Task, function(taskStr) {
+    var items = getItem(log, /#(.*?)#/g, Task, function(taskStr) {
         return getNameAndAttributes(taskStr);
     }, function(value) {
         var task = new Task(value.name, value.attributes);
@@ -567,23 +567,23 @@ function getNameAndAttributes(itemStr) {
 }
 
 function getSimpleProjects(log) {
-    return getItem(log, /<.*?>/g, /[<>]/g, String);
+    return getItem(log, /<(.*?)>/g, String);
 }
 
 
-function getItem(data, regexp, replace, type, processor, creator) {
+function getItem(data, regexp, type, processor, creator) {
 
-    var result = data.match(regexp);
+    var result = regexp.exec(data);
+    var items = [];
     if (!result) {
-        return [];
+        return items;
     }
-    result = result.map(function(itemStr) {
-        var str = itemStr.trim().replace(replace, '').trim();
-        if (typeof processor === 'function') {
-            return processor(str);
-        }
-        return str;
-    });
+    var target = result[1];
+    target = target.trim();
+    if (typeof processor === 'function') {
+        target = processor(target);
+    }
+    result = [target];
     if (type === String) {
         result = result.filter(onlyUnique);
     } else {

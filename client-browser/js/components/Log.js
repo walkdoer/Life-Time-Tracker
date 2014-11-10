@@ -76,7 +76,7 @@ var Log = React.createClass({
                 <span className="ltt_log-len">{getTimeLength(this.props.len)}</span>
                 <LogClass value={this.props.classes}/>
                 {tags}
-                <Origin value={this.props.origin}/>
+                <Origin value={this.props.content}/>
             </div>
         );
 
