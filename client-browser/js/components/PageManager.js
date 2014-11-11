@@ -4,7 +4,8 @@ var pagePrefix = '../pages/';
 var Pages = {
     Dashboard: require('../pages/Dashboard'),
     Logs: require('../pages/Logs'),
-    Page404: require('../pages/Page404')
+    Page404: require('../pages/Page404'),
+    Reports: require('../pages/Reports')
 };
 
 var PAGE_404 = 'Page404';

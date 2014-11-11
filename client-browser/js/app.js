@@ -10,7 +10,6 @@
 // var nv =require('nvd3');
 // var bootstrap = require('bootstrap');
 var React = require('react');
-console.log('teest');
 
 var Ltt = require('./components/Ltt');
 var $ = require('jquery');

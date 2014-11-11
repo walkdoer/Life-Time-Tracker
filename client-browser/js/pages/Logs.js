@@ -8,6 +8,7 @@ require('../libs/bootstrap-datepicker');
 var remoteStorage = require('../components/storage.remote');
 var Moment = require('moment');
 var Log = require('../components/Log');
+var DatePicker = require('../components/DatePicker');
 var Logs = React.createClass({
 
     getInitialState: function () {
@@ -16,23 +17,15 @@ var Logs = React.createClass({
         };
     },
 
-    componentDidMount: function () {
-        var that = this;
-        var today = new Moment().format('YYYY-MM-DD');
-        $(this.refs.date.getDOMNode()).datepicker({
-            format: 'yyyy-mm-dd'
-        }).on('changeDate', function (e) {
-            var date = e.date;
-            that.searchLogs(date);
-        }).datepicker('setDate', today);
-    },
     render: function () {
         var logs = this.state.logs.map(function (log, index) {
             return Log(log);
         });
         return (
             <div className="ltt_c-page-logs">
-                <input type="text" ref="date" className="ltt_c-page-logs-date"/>
+                <DatePicker
+                    onChange={this.searchLogs}
+                    className="ltt_c-page-logs-date"/>
                 <div className="ltt_c-page-logs-list">
                     {logs}
                 </div>
