@@ -86,7 +86,12 @@ function getQueryConditions(options) {
     return {$and: $and};
 
     function syncOptions() {
-        var dateCondition = getDateCondition(options);
+        var dateCondition;
+        if (options.dateItems) {
+            dateCondition = getDateCondition(options);
+        } else if (options.dateRange) {
+            dateCondition = getDateRangeCondition(options);
+        }
         if (dateCondition) {
             $and.push(dateCondition);
         }
@@ -117,7 +122,6 @@ function getDateCondition(options) {
             condition = to$Operator(date, 'year');
         }
     }
-
     function to$Operator(date, dateType) {
         var m = new Moment(date.value);
         var startDate = m.startOf(dateType).format(TimeFormat.date),
@@ -134,6 +138,44 @@ function getDateCondition(options) {
 }
 
 
+function getDateRangeCondition(options) {
+    var dateRange = options.dateRange;
+    var from = dateRange.from,
+        to = dateRange.to;
+    var fromMoment = getMoment(from, true, false),
+        toMoment = getMoment(to, false, true);
+    if (toMoment.diff(fromMoment, 'days') < 0) {
+        var error = 'Wrong date range';
+        Msg.error(error);
+        throw new Error(error);
+    } else {
+        return {
+            date: {
+                $gte: new Date(fromMoment.format(TimeFormat.fullTime)),
+                $lt: new Date(toMoment.format(TimeFormat.fullTime))
+            }
+        };
+    }
+}
+
+
+
+function getMoment(dateObj, isStart, isEnd) {
+    var dateType = dateObj.type,
+        dateValue = dateObj.value,
+        m;
+    var operator;
+    if (isStart) { operator = 'startOf'; }
+    if (isEnd) { operator = 'endOf'; }
+    if (dateType === dateTypeEnum.Day) {
+        m = new Moment(dateValue)[operator]('day');
+    } else if (dateType === dateTypeEnum.Month) {
+        m = new Moment(dateValue)[operator]('month');
+    } else if (dateType === dateTypeEnum.Year) {
+        m = new Moment(dateValue)[operator]('year');
+    }
+    return m;
+}
 
 
 function getFilters(options) {

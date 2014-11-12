@@ -13,6 +13,7 @@ var stat  = require('./components/stat');
 var Param = require('../param');
 var logAttr = require('./components/logAttribute');
 var Search = require('../search/search');
+var Moment = require('moment');
 
 app.get('/actions/:actionName', function(req, res) {
     var actionName = req.params.actionName;
@@ -21,7 +22,7 @@ app.get('/actions/:actionName', function(req, res) {
 });
 
 useHandler('calendars', '/:type/:year/:month?/:day?', calandar);
-useHandler('stats', '/:year/:month?/:day?', stat);
+useHandler('stats', '/:year?/:month?/:day?', stat);
 useHandler('sleepPeriods');
 useHandler('classes', null, getLogAttr);
 useHandler('projects', null, getLogAttr);
@@ -42,16 +43,20 @@ function useHandler(type, url, handler) {
     app.get('/' + type + url, function(req, res) {
         var params = getCommonRequestParams(req.params, req.query);
         var promise;
-        if (_.isFunction(handler)) {
-            promise = handler(params, type);
-        } else {
-            promise = handler.generate(params);
+        try {
+            if (_.isFunction(handler)) {
+                promise = handler(params, type);
+            } else {
+                promise = handler.generate(params);
+            }
+        } catch (e) {
+            res.status(500).send({msg: 'Server Error', err: e.message});
         }
         promise.then(function(result) {
             res.send(result);
         }).catch(function(err) {
             console.error(err.stack || err);
-            res.status(500).send('Server Error');
+            res.status(500).send({msg: 'Server Error'});
         });
     });
 }
@@ -73,10 +78,22 @@ function getCommonRequestParams(params, query) {
         return !!val;
     }).join('-');
     preprocessQuery(query, ['projects', 'tags', 'classes', 'versions', 'tasks']);
+    var dateParams = {};
+    if (dateStr) {
+        dateParams = Param.getDateParams(dateStr);
+    } else {
+        if (query.start && query.end) {
+            dateStr = [
+                new Moment(query.start).format('YYYY-MM-DD'),
+                new Moment(query.end).format('YYYY-MM-DD')
+            ].join('~');
+        }
+        dateParams = Param.getDateParams(dateStr);
+    }
 
     return extend({}, {
         type: params.type
-    }, Param.getDateParams(dateStr), query);
+    }, dateParams, query);
 
     function preprocessQuery(query, attrs) {
         if (_.isEmpty(attrs)) {
