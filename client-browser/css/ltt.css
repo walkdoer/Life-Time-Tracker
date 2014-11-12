@@ -4,6 +4,11 @@
     height: 100%;
 }
 
+.ltt-row {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 /** nav **/
 .ltt_c-nav{
     width:220px;

@@ -33,7 +33,7 @@ define(function(require) {
                 ]),
                 R.div({className: 'row'}, [
                     Bar({className: col4, ref: 'projectTime', data: this.state.projectTime}),
-                    Bar({className: col4, ref: 'categoryTime', data: this.state.categoryTime})
+                    Column({className: col8, ref: 'categoryTime', data: this.state.categoryTime})
                 ]),
                 R.div({className: 'row'}, LogList({ref: 'logList'}))
             ];

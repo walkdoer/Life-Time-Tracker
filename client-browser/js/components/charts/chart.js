@@ -6,6 +6,9 @@ var Highcharts = require('highcharts-browserify');
 
 //在这里添加highchart的全局设置
 Highcharts.setOptions({
+    credits: {
+        enabled: false
+    },
     global: {
         useUTC: false
     },

@@ -13,7 +13,7 @@ var Bar = React.createClass({
             className  = [className, this.props.className].join(' ');
         }
         return(
-            <div className={className}><div>
+            <div className={className}></div>
         );
     },
 

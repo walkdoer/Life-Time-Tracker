@@ -53,7 +53,7 @@ function processSportLog(day) {
             msg.warn('Unknow sport type:' + (tags || []).join(','));
         }
         sportLog.type = type;
-        sportLog.items = getSportItems(log.projects);
+        //sportLog.items = getSportItems(log.projects);
         sportLogs.push(sportLog);
         count++;
         time += log.len;
@@ -68,48 +68,6 @@ function processSportLog(day) {
     day.time = time;
     day.count = count;
     day.sportLogs = sportLogs;
-
-    function getSportItems(projects) {
-        var SPLITTER = ':';
-        var items = [];
-        projects.forEach(function (proj) {
-            // push-up:10s4r means push-up 10 sets, 4reps
-            var projStr = proj.origin;
-            if (projStr.indexOf(SPLITTER)) {
-                var result = transform(projStr);
-                items.push(result);
-            } else {
-                items.push({
-                    name: proj.name
-                });
-            }
-
-            function transform(proj) {
-                var projInfo = proj.split(SPLITTER),
-                    getSetsAndReps = function (str) {
-                        //format: \ds\dr example: 10s9r
-                        var regexp = /^(\d+)s(\d+)r$/g,
-                            result = regexp.exec(str);
-                        if (result.length < 3) {
-                            return null;
-                        }
-                        return {
-                            sets: parseInt(result[1], 10),
-                            reps: parseInt(result[2], 10)
-                        };
-                    };
-                var setsAndReps = getSetsAndReps(projInfo[1].trim());
-                if (setsAndReps === null) {
-                    msg.warn('Sport item record is wrong:' + proj + 'in ' +
-                            day.date);
-                }
-                return extend({
-                    name: projInfo[0].trim()
-                }, setsAndReps);
-            }
-        });
-        return items;
-    }
 }
 
 exports.processSportLog = processSportLog;
@@ -117,8 +75,7 @@ exports.processSportLog = processSportLog;
 function stat(scanResult) {
     var datas = scanResult.days || [scanResult];
     var result = datas.reduce(function (result, day) {
-        var sportTypeTime = result.sportTypeTime,
-            sportItemSum = result.sportItemSum;
+        var sportTypeTime = result.sportTypeTime;
         result.count += day.count;
         result.time += day.time;
 
@@ -126,7 +83,7 @@ function stat(scanResult) {
             //根据运动种类进行time group
             groupTimeBySportType(log);
             //根据运动项目进行time group
-            sumSportItem(log.items);
+            //sumSportItem(log.items);
         });
 
         function groupTimeBySportType (log) {
@@ -143,20 +100,6 @@ function stat(scanResult) {
             });
         }
 
-
-        function sumSportItem(sportItems) {
-            sportItems.forEach(function (item) {
-                var counter = sportItemSum[item.name];
-                if (counter) {
-                    counter.reps += item.reps * item.sets;
-                    counter.sets += item.sets;
-                } else {
-                    sportItemSum[item.name] = counter = {};
-                    counter.reps = item.reps * item.sets;
-                    counter.sets = item.sets;
-                }
-            });
-        }
 
         function getTimeItemTimeByType(type) {
             return sportTypeTime.filter(function (timeItem) {
