@@ -5,6 +5,8 @@
 var React = require('react');
 var DateRangePicker = require('../components/DateRangePicker');
 var Moment = require('moment');
+var Q = require('q');
+var remoteStorage = require('../components/storage.remote');
 var Report = React.createClass({
 
     getUrl: function () {
@@ -28,6 +30,10 @@ var Report = React.createClass({
 
     renderReport: function (start, end) {
         this.setDateRange(start, end);
+        this.loadReportData()
+            .then(function (result) {
+                console.log(result);
+            });
     },
 
     setDateRange: function (start, end) {
@@ -36,7 +42,16 @@ var Report = React.createClass({
     },
 
     loadReportData: function () {
+        var def = Q.defer();
         var url = this.getUrl();
+        remoteStorage.get(url)
+            .then(function (result) {
+                def.resolve(result);
+            })
+            .catch(function (err) {
+                def.reject(err);
+            });
+        return def.promise;
     }
 
 });

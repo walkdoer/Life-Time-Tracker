@@ -1,5 +1,5 @@
 'use strict';
-var $ = require('jquery');
+
 var Q = require('q');
 exports.get = function (url, params) {
     var deferred = Q.defer();
@@ -11,6 +11,9 @@ exports.get = function (url, params) {
                 params: params,
                 data: result
             });
+        },
+        error: function (err) {
+            deferred.reject(err);
         }
     });
     return deferred.promise;

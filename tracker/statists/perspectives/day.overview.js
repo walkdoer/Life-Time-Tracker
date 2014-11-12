@@ -4,10 +4,12 @@
 'use strict';
 
 var msg = require('../../message');
-var util = require('../../util');
 var helper = require('../../helper');
 
 exports.focus = function (options, scanResult) {
+    if (!scanResult) {
+        throw new Error('no scan result');
+    }
     var date = options.dateStr,
         logs = scanResult.logs,
         trackedTime = 0,
