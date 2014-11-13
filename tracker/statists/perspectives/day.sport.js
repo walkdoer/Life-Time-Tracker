@@ -20,8 +20,7 @@
 'use strict';
 
 
-var extend = require('node.extend'),
-    msg = require('../../message'),
+var msg = require('../../message'),
     logClassEnum = require('../../enum/logClass'),
     sportType = require('../../conf/sportType');
 

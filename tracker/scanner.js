@@ -20,7 +20,7 @@ exports.scan = function(options) {
     if (dateItemLen === 1) {
         var dateType = dateItems[0].type;
         if (dateType === dateTypeEnum.Day) {
-            scanner = require('./scanners/dayLifeScanner');
+            scanner = require('./scanners/lifeScanner');
         } else if (dateType === dateTypeEnum.Month) {
             scanner = require('./scanners/lifeScanner');
         } else if (dateType === dateTypeEnum.Year) {

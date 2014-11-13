@@ -31,7 +31,7 @@ function syncNote(client, options) {
     // List all of the notebooks in the user's account
     noteStore.listNotebooks(function(err, notebooks) {
         if (err) {
-            Msg.error(EVERNOTE_SERVER_ERROR + ' 访问限制:' + err.rateLimitDuration, err);
+            Msg.error(EVERNOTE_SERVER_ERROR + ' 访问限制', err);
             return;
         }
         notebooks.forEach(function(note) {
@@ -75,6 +75,7 @@ function syncNote(client, options) {
             var downloadFailNotes = [],
                 downloadSuccessNotes = [],
                 loadedCount = 0,
+                writeFailedNotes = [],
                 totalNotes = downloadNotes.length;
             downloadNotes.forEach(function(note) {
                 noteStore.getNote(authToken, note.guid, true, false, false, false, function(err, result) {
@@ -95,22 +96,27 @@ function syncNote(client, options) {
                         var file = path + '/' + dateArr[2] + '.' + ext;
                         fs.writeFile(file, content, function(err) {
                             if (err) {
-                                throw err;
+                                writeFailedNotes.push(noteTitle);
+                                Msg.error('写文件' + noteTitle + '错误', err);
+                                return;
+                            }
+                            var failLoadCount = downloadFailNotes.length;
+                            if (failLoadCount + loadedCount === totalNotes) {
+                                Msg.success('同步文件完成');
+                                if (failLoadCount > 0) {
+                                    Msg.error('同步失败的文件:' + downloadFailNotes.join(','));
+                                }
+                                if (writeFailedNotes.length > 0) {
+                                    Msg.error('下载成功，但写失败文件:' + downloadFailNotes.join(','));
+                                }
+                                status.finished = true;
+                                syncNoteSig.dispatch(downloadSuccessNotes, downloadFailNotes);
                             }
                         });
                     });
                     bar.tick(1);
                     downloadSuccessNotes.push(noteTitle);
                     loadedCount++;
-                    var failLoadCount = downloadFailNotes.length;
-                    if (failLoadCount + loadedCount === totalNotes) {
-                        console.log('下载完成'.green);
-                        if (failLoadCount > 0) {
-                            Msg.error(downloadFailNotes.join(','));
-                        }
-                        status.finished = true;
-                        syncNoteSig.dispatch(downloadSuccessNotes, downloadFailNotes);
-                    }
                 });
             });
 
