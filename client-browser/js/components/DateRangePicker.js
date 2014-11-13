@@ -34,12 +34,25 @@ var DateRangePicker = React.createClass({
     },
 
     render: function () {
-        var className = 'ltt_c-dateRangePicker input-daterange input-group ' + this.props.className;
+        var className = 'input-daterange input-group ' + this.props.className;
+        var btns = [
+            {text: 'Today', value: 'today'},
+            {text: 'Yesterday', value: 'yesterday'},
+            {text: 'Weekly', value: 'weekly'},
+            {text: 'Monthly', value: 'monthly'},
+            {text: 'Annual', value: 'annual'}
+        ].map(function (btn) {
+            return (<button type="button" className="btn btn-default"
+                onClick={this.setDateRange.bind(this, btn.value)}>{btn.text}</button>);
+        }, this);
         return (
-            <div ref="dateRange" className={className}>
-                <input ref="startDate" type="text" className="input-sm form-control" name="start" />
-                <span className="input-group-addon">to</span>
-                <input ref="endDate" type="text" className="input-sm form-control" name="end" />
+            <div className="ltt_c-dateRangePicker">
+                <div ref="dateRange" className={className}>
+                    <input ref="startDate" type="text" className="input-sm form-control" name="start" />
+                    <span className="input-group-addon">to</span>
+                    <input ref="endDate" type="text" className="input-sm form-control" name="end" />
+                </div>
+                <div className="btn-group" role="daterange">{btns}</div>
             </div>
         );
     },
@@ -58,6 +71,43 @@ var DateRangePicker = React.createClass({
 
     setEndDate: function (date) {
         this._end = date;
+    },
+
+    clearDateRange: function () {
+        this.setEndDate (null);
+        this.setStartDate(null);
+    },
+
+    setDateRange: function (rangeType) {
+        var mStart, mEnd, mNow = new Moment();
+        switch (rangeType) {
+            case 'today':
+                mStart = Moment(mNow).startOf('day');
+                mEnd = Moment(mNow).endOf('day');
+                break;
+            case 'yesterday':
+                mNow.subtract(1, 'day');
+                mStart = Moment(mNow).startOf('day');
+                mEnd = Moment(mNow).endOf('day');
+                break;
+            case 'weekly':
+                mStart = Moment(mNow).startOf('week');
+                mEnd = Moment(mNow).endOf('week');
+                break;
+            case 'monthly':
+                mStart = Moment(mNow).startOf('month');
+                mEnd = Moment(mNow).endOf('month');
+                break;
+            case 'annual':
+                mStart = Moment(mNow).startOf('year');
+                mEnd = Moment(mNow).endOf('year');
+                break;
+        }
+        if (mStart && mEnd) {
+            this.clearDateRange();
+            $(this.refs.startDate.getDOMNode()).datepicker('setDate', mStart.toDate());
+            $(this.refs.endDate.getDOMNode()).datepicker('setDate', mEnd.toDate());
+        }
     }
 
 });

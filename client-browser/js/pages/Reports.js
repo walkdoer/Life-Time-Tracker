@@ -38,7 +38,7 @@ var Report = React.createClass({
                 </div>
                 <div className="row ltt-row">
                     <Bar className={col4} ref="categoryTime" />
-                    <Column className={col8} ref="projectTime" />
+                    <Column title="Top 10 Project" className={col8} ref="projectTime" />
                 </div>
             </div>
         );
@@ -51,9 +51,9 @@ var Report = React.createClass({
             .then(function (result) {
                 var statData = result.data;
                 that.refs.logClassTime.setData(statData.classTime);
-                that.refs.tagTime.setData(statData.tagTime);
+                that.refs.tagTime.setData(statData.tagTime.slice(0, 20));
                 that.refs.categoryTime.setData(statData.categoryPerspective.categoryTime);
-                that.refs.projectTime.setData(statData.projectTime);
+                that.refs.projectTime.setData(statData.projectTime.slice(0,10));
             });
     },
 

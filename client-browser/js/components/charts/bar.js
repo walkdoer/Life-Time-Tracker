@@ -8,7 +8,7 @@ var _ = require('underscore');
 var Bar = React.createClass({
     displayName: 'bar',
     render: function() {
-        var className = 'ltt_c-chart-bar';
+        var className = 'ltt_c-chart ltt_c-chart-bar';
         if (this.props.className) {
             className  = [className, this.props.className].join(' ');
         }

@@ -5,6 +5,10 @@
 }
 
 .ltt_c-dateRangePicker{
+    display: flex;
+    justify-content: space-between;
+}
+
+.ltt_c-dateRangePicker .input-daterange{
     width: 300px;
-    
 }

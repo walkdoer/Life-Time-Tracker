@@ -10,7 +10,7 @@ var _ = require('underscore');
 var Column = React.createClass({
     displayName: 'column',
     render: function() {
-        var className = 'ltt_c-chart-column';
+        var className = 'ltt_c-chart ltt_c-chart-column';
         if (this.props.className) {
             className  = [className, this.props.className].join(' ');
         }
