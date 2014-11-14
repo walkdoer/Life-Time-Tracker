@@ -1,37 +1,26 @@
 /**
  * @jsx React.DOM
  */
-
+require('../libs/daterangepicker');
 var React = require('react');
 var Moment = require('moment');
 
 var DateRangePicker = React.createClass({
 
     componentDidMount: function () {
-        var onChange = this.props.onChange;
         var today = new Moment().format('YYYY-MM-DD');
         var that = this;
-        $(this.refs.dateRange.getDOMNode()).datepicker({
-            todayHighlight: true,
-            format: this.props.format || 'yyyy-mm-dd'
-        }).on('changeDate', function (e) {
-            var target = e.target,
-                name = target.name;
-            var date = e.date;
-            if (name === 'start') {
-                that.setStartDate(date);
-            } else if (name === 'end') {
-                that.setEndDate(date);
-            }
-            var start = that.getStartDate(),
-                end = that.getEndDate();
-            if (start && end) {
-                onChange(start, end);
-            }
+        var $dateRange = $(this.refs.dateRange.getDOMNode());
+        $dateRange.daterangepicker({
+            format: 'YYYY-MM-DD',
+            startDate: '2013-01-01',
+            endDate: '2013-12-31'
+        }, function(start, end, label) {
+            this.setDateRange(start, end);
         });
-        $(this.refs.startDate.getDOMNode()).datepicker('setDate', today);
-        $(this.refs.endDate.getDOMNode()).datepicker('setDate', today);
+        this.setDateRange(today, today);
     },
+
 
     render: function () {
         var className = 'input-daterange input-group ' + this.props.className;
@@ -43,15 +32,11 @@ var DateRangePicker = React.createClass({
             {text: 'Annual', value: 'annual'}
         ].map(function (btn) {
             return (<button type="button" className="btn btn-default"
-                onClick={this.setDateRange.bind(this, btn.value)}>{btn.text}</button>);
+                onClick={this.setDateRangeType.bind(this, btn.value)}>{btn.text}</button>);
         }, this);
         return (
             <div className="ltt_c-dateRangePicker">
-                <div ref="dateRange" className={className}>
-                    <input ref="startDate" type="text" className="input-sm form-control" name="start" />
-                    <span className="input-group-addon">to</span>
-                    <input ref="endDate" type="text" className="input-sm form-control" name="end" />
-                </div>
+                <input ref="dateRange" className={className}/>
                 <div className="btn-group" role="daterange">{btns}</div>
             </div>
         );
@@ -78,7 +63,7 @@ var DateRangePicker = React.createClass({
         this.setStartDate(null);
     },
 
-    setDateRange: function (rangeType) {
+    setDateRangeType: function (rangeType) {
         var mStart, mEnd, mNow = new Moment();
         switch (rangeType) {
             case 'today':
@@ -105,9 +90,19 @@ var DateRangePicker = React.createClass({
         }
         if (mStart && mEnd) {
             this.clearDateRange();
-            $(this.refs.startDate.getDOMNode()).datepicker('setDate', mStart.toDate());
-            $(this.refs.endDate.getDOMNode()).datepicker('setDate', mEnd.toDate());
+            this.setDateRange(mStart, mEnd);
         }
+    },
+
+    setDateRange: function(start, end) {
+        start = Moment(start);
+        end = Moment(end);
+        var $dateRange = $(this.refs.dateRange.getDOMNode());
+        $dateRange.data('daterangepicker').setStartDate(start);
+        $dateRange.data('daterangepicker').setEndDate(end);
+        this.setStartDate(start);
+        this.setEndDate(end);
+        this.props.onChange(start.toDate(), end.toDate());
     }
 
 });
