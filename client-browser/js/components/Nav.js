@@ -24,11 +24,11 @@ var Sidebar = React.createClass({
             text: 'Logs',
             key: 'logs',
             icon: 'fa fa-file'
-        }, {
+        } /*{
             text: 'Projects',
             key: 'projects',
             icon: 'fa fa-rocket'
-        }];
+        }*/];
         return (
             <nav className="ltt_c-nav">
                 <Logo />

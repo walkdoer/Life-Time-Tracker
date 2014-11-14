@@ -21,6 +21,7 @@ var Menu = React.createClass({
             var boundClick = this.handleClick.bind(this, item);
             return (<MenuItem
                 active={active}
+                menuKey={item.key}
                 text={item.text}
                 icon={item.icon}
                 onClick={boundClick}

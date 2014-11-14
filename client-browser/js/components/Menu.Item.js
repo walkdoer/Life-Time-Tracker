@@ -5,6 +5,8 @@
 var React = require('react');
 var $ = require('jquery');
 var addons = require('react/addons').addons;
+var Router = require('react-router');
+var Link = Router.Link;
 var MenuItem = React.createClass({
 
     /**
@@ -19,7 +21,9 @@ var MenuItem = React.createClass({
         return (
             <li className={className} onClick={this.handleClick}>
                 <i className={this.props.icon}></i>
-                <a>{this.props.text}</a>
+                <Link to={this.props.menuKey}>
+                    {this.props.text}
+                </Link>
             </li>
         );
     },
