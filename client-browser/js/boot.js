@@ -31,6 +31,7 @@ var routes = (
             <Route name="reports" handler={Reports}/>
             <Route name="dashboard" handler={Dashboard}/>
             <Route name="logs" handler={Logs}/>
+            <NotFoundRoute handler={Page404}/>
             <DefaultRoute handler={Dashboard}/>
         </Route>
     </Routes>

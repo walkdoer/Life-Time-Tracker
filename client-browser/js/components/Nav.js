@@ -5,8 +5,10 @@
 var React = require('react');
 var Menu = require('./Menu');
 var Logo = require('./Logo');
+var _ = require('lodash');
 
 var Sidebar = React.createClass({
+
 
     /**
      * @return {object}
@@ -29,6 +31,7 @@ var Sidebar = React.createClass({
             key: 'projects',
             icon: 'fa fa-rocket'
         }*/];
+        //var isActive = this.isActive(this.props.to, this.props.params, this.props.query);
         return (
             <nav className="ltt_c-nav">
                 <Logo />
@@ -42,7 +45,9 @@ var Sidebar = React.createClass({
     },
 
     onMenuClick: function (menuItem) {
-        this.props.onMenuClick(menuItem);
+        if (_.isFunction(this.props.onMenuClick)) {
+            this.props.onMenuClick(menuItem);
+        };
     }
 
 });
