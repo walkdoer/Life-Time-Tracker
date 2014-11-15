@@ -6,14 +6,8 @@ var React = require('react');
 var MenuItem = require('./Menu.Item');
 var Menu = React.createClass({
 
-    getInitialState: function () {
-        return {
-            currentMenuItem: this.props.active
-        };
-    },
-
     render: function () {
-        var currentMenuItem = this.state.currentMenuItem;
+        var currentMenuItem = this.props.active;
         var menuItems = this.props.items;
         var menu = this;
         menuItems = menuItems.map(function (item, i) {

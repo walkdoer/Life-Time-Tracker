@@ -5,7 +5,6 @@ var R = React.DOM;
 var chart = require('./chart');
 var className = 'ltt_c-sleepPeriod';
 var remoteStorage = require('../storage.remote');
-var $ = require('jquery');
 var sleepPeriodConvertor = require('../../convertors/sleepPeriod');
 var LoadIndicator = require('../loadIndicator');
 var SleepPeriod = React.createClass({
@@ -19,6 +18,9 @@ var SleepPeriod = React.createClass({
         var that = this;
         remoteStorage.get(this.props.url)
             .then(function(result) {
+                if (!that.isMounted()) {
+                    return;
+                }
                 that.setState({msg: ''});
                 chart.timeline({
                     title: that.props.title,
@@ -32,6 +34,10 @@ var SleepPeriod = React.createClass({
     },
     render: function() {
         return R.div({className: className}, LoadIndicator());
+    },
+
+    componentWillUnmount: function () {
+
     }
 });
 
