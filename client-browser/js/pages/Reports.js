@@ -120,7 +120,7 @@ var Report = React.createClass({
                     return cls.name === name;
                 })[0];
                 if (target) {
-                    data.push([dateTS, target.time]);
+                    data.push([dateTS, Math.round(target.time / 60 * 100)/100]);
                 } else {
                     data.push([dateTS, 0]);
                 }

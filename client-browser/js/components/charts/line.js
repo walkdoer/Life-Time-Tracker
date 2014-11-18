@@ -34,11 +34,26 @@ var Line = React.createClass({
                     type: this.props.type
                 },
                 plotOptions: {
-                    series: {
+                    area: {
                         marker: {
-                            enabled: false
-                        }
+                            enabled: false,
+                            symbol: 'circle',
+                            radius: 2,
+                            states: {
+                                hover: {
+                                    enabled: true
+                                }
+                            }
+                        },
+                        fillOpacity: 0.1
+                    },
+                    areaspline: {
+                        fillOpacity: 0.1
                     }
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
                 },
                 xAxis: {
                     type: 'datetime',

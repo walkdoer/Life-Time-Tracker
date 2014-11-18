@@ -18,6 +18,20 @@ Highcharts.setOptions({
     plotOptions: {
         series: {
             // animation: false
+            lineWidth: 1
+        }
+    },
+    tooltip: {
+        dateTimeLabelFormats: {
+            millisecond:"%A, %b %e, %H:%M:%S.%L",
+            second:"%A, %b %e, %H:%M:%S",
+            minute:"%A, %b %e, %H:%M",
+            hour:"%A, %b %e, %H:%M",
+            //day:"%A, %b %e, %Y",
+            day: "%Y-%m-%d",
+            week:"Week from %A, %b %e, %Y",
+            month:"%B %Y",
+            year:"%Y"
         }
     }
 });

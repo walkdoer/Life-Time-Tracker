@@ -21,7 +21,7 @@ exports.dispose = function (rawData, options) {
 
     function getValue(val) {
         if (timeUnit === 'hour') {
-            val = val / 60;
+            val = Math.round(val / 60 * 100) / 100;
         }
         return val;
     }
