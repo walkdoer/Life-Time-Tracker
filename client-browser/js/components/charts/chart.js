@@ -9,7 +9,7 @@ Highcharts.setOptions({
     credits: {
         enabled: false
     },
-    colors: ['#47bac1', '#F0A0A5', '#ffea88', '#009944','#2f7ed8', '#9999ff', , '#F04C3B' , '#878bb6', '#ff8153','#b2d767'],
+    colors: ['#47bac1', '#F0A0A5', '#ffea88', '#9999ff','#2f7ed8', '#009944', , '#F04C3B' , '#878bb6', '#ff8153','#b2d767'],
     //colors: ['#2f7ed8', '#0d233a', '#8bbc21', '#910000', '#1aadce', '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a'],
     //colors: ['#1bd0dc', '#f9b700', '#eb6100', '#009944', '#eb6877', '#5674b9', '#a98fc2', '#9999ff', '#1c95bd', '#9dd30d'],
     global: {
@@ -170,4 +170,22 @@ exports.column = function (options, highchartOptions) {
     columnOptions = _.extend(columnOptions, highchartOptions);
 
     options.$el.highcharts(columnOptions);
+};
+
+exports.line = function (options, highchartOptions) {
+    var lineOptions = {
+        chart: {
+            type: 'line'
+            //plotBackgroundColor: null,
+            //plotShadow: false
+        },
+        title: {
+            text: options.title
+        },
+        series: options.data
+    };
+
+    lineOptions = _.extend(lineOptions, highchartOptions);
+
+    options.$el.highcharts(lineOptions);
 };
