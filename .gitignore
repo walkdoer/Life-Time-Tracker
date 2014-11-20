@@ -51,3 +51,6 @@ logs
 client-browser/bower_components
 client-browser/js/bundle.js
 client-browser/node_modules
+client-nw/bower_components
+client-nw/node_modules
+client-nw/build

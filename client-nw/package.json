@@ -1,32 +1,32 @@
 {
-  "name": "ltt-client",
-  "version": "0.1.0",
-  "description": "Life time tracker web client",
-  "scripts": {
-    "start": "watchify -o js/bundle.js -v -d .",
-    "build": "NODE_ENV=production browserify . | uglifyjs -cm > js/bundle.min.js",
-    "test": "jest"
-  },
-  "author": "Andrew Zhang",
+  "name": "nw-react",
+  "version": "0.0.0",
+  "author": "andrew",
   "license": "ISC",
-  "devDependencies": {
-    "browserify": "~6.2.0",
-    "browserify-shim": "~3.8.0",
-    "envify": "~3.0.0",
-    "uglify-js": "~2.4.15",
-    "reactify": "~0.15.2",
-    "watchify": "~2.1.0"
+  "main": "index.html",
+  "scripts": {
+    "app": "nw ./build"
   },
   "dependencies": {
     "flux": "~2.0.1",
     "react": "~0.12.0",
-    "express": "~4.10.1",
-    "express3-handlebars": "~0.5.2",
-    "morgan": "~1.4.1",
-    "lodash": "~2.4.1",
     "q": "~1.0.1",
     "highcharts-browserify": "~0.1.1-4.0.3",
-    "react-router": "~0.10.2"
+    "react-router": "~0.10.2",
+    "moment": "~2.8.4"
+  },
+  "devDependencies": {
+    "browserify": "~6.2.0",
+    "gulp": "~3.8.10",
+    "envify": "~3.0.0",
+    "uglify-js": "~2.4.15",
+    "reactify": "~0.15.2",
+    "watchify": "~2.1.0",
+    "vinyl-source-stream": "~1.0.0",
+    "gulp-util": "~3.0.1",
+    "gulp-notify": "~2.0.1",
+    "jquery-browserify": "~1.8.1",
+    "browserify-shim": "~3.8.0"
   },
   "browser": {
     "d3": "./bower_components/d3/d3.min.js",
@@ -66,11 +66,5 @@
         "d3:d3"
       ]
     }
-  },
-  "browserify": {
-    "transform": [
-      "reactify",
-      "envify"
-    ]
   }
 }

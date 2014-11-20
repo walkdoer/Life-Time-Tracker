@@ -1,0 +1,14 @@
+.ltt_c-tag{
+    display: inline-block;
+    padding: 2px 8px;
+    color: #FFF;
+    background: #EF6B5D;
+    margin: auto 2px;
+    border-radius: 10px;
+}
+
+.ltt_c-tag .fa-tag{
+    margin-right: 4px;
+    font-size: 0.8rem;
+    color: #FFE0E0;
+}
