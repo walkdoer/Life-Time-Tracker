@@ -8,7 +8,14 @@ var Moment = require('moment');
 var DateRangePicker = React.createClass({
 
     componentDidMount: function () {
-        var today = new Moment().format('YYYY-MM-DD');
+        var start, end;
+        if (this.props.start && this.props.end) {
+            start = this.props.start;
+            end = this.props.end;
+        } else {
+            var today = new Moment().format('YYYY-MM-DD');
+            start = end = today;
+        }
         var that = this;
         var $dateRange = $(this.refs.dateRange.getDOMNode());
         $dateRange.daterangepicker({
@@ -16,9 +23,9 @@ var DateRangePicker = React.createClass({
             startDate: '2013-01-01',
             endDate: '2013-12-31'
         }, function(start, end, label) {
-            this.setDateRange(start, end);
+            that.setDateRange(start, end, true);
         });
-        this.setDateRange(today, today);
+        this.setDateRange(start, end, false);
     },
 
 
@@ -90,11 +97,11 @@ var DateRangePicker = React.createClass({
         }
         if (mStart && mEnd) {
             this.clearDateRange();
-            this.setDateRange(mStart, mEnd);
+            this.setDateRange(mStart, mEnd, true);
         }
     },
 
-    setDateRange: function(start, end) {
+    setDateRange: function(start, end, trigger) {
         start = Moment(start);
         end = Moment(end);
         var $dateRange = $(this.refs.dateRange.getDOMNode());
@@ -102,7 +109,9 @@ var DateRangePicker = React.createClass({
         $dateRange.data('daterangepicker').setEndDate(end);
         this.setStartDate(start);
         this.setEndDate(end);
-        this.props.onChange(start.toDate(), end.toDate());
+        if (trigger) {
+            this.props.onChange(start.toDate(), end.toDate());
+        }
     }
 
 });
