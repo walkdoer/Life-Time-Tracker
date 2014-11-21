@@ -3,6 +3,7 @@
  */
 
 var React = require('react');
+var nwGui = window.nwGui;
 
 var Header = React.createClass({
     /**
@@ -15,12 +16,27 @@ var Header = React.createClass({
                     className="btn btn-primary ltt_c-header-barBtn js-open-sidebar"
                     onClick={this.handleConfigBtnClick}
                 ><i className="fa fa-bars"></i></button>
-            <button className="btn btn-primary ltt_c-header-cfgBtn js-open-config"><i className="fa fa-gear"></i></button>
+            <button className="ltt-btn ltt_c-header-cfgBtn js-open-config"><i className="fa fa-gear"></i></button>
+            <button className="ltt-btn ltt_c-header-debugBtn js-debugApplication" onClick={this.debugApplication}>
+                <i className="fa fa-gear"></i>
+            </button>
+            <button className="ltt-btn ltt_c-header-closeBtn js-closeWindow" onClick={this.closeWindow}>
+                <i className="fa fa-close"></i>
+            </button>
             </header>
         );
     },
+
     handleConfigBtnClick: function () {
         this.props.onConfigBtnClick();
+    },
+
+    closeWindow: function () {
+        window.close();
+    },
+
+    debugApplication: function () {
+        nwGui.Window.get().showDevTools();
     }
 
 });

@@ -53,7 +53,8 @@ gulp.task('sync', function() {
     ]).pipe(gulp.dest('./css/lib'));
     var cssFiles = './css/**/*.css',
         images = './images/**/*',
-        fonts = './fonts/**/*';
+        fonts = './fonts/**/*',
+        js = './js/initNW.js';
     gulp.src(cssFiles)
         .pipe(watch(cssFiles, function (files) {
             return files.pipe(gulp.dest([buildDir, 'css/'].join('/')));
@@ -61,6 +62,10 @@ gulp.task('sync', function() {
     gulp.src(images)
         .pipe(watch(images, function (files) {
             files.pipe(gulp.dest([buildDir, 'images/'].join('/')));
+        }));
+    gulp.src(js)
+        .pipe(watch(js, function (files) {
+            files.pipe(gulp.dest(buildDir));
         }));
     return gulp.src(fonts)
         .pipe(watch(fonts, function (files) {
@@ -70,7 +75,6 @@ gulp.task('sync', function() {
         //    keepBreaks: true
         //}))
         //.pipe(concat('main.css'))
-        
         /*.pipe(rename({
             suffix: '.min'
         }))

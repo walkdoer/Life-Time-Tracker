@@ -1,0 +1,29 @@
+/** header **/
+.ltt_c-header{
+    height: 50px;
+    /* background: linear-gradient(to bottom, #E1E1E1 0%, #D7D7D7 100%); */
+    background: #FFF;
+    border-bottom: 1px solid #EBEBEB;
+}
+.ltt_c-header .ltt-btn{
+    margin-top: 8px;
+}
+
+.ltt_c-header-cfgBtn{
+    margin-right:8px;
+    float: right;
+}
+
+.ltt_c-header-barBtn{
+    margin-left: 8px;
+    float:  left;
+}
+
+
+.ltt-btn {
+    display: inline-block;
+    border: 1px solid #ccc;
+}
+.ltt-btn-grp{
+
+}
