@@ -81,6 +81,8 @@ function syncNote(client, options) {
                 noteStore.getNote(authToken, note.guid, true, false, false, false, function(err, result) {
                     if (err) {
                         downloadFailNotes.push(note);
+                        Msg.error('下载日志失败' + note, err);
+                        return;
                     }
                     var noteTitle = note.title;
                     var content = stripENML(result.content);
