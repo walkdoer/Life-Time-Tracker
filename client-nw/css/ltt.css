@@ -11,7 +11,7 @@
 
 /** nav **/
 .ltt_c-nav{
-    width:80px;
+    width:40px;
     display: none;
     background-color: #383d40;
     color: #e3e4e6;
@@ -19,7 +19,7 @@
 .ltt_c-sidebar{
     width:220px;
     display: none;
-    background-color: #383d40;
+    background-color: #292d30;
     color: #e3e4e6;
 }
 .ltt__navOpen .ltt_c-nav{

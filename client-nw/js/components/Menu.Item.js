@@ -20,9 +20,8 @@ var MenuItem = React.createClass({
         });
         return (
             <li className={className} onClick={this.handleClick}>
-                <i className={this.props.icon}></i>
                 <Link to={this.props.menuKey}>
-                    {this.props.text}
+                <i className={this.props.icon} title={this.props.text}></i>
                 </Link>
             </li>
         );

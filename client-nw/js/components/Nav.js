@@ -34,7 +34,6 @@ var Sidebar = React.createClass({
         //var isActive = this.isActive(this.props.to, this.props.params, this.props.query);
         return (
             <nav className="ltt_c-nav">
-                <Logo />
                 <Menu
                     items={items}
                     active={this.props.initialMenuItem}

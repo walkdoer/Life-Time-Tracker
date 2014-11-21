@@ -28,15 +28,15 @@ var App = React.createClass({
 
     getInitialState: function () {
         return {
-            openNav: true,
-            openSidebar:  this._needOpenSidebar()
+            openNav: true
         };
     },
+
 
     render: function () {
         var clsObj = {ltt: true};
         clsObj[NAV_OPEN] = this.state.openNav;
-        clsObj[SIDEBAR_OPEN] = this.state.openSidebar;
+        clsObj[SIDEBAR_OPEN] = this._needOpenSidebar();
         var className = cx(clsObj);
         path = this.getCurrentPath();
         return (
@@ -46,9 +46,7 @@ var App = React.createClass({
                     <SearchBox placeholder="search here"/>
                 </Sidebar>
                 <div className="ltt_c-main">
-                    <Header
-                        onConfigBtnClick={this.toggleNav}
-                    />
+                    <Header onConfigBtnClick={this.toggleNav} />
                     <section className="ltt_c-pageManager">
                         <this.props.activeRouteHandler/>
                     </section>
@@ -58,7 +56,7 @@ var App = React.createClass({
     },
 
     _needOpenSidebar: function () {
-        if (this.getCurrentPage === 'reports') {
+        if (this.getCurrentPage() === 'reports') {
             return true;
         }
         return false;
@@ -73,13 +71,8 @@ var App = React.createClass({
         this.setState({
             openNav: !this.state.openNav
         });
-    },
-
-    toggleSidebar: function () {
-        this.setState({
-            openSidebar: !this.state.openSidebar
-        });
     }
+
 });
 
 module.exports = App;

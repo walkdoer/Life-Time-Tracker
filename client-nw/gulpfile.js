@@ -25,7 +25,7 @@ function handleErrors(err) {
 // Based on: http://blog.avisi.nl/2014/04/25/how-to-keep-a-fast-build-with-browserify-and-reactjs/
 function buildScript(main, destFile, watch) {
     var props = {
-        entries: [scriptsDir + '/' + main],
+        entries: [scriptsDir + '/'+ main],
         debug: true
     };
     var bundler = watch ? watchify(browserify(props)) : browserify(props);
@@ -85,6 +85,6 @@ gulp.task('build', function() {
 });
 
 
-gulp.task('default', ['build', 'sync'], function() {
+gulp.task('default', ['build'], function() {
     return buildScript(main, destFile, true);
 });

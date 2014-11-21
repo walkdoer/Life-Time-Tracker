@@ -33,6 +33,13 @@ var Report = React.createClass({
 
 
     render: function () {
+        if (!this.isSingleDay()) {
+            var logClassTimeTrend = (
+                    <div className="row ltt-row">
+                        <Line title="Class time trend" type="area" className={colFull} ref="logClassTimeTrend" />
+                    </div>
+                )
+        }
         return (
             <div className="ltt_c-page-reports">
                 <DateRangePicker onChange={this.renderReport} className="ltt_c-page-reports-dateRange"/>
@@ -40,10 +47,7 @@ var Report = React.createClass({
                     <Pie className={col4} ref="logClassTime" />
                     <Column className={col8} ref="tagTime" />
                 </div>
-
-                <div className="row ltt-row">
-                    <Line title="Class time trend" type="area" className={colFull} ref="logClassTimeTrend" />
-                </div>
+                {logClassTimeTrend}
                 <div className="row ltt-row">
                     <Bar className={col4} ref="categoryTime" />
                     <Column title="Top 10 Project" className={col8} ref="projectTime" />
