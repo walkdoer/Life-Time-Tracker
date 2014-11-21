@@ -10,7 +10,9 @@ var Sidebar = React.createClass({
 
     render: function() {
         return (
-            <div className="ltt_c-sidebar"></div>
+            <div className="ltt_c-sidebar">
+                {this.props.children}
+            </div>
         );
     }
 });
