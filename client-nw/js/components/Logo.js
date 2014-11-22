@@ -7,7 +7,9 @@ var Logo = React.createClass({
 
     render: function () {
         return (
-            <div className="ltt_c-logo"> </div>
+            <div className="ltt_c-logo">
+                <span className="ltt_c-logo-title">{this.props.title}</span>
+            </div>
         );
     }
 });

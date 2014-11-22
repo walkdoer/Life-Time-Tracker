@@ -42,13 +42,13 @@ var App = React.createClass({
         path = this.getCurrentPath();
         return (
             <div className={className}>
-                <Nav initialMenuItem={this.getCurrentPage()}/>
-                <Sidebar>
-                    <SearchBox placeholder="search here"/>
-                </Sidebar>
-                <div className="ltt_c-main">
-                    <Header onConfigBtnClick={this.toggleNav} />
-                    <section className="ltt_c-pageManager">
+                <Header onConfigBtnClick={this.toggleNav} />
+                <div className="ltt_c-outerContainer">
+                    <Nav initialMenuItem={this.getCurrentPage()}/>
+                    <Sidebar ref="sidebar">
+                        <SearchBox placeholder="search here"/>
+                    </Sidebar>
+                    <section className="ltt_c-innerContainer">
                         <this.props.activeRouteHandler/>
                     </section>
                 </div>
@@ -72,6 +72,10 @@ var App = React.createClass({
         this.setState({
             openNav: !this.state.openNav
         });
+    },
+
+    toggleSidebar: function () {
+        this.refs.sidebar.toggle();
     }
 
 });

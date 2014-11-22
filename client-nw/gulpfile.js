@@ -6,6 +6,7 @@ var reactify = require('reactify');
 var watchify = require('watchify');
 var watch = require('gulp-watch');
 var notify = require("gulp-notify");
+var react = require("gulp-react");
 var scriptsDir = './js';
 var buildDir = './build';
 var main = "boot.js";
@@ -44,6 +45,7 @@ function buildScript(main, destFile, watch) {
     return rebundle();
 }
 
+
 //sync resources file
 gulp.task('sync', function() {
     gutil.log('Watching file...');
@@ -54,22 +56,22 @@ gulp.task('sync', function() {
     var cssFiles = './css/**/*.css',
         images = './images/**/*',
         fonts = './fonts/**/*',
-        js = './js/initNW.js';
+        js = './js/nw/**/*.js';
     gulp.src(cssFiles)
         .pipe(watch(cssFiles, function (files) {
             return files.pipe(gulp.dest([buildDir, 'css/'].join('/')));
         }));
     gulp.src(images)
         .pipe(watch(images, function (files) {
-            files.pipe(gulp.dest([buildDir, 'images/'].join('/')));
+            return files.pipe(gulp.dest([buildDir, 'images/'].join('/')));
         }));
     gulp.src(js)
         .pipe(watch(js, function (files) {
-            files.pipe(gulp.dest(buildDir));
+            return files.pipe(gulp.dest(buildDir + '/nw'));
         }));
     return gulp.src(fonts)
         .pipe(watch(fonts, function (files) {
-            files.pipe(gulp.dest([buildDir, 'fonts/'].join('/')));
+            return files.pipe(gulp.dest([buildDir, 'fonts/'].join('/')));
         }));
         //.pipe(minifyCSS({
         //    keepBreaks: true

@@ -1,1 +1,0 @@
-console.error("Error: Cannot find module '/Users/andrew/workspace/github/Life-Time-Tracker/client-browser' from '/Users/andrew/workspace/github/Life-Time-Tracker/client-browser'")

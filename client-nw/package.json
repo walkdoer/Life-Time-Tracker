@@ -3,9 +3,11 @@
   "version": "0.0.0",
   "author": "andrew",
   "license": "ISC",
-  "main": "index.html",
+  "main": "js/boot.js",
   "scripts": {
-    "app": "nw ./build"
+    "start": "watchify -o js/bundle.js -v -d .",
+    "build": "NODE_ENV=production browserify . | uglifyjs -cm > js/bundle.min.js",
+    "test": "jest"
   },
   "dependencies": {
     "flux": "~2.0.1",
@@ -13,7 +15,8 @@
     "q": "~1.0.1",
     "highcharts-browserify": "~0.1.1-4.0.3",
     "react-router": "~0.10.2",
-    "moment": "~2.8.4"
+    "moment": "~2.8.4",
+    "jquery": "~2.1.1"
   },
   "devDependencies": {
     "browserify": "~6.2.0",
@@ -67,5 +70,11 @@
         "d3:d3"
       ]
     }
+  },
+  "browserify": {
+    "transform": [
+      "reactify",
+      "envify"
+    ]
   }
 }

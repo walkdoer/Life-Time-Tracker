@@ -1,6 +1,5 @@
 
 .ltt{
-    display: flex;
     height: 100%;
 }
 
@@ -11,7 +10,7 @@
 
 /** nav **/
 .ltt_c-nav{
-    width:50px;
+    width: 65px;
     display: none;
     background-color: #383d40;
     color: #e3e4e6;
@@ -30,10 +29,9 @@
 }
 /** main **/
 .ltt_c-main {
-    flex:1;
-    -webkit-transition: -webkit-transform 150ms cubic-bezier(.2, .3, .25, .9);
-    transition: transform 150ms cubic-bezier(.2, .3, .25, .9);
-    overflow: overlay;
+    /*-webkit-transition: -webkit-transform 150ms cubic-bezier(.2, .3, .25, .9);
+    transition: transform 150ms cubic-bezier(.2, .3, .25, .9);*/
+    /*overflow: overlay;*/
 }
 
 
@@ -84,7 +82,7 @@
 
 /** logo **/
 
-.ltt_c-logo{
+.ltt_c-cover{
     color: #FFDA6B;
     text-align: center;
     padding: 30px 0;
@@ -95,9 +93,29 @@
     height: 200px;
 }
 
+.ltt_c-logo{
+    width: 65px;
+    color: #FFF;
+    background: #43B2DF;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+}
+.ltt_c-logo-title{
+    font-size: 20px;
+}
 
-.ltt_c-pageManager{
+
+.ltt_c-outerContainer{
+    display: flex;
+    height: 100%;
+    padding-top: 50px;
+}
+.ltt_c-innerContainer{
     padding: 20px;
+    flex: 1;
+    height: 100%;
+    overflow: overlay;
 }
 
 

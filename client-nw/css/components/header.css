@@ -1,19 +1,24 @@
 /** header **/
 .ltt_c-header{
     height: 50px;
-    /* background: linear-gradient(to bottom, #E1E1E1 0%, #D7D7D7 100%); */
     background: #FFF;
     border-bottom: 1px solid #EBEBEB;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0px;
+    z-index: 100;
+    display: flex;
 }
-.ltt_c-header .ltt-btn{
+.ltt_c-header .btn{
     margin-top: 8px;
-    border: 1px solid #ccc;
+    border: none;
+    box-shadow: none;
+    background: none;
 }
-
 
 .ltt_c-header-barBtn{
-    margin-left: 8px;
-    float:  left;
+    margin-left: 0px;
 }
 
 
@@ -23,4 +28,10 @@
 }
 .ltt-btn-grp{
 
+}
+
+.ltt_c-header-controls{
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
 }
