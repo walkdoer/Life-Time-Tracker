@@ -4,6 +4,7 @@
 var React = require('react');
 var chart = require('./chart');
 var convertor = require('../../convertors/column');
+var compareConvertor = require('../../convertors/compareColumn');
 var _ = require('underscore');
 var Bar = React.createClass({
     displayName: 'bar',
@@ -19,17 +20,27 @@ var Bar = React.createClass({
 
     setData: function(data) {
         this.props.data = data;
-        if (data) {
-            chart.bar({
-                title: this.props.title,
-                $el: $(this.getDOMNode()),
-                data: convertor.dispose(data)
-            }, {
-                xAxis: {
-                    categories: this.getCategories(data)
-                }
-            });
-        }
+        chart.bar({
+            title: this.props.title,
+            $el: $(this.getDOMNode()),
+            data: convertor.dispose(data)
+        }, {
+            xAxis: {
+                categories: this.getCategories(data)
+            }
+        });
+    },
+
+    compareData: function (datas){
+        chart.bar({
+            title: this.props.title,
+            $el: $(this.getDOMNode()),
+            data: compareConvertor.dispose(datas)
+        }, {
+            xAxis: {
+                categories: this.getCategoriesFromArray(datas)
+            }
+        });
     },
 
     getCategories: function(data) {
@@ -42,6 +53,14 @@ var Bar = React.createClass({
             categories = _.keys(data);
         }
         return categories;
+    },
+
+    getCategoriesFromArray: function (datas) {
+        var categorys = [];
+        datas.forEach(function (data) {
+            categorys = categorys.concat(this.getCategories(data.values));
+        }, this);
+        return _.uniq(categorys);
     }
 });
 

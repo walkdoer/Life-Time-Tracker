@@ -51,6 +51,20 @@ var Report = React.createClass({
             that.refs.meanLogClassTime.setData(statData.meanPerspective.classes);
             that.refs.meanProjectTime.setData(statData.meanPerspective.projects);
         }
+    },
+
+
+    compareData: function (statDatas) {
+        var categoryTime = [];
+        statDatas.map(function (statData) {
+            var day = statData.days[0];
+            categoryTime.push({
+                name: day.date,
+                values: day.categoryPerspective.categoryTime
+            });
+        });
+
+        this.refs.categoryTime.compareData(categoryTime);
     }
 });
 

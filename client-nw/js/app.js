@@ -33,18 +33,23 @@ var App = React.createClass({
         };
     },
 
+    getInitialProps: function () {
+        return {
+            openNav: true
+        };
+    },
 
     render: function () {
         var clsObj = {ltt: true};
-        clsObj[NAV_OPEN] = this.state.openNav;
         clsObj[SIDEBAR_OPEN] = this._needOpenSidebar();
+        clsObj[NAV_OPEN] = this.state.openNav;
         var className = cx(clsObj);
         path = this.getCurrentPath();
         return (
             <div className={className}>
                 <Header onConfigBtnClick={this.toggleNav} />
                 <div className="ltt_c-outerContainer">
-                    <Nav initialMenuItem={this.getCurrentPage()}/>
+                    <Nav initialMenuItem={this.getCurrentPage()} ref="nav"/>
                     <Sidebar ref="sidebar">
                         <SearchBox placeholder="search here"/>
                     </Sidebar>
@@ -61,6 +66,10 @@ var App = React.createClass({
             return true;
         }
         return false;
+    },
+
+    componentDidMount: function () {
+        this.$el = $(this.getDOMNode());
     },
 
     getCurrentPage: function () {

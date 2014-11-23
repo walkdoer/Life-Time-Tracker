@@ -7,6 +7,7 @@ var Moment = require('moment');
 
 var DateRangePicker = React.createClass({
 
+
     componentDidMount: function () {
         var start, end;
         if (this.props.start && this.props.end) {
@@ -19,9 +20,7 @@ var DateRangePicker = React.createClass({
         var that = this;
         var $dateRange = $(this.refs.dateRange.getDOMNode());
         $dateRange.daterangepicker({
-            format: 'YYYY-MM-DD',
-            startDate: '2013-01-01',
-            endDate: '2013-12-31'
+            format: 'YYYY-MM-DD'
         }, function(start, end, label) {
             that.setDateRange(start, end, true);
         });
@@ -29,8 +28,23 @@ var DateRangePicker = React.createClass({
     },
 
 
+    componentDidUpdate: function () {
+        if (this.props.compare && this.props.compareStart && this.props.compareEnd) {
+            var start = this.props.compareStart,
+                end = this.props.compareEnd;
+            var $compareDateRange = $(this.refs.compareDateRange.getDOMNode());
+            $compareDateRange.daterangepicker({
+                format: 'YYYY-MM-DD'
+            }, function(start, end, label) {
+                that.setCompareDateRange(start, end, true);
+            });
+            this.setCompareDateRange(start, end, false);
+        }
+    },
+
     render: function () {
-        var className = 'input-daterange input-group ' + this.props.className;
+        var className = 'ltt_c-dateRangePicker ' + this.props.className;
+        var inputClassName = 'input-daterange';
         var btns = [
             {text: 'Today', value: 'today'},
             {text: 'Yesterday', value: 'yesterday'},
@@ -41,12 +55,25 @@ var DateRangePicker = React.createClass({
             return (<button type="button" className="btn btn-default"
                 onClick={this.setDateRangeType.bind(this, btn.value)}>{btn.text}</button>);
         }, this);
+        var compareComponents;
+        if (this.props.compare) {
+            compareComponents = (<input ref="compareDateRange" className="input-daterange"/>);
+        }
         return (
-            <div className="ltt_c-dateRangePicker">
-                <input ref="dateRange" className={className}/>
+            <div className={className}>
+                <div>
+                    <input ref="dateRange" className="input-daterange"/>
+                    <input ref="isCompared" type="checkbox" onChange={this.onCompare}/>
+                    {compareComponents}
+                </div>
                 <div className="btn-group" role="daterange">{btns}</div>
             </div>
         );
+    },
+
+    onCompare: function (e) {
+        var checked = e.target.checked;
+        this.props.onCompare(checked);
     },
 
     getStartDate: function () {
@@ -110,7 +137,20 @@ var DateRangePicker = React.createClass({
         this.setStartDate(start);
         this.setEndDate(end);
         if (trigger) {
-            this.props.onChange(start.toDate(), end.toDate());
+            this.props.onDateRangeChange(start.toDate(), end.toDate());
+        }
+    },
+
+    setCompareDateRange: function (start, end, trigger) {
+        start = Moment(start);
+        end = Moment(end);
+        var $compareDateRange = $(this.refs.compareDateRange.getDOMNode());
+        $compareDateRange.data('daterangepicker').setStartDate(start);
+        $compareDateRange.data('daterangepicker').setEndDate(end);
+        this.setStartDate(start);
+        this.setEndDate(end);
+        if (trigger) {
+            this.props.onCompareDateRangeChange(start.toDate(), end.toDate());
         }
     }
 
