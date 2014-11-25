@@ -17,7 +17,10 @@ var Pie = require('../components/charts/Pie');
 var Column = require('../components/charts/Column');
 var Line = require('../components/charts/Line');
 var Bar = require('../components/charts/Bar');
+var compareData = require('../components/charts/compareData');
 var Report = React.createClass({
+
+    mixins: [compareData],
 
     render: function () {
         return (
@@ -51,26 +54,6 @@ var Report = React.createClass({
             that.refs.meanLogClassTime.setData(statData.meanPerspective.classes);
             that.refs.meanProjectTime.setData(statData.meanPerspective.projects);
         }
-    },
-
-
-    compareData: function (statDatas) {
-        var categoryTime = [],
-            tagTime = [];
-        statDatas.map(function (statData) {
-            var day = statData.days[0];
-            categoryTime.push({
-                name: day.date,
-                values: day.categoryPerspective.categoryTime
-            });
-            tagTime.push({
-                name: day.date,
-                values: day.tagTime.slice(0, 20)
-            });
-        });
-
-        this.refs.categoryTime.compareData(categoryTime);
-        this.refs.tagTime.compareData(tagTime);
     }
 });
 

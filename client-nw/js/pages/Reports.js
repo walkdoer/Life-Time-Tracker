@@ -68,7 +68,7 @@ var Report = React.createClass({
         var mStart = new Moment(this.state.start),
             mEnd = new Moment(this.state.end),
             dayDiff = mEnd.diff(mStart, 'day') + 1;
-        var compareEnd = Moment(mStart).subtract(dayDiff, 'day').endOf('day'),
+        var compareEnd = Moment(mStart).subtract(1, 'day').endOf('day'),
             compareStart = Moment(mStart).subtract(dayDiff, 'day');
         this.setState({
             compare: checked,
@@ -155,7 +155,7 @@ var Report = React.createClass({
                     });
                 }
                 def.resolve(promises.map(function (promise) {
-                    return promise.value.data;
+                    return promise.value;
                 }));
             });
         }

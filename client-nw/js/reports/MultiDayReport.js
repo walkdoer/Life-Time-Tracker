@@ -17,8 +17,10 @@ var Pie = require('../components/charts/Pie');
 var Column = require('../components/charts/Column');
 var Line = require('../components/charts/Line');
 var Bar = require('../components/charts/Bar');
-
+var compareData = require('../components/charts/compareData');
 var Report = React.createClass({
+
+    mixins: [compareData],
 
     render: function () {
         var baseClass = 'row ltt-row';
