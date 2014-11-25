@@ -17,49 +17,71 @@ var Pie = require('../components/charts/Pie');
 var Column = require('../components/charts/Column');
 var Line = require('../components/charts/Line');
 var Bar = require('../components/charts/Bar');
-var compareData = require('../components/charts/compareData');
+var setAndCompareData = require('../components/charts/setAndCompareData');
 var Report = React.createClass({
 
-    mixins: [compareData],
+    mixins: [setAndCompareData],
 
+    chartDatas: {
+        chart_logClassTime: 'classTime',
+        chart_logClassTimeTrend: function (data) { return this.getLogClassTimeTrend(data); },
+        chart_tagTime: function (data) { return data.tagTime.slice(0, 20); },
+        chart_sitStandTime: function (data) { return data.sitPerspective;},
+        chart_categoryTime: function (data) { return data.categoryPerspective.categoryTime; },
+        chart_projectTime: function (data) { return  data.projectTime.slice(0,10);},
+        chart_meanLogClassTime: function (data) { return data.meanPerspective.classes},
+        chart_meanProjectTime: function (data) {return data.meanPerspective.projects}
+    },
+    compareChartRefs: [{
+        refName: "chart_categoryTime",
+        getData: function (data) {
+            return data.categoryPerspective.categoryTime;
+        },
+    }, {
+        refName: "chart_tagTime",
+        getData: function (data) {
+            return data.tagTime.slice(0, 20);
+        }
+    }, {
+        refName: "chart_projectTime",
+        getData: function (data) {
+            return data.projectTime.slice(0, 20);
+        }
+    }, {
+        refName: "chart_meanLogClassTime",
+        getData: function (data) {
+            return data.meanPerspective.classes;
+        }
+    }, {
+        refName: "chart_meanProjectTime",
+        getData: function (data) {
+            return data.meanPerspective.projects;
+        }
+    }],
     render: function () {
         var baseClass = 'row ltt-row';
         return (
             <div className="ltt_c-report-multiDay">
                 <div className={baseClass}>
-                    <Pie className={col4} ref="logClassTime" />
-                    <Column className={col8} ref="tagTime" />
+                    <Pie className={col4} ref="chart_logClassTime" />
+                    <Column className={col8} ref="chart_tagTime" />
                 </div>
                 <div className={baseClass}>
-                    <Line title="Class time trend" type="area" className={colFull} ref="logClassTimeTrend" />
+                    <Line title="Class time trend" type="area" className={colFull} ref="chart_logClassTimeTrend" />
                 </div>
                 <div className={baseClass}>
-                    <Bar className={col4} ref="categoryTime" />
-                    <Column title="Top 10 Project" className={col8} ref="projectTime" />
+                    <Bar className={col4} ref="chart_categoryTime" />
+                    <Column title="Top 10 Project" className={col8} ref="chart_projectTime" />
                 </div>
                 <div className={baseClass}>
-                    <Pie className={col4} ref="sitStandTime" />
-                    <Bar className={col4} ref="meanLogClassTime" />
-                    <Bar className={col4} ref="meanProjectTime" />
+                    <Pie className={col4} ref="chart_sitStandTime" />
+                    <Bar className={col4} ref="chart_meanLogClassTime" />
+                    <Bar className={col4} ref="chart_meanProjectTime" />
                 </div>
             </div>
         );
     },
 
-
-    setData: function (statData) {
-        var that = this;
-        that.refs.logClassTime.setData(statData.classTime);
-        that.refs.logClassTimeTrend.setData(that.getLogClassTimeTrend(statData));
-        that.refs.sitStandTime.setData(statData.sitPerspective);
-        that.refs.tagTime.setData(statData.tagTime.slice(0, 20));
-        that.refs.categoryTime.setData(statData.categoryPerspective.categoryTime);
-        that.refs.projectTime.setData(statData.projectTime.slice(0,10));
-        if (statData.meanPerspective) {
-            that.refs.meanLogClassTime.setData(statData.meanPerspective.classes);
-            that.refs.meanProjectTime.setData(statData.meanPerspective.projects);
-        }
-    },
 
     getLogClassTimeTrend: function (statData) {
         var days = statData.scanResult.days;

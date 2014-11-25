@@ -42,9 +42,9 @@ var Report = React.createClass({
 
     render: function () {
         if (this.isSingleDay()) {
-            report = (<DayReport ref="report"/>);
+            report = (<DayReport ref="report" compare={this.state.compare}/>);
         } else {
-            report = (<MultiDayReport ref="report"/>);
+            report = (<MultiDayReport ref="report"  compare={this.state.compare}/>);
         }
         return (
             <div className="ltt_c-page-reports">
@@ -111,6 +111,7 @@ var Report = React.createClass({
                     var statData = result.data;
                     that.refs.report.setData(statData);
                 } else {
+                    that.refs.report.setData(result[0].data);
                     that.refs.report.compareData(result);
                 }
             }).catch(function(err) {
