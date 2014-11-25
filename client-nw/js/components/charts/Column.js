@@ -5,7 +5,9 @@
 var React = require('react');
 var R = React.DOM;
 var chart = require('./chart');
+var helper = require('./helper');
 var convertor = require('../../convertors/column');
+var compareConvertor = require('../../convertors/compareColumn');
 var _ = require('underscore');
 var Column = React.createClass({
     displayName: 'column',
@@ -28,22 +30,22 @@ var Column = React.createClass({
                 data: convertor.dispose(data)
             }, {
                 xAxis: {
-                    categories: this.getCategories(data)
+                    categories: helper.getCategories(data)
                 }
             });
         }
     },
 
-    getCategories: function(data) {
-        var categories = [];
-        if (_.isArray(data)) {
-            _.each(data, function(d) {
-                categories.push(d.name || d.label);
-            });
-        } else if (_.isObject(data)){
-            categories = _.keys(data);
-        }
-        return categories;
+    compareData: function (datas){
+        chart.column({
+            title: this.props.title,
+            $el: $(this.getDOMNode()),
+            data: compareConvertor.dispose(datas)
+        }, {
+            xAxis: {
+                categories: helper.getCategoriesForCompareDatas(datas)
+            }
+        });
     }
 });
 

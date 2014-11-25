@@ -11,3 +11,13 @@ exports.getValueKey = function (rawData) {
     }
     return valueKey;
 };
+
+exports.getNameKey = function (rawData) {
+    var key, firstRecord = rawData[0];
+    if (firstRecord.name !== undefined) {
+        key = 'name';
+    } else if (firstRecord.label !== undefined) {
+        key = 'label';
+    }
+    return key;
+};

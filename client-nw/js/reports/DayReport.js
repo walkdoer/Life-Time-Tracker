@@ -55,16 +55,22 @@ var Report = React.createClass({
 
 
     compareData: function (statDatas) {
-        var categoryTime = [];
+        var categoryTime = [],
+            tagTime = [];
         statDatas.map(function (statData) {
             var day = statData.days[0];
             categoryTime.push({
                 name: day.date,
                 values: day.categoryPerspective.categoryTime
             });
+            tagTime.push({
+                name: day.date,
+                values: day.tagTime.slice(0, 20)
+            });
         });
 
         this.refs.categoryTime.compareData(categoryTime);
+        this.refs.tagTime.compareData(tagTime);
     }
 });
 

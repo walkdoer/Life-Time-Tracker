@@ -29,6 +29,7 @@ var DateRangePicker = React.createClass({
 
 
     componentDidUpdate: function () {
+        var that = this;
         if (this.props.compare && this.props.compareStart && this.props.compareEnd) {
             var start = this.props.compareStart,
                 end = this.props.compareEnd;
