@@ -33,7 +33,7 @@ var Report = React.createClass({
         refName: "chart_categoryTime",
         getData: function (data) {
             return data.categoryPerspective.categoryTime;
-        },
+        }
     }, {
         refName: "chart_tagTime",
         getData: 'tagTime'

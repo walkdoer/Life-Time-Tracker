@@ -1,5 +1,5 @@
 .ltt_c-page {
-
+    padding: 20px;
 }
 
 .ltt_c-page-title{
@@ -11,4 +11,21 @@
     background: #fff;
     padding: 15px;
     margin-bottom: 15px;
+}
+
+.ltt_c-page-reports {
+    display: flex;
+    padding: 0px;
+    height: 100%;
+}
+.ltt_c-page-reports .ltt_c-sidebar .ltt_c-menu-item.active{
+    border-color:#292d30;    
+}
+
+
+.ltt_c-page-reports-report{
+    height: 100%;
+    flex: 1;
+    overflow: overlay;
+    padding: 20px;
 }

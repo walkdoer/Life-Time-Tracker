@@ -7,16 +7,21 @@ var MenuItem = require('./Menu.Item');
 var Menu = React.createClass({
 
     render: function () {
-        var currentMenuItem = this.props.active;
+        var currentMenuItem = this.props.activeKey;
         var menuItems = this.props.items;
         var menu = this;
+        var onlyIcon;
+        if (this.props.text === false) {
+            onlyIcon = true;
+        }
         menuItems = menuItems.map(function (item, i) {
             var active = item.key === currentMenuItem;
             var boundClick = this.handleClick.bind(this, item);
             return (<MenuItem
                 active={active}
                 menuKey={item.key}
-                text={item.text}
+                path={item.path}
+                text={onlyIcon ? null : item.text}
                 icon={item.icon}
                 onClick={boundClick}
                 key={item.key}/>);
@@ -29,10 +34,9 @@ var Menu = React.createClass({
     },
 
     handleClick: function (menuItem) {
-        this.setState({
-            currentMenuItem: menuItem.key
-        });
-        this.props.onMenuClick(menuItem);
+        if (this.props.onMenuClick) {
+            this.props.onMenuClick(menuItem);
+        }
     }
 
 });

@@ -9,7 +9,7 @@ var Dashboard = React.createClass({
 
     render: function () {
         return (
-            <div className="ltt_c-page-dashboard">
+            <div className="ltt_c-page ltt_c-page-dashboard">
                 <div className="ltt_c-page-com">
                     <p className="ltt_c-page-title">Sport Cal-Heatmap</p>
                     <CalendarHeatMap

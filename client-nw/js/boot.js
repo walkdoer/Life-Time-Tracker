@@ -17,8 +17,8 @@ var Routes = Router.Routes;
 var NotFoundRoute = Router.NotFoundRoute;
 var DefaultRoute = Router.DefaultRoute;
 var Link = Router.Link;
-
-
+var OverviewReport = require('./reports/Overview');
+var Report = require('./reports/report');
 var App = require('./app');
 var Dashboard = require('./pages/Dashboard'),
     Logs = require('./pages/Logs'),
@@ -26,18 +26,21 @@ var Dashboard = require('./pages/Dashboard'),
     Reports = require('./pages/Reports');
 
 var routes = (
-    <Routes hash>
-        <Route name="app" path="/" handler={App}>
-            <Route name="reports" handler={Reports}/>
-            <Route name="dashboard" handler={Dashboard}/>
-            <Route name="logs" handler={Logs}/>
-            <NotFoundRoute handler={Page404}/>
-            <DefaultRoute handler={Dashboard}/>
+    <Route name="app" path="/" handler={App}>
+        <Route name="reports" path="/reports" handler={Reports}>
+            <Route name="report" path="/reports/:reportId" handler={Report}/>
+            <DefaultRoute handler={Report}/>
         </Route>
-    </Routes>
+        <Route name="dashboard" path="/dashboard" handler={Dashboard}/>
+        <Route name="logs" path="/logs" handler={Logs}/>
+        <NotFoundRoute handler={Page404}/>
+        <DefaultRoute handler={Dashboard}/>
+    </Route>
 );
 
-React.renderComponent(routes, document.getElementById('app-container'));
+Router.run(routes, function(Handler) {
+    React.render(<Handler />, document.getElementById('app-container'));
+});
 /*
 React.render(
     <App

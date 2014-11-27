@@ -16,16 +16,9 @@
     color: #e3e4e6;
 }
 .ltt_c-sidebar{
-    width:220px;
-    display: none;
+    width: 180px;
     background-color: #292d30;
     color: #e3e4e6;
-}
-.ltt__navOpen .ltt_c-nav{
-    display: block;
-}
-.ltt__sidebarOpen .ltt_c-sidebar{
-    display: block;
 }
 /** main **/
 .ltt_c-main {
@@ -34,7 +27,9 @@
     /*overflow: overlay;*/
 }
 
-
+.ltt__navOpen .ltt_c-nav{
+    display: block;
+}
 
 
 /**menu**/
@@ -112,9 +107,8 @@
     padding-top: 50px;
 }
 .ltt_c-innerContainer{
-    padding: 20px;
-    flex: 1;
     height: 100%;
+    flex: 1;
     overflow: overlay;
 }
 

@@ -7,7 +7,7 @@ var Menu = require('./Menu');
 var Logo = require('./Logo');
 var _ = require('lodash');
 
-var Sidebar = React.createClass({
+var Nav = React.createClass({
 
 
     /**
@@ -17,14 +17,17 @@ var Sidebar = React.createClass({
         var items = [{
             text: 'Dashboard',
             key: 'dashboard',
+            path: 'dashboard',
             icon: 'fa fa-dashboard'
         }, {
             text: 'Reports',
             key: 'reports',
+            path: 'reports',
             icon: 'fa fa-bar-chart'
         }, {
             text: 'Logs',
             key: 'logs',
+            path: 'logs',
             icon: 'fa fa-file'
         } /*{
             text: 'Projects',
@@ -36,7 +39,8 @@ var Sidebar = React.createClass({
             <nav className="ltt_c-nav">
                 <Menu
                     items={items}
-                    active={this.props.initialMenuItem}
+                    activeKey={this.props.initialMenuItem}
+                    text={false} //only icon
                     onMenuClick={this.onMenuClick}
                 />
             </nav>
@@ -51,4 +55,4 @@ var Sidebar = React.createClass({
 
 });
 
-module.exports = Sidebar;
+module.exports = Nav;

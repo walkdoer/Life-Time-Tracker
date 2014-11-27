@@ -5,8 +5,13 @@
 
 var React = require('react');
 
-
 var Sidebar = React.createClass({
+
+    getDefaultProps: function () {
+        return {
+            initialMenuItem: 'Overview'
+        };
+    },
 
     render: function() {
         return (

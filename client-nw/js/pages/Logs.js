@@ -22,7 +22,7 @@ var Logs = React.createClass({
             return Log(log);
         });
         return (
-            <div className="ltt_c-page-logs">
+            <div className="ltt_c-page ltt_c-page-logs">
                 <DatePicker
                     onChange={this.searchLogs}
                     className="ltt_c-page-logs-date"/>
