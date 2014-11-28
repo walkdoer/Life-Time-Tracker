@@ -20,19 +20,30 @@ var Reports = React.createClass({
         var params = this.getParams();
         var reportId = params.reportId;
         if (!reportId) {
+            //default report is overview
             this.replaceWith('/reports/overview');
-            return;
+            reportId = 'overview';
         }
         var menuItems = [{
             text: 'Overview',
             key: 'overview',
             path: '/reports/overview',
             icon: 'fa fa-area-chart'
-        } ,{
+        }, {
             text: 'Today',
             key: 'today',
             path: '/reports/today',
             icon: 'fa fa-sun-o'
+        }, {
+            text: 'Tag',
+            key: 'tag',
+            path: '/reports/tag',
+            icon: 'fa fa-tag'
+        }, {
+            text: 'Project',
+            key: 'project',
+            path: '/reports/project',
+            icon: 'fa fa-rocket'
         }];
 
         var initialMenuItem = menuItems.filter(function(menu) {

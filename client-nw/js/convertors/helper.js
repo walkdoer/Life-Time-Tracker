@@ -4,6 +4,10 @@
 'use strict';
 exports.getValueKey = function (rawData) {
     var valueKey, firstRecord = rawData[0];
+    //if no record
+    if (!firstRecord) {
+        return null;
+    }
     if (firstRecord.time !== undefined) {
         valueKey = 'time';
     } else if (firstRecord.count !== undefined) {

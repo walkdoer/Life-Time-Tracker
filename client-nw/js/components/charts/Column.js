@@ -9,8 +9,10 @@ var helper = require('./helper');
 var convertor = require('../../convertors/column');
 var compareConvertor = require('../../convertors/compareColumn');
 var _ = require('underscore');
+var CommonFunction = require('./CommonFunction');
 var Column = React.createClass({
     displayName: 'column',
+    mixins: [ CommonFunction ],
     render: function() {
         var className = 'ltt_c-chart ltt_c-chart-column';
         if (this.props.className) {
@@ -24,15 +26,16 @@ var Column = React.createClass({
     setData: function(data) {
         this.props.data = data;
         if (data) {
+            var userHighchartOptions = this.getUserHighchartOptions();
             chart.column({
                 title: this.props.title,
                 $el: $(this.getDOMNode()),
                 data: convertor.dispose(data)
-            }, {
+            }, _.extend({
                 xAxis: {
                     categories: helper.getCategories(data)
                 }
-            });
+            }, userHighchartOptions));
         }
     },
 
