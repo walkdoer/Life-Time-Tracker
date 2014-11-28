@@ -36,7 +36,7 @@ function buildScript(main, destFile, watch) {
         var stream = bundler.bundle();
         return stream.on('error', handleErrors)
             .pipe(source(destFile))
-            .pipe(gulp.dest(buildDir + '/'));
+            .pipe(gulp.dest(buildDir + '/js/'));
     }
     bundler.on('update', function() {
         rebundle();
@@ -56,6 +56,7 @@ gulp.task('sync', function() {
     var cssFiles = './css/**/*.css',
         images = './images/**/*',
         fonts = './fonts/**/*',
+        index = './index.html',
         js = './js/nw/**/*.js';
     gulp.src(cssFiles)
         .pipe(watch(cssFiles, function (files) {
@@ -67,7 +68,11 @@ gulp.task('sync', function() {
         }));
     gulp.src(js)
         .pipe(watch(js, function (files) {
-            return files.pipe(gulp.dest(buildDir + '/nw'));
+            return files.pipe(gulp.dest(buildDir + '/js/nw/'));
+        }));
+    gulp.src(index)
+        .pipe(watch(index, function (file) {
+            return file.pipe(gulp.dest(buildDir));
         }));
     return gulp.src(fonts)
         .pipe(watch(fonts, function (files) {

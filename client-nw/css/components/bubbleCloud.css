@@ -1,0 +1,77 @@
+.ltt_c-chart-bubbleCloud {
+    overflow:hidden;
+    position:relative;
+    height:259px;
+    background: #FFF;
+}
+
+.ltt_c-chart-bubbleCloud a,
+.ltt_c-chart-bubbleCloud a:link,
+.ltt_c-chart-bubbleCloud a:visited,
+.ltt_c-chart-bubbleCloud a:active,
+.ltt_c-chart-bubbleCloud a:hover{
+    color: #FFF;
+    text-decoration: none;
+}
+#book-title {
+    font-family: georgia, "times new roman", times, serif;
+    color: #555;
+    font-size: 2.3em;
+    text-align: center;
+}
+#text-select {
+    float: right;
+    margin-right: 10px;
+}
+#vis {
+    overflow: hidden;
+    position: relative;
+}
+#status {
+    padding: 0 0 20px 20px;
+}
+#controls {
+    padding: 20px;
+    background-color: #eee;
+    margin: 10px;
+    width: 350px;
+}
+#bubble-background {
+    fill: none;
+    pointer-events: all;
+}
+.bubble-node {
+    /* fill: #d1e0f3; */
+    fill: #1bd0dc;
+}
+.bubble-hover {
+    /* fill: #b8c7d9; */
+    fill: #139AB0;
+}
+.bubble-selected {
+    /* fill: #a8c8ee;  */
+    fill: #139AB0;
+    /* stroke: #6081a3; */
+    stroke: #139AB0;
+    stroke-width: 1.5px;
+}
+.bubble-active {
+    color: #139AB0;
+}
+a.bubble-label {
+    font-family: georgia, "times new roman", times, serif;
+    color: inherit;
+    cursor: pointer;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    line-height: 1em;
+    position: absolute;
+}
+.bubble-label .bubble-label-value {
+    font: 11px sans-serif;
+    white-space: nowrap;
+}
+.bubble-label-value {
+    display: none;
+}

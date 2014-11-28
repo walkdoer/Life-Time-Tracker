@@ -22,10 +22,6 @@ app.engine('handlebars', exphbs({
 app.set('view engine', 'handlebars');
 app.use(morgan('combined'));
 //static resources
-app.get('/', appRouter);
-app.get('/dashboard*', appRouter);
-app.get('/reports*', appRouter);
-app.get('/logs*', appRouter);
 app.use('/', express.static(path.join(__dirname, './')));
 app.get('/api/*', redirect);
 

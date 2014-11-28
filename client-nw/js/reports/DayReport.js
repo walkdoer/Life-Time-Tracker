@@ -49,7 +49,7 @@ var Report = React.createClass({
             <div className="ltt_c-report-day">
                 <div className="row ltt-row">
                     <Pie className={col4} ref="chart_logClassTime" />
-                    <Column className={col8} ref="chart_tagTime" legend={false}/>
+                    <Column title="Tag Time" className={col8} ref="chart_tagTime" legend={false}/>
                 </div>
                 <div className="row ltt-row">
                     <Bar className={col4} ref="chart_categoryTime" legend={false}/>

@@ -17,6 +17,7 @@ var Pie = require('../components/charts/Pie');
 var Column = require('../components/charts/Column');
 var Line = require('../components/charts/Line');
 var Bar = require('../components/charts/Bar');
+var BubbleCloud = require('../components/charts/BubbleCloud');
 var setAndCompareData = require('../components/charts/setAndCompareData');
 var Report = React.createClass({
 
@@ -30,7 +31,8 @@ var Report = React.createClass({
         chart_categoryTime: function (data) { return data.categoryPerspective.categoryTime; },
         chart_projectTime: function (data) { return  data.projectTime.slice(0,10);},
         chart_meanLogClassTime: function (data) { return data.meanPerspective.classes},
-        chart_meanProjectTime: function (data) {return data.meanPerspective.projects}
+        chart_meanProjectTime: function (data) {return data.meanPerspective.projects},
+        chart_bubbleCloud: function (data) { return data.tagTime; }
     },
     compareChartRefs: [{
         refName: "chart_categoryTime",
@@ -45,7 +47,7 @@ var Report = React.createClass({
     }, {
         refName: "chart_projectTime",
         getData: function (data) {
-            return data.projectTime.slice(0, 20);
+            return data.projectTime.slice(0, 10);
         }
     }, {
         refName: "chart_meanLogClassTime",
@@ -64,7 +66,7 @@ var Report = React.createClass({
             <div className="ltt_c-report-multiDay">
                 <div className={baseClass}>
                     <Pie className={col4} ref="chart_logClassTime" />
-                    <Column className={col8} ref="chart_tagTime" />
+                    <Column title="Tag Time" className={col8} ref="chart_tagTime" legend={false} />
                 </div>
                 <div className={baseClass}>
                     <Line title="Class time trend" type="area" className={colFull} ref="chart_logClassTimeTrend" />
@@ -75,8 +77,14 @@ var Report = React.createClass({
                 </div>
                 <div className={baseClass}>
                     <Pie className={col4} ref="chart_sitStandTime" />
-                    <Bar className={col4} ref="chart_meanLogClassTime" />
-                    <Bar className={col4} ref="chart_meanProjectTime" />
+                    <Bar className={col4} title="Mean Class Time" ref="chart_meanLogClassTime" legend={false} />
+                    <Bar className={col4} title="Mean Project Time" ref="chart_meanProjectTime" legend={false} />
+                </div>
+                <div className={baseClass}>
+                    <BubbleCloud
+                        className={colFull}
+                        title="Tag Cloud"
+                        ref="chart_bubbleCloud"/>
                 </div>
             </div>
         );
