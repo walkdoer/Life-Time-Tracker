@@ -31,7 +31,13 @@ var Report = React.createClass({
         chart_categoryTime: function (data) { return data.categoryPerspective.categoryTime; },
         chart_projectTime: function (data) { return  data.projectTime.slice(0,10);},
         chart_meanLogClassTime: function (data) { return data.meanPerspective.classes},
-        chart_meanProjectTime: function (data) {return data.meanPerspective.projects},
+        chart_meanProjectTime: function (data) {
+            var n = 8;
+            //pick the top N project;
+            var meanProjectTime = data.meanPerspective.projects;
+            var tops = _.keys(meanProjectTime).slice(0, n);
+            return _.pick(meanProjectTime, tops);
+        },
         chart_bubbleCloud: function (data) { return data.tagTime; }
     },
     compareChartRefs: [{
@@ -78,7 +84,7 @@ var Report = React.createClass({
                 <div className={baseClass}>
                     <Pie className={col4} ref="chart_sitStandTime" />
                     <Bar className={col4} title="Mean Class Time" ref="chart_meanLogClassTime" legend={false} />
-                    <Bar className={col4} title="Mean Project Time" ref="chart_meanProjectTime" legend={false} />
+                    <Bar className={col4} title="Mean Top 8 Project Time" ref="chart_meanProjectTime" legend={false} />
                 </div>
                 <div className={baseClass}>
                     <BubbleCloud

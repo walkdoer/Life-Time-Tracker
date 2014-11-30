@@ -70,8 +70,8 @@ var Bubbles = function(options) {
             node.append("rect").attr("id", "bubble-background").attr("width", width).attr("height", height).on("click", clear);
             label = d3.select(this).selectAll("#bubble-labels").data([data]).enter().append("div").attr("id", "bubble-labels");
             update();
-            hashchange();
-            return d3.select(window).on("hashchange", hashchange);
+            //hashchange();
+            //return d3.select(window).on("hashchange", hashchange);
         });
     };
     update = function() {
@@ -81,6 +81,7 @@ var Bubbles = function(options) {
         force.nodes(data).start();
         updateNodes();
         return updateLabels();
+
     };
     updateNodes = function() {
         node = node.selectAll(".bubble-node").data(data, function(d) {
@@ -100,6 +101,7 @@ var Bubbles = function(options) {
             return idValue(d);
         });
         label.exit().remove();
+        /*.*/
         labelEnter = label.enter().append("a").attr("class", "bubble-label").attr("href", function(d) {
             return "#" + (encodeURIComponent(idValue(d)));
         }).call(force.drag).call(connectEvents);
