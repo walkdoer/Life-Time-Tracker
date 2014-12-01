@@ -3,7 +3,7 @@
  */
 
 var React = require('react');
-var DateRangePicker = require('../components/DateRangePicker');
+var ReportDateConfig = require('../components/ReportDateConfig');
 var Moment = require('moment');
 var Q = require('q');
 var _ = require('lodash');
@@ -48,7 +48,7 @@ var Overview = React.createClass({
         }
         return (
             <div className="ltt_c-report-overview">
-                <DateRangePicker
+                <ReportDateConfig
                     start= {this.state.start}
                     end= {this.state.end}
                     compareStart= {this.state.compareStart}
@@ -57,8 +57,7 @@ var Overview = React.createClass({
                     onCompare={this.onCompare}
                     onDateRangeChange={this.onDateRangeChange}
                     onCompareDateRangeChange={this.onCompareDateRangeChange}
-                    className="ltt_c-page-reports-dateRange"
-                    ref="dateRangePicker"/>
+                    className="ltt_c-page-reports-dateRange"/>
                 {report}
             </div>
         );
