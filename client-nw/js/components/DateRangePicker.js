@@ -58,12 +58,18 @@ var DateRangePicker = React.createClass({
         }, this);
         var compareComponents;
         if (this.props.compare) {
-            compareComponents = (<input ref="compareDateRange" className="input-daterange"/>);
+            compareComponents = [
+                (<button className="prev" type="button" onClick={this.prevCompareDateRange} title="prev"><i className="fa fa-angle-double-left"></i></button>),
+                (<input ref="compareDateRange" className="input-daterange"/>),
+                (<button className="next" type="button" onClick={this.nextCompareDateRange} title="next"><i className="fa fa-angle-double-right"></i></button>)
+            ];
         }
         return (
             <div className={className}>
-                <div>
+                <div className="ltt_c-dateRangePicker-dateGroup">
+                    <button className="prev" type="button" onClick={this.prevDateRange} title="prev"><i className="fa fa-angle-double-left"></i></button>
                     <input ref="dateRange" className="input-daterange"/>
+                    <button className="next" type="button" onClick={this.nextDateRange} title="next"><i className="fa fa-angle-double-right"></i></button>
                     <input ref="isCompared" type="checkbox" onChange={this.onCompare}/>
                     {compareComponents}
                 </div>
@@ -77,21 +83,21 @@ var DateRangePicker = React.createClass({
         this.props.onCompare(checked);
     },
 
-    getStartDate: function () {
-        return this._start;
-    },
+    getStartDate: function () { return this._start; },
 
-    setStartDate: function (date) {
-        this._start = date;
-    },
+    setStartDate: function (date) { this._start = date; },
 
-    getEndDate: function () {
-        return this._end;
-    },
+    getEndDate: function () { return this._end; },
 
-    setEndDate: function (date) {
-        this._end = date;
-    },
+    setEndDate: function (date) { this._end = date; },
+
+    getCompareStartDate: function () { return this._compareStart; },
+
+    setCompareStartDate: function (date) { this._compareStart = date; },
+
+    getCompareEndDate: function () { return this._compareEnd; },
+
+    setCompareEndDate: function (date) { this._compareEnd = date; },
 
     clearDateRange: function () {
         this.setEndDate (null);
@@ -148,12 +154,53 @@ var DateRangePicker = React.createClass({
         var $compareDateRange = $(this.refs.compareDateRange.getDOMNode());
         $compareDateRange.data('daterangepicker').setStartDate(start);
         $compareDateRange.data('daterangepicker').setEndDate(end);
-        this.setStartDate(start);
-        this.setEndDate(end);
+        this.setCompareStartDate(start);
+        this.setCompareEndDate(end);
         if (trigger) {
             this.props.onCompareDateRangeChange(start.toDate(), end.toDate());
         }
-    }
+    },
+
+    prevDateRange: function () {
+        var start = this.getStartDate(),
+            end = this.getEndDate(),
+            diffDay = end.diff(start, 'day') + 1;
+
+        var newStart = Moment(start).subtract(diffDay, 'day').startOf('day');
+        var newEnd = Moment(start).subtract(1, 'day').endOf('day');
+        this.setDateRange(newStart, newEnd, true);
+    },
+
+    nextDateRange: function () {
+        var start = this.getStartDate(),
+            end = this.getEndDate(),
+            diffDay = end.diff(start, 'day') + 1;
+
+        var newStart = Moment(end).add(1, 'day').startOf('day'),
+            newEnd  = Moment(end).add(diffDay, 'day');
+        this.setDateRange(newStart, newEnd, true);
+    },
+
+    prevCompareDateRange: function () {
+        var start = this.getCompareStartDate(),
+            end = this.getCompareEndDate(),
+            diffDay = end.diff(start, 'day') + 1;
+
+        var newStart = Moment(start).subtract(diffDay, 'day').startOf('day');
+        var newEnd = Moment(start).subtract(1, 'day').endOf('day');
+        this.setCompareDateRange(newStart, newEnd, true);
+    },
+
+    nextCompareDateRange: function () {
+        var start = this.getCompareStartDate(),
+            end = this.getCompareEndDate(),
+            diffDay = end.diff(start, 'day') + 1;
+
+        var newStart = Moment(end).add(1, 'day').startOf('day'),
+            newEnd  = Moment(end).add(diffDay, 'day');
+        this.setCompareDateRange(newStart, newEnd, true);
+    },
+
 
 });
 

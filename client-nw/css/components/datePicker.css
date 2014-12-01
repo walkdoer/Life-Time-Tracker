@@ -23,3 +23,23 @@
 .ltt_c-dateRangePicker input[type="checkbox"]{
     margin:auto 10px;
 }
+
+.ltt_c-dateRangePicker-dateGroup {
+    display: flex;
+    align-items: stretch;
+}
+
+.ltt_c-dateRangePicker-dateGroup button[type="button"]{
+    border: 1px solid #ccc;
+    text-indent:3px;
+    outline:none;
+    background-image: linear-gradient(to bottom, #FFFFFF 0%, #e0e0e0 100%);
+    display:inline-block;
+    height: 34px;
+}
+.ltt_c-dateRangePicker-dateGroup button[type="button"].prev{
+    border-right: none;
+}
+.ltt_c-dateRangePicker-dateGroup button[type="button"].next{
+    border-left: none;
+}
