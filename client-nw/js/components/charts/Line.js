@@ -5,6 +5,7 @@
 var React = require('react');
 var R = React.DOM;
 var chart = require('./chart');
+var _ = require('lodash');
 //var lineConvertor = require('../../convertors/line');
 var Line = React.createClass({
     displayName: 'line',
@@ -24,6 +25,12 @@ var Line = React.createClass({
 
     setData: function (data) {
         this.props.data = data;
+        var visibleCount = this.props.visibleCount;
+        if (_.isNumber(visibleCount)) {
+            data.forEach(function (serie, index) {
+                serie.visible = index < visibleCount;
+            });
+        }
         if (data) {
             chart.line({
                 title: this.props.title,

@@ -80,14 +80,14 @@ var Report = React.createClass({
                     <Line title="Class time trend" type="area" className={colFull} ref="chart_logClassTimeTrend" />
                 </div>
                 <div className={baseClass}>
-                    <Line title="Tag time trend" type="area" className={colFull} ref="chart_tagTimeTrend" />
+                    <Line title="Tag time trend" type="area" className={colFull} ref="chart_tagTimeTrend" visibleCount={4}/>
                 </div>
                 <div className={baseClass}>
                     <Bar className={col4} ref="chart_categoryTime" />
                     <Column title="Top 10 Project" className={col8} ref="chart_projectTime" />
                 </div>
                 <div className={baseClass}>
-                    <Line title="Project time trend" type="area" className={colFull} ref="chart_projectTimeTrend" />
+                    <Line title="Project time trend" type="area" className={colFull} ref="chart_projectTimeTrend" visibleCount={4}/>
                 </div>
                 <div className={baseClass}>
                     <Pie className={col4} ref="chart_sitStandTime" />

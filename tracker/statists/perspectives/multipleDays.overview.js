@@ -98,7 +98,9 @@ function groupTimeBy(type, days, process, filter) {
                 target[0].count += time.count;
             } else {
                 if(typeof process === 'function') {
-                    time = process(extend({}, time));
+                    time = process(extend(true, {}, time));
+                } else  {
+                    time = extend(true, {}, time);
                 }
                 result.push(time);
             }

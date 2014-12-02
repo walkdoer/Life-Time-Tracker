@@ -368,8 +368,8 @@ function getLogContent(logStr) {
 function getTimeSpan(start, end) {
     var diff = -1;
     if (end && start) {
-        var startTime = new moment(start, timeFormat),
-            endTime = new moment(end, timeFormat);
+        var startTime = new moment(start),
+            endTime = new moment(end);
         diff = endTime.diff(startTime, 'minutes');
     }
     return diff;
