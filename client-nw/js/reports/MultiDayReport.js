@@ -26,6 +26,8 @@ var Report = React.createClass({
     chartDatas: {
         chart_logClassTime: 'classTime',
         chart_logClassTimeTrend: function (data) { return this.getLogClassTimeTrend(data); },
+        chart_tagTimeTrend: function (data) { return this.getTagTimeTrend(data); },
+        chart_projectTimeTrend: function (data) { return this.getProjectTimeTrend(data); },
         chart_tagTime: function (data) { return data.tagTime.slice(0, 20); },
         chart_sitStandTime: function (data) { return data.sitPerspective;},
         chart_categoryTime: function (data) { return data.categoryPerspective.categoryTime; },
@@ -78,8 +80,14 @@ var Report = React.createClass({
                     <Line title="Class time trend" type="area" className={colFull} ref="chart_logClassTimeTrend" />
                 </div>
                 <div className={baseClass}>
+                    <Line title="Tag time trend" type="area" className={colFull} ref="chart_tagTimeTrend" />
+                </div>
+                <div className={baseClass}>
                     <Bar className={col4} ref="chart_categoryTime" />
                     <Column title="Top 10 Project" className={col8} ref="chart_projectTime" />
+                </div>
+                <div className={baseClass}>
+                    <Line title="Project time trend" type="area" className={colFull} ref="chart_projectTimeTrend" />
                 </div>
                 <div className={baseClass}>
                     <Pie className={col4} ref="chart_sitStandTime" />
@@ -96,29 +104,57 @@ var Report = React.createClass({
         );
     },
 
+    getTagTimeTrend: function (statData) {
+        return this.getTrend(statData, {
+            dataName: 'tagTime',
+            labelName: 'label',
+            countName: 'count'
+        });
+    },
+
 
     getLogClassTimeTrend: function (statData) {
+        return this.getTrend(statData, {
+            dataName: 'classes',
+            labelName: 'name',
+            countName: 'time'
+        });
+    },
+
+    getProjectTimeTrend: function (statData) {
+        return this.getTrend(statData, {
+            dataName: 'projectTime',
+            labelName: 'label',
+            countName: 'count'
+        });
+    },
+
+    getTrend: function (statData, options) {
+        var dataName = options.dataName;
+        var labelName = options.labelName;
+        var countName = options.countName;
         var days = statData.scanResult.days;
         if (_.isEmpty(days)) {
             return [];
         }
         var result = {};
         days.forEach(function (day) {
-            day.classes.forEach(function (cls) {
-                if (!result[cls.name]) {
-                    result[cls.name] = [];
+            day[dataName].forEach(function (item) {
+                var name = item[labelName];
+                if (!result[name]) {
+                    result[name] = [];
                 }
             });
         });
         days.forEach(function (day) {
             var dateTS = new Moment(day.date).unix() * 1000;
-            var classes = day.classes;
+            var datas = day[dataName];
             _.each(result, function (data, name) {
-                var target = classes.filter(function (cls) {
-                    return cls.name === name;
+                var target = datas.filter(function (item) {
+                    return item[labelName] === name;
                 })[0];
-                if (target) {
-                    data.push([dateTS, Math.round(target.time / 60 * 100)/100]);
+                if (target && target[countName]) {
+                    data.push([dateTS, Math.round(target[countName] / 60 * 100)/100]);
                 } else {
                     data.push([dateTS, 0]);
                 }
