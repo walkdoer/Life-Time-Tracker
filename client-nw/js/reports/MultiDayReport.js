@@ -19,6 +19,7 @@ var Line = require('../components/charts/Line');
 var Bar = require('../components/charts/Bar');
 var BubbleCloud = require('../components/charts/BubbleCloud');
 var setAndCompareData = require('../components/charts/setAndCompareData');
+
 var Report = React.createClass({
 
     mixins: [setAndCompareData],
@@ -33,6 +34,22 @@ var Report = React.createClass({
         chart_categoryTime: function (data) { return data.categoryPerspective.categoryTime; },
         chart_projectTime: function (data) { return  data.projectTime.slice(0,10);},
         chart_meanLogClassTime: function (data) { return data.meanPerspective.classes},
+        chart_activeTime: function (data) {
+            var trackedTime = [], unTrackedTime = [], sleepTime = [];
+            var days = data.days;
+            days.forEach(function (day) {
+                var dateTS = new Moment(day.date).unix() * 1000;
+                var activeTime = day.activeTime;
+                unTrackedTime.push([dateTS, activeTime - day.trackedTime]);
+                sleepTime.push([dateTS, day.sleepTime]);
+                trackedTime.push([dateTS, day.trackedTime]);
+            });
+            return [
+                { name: 'Sleep Time', data: sleepTime},
+                { name: 'Tracked Time', data: trackedTime},
+                { name: 'unTracked Time', data: unTrackedTime}
+            ];
+        },
         chart_meanProjectTime: function (data) {
             var n = 8;
             //pick the top N project;
@@ -88,6 +105,9 @@ var Report = React.createClass({
                 </div>
                 <div className={baseClass}>
                     <Line title="Project time trend" type="area" className={colFull} ref="chart_projectTimeTrend" visibleCount={4}/>
+                </div>
+                <div className={baseClass}>
+                    <Column title="Active Time" type="stack" className={colFull} ref="chart_activeTime" xAxis="datetime" convert={false}/>
                 </div>
                 <div className={baseClass}>
                     <Pie className={col4} ref="chart_sitStandTime" />

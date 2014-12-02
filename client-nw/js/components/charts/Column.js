@@ -23,14 +23,17 @@ var Column = React.createClass({
         )
     },
 
-    setData: function(data) {
+    setData: function(data, options) {
         this.props.data = data;
         if (data) {
+            if (this.props.convert) {
+                data = convertor.dispose(data);
+            }
             var userHighchartOptions = this.getUserHighchartOptions();
             chart.column({
                 title: this.props.title,
                 $el: $(this.getDOMNode()),
-                data: convertor.dispose(data)
+                data: data
             }, _.extend({
                 xAxis: {
                     categories: helper.getCategories(data)
