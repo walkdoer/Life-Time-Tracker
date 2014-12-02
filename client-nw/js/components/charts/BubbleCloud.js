@@ -249,6 +249,11 @@ root.render = function (dom, data, options) {
 
 var ReactBubble = React.createClass({
     displayName: 'bubble',
+
+    componentDidUpdate: function () {
+        $(this.getDOMNode()).empty();
+    },
+
     render: function () {
         var className = 'ltt_c-chart ltt_c-chart-bubbleCloud ' + this.props.className;
         return (
@@ -263,14 +268,14 @@ var ReactBubble = React.createClass({
             width: $el.width(),
             height: $el.height()
         };
-        $(window).on('resize', function () {
+        $(window).on('resize', _.debounce(function () {
             var $el = $(that.getDOMNode());
             that.size = {
                 width: $el.width(),
                 height: $el.height()
             };
-            that.setData(that.props.data);
-        });
+            that.setData(that._data);
+        }, 150));
     },
 
     setData: function (data) {
