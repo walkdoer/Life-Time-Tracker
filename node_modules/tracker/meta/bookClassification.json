@@ -1,0 +1,56 @@
+{
+    "author": "andrew zhange",
+    "desc": "book classifications",
+    "classifications": [{
+        "name": "人文",
+        "code": "human",
+        "subClassifications": []
+    }, {
+        "name": "历史",
+        "code": "history",
+        "subClassifications": []
+    }, {
+        "name": "建筑",
+        "code": "arch",
+        "subClassifications": []
+    }, {
+        "name": "科学",
+        "code": "science",
+        "subClassifications": [{
+            "name": "物理",
+            "code": "physics"
+        }, {
+            "name": "计算机",
+            "code": "computer",
+            "subClassifications": [{
+                "name": "客户端开发",
+                "code": "client_dev"
+            }]
+        }, {
+            "name": "化学",
+            "code": "chemistry"
+        }, {
+            "name": "数学",
+            "code": "math"
+        }, {
+            "name": "机械",
+            "code": "machine"
+        }]
+    }, {
+        "name": "生活",
+        "code": "life",
+        "subClassifications": []
+    }, {
+        "name": "",
+        "code": "",
+        "subClassifications": []
+    }, {
+        "name": "",
+        "code": "",
+        "subClassifications": []
+    }, {
+        "name": "",
+        "code": "",
+        "subClassifications": []
+    }]
+}

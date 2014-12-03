@@ -52,5 +52,4 @@ node_modules/tracker/conf/token.json
 node_modules/tracker/node_modules
 logs/
 bower_components/
-node_modules/
 build/
