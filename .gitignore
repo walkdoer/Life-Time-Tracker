@@ -50,6 +50,7 @@ node_modules/*
 !node_modules/tracker/
 node_modules/tracker/conf/token.json
 node_modules/tracker/node_modules
+node_modules/tracker/.DS_Store
 logs/
 bower_components/
 build/
