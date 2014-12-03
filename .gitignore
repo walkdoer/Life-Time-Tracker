@@ -45,12 +45,11 @@ vendor
 *.pid
 *.swo
 
-tracker/conf/token.json
-frontend/resources/vendors
-logs
-client-browser/bower_components
-client-browser/js/bundle.js
-client-browser/node_modules
-client-nw/bower_components
-client-nw/node_modules
-client-nw/build
+node_modules/*
+!node_modules/tracker/
+node_modules/tracker/conf/token.json
+node_modules/tracker/node_modules
+logs/
+bower_components/
+node_modules/
+build/

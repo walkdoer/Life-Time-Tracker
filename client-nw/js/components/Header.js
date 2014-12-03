@@ -21,8 +21,8 @@ var Header = React.createClass({
                             className="btn btn-primary ltt_c-header-barBtn js-open-sidebar"
                             onClick={this.handleConfigBtnClick}
                         ><i className="fa fa-bars"></i></button>
-                        <button className="btn btn-default">
-                            <i className="fa fa-check"></i>
+                        <button className="btn btn-default" onClick={this.syncNote}>
+                            <i className="fa fa-refresh"></i>
                         </button>
                     </div>
 
@@ -50,6 +50,10 @@ var Header = React.createClass({
 
     debugApplication: function () {
         nwGui.Window.get().showDevTools();
+    },
+
+    syncNote: function () {
+        
     }
 
 });
