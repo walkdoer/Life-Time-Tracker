@@ -39,11 +39,12 @@ server.pid
 
 #Folder#
 node_modules
-vendor
 *.pid
 *.swp
 *.pid
 *.swo
+
+!node_modules/
 
 node_modules/*
 !node_modules/tracker/
