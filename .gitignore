@@ -44,6 +44,7 @@ node_modules
 *.pid
 *.swo
 
+js/bundle.js
 !node_modules/
 
 node_modules/*
