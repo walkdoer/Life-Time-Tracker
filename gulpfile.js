@@ -11,6 +11,8 @@ var scriptsDir = './js';
 var buildDir = './build';
 var main = "boot.js";
 var destFile = "bundle.js";
+var inject = require("gulp-inject");
+var rename = require('gulp-rename');
 
 function handleErrors(err) {
     var args = Array.prototype.slice.call(arguments);
@@ -26,7 +28,7 @@ function handleErrors(err) {
 // Based on: http://blog.avisi.nl/2014/04/25/how-to-keep-a-fast-build-with-browserify-and-reactjs/
 function buildScript(main, destFile, watch) {
     var props = {
-        entries: [scriptsDir + '/'+ main],
+        entries: [scriptsDir + '/' + main],
         debug: true
     };
     var bundler = watch ? watchify(browserify(props)) : browserify(props);
@@ -45,6 +47,29 @@ function buildScript(main, destFile, watch) {
     return rebundle();
 }
 
+gulp.task('buildHTML', function() {
+    gutil.log('Watching html file...');
+    var htmlFile = './index.src.html';
+    return gulp.src(htmlFile)
+        .pipe(watch(htmlFile, function (file) {
+            gutil.log('Rebuild ' + htmlFile + ' file...');
+            var sources = gulp.src([
+                './js/nw/initNW.js',
+                './js/bundle.js',
+                './css/lib/normalize.css',
+                './css/lib/**/*.css',
+                './css/ltt.css',
+                './css/main.css',
+                './css/**/*.css',
+            ], {
+                read: false
+            });
+            return file.pipe(inject(sources))
+                .pipe(rename('index.html'))
+                .pipe(gulp.dest('./'));
+        }));
+});
+
 
 //sync resources file
 gulp.task('sync', function() {
@@ -59,43 +84,43 @@ gulp.task('sync', function() {
         index = './index.html',
         js = './js/nw/**/*.js';
     gulp.src(cssFiles)
-        .pipe(watch(cssFiles, function (files) {
+        .pipe(watch(cssFiles, function(files) {
             return files.pipe(gulp.dest([buildDir, 'css/'].join('/')));
         }));
     gulp.src(images)
-        .pipe(watch(images, function (files) {
+        .pipe(watch(images, function(files) {
             return files.pipe(gulp.dest([buildDir, 'images/'].join('/')));
         }));
     gulp.src(js)
-        .pipe(watch(js, function (files) {
+        .pipe(watch(js, function(files) {
             return files.pipe(gulp.dest(buildDir + '/js/nw/'));
         }));
     gulp.src(index)
-        .pipe(watch(index, function (file) {
+        .pipe(watch(index, function(file) {
             return file.pipe(gulp.dest(buildDir));
         }));
     return gulp.src(fonts)
-        .pipe(watch(fonts, function (files) {
+        .pipe(watch(fonts, function(files) {
             return files.pipe(gulp.dest([buildDir, 'fonts/'].join('/')));
         }));
-        //.pipe(minifyCSS({
-        //    keepBreaks: true
-        //}))
-        //.pipe(concat('main.css'))
-        /*.pipe(rename({
-            suffix: '.min'
-        }))
-        .pipe(gulp.dest('./dist/'))
-        .pipe(notify({
-            message: 'CSS压缩完成'
-        }));*/
+    //.pipe(minifyCSS({
+    //    keepBreaks: true
+    //}))
+    //.pipe(concat('main.css'))
+    /*.pipe(rename({
+        suffix: '.min'
+    }))
+    .pipe(gulp.dest('./dist/'))
+    .pipe(notify({
+        message: 'CSS压缩完成'
+    }));*/
 });
 
-gulp.task('build', function() {
+gulp.task('build', ['buildHTML'], function() {
     return buildScript(main, destFile, false);
 });
 
 
-gulp.task('default', ['build'], function() {
+gulp.task('default', ['build', 'buildHTML'], function() {
     return buildScript(main, destFile, true);
 });
