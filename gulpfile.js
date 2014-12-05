@@ -64,7 +64,7 @@ gulp.task('buildHTML', function() {
             ], {
                 read: false
             });
-            return file.pipe(inject(sources))
+            return file.pipe(inject(sources, {relative: true}))
                 .pipe(rename('index.html'))
                 .pipe(gulp.dest('./'));
         }));

@@ -1,17 +1,63 @@
-(function (window, global) {
+(function () {
+    'use strict';
+    var isNodeWebkit = false;
+    var root = this;
 
-    var nwGui = require('nw.gui');
-    var Ltt = {
+    if (typeof require !== 'undefined') {
+        isNodeWebkit = true;
+    }
 
-        /**
-         * close application window
-         */
-        close: function () {
-            var win = nwGui.Window.get();
-            win.close();
-        }
-    };
-    global.Ltt = Ltt;
-    global.nwGui = nwGui;
+    if (isNodeWebkit === true) {
+        var Menubar = require('menubar');
+        var nwGui = require('nw.gui');
+        var Ltt = {
 
-})(window, global);
+            getWindow: function () {
+                return nwGui.Window.get();
+            },
+
+            /**
+             * close application window
+             */
+            close: function () {
+                this.getWindow().close();
+            }
+        };
+        root = global;
+        root.Ltt = Ltt;
+        root.nwGui = nwGui;
+        //a series of init action to intialize components
+        initMenu();
+    }
+
+    function initMenu() {
+        var menu = new Menubar([{
+            name: 'default',
+            items: [{
+                name: 'Import Data',
+                handler: function () {
+                }
+            }, {
+                name: 'Quit',
+                handler: function () {
+                    Ltt.close();
+                }
+            }]
+        }, {
+            name: 'File',
+            items: [{
+                name: 'Import Data',
+                handler: function () {
+                }
+            }, {
+                name: 'Create Note',
+                handler: function () {
+
+                }
+            }]
+        }]);
+        var win = Ltt.getWindow();
+        win.menu = menu;
+    }
+
+})();
