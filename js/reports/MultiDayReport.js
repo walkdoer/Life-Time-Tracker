@@ -153,7 +153,7 @@ var Report = React.createClass({
         var dataName = options.dataName;
         var labelName = options.labelName;
         var countName = options.countName;
-        var days = statData.scanResult.days;
+        var days = statData.days;
         if (_.isEmpty(days)) {
             return [];
         }
