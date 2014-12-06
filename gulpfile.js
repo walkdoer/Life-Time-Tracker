@@ -116,11 +116,11 @@ gulp.task('sync', function() {
     }));*/
 });
 
-gulp.task('build', ['buildHTML'], function() {
+gulp.task('build', function() {
     return buildScript(main, destFile, false);
 });
 
 
-gulp.task('default', ['build', 'buildHTML'], function() {
+gulp.task('default', ['build'], function() {
     return buildScript(main, destFile, true);
 });

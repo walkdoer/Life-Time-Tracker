@@ -16,6 +16,18 @@
                 return nwGui.Window.get();
             },
 
+            enterFullscreen: function () {
+                this.getWindow().enterFullscreen();
+            },
+
+            leaveFullscreen: function () {
+                this.getWindow().leaveFullscreen();
+            },
+
+            isFullscreen: function () {
+               return this.getWindow().isFullscreen;
+            },
+
             /**
              * close application window
              */

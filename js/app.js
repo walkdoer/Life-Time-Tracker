@@ -9,6 +9,7 @@ var React = require('react');
 var $ = require('jquery');window.$ = window.Jquery = $;
 var addons = require('react/addons').addons;
 var cx = addons.classSet;
+var Ltt = global.Ltt;
 var Router = require('react-router');
 var State = Router.State;
 var RouteHandler = Router.RouteHandler;
@@ -27,7 +28,8 @@ var App = React.createClass({
     mixins: [State],
     getInitialState: function () {
         return {
-            openNav: true
+            openNav: true,
+            isFullscreen: false
         };
     },
 
@@ -38,7 +40,11 @@ var App = React.createClass({
         var className = cx(clsObj);
         return (
             <div className={className}>
-                <Header onConfigBtnClick={this.toggleNav} />
+                <Header
+                    isFullscreen={this.state.isFullscreen}
+                    onConfigBtnClick={this.toggleNav}
+                    onEnterFullscreen={this.enterFullscreen}
+                    onLeaveFullscreen={this.leaveFullscreen}/>
                 <div className="ltt_c-outerContainer">
                     <Nav initialMenuItem={this.getCurrentPage()} ref="nav"/>
                     <section className="ltt_c-innerContainer">
@@ -62,7 +68,30 @@ var App = React.createClass({
         this.setState({
             openNav: !this.state.openNav
         });
-    }
+    },
+
+
+    leaveFullscreen: function () {
+        Ltt.leaveFullscreen();
+        this.setState({
+            isFullscreen: false
+        });
+    },
+
+    enterFullscreen: function () {
+        Ltt.enterFullscreen();
+        this.setState({
+            isFullscreen: true
+        });
+    },
+
+    isFullscreen: function () {
+        if (Ltt) {
+            return Ltt.isFullscreen();
+        } else {
+            return null;
+        }
+    },
 
 });
 

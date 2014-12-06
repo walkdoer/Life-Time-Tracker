@@ -6,6 +6,7 @@ var React = require('react');
 var nwGui = global.nwGui;
 var Ltt = global.Ltt;
 var Logo = require('./Logo');
+var noty = require('noty');
 var remoteStorage = require('./storage.remote');
 var Moment = require('moment');
 var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
@@ -30,6 +31,17 @@ var Header = React.createClass({
         } else if (syncStatus === NO_SYNC){
             syncIcon = 'fa fa-refresh';
         }
+
+        var screenBtn = null;
+        if (this.props.isFullscreen) {
+            screenBtn = (<button className="btn btn-default ltt_c-header-cfgBtn"
+                onClick={this.props.onLeaveFullscreen}>
+                <i className="fa fa-compress"></i></button>);
+        } else {
+            screenBtn = (<button className="btn btn-default ltt_c-header-cfgBtn"
+                onClick={this.props.onEnterFullscreen}>
+                <i className="fa fa-expand"></i></button>);
+        }
         return (
             <header className="ltt_c-header">
                 <Logo title="LTT"/>
@@ -45,10 +57,10 @@ var Header = React.createClass({
                     </div>
 
                     <div className="btn-group">
-                        <button className="btn btn-default ltt_c-header-cfgBtn js-open-config"><i className="fa fa-gear"></i></button>
                         <button className="btn btn-default ltt_c-header-debugBtn js-debugApplication" onClick={this.debugApplication}>
                             <i className="fa fa-gear"></i>
                         </button>
+                        {screenBtn}
                         <button className="btn btn-default ltt_c-header-closeBtn js-closeWindow" onClick={this.closeWindow}>
                             <i className="fa fa-close"></i>
                         </button>
@@ -83,6 +95,9 @@ var Header = React.createClass({
         }).then(function (result) {
             var data = result.data;
             if (data.success) {
+                window.noty({
+                    text: 'Successfully backup!'
+                });
                 that.setState({
                     syncStatus: NO_SYNC
                 });
