@@ -6,8 +6,8 @@ var React = require('react');
 var nwGui = global.nwGui;
 var Ltt = global.Ltt;
 var Logo = require('./Logo');
-var noty = require('noty');
 var remoteStorage = require('./storage.remote');
+var Notify = require('./Notify');
 var Moment = require('moment');
 var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
 var Header = React.createClass({
@@ -95,9 +95,7 @@ var Header = React.createClass({
         }).then(function (result) {
             var data = result.data;
             if (data.success) {
-                window.noty({
-                    text: 'Successfully backup!'
-                });
+                Notify.success('Successfully sync!');
                 that.setState({
                     syncStatus: NO_SYNC
                 });
