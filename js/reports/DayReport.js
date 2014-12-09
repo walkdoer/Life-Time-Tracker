@@ -12,12 +12,15 @@ var col4 = 'col-xs-6 col-md-4',
     colFull = 'col-xs-12 col-md-12',
     col3 = 'col-xs-6 col-md-3';
 
+var chartHelper = require('../components/charts/helper');
 //charts
 var Pie = require('../components/charts/Pie');
 var Column = require('../components/charts/Column');
 var Line = require('../components/charts/Line');
 var Bar = require('../components/charts/Bar');
 var setAndCompareData = require('../components/charts/setAndCompareData');
+var SpiderWeb = require('../components/charts/SpiderWeb');
+
 var Report = React.createClass({
 
     mixins: [setAndCompareData],
@@ -48,7 +51,7 @@ var Report = React.createClass({
         return (
             <div className="ltt_c-report-day">
                 <div className="row ltt-row">
-                    <Pie className={col4} ref="chart_logClassTime" />
+                    <SpiderWeb className={col4} ref="chart_logClassTime" categories={['NT', 'WK', 'STU', 'TK', 'BRK', 'SPR']}/>
                     <Column title="Tag Time" className={col8} ref="chart_tagTime" legend={false}/>
                 </div>
                 <div className="row ltt-row">

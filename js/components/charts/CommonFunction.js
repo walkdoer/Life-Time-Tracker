@@ -33,6 +33,15 @@ module.exports = {
             });
         }
 
+        var categories = this.props.categories;
+        if (_.isArray(categories)) {
+            options = _.extend(options, {
+                xAxis: {
+                    categories: categories
+                }
+            });
+        }
+
         if (this.props.xAxis === 'datetime') {
             options = _.extend(options, {
                 xAxis: {

@@ -17,7 +17,8 @@
     "react-router": "~0.11.0",
     "moment": "~2.8.4",
     "jquery": "~2.1.1",
-    "noty": "~2.3.2"
+    "noty": "~2.3.2",
+    "extend": "~2.0.0"
   },
   "devDependencies": {
     "browserify": "~6.2.0",
@@ -45,11 +46,13 @@
     "highcharts": "./bower_components/highcharts/highcharts.src.js",
     "highchartsAdapter": "./bower_components/highcharts/adapters/standalone-framework.src.js",
     "bootstrap": "./bower_components/bootstrap/dist/js/bootstrap.js",
-    "noty": "./node_modules/noty/js/noty/packaged/jquery.noty.packaged.js"
+    "noty": "./node_modules/noty/js/noty/packaged/jquery.noty.packaged.js",
+    "chart": "./bower_components/chartjs/Chart.js"
   },
   "browserify-shim": {
     "jquery": "$",
     "noty": "noty",
+    "chart": "chart",
     "highcharts": {
       "depends": [
         "highchartsAdapter:highchartsAdapter"

@@ -1,3 +1,9 @@
 .ltt_c-chart{
     height: 300px;
 }
+
+.ltt_c-chart canvas{
+    background: #FFF;
+    width: 100% !important;
+    height: auto !important;
+}

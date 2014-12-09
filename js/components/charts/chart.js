@@ -3,6 +3,7 @@ var _ = require('lodash');
 var $ = require('jquery');
 window.$ = window.jQuery = $;
 var Highcharts = require('highcharts-browserify');
+var extend = require('extend');
 
 //在这里添加highchart的全局设置
 Highcharts.setOptions({
@@ -202,4 +203,40 @@ exports.line = function (options, highchartOptions) {
     lineOptions = _.extend(lineOptions, highchartOptions);
 
     options.$el.highcharts(lineOptions);
+};
+
+
+exports.spiderWeb = function (options, highchartOptions) {
+    var spiderWebOptions = {
+        chart: {
+            polar: true,
+            type: 'line'
+        },
+        pane: {
+            size: '80%'
+        },
+
+        xAxis: {
+            tickmarkPlacement: 'on',
+            lineWidth: 0
+        },
+
+        yAxis: {
+            gridLineInterpolation: 'polygon',
+            lineWidth: 0,
+            min: 0
+        },
+
+        legend: {
+            align: 'right',
+            verticalAlign: 'top',
+            y: 70,
+            layout: 'vertical'
+        },
+
+        series: options.data
+    };
+
+    spiderWebOptions = extend(true, spiderWebOptions, highchartOptions);
+    options.$el.highcharts(spiderWebOptions);
 };

@@ -17,7 +17,8 @@
     "q": "~2.0.2",
     "d3": "~3.4.11",
     "nvd3": "~1.1.15-beta",
-    "Buttons": "~1.1.1"
+    "Buttons": "~1.1.1",
+    "chartjs": "~0.2.0"
   },
   "devDependencies": {},
   "keywords": [
