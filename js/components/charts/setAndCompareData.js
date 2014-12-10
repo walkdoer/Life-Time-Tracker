@@ -82,7 +82,10 @@ module.exports = {
 
         compareChartRefs.forEach(function (chartRefCfg) {
             var chartRefName = chartRefCfg.refName;
-            this.refs[chartRefName].compareData(compareData[chartRefName]);
+            var chart = this.refs[chartRefName];
+            if (chart && _.isFunction(chart.compareData)) {
+                chart.compareData(compareData[chartRefName]);
+            }
         }, this);
 
     }

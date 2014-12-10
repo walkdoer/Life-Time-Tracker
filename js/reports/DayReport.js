@@ -33,6 +33,9 @@ var Report = React.createClass({
     },
 
     compareChartRefs: [{
+        refName: "chart_logClassTime",
+        getData: "classTime"
+    }, {
         refName: "chart_categoryTime",
         getData: function (data) {
             return data.categoryPerspective.categoryTime;

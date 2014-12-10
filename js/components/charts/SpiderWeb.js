@@ -27,8 +27,8 @@ var SpiderWeb = React.createClass({
         )
     },
 
-    setData: function(data, options) {
-        var data = spiderWebConvertor.dispose(data, this.props.categories);
+    setData: function(data, options, isGroup) {
+        var data = spiderWebConvertor.dispose(data, this.props.categories, isGroup);
         //data.datasets[0].la
         var ctx = this.refs.canvas.getDOMNode().getContext("2d");
         if (this.myRadarChart){
@@ -38,6 +38,10 @@ var SpiderWeb = React.createClass({
             this.chart = new Chart(ctx)
             this.myRadarChart = this.chart.Radar(data, {});
         }
+    },
+
+    compareData: function (datas, options) {
+        this.setData(datas, options, true);
     }
 });
 

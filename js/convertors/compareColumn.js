@@ -27,13 +27,15 @@ exports.dispose = function (rawData, options) {
     function getValue(values, category) {
         if (_.isObject(values) && !_.isArray(values)) {
             return values[category] || null;
-        } else if (_.isArray(values)) {
+        } else if (_.isArray(values) && !_.isEmpty(values)) {
             var nameKey = helper.getNameKey(values);
             var valueKey = helper.getValueKey(values);
             var target = values.filter(function (val) {
                 return val[nameKey] === category;
             })[0];
             return target ? target[valueKey] : null;
+        } else {
+            return null;
         }
     }
 
