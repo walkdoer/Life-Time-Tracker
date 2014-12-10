@@ -31,12 +31,16 @@ var SpiderWeb = React.createClass({
         var data = spiderWebConvertor.dispose(data, this.props.categories, isGroup);
         //data.datasets[0].la
         var ctx = this.refs.canvas.getDOMNode().getContext("2d");
+        var plotOptions = {
+            pointDot: false,
+            scaleShowLabels : false
+        };
         if (this.myRadarChart){
             this.myRadarChart.destroy();
-            this.myRadarChart = this.chart.Radar(data, {});
+            this.myRadarChart = this.chart.Radar(data, plotOptions);
         } else {
             this.chart = new Chart(ctx)
-            this.myRadarChart = this.chart.Radar(data, {});
+            this.myRadarChart = this.chart.Radar(data, plotOptions);
         }
     },
 
