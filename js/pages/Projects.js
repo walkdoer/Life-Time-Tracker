@@ -5,12 +5,18 @@
 var React = require('react');
 var ProjectCard = require('../components/Project/ProjectCard');
 var remoteStorage = require('../components/storage.remote');
+var Moment = require('moment');
+var DateRangePicker = require('../components/DateRangePicker');
 
 var Projects = React.createClass({
 
     getInitialState: function () {
+        var startDate = new Moment('2014-08-01').toDate(),
+            endDate = new Moment().endOf('day').toDate();
         return {
             loading: true,
+            startDate: startDate,
+            endDate: endDate,
             projects: []
         };
     },
@@ -26,6 +32,8 @@ var Projects = React.createClass({
         }
         return (
             <div className="ltt_c-page ltt_c-page-projects">
+                <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
+                    onDateRangeChange={this.onDateRangeChange}/>
                 {loadingMsg}
                 <div className="ltt_c-page-projects-projectCards">
                     {projectCards}
@@ -41,14 +49,24 @@ var Projects = React.createClass({
     loadProjects: function () {
         var that = this;
         this.setState({ loading: true });
-        remoteStorage.get('/api/projects/2014')
-            .then(function (results) {
+        remoteStorage.get('/api/projects', {
+            start: this.state.startDate,
+            end: this.state.endDate
+        }).then(function (results) {
                 var projects = results.data;
                 that.setState({
                     loading: false,
                     projects: projects
                 });
             });
+    },
+
+    onDateRangeChange: function (start, end) {
+        this.setState({
+            startDate: start,
+            endDate: end
+        });
+        this.loadProjects();
     }
 
 });

@@ -2,7 +2,10 @@
     display: inline-block;
     width: 21%;
     margin: 2%;
-    background: #e8ecef;
-    border-radius: 12px;
-    box-shadow: 0 0 3px #c2c3c5;
+    background: #FFFFFF;
+    border-radius: 5px;
+    box-shadow: 0 0 1px #AFAFAF;
+    overflow: hidden;
+    height: 200px;
+    position: relative;
 }
