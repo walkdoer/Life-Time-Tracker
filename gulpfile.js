@@ -49,10 +49,23 @@ function buildScript(main, destFile, watch) {
 
 gulp.task('buildHTML', function() {
     gutil.log('Watching html file...');
-    var htmlFile = './index.src.html';
-    return gulp.src(htmlFile)
-        .pipe(watch(htmlFile, function (file) {
-            gutil.log('Rebuild ' + htmlFile + ' file...');
+    var htmlFile = './index.src.html',
+        cssFiles = './css/**/*',
+        jsScripts = './js/**/*';
+    var target = gulp.src(htmlFile);
+        injectScript(target);
+    gulp.watch(htmlFile, function () {
+        var target = gulp.src(htmlFile);
+        injectScript(target);
+    });
+
+    gulp.watch([cssFiles, jsScripts], function () {
+        var target = gulp.src(htmlFile);
+        injectScript(target);
+    });
+
+    function injectScript(file) {
+        gutil.log('Rebuild ' + htmlFile + ' file...');
             var sources = gulp.src([
                 './js/nw/initNW.js',
                 './js/bundle.js',
@@ -67,7 +80,7 @@ gulp.task('buildHTML', function() {
             return file.pipe(inject(sources, {relative: true}))
                 .pipe(rename('index.html'))
                 .pipe(gulp.dest('./'));
-        }));
+    }
 });
 
 

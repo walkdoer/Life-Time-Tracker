@@ -29,11 +29,12 @@ var Nav = React.createClass({
             key: 'logs',
             path: 'logs',
             icon: 'fa fa-file'
-        } /*{
+        }, {
             text: 'Projects',
             key: 'projects',
+            path: 'projects',
             icon: 'fa fa-rocket'
-        }*/];
+        }];
         //var isActive = this.isActive(this.props.to, this.props.params, this.props.query);
         return (
             <nav className="ltt_c-nav">

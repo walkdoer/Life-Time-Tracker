@@ -1,0 +1,9 @@
+.ltt_c-projectCard {
+    width: 20%;
+    height: 100px;
+}
+
+.ltt_c-projectCard h1 {
+    font-size: 12px;
+    font-weight: bold;
+}

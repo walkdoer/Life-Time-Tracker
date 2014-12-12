@@ -23,6 +23,7 @@ var App = require('./app');
 var Dashboard = require('./pages/Dashboard'),
     Logs = require('./pages/Logs'),
     Page404 = require('./pages/Page404'),
+    Projects = require('./pages/Projects'),
     Reports = require('./pages/Reports');
 
 var routes = (
@@ -33,6 +34,7 @@ var routes = (
         </Route>
         <Route name="dashboard" path="/dashboard" handler={Dashboard}/>
         <Route name="logs" path="/logs" handler={Logs}/>
+        <Route name="projects" path="/projects" handler={Projects}/>
         <NotFoundRoute handler={Page404}/>
         <DefaultRoute handler={Dashboard}/>
     </Route>
