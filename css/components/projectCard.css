@@ -15,6 +15,11 @@
     text-overflow: ellipsis;
 }
 
+.ltt_c-projectCard-lastActiveTime{
+    font-size:12px;
+    color:#ccc;
+}
+
 .ltt_c-projectCard .ltt_c-tag{
     color:#FFF;
     background: #3E91D2;
@@ -36,15 +41,16 @@
     left: 0;
     right: 0;
     display: flex;
+    text-align: center;
 }
 
 .ltt_c-projectCard-footer .ltt_c-projectCard-footer-lastActiveTime,
 .ltt_c-projectCard-footer .ltt_c-projectCard-footer-taskCount{
-    padding-left:10px;
+    /* padding-left:10px; */
 }
 
 .ltt_c-projectCard-footer-lastActiveTime{
-    flex: 1;
+    width: 150px;
     text-align: right;
     padding-right: 10px;
     color: #BFBFBF;

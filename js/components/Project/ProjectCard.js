@@ -2,8 +2,11 @@
  * @jsx React.DOM
  */
 
+
+
 var React = require('react');
 var Moment = require('moment');
+require("moment-duration-format");
 var Tag = require('../Tag');
 var LogClass = require('../LogClass');
 var _ = require('lodash');
@@ -31,20 +34,23 @@ var ProjectCard = React.createClass({
         var logClasses = logClasses.map(function(cls) {
             return (<LogClass data={cls}/>);
         });
-        var lastTasks = projectData.lastTasks.map(function (task) {
-            return (<li className="ltt_c-projectCard-task">{task.name}</li>);
-        });
+        var lastTasks;
+        if (projectData.lastTasks) {
+            lastTasks = projectData.lastTasks.map(function (task) {
+                return (<li className="ltt_c-projectCard-task">{task.name}</li>);
+            });
+        }
 
-
+        /* <p className="ltt_c-projectCard-logClasses">{logClasses}</p> */
         return (
             <div className="ltt_c-projectCard">
                 <h1>{projectData.name}</h1>
                 <p className="ltt_c-projectCard-tags">{tags}</p>
-                <p className="ltt_c-projectCard-logClasses">{logClasses}</p>
+                <p className="ltt_c-projectCard-lastActiveTime">{new Moment(projectData.lastActiveTime).format('YYYY-MM-DD HH:mm')}</p>
                 <ul className="ltt_c-projectCard-tasks">{lastTasks}</ul>
                 <p className="ltt_c-projectCard-footer">
                     <span className="ltt_c-projectCard-footer-taskCount"><i className="fa fa-tasks"></i>&times;{projectData.taskCount}</span>
-                    <span className="ltt_c-projectCard-footer-lastActiveTime">{new Moment(projectData.lastActiveTime).format('YYYY-MM-DD HH:mm')}</span>
+                    <span className="ltt_c-projectCard-footer-taskCount"><i className="fa fa-clock-o"></i> {Moment.duration(projectData.totalTime, "minutes").format("d[d],h:mm")}</span>
                 </p>
                 {this.getLogClassIndicators()}
             </div>
