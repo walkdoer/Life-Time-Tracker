@@ -10,25 +10,79 @@
     margin: 0px;
     text-indent: 10px;
     margin-bottom: 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .ltt_c-projectCard .ltt_c-tag{
     color:#FFF;
-    background: #ccc;
+    background: #3E91D2;
     margin-top: 3px;
     margin-bottom: 3px;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.45);
+    border-radius: 5px;
 }
 
 .ltt_c-projectCard .ltt_c-tag .fa-tag{
-    color: #FFF;
+    color: #CFEAFF;
+    margin-right: 4px;
+    text-shadow: 0px 1px 0px #326994;
 }
 
-.ltt_c-projectCard-lastActiveTime{
+.ltt_c-projectCard-footer{
     position: absolute;
     bottom: 0px;
     left: 0;
     right: 0;
+    display: flex;
+}
+
+.ltt_c-projectCard-footer .ltt_c-projectCard-footer-lastActiveTime,
+.ltt_c-projectCard-footer .ltt_c-projectCard-footer-taskCount{
+    padding-left:10px;
+}
+
+.ltt_c-projectCard-footer-lastActiveTime{
+    flex: 1;
     text-align: right;
     padding-right: 10px;
     color: #BFBFBF;
+}
+.ltt_c-projectCard-footer-taskCount{
+    flex: 1;
+}
+
+
+.ltt_c-projectCard-tasks{
+    list-style: none;
+    margin:0px;
+    padding: 10px;
+}
+
+.ltt_c-projectCard-task{
+    color:#ccc;
+    font-size:11px;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.ltt_c-projectCard-logClassIndicators{
+    position: absolute;
+    bottom: 0px;
+    right:0;
+    left:0;
+    height: 4px;
+    display: flex;
+    margin: 0px;
+    border-radius: 0 0 4px 4px;
+    overflow: hidden;
+}
+
+.ltt_c-projectCard-logClassIndicators i{
+    flex: 1;
+    background-color: #ccc;
+    display: block;
 }

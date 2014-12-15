@@ -48,7 +48,7 @@ var Header = React.createClass({
                 <div className="ltt_c-header-controls">
                     <div className="btn-group">
                         <button
-                            className="btn btn-primary ltt_c-header-barBtn js-open-sidebar"
+                            className="btn ltt_c-header-barBtn js-open-sidebar"
                             onClick={this.handleConfigBtnClick}
                         ><i className="fa fa-bars"></i></button>
                         <button className="btn btn-default" onClick={this.syncNote}>

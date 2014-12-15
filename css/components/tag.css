@@ -11,4 +11,6 @@ p.ltt_c-projectCard-tags{
     margin-right: 4px;
     font-size: 0.8rem;
     color: #FFE0E0;
+    height: 30px;
+    overflow: hidden;
 }
