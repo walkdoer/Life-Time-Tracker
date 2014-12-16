@@ -24,6 +24,8 @@ var Dashboard = require('./pages/Dashboard'),
     Logs = require('./pages/Logs'),
     Page404 = require('./pages/Page404'),
     Projects = require('./pages/Projects'),
+    ProjectDetail = require('./pages/ProjectDetail'),
+    ProjectCards = require('./pages/ProjectCards'),
     Reports = require('./pages/Reports');
 
 var routes = (
@@ -34,7 +36,10 @@ var routes = (
         </Route>
         <Route name="dashboard" path="/dashboard" handler={Dashboard}/>
         <Route name="logs" path="/logs" handler={Logs}/>
-        <Route name="projects" path="/projects" handler={Projects}/>
+        <Route name="projects" path="/projects" handler={Projects}>
+            <Route name="projectDetail" path="/projects/:projectId" handler={ProjectDetail}/>
+            <DefaultRoute handler={ProjectCards}/>
+        </Route>
         <NotFoundRoute handler={Page404}/>
         <DefaultRoute handler={Dashboard}/>
     </Route>

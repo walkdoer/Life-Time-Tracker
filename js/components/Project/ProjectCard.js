@@ -37,7 +37,11 @@ var ProjectCard = React.createClass({
         var lastTasks;
         if (projectData.lastTasks) {
             lastTasks = projectData.lastTasks.map(function (task) {
-                return (<li className="ltt_c-projectCard-task">{task.name}</li>);
+                return (
+                    <li className="ltt_c-projectCard-task">
+                        <i className="fa fa-angle-right"></i>{task.name}
+                    </li>
+                );
             });
         }
 
@@ -45,12 +49,17 @@ var ProjectCard = React.createClass({
         return (
             <div className="ltt_c-projectCard">
                 <h1>{projectData.name}</h1>
-                <p className="ltt_c-projectCard-tags">{tags}</p>
                 <p className="ltt_c-projectCard-lastActiveTime">{new Moment(projectData.lastActiveTime).format('YYYY-MM-DD HH:mm')}</p>
+                <p className="ltt_c-projectCard-tags">{tags}</p>
                 <ul className="ltt_c-projectCard-tasks">{lastTasks}</ul>
                 <p className="ltt_c-projectCard-footer">
-                    <span className="ltt_c-projectCard-footer-taskCount"><i className="fa fa-tasks"></i>&times;{projectData.taskCount}</span>
-                    <span className="ltt_c-projectCard-footer-taskCount"><i className="fa fa-clock-o"></i> {Moment.duration(projectData.totalTime, "minutes").format("d[d],h:mm")}</span>
+                    <span className="ltt_c-projectCard-footer-item ltt_c-projectCard-footer-taskCount">
+                        <i className="fa fa-tasks"></i> &times; {projectData.taskCount}
+                    </span>
+                    <span className="ltt_c-projectCard-footer-item ltt_c-projectCard-footer-totalTime">
+                        <i className="fa fa-clock-o"></i>
+                        {Moment.duration(projectData.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
+                    </span>
                 </p>
                 {this.getLogClassIndicators()}
             </div>
