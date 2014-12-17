@@ -3,10 +3,10 @@
  */
 
 var React = require('react');
-var ProjectCard = require('../components/Project/ProjectCard');
-var remoteStorage = require('../components/storage.remote');
+var ProjectCard = require('./Project/ProjectCard');
+var remoteStorage = require('./storage.remote');
 var Moment = require('moment');
-var DateRangePicker = require('../components/DateRangePicker');
+var DateRangePicker = require('./DateRangePicker');
 
 var ProjectCards = React.createClass({
 

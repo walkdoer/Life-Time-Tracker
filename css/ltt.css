@@ -3,6 +3,11 @@
     height: 100%;
 }
 
+.ltt-M2 { margin: 2px; }
+.ltt-M3 { margin: 3px; }
+.ltt-M4 { margin: 4px; }
+.ltt-M5 { margin: 5px; }
+
 .ltt-row {
     margin-top: 10px;
     margin-bottom: 10px;

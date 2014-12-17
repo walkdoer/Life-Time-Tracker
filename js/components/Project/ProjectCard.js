@@ -50,7 +50,7 @@ var ProjectCard = React.createClass({
             <div className="ltt_c-projectCard">
                 <h1>{projectData.name}</h1>
                 <p className="ltt_c-projectCard-lastActiveTime">{new Moment(projectData.lastActiveTime).format('YYYY-MM-DD HH:mm')}</p>
-                <p className="ltt_c-projectCard-tags">{tags}</p>
+                <p className="ltt_c-projectCard-tags ltt-tags">{tags}</p>
                 <ul className="ltt_c-projectCard-tasks">{lastTasks}</ul>
                 <p className="ltt_c-projectCard-footer">
                     <span className="ltt_c-projectCard-footer-item ltt_c-projectCard-footer-taskCount">

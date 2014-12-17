@@ -24,8 +24,8 @@ var Dashboard = require('./pages/Dashboard'),
     Logs = require('./pages/Logs'),
     Page404 = require('./pages/Page404'),
     Projects = require('./pages/Projects'),
-    ProjectDetail = require('./pages/ProjectDetail'),
-    ProjectCards = require('./pages/ProjectCards'),
+    ProjectDetail = require('./components/ProjectDetail'),
+    ProjectCards = require('./components/ProjectCards'),
     Reports = require('./pages/Reports');
 
 var routes = (
