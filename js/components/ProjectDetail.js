@@ -11,6 +11,7 @@ var _ = require('lodash');
 var LogClass = require('./LogClass');
 var TIME_FORMAT = 'YYYY-MM-DD HH:mm';
 var LoadIndicator = require('./LoadIndicator');
+var Log = require('./Log');
 
 var ProjectDetail = React.createClass({
     mixins: [Router.State],
@@ -18,13 +19,15 @@ var ProjectDetail = React.createClass({
         return {
             loading: true,
             loadingTask: true,
+            loadingLog: true,
             project: null,
-            tasks: []
+            tasks: [],
+            logs: []
         };
     },
 
     render: function () {
-        var loadingMsg, projectBasicInfo, taskList;
+        var loadingMsg, projectBasicInfo, taskList, logList;
         var project = this.state.project;
         if (this.state.loading) {
             loadingMsg = (<div className="text-center"><i className="fa fa-spinner fa-spin"></i> Loading project</div>);
@@ -55,8 +58,11 @@ var ProjectDetail = React.createClass({
             );
 
             var tasks = this.state.tasks,
+                logs = this.state.logs,
                 noTask = (<p>No Task.</p>),
-                taskLoading;
+                noLog = (<p>No Log.</p>),
+                taskLoading,
+                logLoading;
             if (this.state.loadingTask) {
                 taskLoading = (<LoadIndicator/>);
             }
@@ -64,16 +70,32 @@ var ProjectDetail = React.createClass({
                 <TaskList>
                     {taskLoading}
                     {!_.isEmpty(tasks) ? tasks.map(function(task) {
-                        return <Task data={task} key={task._id}/>
-                    }) : noTask}
+                        return <Task data={task} key={task._id} onClick={this.onTaskClick}/>
+                    }, this) : noTask}
                 </TaskList>
+            );
+
+            if (this.state.loadingLogs) {
+                logLoading = (<LoadIndicator/>);
+            }
+            var logContent = _.isEmpty(logs) ? noLog : logs.map(function (log) {
+                return (<Log {... log}/>);
+            });
+            logList = (
+                <ul>
+                    {logLoading}
+                    {logContent}
+                </ul>
             );
         }
         return (
             <div className="ltt_c-projectDetail">
                 {loadingMsg}
                 {projectBasicInfo}
-                {taskList}
+                <div className="ltt-flex">
+                    {taskList}
+                    {logList}
+                </div>
             </div>
         );
     },
@@ -100,10 +122,25 @@ var ProjectDetail = React.createClass({
                             tasks: res.data
                         });
                     })
+                that.loadLogs(project)
+                    .then(function (res) {
+                        that.setState({
+                            loadingLog: false,
+                            logs: res.data
+                        });
+                    })
             })
             .catch(function (err) {
                 throw err;
             });
+    },
+
+    loadLogs: function (project) {
+        return remoteStorage.get('/api/logs', {projectId: project._id});
+    },
+
+    onTaskClick: function () {
+        console.log(arguments);
     }
 
 });

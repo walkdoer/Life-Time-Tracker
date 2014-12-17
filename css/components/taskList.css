@@ -1,3 +1,7 @@
 .ltt_c-taskList{
-    
+
+}
+
+.ltt_c-taskList li{
+    border-bottom: 1px solid #ccc;
 }
