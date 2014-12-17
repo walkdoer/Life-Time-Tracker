@@ -19,4 +19,10 @@
     border:  1px solid #ccc;
     overflow-y: overlay;
     padding: 10px;
+    margin-right: 20px;
+}
+
+
+.ltt_c-projectDetail-logs {
+    flex: 1;
 }

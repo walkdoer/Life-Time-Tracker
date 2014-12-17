@@ -10,6 +10,8 @@ require("moment-duration-format");
 var Tag = require('../Tag');
 var LogClass = require('../LogClass');
 var _ = require('lodash');
+var Router = require('react-router');
+var Link = Router.Link;
 
 var LogClassColors = {
     NT: '#CCC',
@@ -48,7 +50,7 @@ var ProjectCard = React.createClass({
         /* <p className="ltt_c-projectCard-logClasses">{logClasses}</p> */
         return (
             <div className="ltt_c-projectCard">
-                <h1>{projectData.name}</h1>
+                <h1><Link to={'/projects/' + projectData._id}>{projectData.name}</Link></h1>
                 <p className="ltt_c-projectCard-lastActiveTime">{new Moment(projectData.lastActiveTime).format('YYYY-MM-DD HH:mm')}</p>
                 <p className="ltt_c-projectCard-tags ltt-tags">{tags}</p>
                 <ul className="ltt_c-projectCard-tasks">{lastTasks}</ul>

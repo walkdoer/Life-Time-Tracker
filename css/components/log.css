@@ -6,6 +6,10 @@
     border-left: 8px solid #FFFFFF;
 }
 
+.ltt_c-log:first-child{
+    margin-top:0px;
+}
+
 .ltt_c-log__wake{
     background: #4EC627;
     border-color: #4EC627;

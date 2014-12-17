@@ -82,10 +82,10 @@ var ProjectDetail = React.createClass({
                 return (<Log {... log}/>);
             });
             logList = (
-                <ul>
+                <div className="ltt_c-projectDetail-logs">
                     {logLoading}
                     {logContent}
-                </ul>
+                </div>
             );
         }
         return (
