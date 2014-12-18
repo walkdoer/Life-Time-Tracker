@@ -46,12 +46,24 @@ var ProjectCard = React.createClass({
                 );
             });
         }
+        var versions = projectData.versions,
+            lastVersion;
+        if (!_.isEmpty(versions)) {
+            lastVersion = (
+                <span className="ltt_c-projectCard-lastVersion" title="version">
+                    <i className="fa fa-sitemap" title="version"></i>{projectData.versions[0].name}
+                </span>
+            )
+        }
 
         /* <p className="ltt_c-projectCard-logClasses">{logClasses}</p> */
         return (
             <div className="ltt_c-projectCard">
                 <h1><Link to={'/projects/' + projectData._id}>{projectData.name}</Link></h1>
-                <p className="ltt_c-projectCard-lastActiveTime">{new Moment(projectData.lastActiveTime).format('YYYY-MM-DD HH:mm')}</p>
+                <div>
+                    <span className="ltt_c-projectCard-lastActiveTime">{new Moment(projectData.lastActiveTime).fromNow()}</span>
+                    {lastVersion}
+                </div>
                 <p className="ltt_c-projectCard-tags ltt-tags">{tags}</p>
                 <ul className="ltt_c-projectCard-tasks">{lastTasks}</ul>
                 <p className="ltt_c-projectCard-footer">
