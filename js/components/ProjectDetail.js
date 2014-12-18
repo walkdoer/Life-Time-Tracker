@@ -12,6 +12,7 @@ var LogClass = require('./LogClass');
 var TIME_FORMAT = 'YYYY-MM-DD HH:mm';
 var LoadIndicator = require('./LoadIndicator');
 var Log = require('./Log');
+var DropdownButton = require('react-bootstrap').DropdownButton;
 
 var ProjectDetail = React.createClass({
     mixins: [Router.State],
@@ -45,6 +46,14 @@ var ProjectDetail = React.createClass({
                     return (<LogClass data={cls}/>);
                 });
             }
+            var versions;
+            if (!_.isEmpty(project.versions)) {
+                versions = (<select>
+                    {project.versions.map(function (ver) {
+                        return (<option value={ver.name}>{ver.name}</option>);
+                    })}
+                </select>);
+            }
             projectBasicInfo = (
                 <section className="ltt_c-projectDetail-basicInfo">
                     <h1>{project.name}</h1>
@@ -54,6 +63,7 @@ var ProjectDetail = React.createClass({
                         <span className="ltt-M2"><i className="fa fa-child" title="last active"></i> {new Moment(project.lastActiveTime).fromNow()}</span>
                     </p>
                     <p className="ltt_c-projectDetail-logClasses">{logClasses}</p>
+                    {versions}
                 </section>
             );
 
@@ -161,8 +171,9 @@ var Task = React.createClass({
     render: function () {
         var task = this.props.data;
         return (
-            <li>
-                <p>{task.name}</p>
+            <li className="ltt_c-task">
+                <span className="ltt_c-task-tag"><i className="fa fa-ellipsis-v"></i></span>
+                <span>{task.name}</span>
             </li>
         );
     }

@@ -1,0 +1,18 @@
+.ltt_c-task{
+    padding: 15px;
+    position: relative;
+}
+
+.ltt_c-task-tag{
+    position: absolute;
+    background: #6081AD;
+    display: inline-block;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding:10px 2px;
+}
+.ltt_c-task-tag .fa{
+    color: #fff;
+    font-size: 8px;
+}
