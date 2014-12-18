@@ -6,6 +6,7 @@ var React = require('react');
 var remoteStorage = require('./storage.remote');
 var Moment = require('moment');
 var Router = require('react-router');
+var Link = Router.Link;
 var Tag = require('./Tag');
 var _ = require('lodash');
 var LogClass = require('./LogClass');
@@ -13,17 +14,26 @@ var TIME_FORMAT = 'YYYY-MM-DD HH:mm';
 var LoadIndicator = require('./LoadIndicator');
 var Log = require('./Log');
 var DropdownButton = require('react-bootstrap').DropdownButton;
+var initParams = require('./mixins/initParams');
+var extend = require('extend');
 
 var ProjectDetail = React.createClass({
-    mixins: [Router.State],
+    mixins: [initParams],
+
     getInitialState: function () {
-        return {
+        return extend({
             loading: true,
             loadingTask: true,
             loadingLog: true,
             project: null,
             tasks: [],
             logs: []
+        }, this.getStateFromParams());
+    },
+
+    getStateFromParams: function () {
+        return {
+            selectedTask: this.params.taskId
         };
     },
 
@@ -72,6 +82,7 @@ var ProjectDetail = React.createClass({
                 noTask = (<p>No Task.</p>),
                 noLog = (<p>No Log.</p>),
                 taskLoading,
+                currentTaskId = this.state.selectedTask,
                 logLoading;
             if (this.state.loadingTask) {
                 taskLoading = (<LoadIndicator/>);
@@ -80,12 +91,12 @@ var ProjectDetail = React.createClass({
                 <TaskList>
                     {taskLoading}
                     {!_.isEmpty(tasks) ? tasks.map(function(task) {
-                        return <Task data={task} key={task._id} onClick={this.onTaskClick}/>
+                        return <Task data={task} key={task._id} selected={currentTaskId === task._id}/>
                     }, this) : noTask}
                 </TaskList>
             );
 
-            if (this.state.loadingLogs) {
+            if (this.state.loadingLog) {
                 logLoading = (<LoadIndicator/>);
             }
             var logContent = _.isEmpty(logs) ? noLog : logs.map(function (log) {
@@ -108,6 +119,12 @@ var ProjectDetail = React.createClass({
                 </div>
             </div>
         );
+    },
+    componentWillReceiveProps: function (nextProps) {
+        this.setState(extend({
+            loadingLog: true
+        }, this.getStateFromParams()));
+        this.loadLogs(_.pick(this.params, ['projectId', 'taskId']));
     },
 
     componentDidMount: function () {
@@ -132,25 +149,23 @@ var ProjectDetail = React.createClass({
                             tasks: res.data
                         });
                     })
-                that.loadLogs(project)
-                    .then(function (res) {
-                        that.setState({
-                            loadingLog: false,
-                            logs: res.data
-                        });
-                    })
+                that.loadLogs(_.pick(that.getParams(), ['projectId', 'taskId']));
             })
             .catch(function (err) {
                 throw err;
             });
     },
 
-    loadLogs: function (project) {
-        return remoteStorage.get('/api/logs', {projectId: project._id});
-    },
-
-    onTaskClick: function () {
-        console.log(arguments);
+    loadLogs: function (params) {
+        var that = this;
+        var promise = remoteStorage.get('/api/logs', params)
+            .then(function (res) {
+                that.setState({
+                    loadingLog: false,
+                    logs: res.data
+                });
+            });
+        return promise;
     }
 
 });
@@ -170,10 +185,15 @@ var TaskList = React.createClass({
 var Task = React.createClass({
     render: function () {
         var task = this.props.data;
+        var url = '/projects/' + task.projectId + '/tasks/' + task._id;
+        var className = "ltt_c-task";
+        if (this.props.selected) {
+            className += ' selected';
+        }
         return (
-            <li className="ltt_c-task">
+            <li className={className}>
                 <span className="ltt_c-task-tag"><i className="fa fa-ellipsis-v"></i></span>
-                <span>{task.name}</span>
+                <Link to={url}><span>{task.name}</span></Link>
             </li>
         );
     }

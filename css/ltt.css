@@ -2,7 +2,9 @@
 .ltt{
     height: 100%;
 }
-
+.ltt a:hover{
+    text-decoration:none;
+}
 .ltt-M2 { margin: 2px; }
 .ltt-M3 { margin: 3px; }
 .ltt-M4 { margin: 4px; }

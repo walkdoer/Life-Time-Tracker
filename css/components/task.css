@@ -3,6 +3,10 @@
     position: relative;
 }
 
+.ltt_c-task a{
+    color:#333;
+}
+
 .ltt_c-task-tag{
     position: absolute;
     background: #6081AD;

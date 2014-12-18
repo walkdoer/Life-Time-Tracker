@@ -19,7 +19,7 @@
     background: #FFF;
     border:  1px solid #ccc;
     overflow-y: overlay;
-    margin-right: 20px;
+    margin: 0 20px 0 0;
     padding: 0px;
 }
 

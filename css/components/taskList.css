@@ -5,3 +5,8 @@
 .ltt_c-taskList li{
     border-bottom: 1px solid #ccc;
 }
+
+
+.ltt_c-taskList .ltt_c-task.selected{
+    background: #F1FAFF;
+}
