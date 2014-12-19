@@ -3,19 +3,28 @@
  */
 
 var React = require('react');
-var remoteStorage = require('./storage.remote');
 var Moment = require('moment');
 var Router = require('react-router');
 var Link = Router.Link;
-var Tag = require('./Tag');
 var _ = require('lodash');
-var LogClass = require('./LogClass');
-var TIME_FORMAT = 'YYYY-MM-DD HH:mm';
-var LoadIndicator = require('./LoadIndicator');
-var Log = require('./Log');
-var DropdownButton = require('react-bootstrap').DropdownButton;
-var initParams = require('./mixins/initParams');
+
 var extend = require('extend');
+
+/** mixins */
+var initParams = require('./mixins/initParams');
+
+/** const */
+var TIME_FORMAT = 'YYYY-MM-DD HH:mm';
+
+/** components */
+var Tag = require('./Tag');
+var Log = require('./Log');
+var LoadIndicator = require('./LoadIndicator');
+var DropdownButton = require('react-bootstrap').DropdownButton;
+var LogClass = require('./LogClass');
+var remoteStorage = require('./storage.remote');
+var TaskPanel = require('./Task/TaskPanel');
+
 
 var ProjectDetail = React.createClass({
     mixins: [initParams],
@@ -77,24 +86,14 @@ var ProjectDetail = React.createClass({
                 </section>
             );
 
-            var tasks = this.state.tasks,
-                logs = this.state.logs,
-                noTask = (<p>No Task.</p>),
+            var logs = this.state.logs,
                 noLog = (<p>No Log.</p>),
-                taskLoading,
-                currentTaskId = this.state.selectedTask,
                 logLoading;
             if (this.state.loadingTask) {
                 taskLoading = (<LoadIndicator/>);
             }
-            taskList = (
-                <TaskList>
-                    {taskLoading}
-                    {!_.isEmpty(tasks) ? tasks.map(function(task) {
-                        return <Task data={task} key={task._id} selected={currentTaskId === task._id}/>
-                    }, this) : noTask}
-                </TaskList>
-            );
+
+            var taskPanel = <TaskPanel tasks={this.state.tasks} selectedTask={this.state.selectedTask}/>
 
             if (this.state.loadingLog) {
                 logLoading = (<LoadIndicator/>);
@@ -113,10 +112,8 @@ var ProjectDetail = React.createClass({
             <div className="ltt_c-projectDetail">
                 {loadingMsg}
                 {projectBasicInfo}
-                <div className="ltt-flex">
-                    {taskList}
-                    {logList}
-                </div>
+                {taskPanel}
+                {logList}
             </div>
         );
     },
@@ -152,6 +149,7 @@ var ProjectDetail = React.createClass({
                 that.loadLogs(_.pick(that.getParams(), ['projectId', 'taskId']));
             })
             .catch(function (err) {
+                console.error(err.stack);
                 throw err;
             });
     },
@@ -168,35 +166,6 @@ var ProjectDetail = React.createClass({
         return promise;
     }
 
-});
-
-
-
-var TaskList = React.createClass({
-    render: function () {
-        return (
-            <ul className="ltt_c-taskList">
-                {this.props.children}
-            </ul>
-        );
-    }
-});
-
-var Task = React.createClass({
-    render: function () {
-        var task = this.props.data;
-        var url = '/projects/' + task.projectId + '/tasks/' + task._id;
-        var className = "ltt_c-task";
-        if (this.props.selected) {
-            className += ' selected';
-        }
-        return (
-            <li className={className}>
-                <span className="ltt_c-task-tag"><i className="fa fa-ellipsis-v"></i></span>
-                <Link to={url}><span>{task.name}</span></Link>
-            </li>
-        );
-    }
 });
 
 module.exports = ProjectDetail;
