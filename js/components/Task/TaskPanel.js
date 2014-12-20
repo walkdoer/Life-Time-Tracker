@@ -35,7 +35,7 @@ var TaskPanel = React.createClass({
                 </TaskList>
                 <TaskList>
                 {doingTasks.map(function (task) {
-                    return <Task data={task} key={task._id} selected={task._id === selectedTask}/>
+                    return <Task data={task} key={task._id} selected={task._id === selectedTask} progress={true}/>
                 })}
                 </TaskList>
                 <TaskList>

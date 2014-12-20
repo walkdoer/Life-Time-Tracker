@@ -75,13 +75,12 @@ var ProjectDetail = React.createClass({
             }
             projectBasicInfo = (
                 <section className="ltt_c-projectDetail-basicInfo">
-                    <h1>{project.name}</h1>
+                    <h1>{project.name}<span className="ltt_c-projectDetail-logClasses">{logClasses}</span></h1>
                     <p className="ltt_c-projectDetail-tags">{tags}</p>
                     <p className="ltt_c-projectDetail-times">
                         <span className="ltt-M2">create: {new Moment(project.createdTime).format(TIME_FORMAT)}</span>
                         <span className="ltt-M2"><i className="fa fa-child" title="last active"></i> {new Moment(project.lastActiveTime).fromNow()}</span>
                     </p>
-                    <p className="ltt_c-projectDetail-logClasses">{logClasses}</p>
                     {versions}
                 </section>
             );

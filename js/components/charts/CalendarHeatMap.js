@@ -17,7 +17,7 @@ var CalendarHeatMap = React.createClass({
     },
     componentDidMount: function () {
         var that = this;
-        createCalHealMap(this.props.url, this.props.options)
+        createCalHealMap.call(this, this.props.url, this.props.options)
             .then(function () {
                 that.refs.ind.done();
             });
@@ -34,7 +34,11 @@ var CalendarHeatMap = React.createClass({
  function createCalHealMap(url, options) {
     var deferred = Q.defer();
     var calendar = new CalHeatMap();
+    var that = this;
     d3.json(server + url, function(error, data) {
+        if (!that.isMounted()) {
+            return;
+        }
         deferred.resolve(data);
         var renderData = {};
         if (!data) {return;}

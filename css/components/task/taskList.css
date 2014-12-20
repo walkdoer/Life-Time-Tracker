@@ -1,9 +1,9 @@
 .ltt_c-taskList{
-
+    list-style:none;
 }
 
-.ltt_c-taskList li{
-    border-bottom: 1px solid #ccc;
+.ltt_c-taskList .ltt_c-task{
+    border-bottom: 1px solid #E2E2E2;
 }
 
 
