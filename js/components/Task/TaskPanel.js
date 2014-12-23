@@ -87,7 +87,7 @@ var TaskPanel = React.createClass({
                         promise = task.start();
                     }
                     promise.then(function (result) {
-                        Notify.success('Task ' + result.name + 'complete!');
+                        Notify.success('Task ' + result.name + ' complete!');
                     }, function (err) {
                         console.error('update progress failed');
                         $(ui.sender).sortable('cancel');

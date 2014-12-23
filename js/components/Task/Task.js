@@ -39,15 +39,19 @@ var Task = React.createClass({
         var deferred = Q.defer();
         var taskId = this.props.data._id;
         console.log('update task ' + taskId);
-        return $.post('/api/tasks/' + taskId, data)
-                .then(function (result) {
-                    console.log(result);
-                    deferred.resolve(result);
-                })
-                .fail(function (err) {
-                    console.error(err);
-                    deferred.reject(err);
-                });
+        $.ajax({
+            type: "POST",
+            url: '/api/tasks/' + taskId,
+            data: data,
+            success: function (result) {
+                deferred.resolve(result);
+            },
+            error: function (err) {
+                console.error(err);
+                deferred.reject(err);
+            },
+            dataType: 'json'
+        });
         return deferred.promise;
     },
 
