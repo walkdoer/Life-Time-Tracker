@@ -48,10 +48,18 @@ js/bundle.js
 !node_modules/
 
 node_modules/*
+
+# tracker modules #
 !node_modules/tracker/
 node_modules/tracker/conf/token.json
 node_modules/tracker/node_modules
 node_modules/tracker/.DS_Store
+
+# sdk module #
+!node_modules/ltt-sdk/
+node_modules/ltt-sdk/node_modules
+node_modules/ltt-sdk/.DS_Store
+
 logs/
 bower_components/
 build/

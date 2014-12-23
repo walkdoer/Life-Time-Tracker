@@ -95,16 +95,18 @@ var Header = React.createClass({
         }).then(function (result) {
             var data = result.data;
             if (data.success) {
-                Notify.success('Successfully sync!');
+                Notify.success('Successfully sync!', {timeout: 5000});
                 that.setState({
                     syncStatus: NO_SYNC
                 });
             } else {
+                Notify.error('failed to sync!');
                 that.setState({
                     syncStatus: SYNC_ERROR
                 });
             }
         }).catch(function (err) {
+            Notify.error('failed to sync!');
             that.setState({
                 syncStatus: SYNC_ERROR
             });

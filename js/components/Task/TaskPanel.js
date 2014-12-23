@@ -5,13 +5,9 @@ var React = require('react');
 var Router = require('react-router');
 var TaskList = require('./TaskList');
 var Task = require('./Task');
+var Notify = require('../Notify');
 
-var PROGRESS_TYPE_MAP = {};
 var TODO = 'todo', DOING = 'doing', COMPLETE = 'complete';
-PROGRESS_TYPE_MAP[TODO] = -1;
-PROGRESS_TYPE_MAP[DOING] = 0;
-PROGRESS_TYPE_MAP[COMPLETE] = 100;
-
 var TaskPanel = React.createClass({
     render: function () {
         var tasks = this.props.tasks,
@@ -76,27 +72,30 @@ var TaskPanel = React.createClass({
                 ui.item.removeData("move_handler");
             },
             receive: function (event, ui) {
-                var $receiveList = $(event.target);
+                var $receiveList = $(event.target),
+                    listName = $receiveList.data('name');
                 var $task = ui.item;
                 var taskId = $task.data('id');
                 var task = that.refs[taskId];
+                var promise;
                 if (task) {
-                    var progress = getProgress(task, $receiveList.data('name'));
-                    task.update({
-                        progress: progress
+                    if (listName === COMPLETE) {
+                        promise = task.complete();
+                    } else if (listName === TODO) {
+                        promise = task.todo();
+                    } else if (listName === DOING) {
+                        promise = task.start();
+                    }
+                    promise.then(function (result) {
+                        Notify.success('Task ' + result.name + 'complete!');
+                    }, function (err) {
+                        console.error('update progress failed');
+                        $(ui.sender).sortable('cancel');
+                        Notify.error('move task failed');
                     });
-                    console.log('update progress = ' + progress);
                 }
             }
         }).disableSelection();
-
-        function getProgress(task, listType) {
-            var progress = PROGRESS_TYPE_MAP[listType];
-            if (listType === DOING) {
-                return task.get('progress');
-            }
-            return progress;
-        }
     }
 });
 

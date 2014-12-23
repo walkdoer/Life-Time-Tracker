@@ -4,6 +4,7 @@
 var React = require('react');
 var Router = require('react-router');
 var Link = Router.Link;
+var Q = require('q');
 
 /**components*/
 var Progress = require('../Progress');
@@ -35,7 +36,31 @@ var Task = React.createClass({
     },
 
     update: function (data) {
-        console.log('update task' + data);
+        var deferred = Q.defer();
+        var taskId = this.props.data._id;
+        console.log('update task ' + taskId);
+        return $.post('/api/tasks/' + taskId, data)
+                .then(function (result) {
+                    console.log(result);
+                    deferred.resolve(result);
+                })
+                .fail(function (err) {
+                    console.error(err);
+                    deferred.reject(err);
+                });
+        return deferred.promise;
+    },
+
+    complete: function () {
+        return this.update({progress: 100});
+    },
+
+    todo: function () {
+        return this.update({progress: -1});
+    },
+
+    start: function () {
+      return this.update({progress: 0});
     }
 });
 
