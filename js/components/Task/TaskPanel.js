@@ -19,7 +19,7 @@ var TaskPanel = React.createClass({
         tasks.forEach(function(task) {
             var bucket,
                 progress = task.progress;
-            if (progress > 0 && progress < 100) {
+            if (progress >= 0 && progress < 100) {
                 bucket = doingTasks;
             } else if (progress === 100) {
                 bucket = completedTasks;
@@ -80,19 +80,25 @@ var TaskPanel = React.createClass({
                 var promise;
                 if (task) {
                     if (listName === COMPLETE) {
-                        promise = task.complete();
+                        promise = task.complete().then(function (result) {
+                            Notify.success('Task ' + result.name + ' complete!');
+                        });
                     } else if (listName === TODO) {
-                        promise = task.todo();
+                        promise = task.todo().then(function (result) {
+                            Notify.success('Task ' + result.name + ' move to todo!');
+                        });
                     } else if (listName === DOING) {
-                        promise = task.start();
+                        promise = task.start().then(function (result) {
+                            Notify.success('Task ' + result.name + ' start!');
+                        });
                     }
-                    promise.then(function (result) {
-                        Notify.success('Task ' + result.name + ' complete!');
-                    }, function (err) {
-                        console.error('update progress failed');
-                        $(ui.sender).sortable('cancel');
-                        Notify.error('move task failed');
-                    });
+                    if (promise) {
+                        promise.catch(function (err) {
+                            console.error('update progress failed');
+                            $(ui.sender).sortable('cancel');
+                            Notify.error('move task failed');
+                        });
+                    }
                 }
             }
         }).disableSelection();

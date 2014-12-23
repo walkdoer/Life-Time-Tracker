@@ -12,20 +12,21 @@ var animation = {
 };
 
 
-var notify = function (type) {
+var notify = function (type, defineOptions) {
     return function (message, options) {
         var defaultOptions = {
             type: type,
             text: message,
-            theme: 'relax',
             dismissQueue: true,
+            theme : 'relax',
             layout: layout,
             animation: animation
         };
-        options = _.extend(defaultOptions, options);
+        _.extend(defaultOptions, defineOptions);
+        options = _.extend(defaultOptions, defineOptions, options);
         noty(options);
     };
 };
-exports.success = notify('success');
+exports.success = notify('success', {timeout: 3000});
 exports.error = notify('error');
 exports.warning = notify('warning');

@@ -19,7 +19,7 @@ var Task = React.createClass({
         if (this.props.selected) {
             className += ' selected';
         }
-        if (this.props.progress) {
+        if (this.props.progress >= 0) {
             progress = (<Progress max={100} value={task.progress}/>);
         }
         return (
@@ -64,7 +64,7 @@ var Task = React.createClass({
     },
 
     start: function () {
-      return this.update({progress: 0});
+        return this.update({progress: 0});
     }
 });
 
