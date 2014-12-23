@@ -4,8 +4,9 @@
 var React = require('react');
 var TaskList = React.createClass({
     render: function () {
+        var className = ['ltt_c-taskList'].concat([this.props.className]).join(' ');
         return (
-            <ul className="ltt_c-taskList">
+            <ul className={className}>
                 {this.props.children}
             </ul>
         );

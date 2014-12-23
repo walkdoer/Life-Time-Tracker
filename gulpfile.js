@@ -89,8 +89,13 @@ gulp.task('sync', function() {
     gutil.log('Watching file...');
     gulp.src([
         './bower_components/bootstrap/dist/css/bootstrap.css',
-        './bower_components/bootstrap/dist/css/bootstrap-theme.css'
+        './bower_components/bootstrap/dist/css/bootstrap-theme.css',
+        './bower_components/jquery-ui/jquery-ui.css'
     ]).pipe(gulp.dest('./css/lib'));
+    gulp.src([
+        './bower_components/jquery-ui/jquery-ui.js'
+    ]).pipe(gulp.dest('./js/libs'));
+
     var cssFiles = './css/**/*.css',
         images = './images/**/*',
         fonts = './fonts/**/*',

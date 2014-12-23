@@ -16,3 +16,20 @@
 .ltt_c-taskPanel .ltt_c-taskList:last-child{
     margin-right:0px;
 }
+
+
+.ltt_c-taskPanel .tilt.right {
+    transform: rotate(3deg);
+    -moz-transform: rotate(3deg);
+    -webkit-transform: rotate(3deg);
+}
+.ltt_c-taskPanel .tilt.left {
+    transform: rotate(-3deg);
+    -moz-transform: rotate(-3deg);
+    -webkit-transform: rotate(-3deg);
+}
+
+.ltt_c-taskPanel .item-highlight{
+    height: 51px;
+    background: #FCDA00;
+}

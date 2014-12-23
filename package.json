@@ -45,7 +45,6 @@
   },
   "browser": {
     "d3": "./bower_components/d3/d3.min.js",
-    "jquery": "./bower_components/jquery/dist/jquery.min.js",
     "nvd3": "./bower_components/nvd3/nv.d3.min.js",
     "highcharts": "./bower_components/highcharts/highcharts.src.js",
     "highchartsAdapter": "./bower_components/highcharts/adapters/standalone-framework.src.js",
@@ -54,7 +53,6 @@
     "chart": "./bower_components/chartjs/Chart.js"
   },
   "browserify-shim": {
-    "jquery": "$",
     "noty": "noty",
     "chart": "chart",
     "highcharts": {
