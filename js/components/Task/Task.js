@@ -22,12 +22,20 @@ var Task = React.createClass({
             progress = (<Progress max={100} value={task.progress}/>);
         }
         return (
-            <li className={className}>
+            <li className={className} data-id={task._id}>
                 <span className="ltt_c-task-tag"><i className="fa fa-ellipsis-v"></i></span>
                 <Link to={url}><span>{task.name}</span></Link>
                 {progress}
             </li>
         );
+    },
+
+    get: function (attrName) {
+        return this.props[attrName];
+    },
+
+    update: function (data) {
+        console.log('update task' + data);
     }
 });
 

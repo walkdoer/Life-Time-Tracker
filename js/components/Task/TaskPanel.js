@@ -5,6 +5,13 @@ var React = require('react');
 var Router = require('react-router');
 var TaskList = require('./TaskList');
 var Task = require('./Task');
+
+var PROGRESS_TYPE_MAP = {};
+var TODO = 'todo', DOING = 'doing', COMPLETE = 'complete';
+PROGRESS_TYPE_MAP[TODO] = -1;
+PROGRESS_TYPE_MAP[DOING] = 0;
+PROGRESS_TYPE_MAP[COMPLETE] = 100;
+
 var TaskPanel = React.createClass({
     render: function () {
         var tasks = this.props.tasks,
@@ -30,19 +37,19 @@ var TaskPanel = React.createClass({
 
         return (
             <div className="ltt_c-taskPanel">
-                <TaskList className={sortClass}>
+                <TaskList className={sortClass} name="todo">
                 {todoTasks.map(function (task) {
-                    return <Task data={task} key={task._id} selected={task._id === selectedTask}/>
+                    return <Task ref={task._id} data={task} key={task._id} selected={task._id === selectedTask}/>
                 })}
                 </TaskList>
-                <TaskList className={sortClass}>
+                <TaskList className={sortClass} name="doing">
                 {doingTasks.map(function (task) {
-                    return <Task data={task} key={task._id} selected={task._id === selectedTask} progress={true}/>
+                    return <Task ref={task._id} data={task} key={task._id} selected={task._id === selectedTask} progress={true}/>
                 })}
                 </TaskList>
-                <TaskList className={sortClass}>
+                <TaskList className={sortClass} name="complete">
                 {completedTasks.map(function (task) {
-                    return <Task data={task} key={task._id} selected={task._id === selectedTask}/>
+                    return <Task ref={task._id} data={task} key={task._id} selected={task._id === selectedTask}/>
                 })}
                 </TaskList>
             </div>
@@ -54,6 +61,7 @@ var TaskPanel = React.createClass({
     },
 
     initDnd: function () {
+        var that = this;
         var $column = $(this.getDOMNode()).find('.ltt__sortable');
         $column.sortable({
             connectWith: ".ltt__sortable",
@@ -66,8 +74,29 @@ var TaskPanel = React.createClass({
                 ui.item.removeClass("tilt");
                 $("html").unbind('mousemove', ui.item.data("move_handler"));
                 ui.item.removeData("move_handler");
+            },
+            receive: function (event, ui) {
+                var $receiveList = $(event.target);
+                var $task = ui.item;
+                var taskId = $task.data('id');
+                var task = that.refs[taskId];
+                if (task) {
+                    var progress = getProgress(task, $receiveList.data('name'));
+                    task.update({
+                        progress: progress
+                    });
+                    console.log('update progress = ' + progress);
+                }
             }
         }).disableSelection();
+
+        function getProgress(task, listType) {
+            var progress = PROGRESS_TYPE_MAP[listType];
+            if (listType === DOING) {
+                return task.get('progress');
+            }
+            return progress;
+        }
     }
 });
 
