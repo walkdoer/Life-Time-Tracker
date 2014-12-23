@@ -99,6 +99,7 @@ var Log = React.createClass({
                 {project}
                 {task}
                 {tags}
+                <span>progress:{this.props.progress}</span>
                 <Origin value={this.props.content}/>
             </div>
         );
