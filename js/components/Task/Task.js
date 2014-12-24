@@ -5,9 +5,11 @@ var React = require('react');
 var Router = require('react-router');
 var Link = Router.Link;
 var Q = require('q');
+var _ = require('lodash');
 
 /**components*/
 var Progress = require('../Progress');
+var TaskList = require('../Task/TaskList');
 
 
 var Task = React.createClass({
@@ -22,11 +24,25 @@ var Task = React.createClass({
         if (this.props.progress >= 0) {
             progress = (<Progress max={100} value={task.progress}/>);
         }
+        var subTasks = task.subTasks,
+            subTaskList = null;
+        if (!_.isEmpty(subTasks)) {
+            subTaskList = (
+                <TaskList>
+                    {subTasks.map(function (task) {
+                        return (<Task data={task} key={task.id}/>);
+                    })}
+                </TaskList>
+            );
+        }
         return (
             <li className={className} data-id={task._id}>
-                <span className="ltt_c-task-tag"><i className="fa fa-ellipsis-v"></i></span>
-                <Link to={url}><span>{task.name}</span></Link>
-                {progress}
+                <div className="ltt_c-task-title">
+                    <span className="ltt_c-task-tag"><i className="fa fa-ellipsis-v"></i></span>
+                    <Link to={url}><span>{task.name}</span></Link>
+                    {progress}
+                </div>
+                {subTaskList}
             </li>
         );
     },
