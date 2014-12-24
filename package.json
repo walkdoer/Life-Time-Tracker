@@ -24,7 +24,8 @@
     "react-bootstrap": "~0.13.0",
     "request": "~2.51.0",
     "body-parser": "~1.10.0",
-    "multer": "~0.1.6"
+    "multer": "~0.1.6",
+    "he": "~0.5.0"
   },
   "devDependencies": {
     "browserify": "~6.2.0",
