@@ -13,6 +13,7 @@ var main = "boot.js";
 var destFile = "bundle.js";
 var inject = require("gulp-inject");
 var rename = require('gulp-rename');
+var NwBuilder = require('node-webkit-builder');
 
 function handleErrors(err) {
     var args = Array.prototype.slice.call(arguments);
@@ -29,7 +30,7 @@ function handleErrors(err) {
 function buildScript(main, destFile, watch) {
     var props = {
         entries: [scriptsDir + '/' + main],
-        debug: true
+        debug: false
     };
     var bundler = watch ? watchify(browserify(props)) : browserify(props);
     bundler.transform(reactify);
@@ -136,6 +137,25 @@ gulp.task('sync', function() {
 
 gulp.task('build', function() {
     return buildScript(main, destFile, false);
+});
+
+
+gulp.task('nw', function () {
+    var nw = new NwBuilder({
+        files: [ './build/**/**'],
+        platforms: ['osx64'],
+        buildDir: './production'
+    });
+    // Log stuff you want
+    nw.on('log', function (msg) {
+        gutil.log('node-webkit-builder', msg);
+    });
+    // Build returns a promise, return it so the task isn't called in parallel
+    return nw.build().then(function () {
+       console.log('build nw all done!');
+    }).catch(function (error) {
+        gutil.log('node-webkit-builder', error);
+    });
 });
 
 

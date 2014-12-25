@@ -44,6 +44,8 @@ node_modules
 *.pid
 *.swo
 
+production/
+cache/
 js/bundle.js
 !node_modules/
 
