@@ -1,4 +1,4 @@
-(function () {
+(function() {
     'use strict';
     var isNodeWebkit = false;
     var root = this;
@@ -12,29 +12,49 @@
         var nwGui = require('nw.gui');
         var Ltt = {
 
-            getWindow: function () {
+            init: function () {
+                var win = this.getWindow();
+                nwGui.App.on('reopen', function () {
+                    win.show();
+                });
+            },
+
+            getWindow: function() {
                 return nwGui.Window.get();
             },
 
-            enterFullscreen: function () {
+            enterFullscreen: function() {
                 this.getWindow().enterFullscreen();
             },
 
-            leaveFullscreen: function () {
+            leaveFullscreen: function() {
                 this.getWindow().leaveFullscreen();
             },
 
-            isFullscreen: function () {
-               return this.getWindow().isFullscreen;
+            isFullscreen: function() {
+                return this.getWindow().isFullscreen;
             },
 
             /**
              * close application window
              */
-            close: function () {
-                this.getWindow().close();
+            close: function() {
+                var win = this.getWindow();
+                win.hide();
+            },
+
+            quit: function () {
+                var win = this.getWindow();
+                win.on('close', function() {
+                    // Hide the window to give user the feeling of closing immediately
+                    this.hide();
+                    // After closing the new window, close the main window.
+                    this.close(true);
+                });
+                win.close();
             }
         };
+        Ltt.init();
         root = global;
         root.Ltt = Ltt;
         root.nwGui = nwGui;
@@ -47,23 +67,21 @@
             name: 'default',
             items: [{
                 name: 'Import Data',
-                handler: function () {
-                }
+                handler: function() {}
             }, {
                 name: 'Quit',
-                handler: function () {
-                    Ltt.close();
+                handler: function() {
+                    Ltt.quit();
                 }
             }]
         }, {
             name: 'File',
             items: [{
                 name: 'Import Data',
-                handler: function () {
-                }
+                handler: function() {}
             }, {
                 name: 'Create Note',
-                handler: function () {
+                handler: function() {
 
                 }
             }]
