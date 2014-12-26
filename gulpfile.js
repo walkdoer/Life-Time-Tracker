@@ -30,7 +30,7 @@ function handleErrors(err) {
 function buildScript(main, destFile, watch) {
     var props = {
         entries: [scriptsDir + '/' + main],
-        debug: false
+        debug: true
     };
     var bundler = watch ? watchify(browserify(props)) : browserify(props);
     bundler.transform(reactify);
