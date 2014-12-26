@@ -62,6 +62,11 @@ node_modules/tracker/.DS_Store
 node_modules/ltt-sdk/node_modules
 node_modules/ltt-sdk/.DS_Store
 
+# nw module #
+!node_modules/ltt-nw/
+node_modules/ltt-nw/node_modules
+node_modules/ltt-nw/.DS_Store
+
 logs/
 bower_components/
 build/

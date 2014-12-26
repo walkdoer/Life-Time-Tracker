@@ -2,8 +2,7 @@
     'use strict';
     var isNodeWebkit = false;
     var root = this;
-    var evernoteSync = require('tracker/sync/evernote');
-    var Moment = require('moment');
+    var sdk = require('ltt-sdk');
 
     if (typeof require !== 'undefined') {
         isNodeWebkit = true;
@@ -58,6 +57,7 @@
             }
         };
         Ltt.init();
+        Ltt.sdk = sdk;
         root = global;
         root.Ltt = Ltt;
         root.nwGui = nwGui;
@@ -75,12 +75,10 @@
             }, {
                 name: 'Sync From Evernote',
                 handler: function () {
-                    var mStart = new Moment().startOf('month');
-                    var mEnd = new Moment().endOf('month');
-                    evernoteSync.sync({
-                        start: mStart.toDate(),
-                        end: mEnd.toDate()
-                    });
+                    sdk.syncEvernote()
+                        .then(function (result) {
+                            alert(result);
+                        });
                 }
             }, {
                 name: 'Quit',

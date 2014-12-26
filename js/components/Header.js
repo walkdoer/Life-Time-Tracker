@@ -87,13 +87,7 @@ var Header = React.createClass({
         this.setState({
             syncStatus: SYNCING
         });
-        var mStart = new Moment().startOf('month');
-        var mEnd = new Moment().endOf('month');
-        remoteStorage.get('/api/syncNote', {
-            start: mStart.toDate(),
-            end: mEnd.toDate()
-        }).then(function (result) {
-            var data = result.data;
+        Ltt.sdk.syncEvernote().then(function (data) {
             if (data.success) {
                 Notify.success('Successfully sync!', {timeout: 5000});
                 that.setState({
