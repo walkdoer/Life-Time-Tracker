@@ -2,14 +2,17 @@
     'use strict';
     var isNodeWebkit = false;
     var root = this;
+    var evernoteSync = require('tracker/sync/evernote');
+    var Moment = require('moment');
 
     if (typeof require !== 'undefined') {
         isNodeWebkit = true;
     }
 
     if (isNodeWebkit === true) {
-        var Menubar = require('menubar');
+        var Menubar = require('ltt-nw/menubar');
         var nwGui = require('nw.gui');
+        var shortcut = require('ltt-nw/shortcut');
         var Ltt = {
 
             init: function () {
@@ -60,6 +63,7 @@
         root.nwGui = nwGui;
         //a series of init action to intialize components
         initMenu();
+        initShortcut();
     }
 
     function initMenu() {
@@ -68,6 +72,16 @@
             items: [{
                 name: 'Import Data',
                 handler: function() {}
+            }, {
+                name: 'Sync From Evernote',
+                handler: function () {
+                    var mStart = new Moment().startOf('month');
+                    var mEnd = new Moment().endOf('month');
+                    evernoteSync.sync({
+                        start: mStart.toDate(),
+                        end: mEnd.toDate()
+                    });
+                }
             }, {
                 name: 'Quit',
                 handler: function() {
@@ -88,6 +102,10 @@
         }]);
         var win = Ltt.getWindow();
         win.menu = menu;
+    }
+
+    function initShortcut() {
+        shortcut.init({});
     }
 
 })();

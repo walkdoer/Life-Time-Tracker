@@ -97,14 +97,32 @@ gulp.task('sync', function() {
         './bower_components/jquery-ui/jquery-ui.js'
     ]).pipe(gulp.dest('./js/libs'));
 
+    gulp.src([
+        './node_modules/lodash/**/*',
+    ]).pipe(gulp.dest('./build/node_modules/lodash/'));
+
+    gulp.src([
+        './node_modules/moment/**/*',
+    ]).pipe(gulp.dest('./build/node_modules/moment/'));
+
+    gulp.src([
+        './node_modules/ltt-nw/**/*',
+    ]).pipe(gulp.dest('./build/node_modules/ltt-nw/'));
+
     var cssFiles = './css/**/*.css',
         images = './images/**/*',
         fonts = './fonts/**/*',
+        lttNw = './node_modules/ltt-nw/**/*',
         index = './index.html',
         js = './js/nw/**/*.js';
     gulp.src(cssFiles)
         .pipe(watch(cssFiles, function(files) {
             return files.pipe(gulp.dest([buildDir, 'css/'].join('/')));
+        }));
+
+    gulp.src(lttNw)
+        .pipe(watch(lttNw, function (files) {
+            return files.pipe(gulp.dest([buildDir, 'node_modules/ltt-nw'].join('/')));
         }));
     gulp.src(images)
         .pipe(watch(images, function(files) {
