@@ -7,10 +7,8 @@ var watchify = require('watchify');
 var watch = require('gulp-watch');
 var notify = require("gulp-notify");
 var react = require("gulp-react");
-var scriptsDir = './js';
+var scriptsDir = './';
 var buildDir = './build';
-var main = "boot.js";
-var destFile = "bundle.js";
 var inject = require("gulp-inject");
 var rename = require('gulp-rename');
 var NwBuilder = require('node-webkit-builder');
@@ -26,8 +24,12 @@ function handleErrors(err) {
 }
 
 
+var main = "boot.js";
+var mainDestFile = 'bundle.js';
+var jsDestDir = buildDir;
+
 // Based on: http://blog.avisi.nl/2014/04/25/how-to-keep-a-fast-build-with-browserify-and-reactjs/
-function buildScript(main, destFile, watch) {
+function buildScript(scriptsDir, main, destFile, buildDir, watch) {
     var props = {
         entries: [scriptsDir + '/' + main],
         debug: true
@@ -39,7 +41,8 @@ function buildScript(main, destFile, watch) {
         var stream = bundler.bundle();
         return stream.on('error', handleErrors)
             .pipe(source(destFile))
-            .pipe(gulp.dest(buildDir + '/js/'));
+            .pipe(gulp.dest(buildDir))
+            .pipe(gulp.dest(scriptsDir));
     }
     bundler.on('update', function() {
         rebundle();
@@ -50,37 +53,43 @@ function buildScript(main, destFile, watch) {
 
 gulp.task('buildHTML', function() {
     gutil.log('Watching html file...');
-    var htmlFile = './index.src.html',
-        cssFiles = './css/**/*',
-        jsScripts = './js/**/*';
-    var target = gulp.src(htmlFile);
-        injectScript(target);
+    var htmlFile = './index.src.html';
+    var appResources = [
+        './nw/initNW.js',
+        './bundle.js',
+        './css/lib/normalize.css',
+        './css/lib/**/*.css',
+        './css/ltt.css',
+        './css/main.css',
+        './css/**/*.css',
+    ];
+    injectScript(gulp.src(htmlFile), appResources, 'index.html', buildDir);
     gulp.watch(htmlFile, function () {
         var target = gulp.src(htmlFile);
-        injectScript(target);
+        injectScript(target, appResources, 'index.html', buildDir);
     });
 
-    gulp.watch([cssFiles, jsScripts], function () {
-        var target = gulp.src(htmlFile);
-        injectScript(target);
+    var addLogHTML = './node_modules/ltt-addLog/index.html',
+        addLogResources = [
+            './node_modules/ltt-addLog/addLog.js',
+            './css/**/*.css'
+        ];
+
+    injectScript(gulp.src(addLogHTML), addLogResources, 'addLog.html', buildDir);
+    gulp.watch(addLogHTML, function () {
+        var target = gulp.src(addLogHTML);
+        injectScript(target, addLogResources, 'addLog.html', buildDir);
     });
 
-    function injectScript(file) {
-        gutil.log('Rebuild ' + htmlFile + ' file...');
-            var sources = gulp.src([
-                './js/nw/initNW.js',
-                './js/bundle.js',
-                './css/lib/normalize.css',
-                './css/lib/**/*.css',
-                './css/ltt.css',
-                './css/main.css',
-                './css/**/*.css',
-            ], {
-                read: false
-            });
-            return file.pipe(inject(sources, {relative: true}))
-                .pipe(rename('index.html'))
-                .pipe(gulp.dest('./'));
+
+    function injectScript(file, resources, destFile, buildDir) {
+        gutil.log('Rebuild ' + destFile + ' file...');
+        var sources = gulp.src(resources, {
+            read: false
+        });
+        return file.pipe(inject(sources, {relative: true}))
+            .pipe(rename(destFile))
+            .pipe(gulp.dest(buildDir));
     }
 });
 
@@ -95,7 +104,7 @@ gulp.task('sync', function() {
     ]).pipe(gulp.dest('./css/lib'));
     gulp.src([
         './bower_components/jquery-ui/jquery-ui.js'
-    ]).pipe(gulp.dest('./js/libs'));
+    ]).pipe(gulp.dest('./libs'));
 
     gulp.src([
         './node_modules/lodash/**/*',
@@ -114,7 +123,7 @@ gulp.task('sync', function() {
         fonts = './fonts/**/*',
         lttNw = './node_modules/ltt-nw/**/*',
         index = './index.html',
-        js = './js/nw/**/*.js';
+        js = './nw/**/*.js';
     gulp.src(cssFiles)
         .pipe(watch(cssFiles, function(files) {
             return files.pipe(gulp.dest([buildDir, 'css/'].join('/')));
@@ -130,7 +139,7 @@ gulp.task('sync', function() {
         }));
     gulp.src(js)
         .pipe(watch(js, function(files) {
-            return files.pipe(gulp.dest(buildDir + '/js/nw/'));
+            return files.pipe(gulp.dest(buildDir + '/nw/'));
         }));
     gulp.src(index)
         .pipe(watch(index, function(file) {
@@ -153,8 +162,12 @@ gulp.task('sync', function() {
     }));*/
 });
 
+var addLogScriptDir = './node_modules/ltt-addLog';
+var addLogMain = 'app.js';
+var addLogDest = 'addLog.js';
 gulp.task('build', function() {
-    return buildScript(main, destFile, false);
+    buildScript(addLogScriptDir, addLogMain, addLogDest, jsDestDir, false);
+    return buildScript(scriptsDir, main, mainDestFile, jsDestDir, false);
 });
 
 
@@ -178,5 +191,6 @@ gulp.task('nw', function () {
 
 
 gulp.task('default', ['build'], function() {
-    return buildScript(main, destFile, true);
+    buildScript(addLogScriptDir, addLogMain, addLogDest, jsDestDir, true);
+    return buildScript(scriptsDir, main, mainDestFile, jsDestDir, true);
 });
