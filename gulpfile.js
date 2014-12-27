@@ -89,7 +89,8 @@ gulp.task('buildHTML', function() {
         });
         return file.pipe(inject(sources, {relative: true}))
             .pipe(rename(destFile))
-            .pipe(gulp.dest(buildDir));
+            .pipe(gulp.dest(buildDir))
+            .pipe(gulp.dest('./build'));
     }
 });
 
