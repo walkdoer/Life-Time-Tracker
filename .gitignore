@@ -67,6 +67,11 @@ node_modules/ltt-sdk/.DS_Store
 node_modules/ltt-nw/node_modules
 node_modules/ltt-nw/.DS_Store
 
+# nw module #
+!node_modules/ltt-addLog/
+node_modules/ltt-addLog/node_modules
+node_modules/ltt-addLog/.DS_Store
+
 logs/
 bower_components/
 build/

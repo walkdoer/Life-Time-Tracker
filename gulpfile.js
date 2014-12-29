@@ -69,16 +69,20 @@ gulp.task('buildHTML', function() {
         injectScript(target, appResources, 'index.html', buildDir);
     });
 
-    var addLogHTML = './node_modules/ltt-addLog/index.html',
+    var addLogHTML = './node_modules/ltt-addLog/index.src.html',
         addLogResources = [
-            './node_modules/ltt-addLog/addLog.js',
-            './css/**/*.css'
-        ];
+            './node_modules/ltt-addLog/css/lib/normalize.css',
+            './node_modules/ltt-addLog/css/lib/**/*.css',
+            './node_modules/ltt-addLog/css/addLog.css',
+            /**js*/
+            './node_modules/ltt-addLog/addLog.js'
+        ],
+        addLogBuildDir = './node_modules/ltt-addLog';
 
-    injectScript(gulp.src(addLogHTML), addLogResources, 'addLog.html', buildDir);
+    injectScript(gulp.src(addLogHTML), addLogResources, 'addLog.html', addLogBuildDir);
     gulp.watch(addLogHTML, function () {
         var target = gulp.src(addLogHTML);
-        injectScript(target, addLogResources, 'addLog.html', buildDir);
+        injectScript(target, addLogResources, 'addLog.html', addLogBuildDir);
     });
 
 
@@ -98,14 +102,15 @@ gulp.task('buildHTML', function() {
 //sync resources file
 gulp.task('sync', function() {
     gutil.log('Watching file...');
+    /*
     gulp.src([
         './bower_components/bootstrap/dist/css/bootstrap.css',
         './bower_components/bootstrap/dist/css/bootstrap-theme.css',
         './bower_components/jquery-ui/jquery-ui.css'
-    ]).pipe(gulp.dest('./css/lib'));
+    ]).pipe(gulp.dest('./css/lib')).pipe(gulp.dest('./node_modules/ltt-addLog/css/lib'));
     gulp.src([
         './bower_components/jquery-ui/jquery-ui.js'
-    ]).pipe(gulp.dest('./libs'));
+    ]).pipe(gulp.dest('./libs'));*/
 
     gulp.src([
         './node_modules/lodash/**/*',
@@ -123,10 +128,15 @@ gulp.task('sync', function() {
         images = './images/**/*',
         fonts = './fonts/**/*',
         lttNw = './node_modules/ltt-nw/**/*',
-        index = './index.html',
         js = './nw/**/*.js';
     gulp.src(cssFiles)
         .pipe(watch(cssFiles, function(files) {
+            return files.pipe(gulp.dest([buildDir, 'css/'].join('/')));
+        }));
+
+    var addLogCssFiles = './node_modules/ltt-addLog/css/*.css';
+    gulp.src(addLogCssFiles)
+        .pipe(watch(addLogCssFiles, function (files) {
             return files.pipe(gulp.dest([buildDir, 'css/'].join('/')));
         }));
 
@@ -142,10 +152,7 @@ gulp.task('sync', function() {
         .pipe(watch(js, function(files) {
             return files.pipe(gulp.dest(buildDir + '/nw/'));
         }));
-    gulp.src(index)
-        .pipe(watch(index, function(file) {
-            return file.pipe(gulp.dest(buildDir));
-        }));
+
     return gulp.src(fonts)
         .pipe(watch(fonts, function(files) {
             return files.pipe(gulp.dest([buildDir, 'fonts/'].join('/')));

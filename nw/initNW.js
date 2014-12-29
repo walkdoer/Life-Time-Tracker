@@ -3,26 +3,46 @@
     var isNodeWebkit = false;
     var root = this;
     var sdk = require('ltt-sdk');
+    var path = require('path');
 
     if (typeof require !== 'undefined') {
         isNodeWebkit = true;
     }
 
+
+    /**
+     * application funtion map
+     */
+    var functionMap = {
+        'open_addLog_window': function () {
+            var fileSrc = getFileSrc('addLog.html');
+            var win = gui.Window.open(fileSrc, {
+                height: 200,
+                width: 350,
+                position: 'center'
+            });
+        }
+    };
+
+    function getFileSrc(fileName) {
+        var fileSrc = 'file:///' + path.resolve('./' + fileName);
+        return fileSrc;
+    }
+
     if (isNodeWebkit === true) {
         var Menubar = require('ltt-nw/menubar');
-        var nwGui = require('nw.gui');
-        var shortcut = require('ltt-nw/shortcut');
+        var gui = require('nw.gui');
         var Ltt = {
 
             init: function () {
                 var win = this.getWindow();
-                nwGui.App.on('reopen', function () {
+                gui.App.on('reopen', function () {
                     win.show();
                 });
             },
 
             getWindow: function() {
-                return nwGui.Window.get();
+                return gui.Window.get();
             },
 
             enterFullscreen: function() {
@@ -60,7 +80,7 @@
         Ltt.sdk = sdk;
         root = global;
         root.Ltt = Ltt;
-        root.nwGui = nwGui;
+        root.nwGui = gui;
         //a series of init action to intialize components
         initMenu();
         initShortcut();
@@ -103,7 +123,22 @@
     }
 
     function initShortcut() {
-        shortcut.init({});
+        var shortcutDefinitions = [{
+            key: "Ctrl+Shift+A",
+            active: function() {
+                console.log("Global desktop keyboard shortcut: " + this.key + " active.");
+                functionMap.open_addLog_window();
+            },
+            failed: function(msg) {
+                console.log(msg);
+            }
+        }];
+        shortcutDefinitions.forEach(function(definition) {
+            // Create a shortcut with |option|.
+            var shortcut = new gui.Shortcut(definition);
+            // Register global desktop shortcut, which can work without focus.
+            gui.App.registerGlobalHotKey(shortcut);
+        });
     }
 
 })();
