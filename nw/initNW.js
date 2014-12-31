@@ -120,7 +120,9 @@
             }]
         }]);
         var win = Ltt.getWindow();
-        win.menu = menu;
+        var nativeMenuBar = new gui.Menu({ type: "menubar" });
+        nativeMenuBar.createMacBuiltin("My App");
+        win.menu = nativeMenuBar;
     }
 
     function initShortcut() {

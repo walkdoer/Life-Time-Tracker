@@ -134,28 +134,3 @@
     flex: 1;
     overflow: overlay;
 }
-
-
-
-.ltt_c-searchBox{
-    padding: 10px;
-    display: flex;
-}
-
-
-.ltt_c-searchBox input{
-    outline: none;
-    border: none;
-    background: #292d30;
-    color: #fff;
-}
-.ltt_c-searchBox .fa{
-    padding-top: 5px;
-}
-.ltt_c-searchBox .fa-search{
-    margin-right: 10px;
-}
-
-.ltt_c-searchBox .fa-times-circle{
-    margin-left: 10px;
-}

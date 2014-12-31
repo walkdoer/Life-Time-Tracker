@@ -1,8 +1,47 @@
 .ltt_c-page-logEditor{
     height:100%;
     padding: 0px;
+    display: flex;
 }
 .ltt_c-page-logEditor #ltt-logEditor{
     height: 100%;
     border: none;
+    flex: 5;
+}
+
+.ltt_c-page-logEditor .ltt_c-filterableList{
+    height: 100%;
+    overflow: overlay;
+    flex: 1.2;
+}
+
+/*************************/
+
+.ltt_c-filterableList{
+    background: #181B1D;
+    color:#FFF;
+}
+
+.ltt_c-filterableList .ltt_c-searchBox {
+    background: #292d30;
+
+    border-bottom: 1px solid #3D3D3D;
+}
+
+.ltt_c-filterableList-list{
+}
+
+.ltt_c-filterableList-list-item{
+
+}
+.ltt_c-filterableList-list-item.selected{
+    color: rgb(255, 208, 208);
+    background: #292d30;
+}
+.ltt_c-filterableList-list-item:hover{
+    background: #292d30;
+}
+
+.ltt_c-filterableList-list-item-name{
+    padding: 10px;
 }
