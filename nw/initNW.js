@@ -21,6 +21,7 @@
                 width: 350,
                 position: 'center'
             });
+            win.focus();
         }
     };
 

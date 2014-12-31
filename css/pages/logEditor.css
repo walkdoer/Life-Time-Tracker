@@ -1,0 +1,8 @@
+.ltt_c-page-logEditor{
+    height:100%;
+    padding: 0px;
+}
+.ltt_c-page-logEditor #ltt-logEditor{
+    height: 100%;
+    border: none;
+}

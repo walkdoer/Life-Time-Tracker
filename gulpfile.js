@@ -63,10 +63,10 @@ gulp.task('buildHTML', function() {
         './css/main.css',
         './css/**/*.css',
     ];
-    injectScript(gulp.src(htmlFile), appResources, 'index.html', buildDir);
+    injectScript(gulp.src(htmlFile), appResources, 'index.html', './');
     gulp.watch(htmlFile, function () {
         var target = gulp.src(htmlFile);
-        injectScript(target, appResources, 'index.html', buildDir);
+        injectScript(target, appResources, 'index.html', './');
     });
 
     var addLogHTML = './node_modules/ltt-addLog/index.src.html',
@@ -74,6 +74,7 @@ gulp.task('buildHTML', function() {
             './node_modules/ltt-addLog/css/lib/normalize.css',
             './node_modules/ltt-addLog/css/lib/**/*.css',
             './node_modules/ltt-addLog/css/addLog.css',
+            './node_modules/ltt-addLog/css/*.css',
             /**js*/
             './node_modules/ltt-addLog/addLog.js'
         ],
