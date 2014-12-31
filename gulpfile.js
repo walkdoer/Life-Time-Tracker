@@ -40,6 +40,9 @@ function buildScript(scriptsDir, main, destFile, buildDir, watch) {
     function rebundle() {
         var stream = bundler.bundle();
         return stream.on('error', handleErrors)
+            .on('postbundle', function () {
+                gutil.log('bundle done');
+            })
             .pipe(source(destFile))
             .pipe(gulp.dest(buildDir))
             .pipe(gulp.dest(scriptsDir));

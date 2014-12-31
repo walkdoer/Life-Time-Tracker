@@ -3,10 +3,18 @@
     padding: 0px;
     display: flex;
 }
-.ltt_c-page-logEditor #ltt-logEditor{
+.ltt_c-page-logEditor .ltt_c-logEditor{
+    height: 100%;
+    flex: 5;
+}
+
+.ltt_c-logEditor-title{
+    padding: 10px;
+    background:#FFF;
+}
+.ltt_c-page-logEditor .ltt_c-logEditor #ltt-logEditor{
     height: 100%;
     border: none;
-    flex: 5;
 }
 
 .ltt_c-page-logEditor .ltt_c-filterableList{
