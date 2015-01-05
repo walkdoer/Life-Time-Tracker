@@ -4,6 +4,7 @@
     var root = this;
     var sdk = require('ltt-sdk');
     var path = require('path');
+    var _ = require('lodash');
 
     if (typeof require !== 'undefined') {
         isNodeWebkit = true;
@@ -88,8 +89,11 @@
     }
 
     function initMenu() {
-        var menu = new Menubar([{
-            name: 'default',
+        var win = Ltt.getWindow();
+        var menubar = new gui.Menu({ type: "menubar" });
+        menubar.createMacBuiltin("My App");
+        var menus = [{
+            name: 'Data',
             items: [{
                 name: 'Import Data',
                 handler: function() {}
@@ -100,11 +104,6 @@
                         .then(function (result) {
                             alert(result);
                         });
-                }
-            }, {
-                name: 'Quit',
-                handler: function() {
-                    Ltt.quit();
                 }
             }]
         }, {
@@ -118,11 +117,25 @@
 
                 }
             }]
-        }]);
-        var win = Ltt.getWindow();
-        var nativeMenuBar = new gui.Menu({ type: "menubar" });
-        nativeMenuBar.createMacBuiltin("My App");
-        win.menu = nativeMenuBar;
+        }];
+        menus.forEach(function (menu) {
+            var name = menu.name;
+            var submenu = new gui.Menu();
+            var items = menu.items;
+            if (!_.isEmpty(items)) {
+                items.forEach(function (item) {
+                    submenu.append(new gui.MenuItem({
+                        label: item.name,
+                        click: item.handler
+                    }));
+                });
+            }
+            menubar.append(new gui.MenuItem({
+                label: name,
+                submenu: submenu
+            }));
+        });
+        win.menu = menubar;
     }
 
     function initShortcut() {
