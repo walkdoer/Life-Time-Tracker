@@ -28,7 +28,7 @@ var LogEditor = React.createClass({
         });
         editor.commands.addCommand({
             name: "import",
-            bindKey: {win: "Ctrl-S", mac: "Command-Shift-S"},
+            bindKey: {win: "Ctrl-S", mac: "Command-S"},
             exec: function(editor) {
                 that.props.onImport(editor.getValue());
             }
@@ -40,7 +40,8 @@ var LogEditor = React.createClass({
 
     setValue: function (content) {
         editorStore(SK_CONTENT, content);
-        this.editor.setValue(content, 1);
+        this.editor.setValue(content, -1);
+        this.editor.focus();
     }
 });
 

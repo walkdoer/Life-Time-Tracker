@@ -133,4 +133,9 @@
     height: 100%;
     flex: 1;
     overflow: overlay;
+    position: relative;
+}
+
+.scrollable {
+     overflow-y:auto;
 }

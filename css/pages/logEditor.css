@@ -1,25 +1,36 @@
 .ltt_c-page-logEditor{
-    height:100%;
+    position: absolute;
+    height: 100%;
+    top: 0;
+    right: 0;
+    left: 0;
     padding: 0px;
-    display: flex;
+    display:flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    -webkit-align-content: stretch;
+    align-content: stretch;
 }
 .ltt_c-page-logEditor .ltt_c-logEditor{
     height: 100%;
     flex: 5;
+    position: relative;
+    padding-top: 40px;
 }
 
 .ltt_c-logEditor-title{
     padding: 10px;
     background:#FFF;
+    position: absolute;
+    top:0;
+    right: 0;
+    left: 0;
 }
-.ltt_c-page-logEditor .ltt_c-logEditor #ltt-logEditor{
-    height: 100%;
-    border: none;
-}
+.ltt_c-page-logEditor .ltt_c-logEditor #ltt-logEditor{     height:100%;
+     margin-bottom: 0px;     border-radius: 0px;}
 
 .ltt_c-page-logEditor .ltt_c-filterableList{
-    height: 100%;
-    overflow: overlay;
     flex: 1.2;
 }
 

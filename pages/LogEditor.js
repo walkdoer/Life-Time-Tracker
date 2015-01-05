@@ -27,6 +27,7 @@ var Page = React.createClass({
             days.push(Moment(start).toDate());
             start.add(1, 'day');
         }
+        //days = days.slice(0,2);
         days.reverse();
         return {
             days: days,
