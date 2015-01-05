@@ -32,6 +32,9 @@
 
 .ltt_c-page-logEditor .ltt_c-filterableList{
     flex: 1.2;
+    position: relative;
+    padding-top: 43px;
+    height: 100%;
 }
 
 /*************************/
@@ -45,9 +48,15 @@
     background: #292d30;
 
     border-bottom: 1px solid #3D3D3D;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
 }
 
 .ltt_c-filterableList-list{
+    height: 100%;
+    width: 100%;
 }
 
 .ltt_c-filterableList-list-item{

@@ -46,7 +46,7 @@ node_modules
 
 production/
 cache/
-js/bundle.js
+bundle.js
 !node_modules/
 
 node_modules/*

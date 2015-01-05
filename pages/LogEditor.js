@@ -104,7 +104,7 @@ var FilterableList = React.createClass({
         return (
             <div className="ltt_c-filterableList">
                 <SearchBox placeholder="search here"/>
-                <div className="ltt_c-filterableList-list">
+                <div className="ltt_c-filterableList-list scrollable">
                 {items.map(function (item) {
                     var selected = item.key === select;
                     return (<ListItem {...item} selected={selected} onClick={this.props.onItemClick}/>)
