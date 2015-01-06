@@ -32,7 +32,6 @@
     }
 
     if (isNodeWebkit === true) {
-        var Menubar = require('ltt-nw/menubar');
         var gui = require('nw.gui');
         var Ltt = {
 

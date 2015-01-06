@@ -20,40 +20,23 @@ var DATE_FORMAT = 'YYYY-MM-DD';
 var Page = React.createClass({
 
     getInitialState: function () {
-        var days = [];
-        var start = new Moment().startOf('month');
-        var end = new Moment().endOf('month');
-        while(start.diff(end) <= 0) {
-            days.push(Moment(start).toDate());
-            start.add(1, 'day');
-        }
-        //days = days.slice(0,2);
-        days.reverse();
         return {
-            days: days,
             current: new Moment().format(DATE_FORMAT)
         };
     },
 
     render: function () {
         var days = this.state.days;
-        days = days.map(function (day) {
-            var name = new Moment(day).format(DATE_FORMAT);
-            return {
-                name: name,
-                key: name
-            };
-        });
         return (
             <div className="ltt_c-page ltt_c-page-logEditor">
-                <FilterableList items={days} select={this.state.current}
-                    onItemClick={function (e, item) {
-                        this.openLog(item.name);
-                    }.bind(this)}/>
                 <LogEditor title={this.state.current}
                     onImport={this.onImport}
                     onLoad={this.onEditorLoad}
                     ref="logEditor"/>
+                <LogDatePicker select={this.state.current}
+                    onDateChange={function (date) {
+                        this.openLog(new Moment(date).format(DATE_FORMAT));
+                    }.bind(this)}/>
             </div>
         );
     },
@@ -80,6 +63,7 @@ var Page = React.createClass({
             current: date
         });
         var editor = this.refs.logEditor;
+        if (!Ltt) { return; }
         Ltt.sdk.readLogContent(date)
             .then(function (content) {
                 editor.setValue(content);
@@ -87,6 +71,28 @@ var Page = React.createClass({
             .catch(function (err) {
                 Notify.error('Open log content failed', {timeout: 3500});
             });
+    }
+});
+
+var LogDatePicker = React.createClass({
+    render: function () {
+        return (
+            <div className="ltt_c-page-logEditor-datepicker"></div>
+        );
+    },
+
+    componentDidMount: function () {
+        var onDateChange = this.props.onDateChange;
+        $(this.getDOMNode())
+        .datepicker({
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            calendarWeeks: true
+        })
+        .on('changeDate', function (e) {
+            var date = e.date;
+            onDateChange(date);
+        }).datepicker('setDate', this.props.select);
     }
 });
 

@@ -14,9 +14,9 @@
 }
 .ltt_c-page-logEditor .ltt_c-logEditor{
     height: 100%;
-    flex: 5;
+    flex: 1;
     position: relative;
-    padding-top: 40px;
+    padding-top: 41px;
 }
 
 .ltt_c-logEditor-title{
@@ -26,18 +26,24 @@
     top:0;
     right: 0;
     left: 0;
+    border-bottom: 1px solid #ECECEC;
 }
-.ltt_c-page-logEditor .ltt_c-logEditor #ltt-logEditor{     height:100%;
-     margin-bottom: 0px;     border-radius: 0px;}
+.ltt_c-page-logEditor .ltt_c-logEditor #ltt-logEditor{
+    height:100%;
+    margin-bottom: 0px;
+    border: none;
+    border-radius: 0px;
+}
 
-.ltt_c-page-logEditor .ltt_c-filterableList{
-    flex: 1.2;
+.ltt_c-page-logEditor-datepicker{
+    width: 230px;
     position: relative;
-    padding-top: 43px;
     height: 100%;
+    border-left: 1px solid #ECECEC;
 }
 
 /*************************/
+
 
 .ltt_c-filterableList{
     background: #181B1D;
