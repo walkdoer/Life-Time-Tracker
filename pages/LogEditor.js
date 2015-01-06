@@ -10,9 +10,9 @@ var Moment = require('moment');
 var LogEditor = require('../components/editor/LogEditor');
 var SearchBox = require('../components/SearchBox');
 var Moment = require('moment');
-var Ltt = global.Ltt;
 var Notify = require('../components/Notify');
 
+var Ltt = global.Ltt;
 
 var DATE_FORMAT = 'YYYY-MM-DD';
 
@@ -30,7 +30,6 @@ var Page = React.createClass({
         return (
             <div className="ltt_c-page ltt_c-page-logEditor">
                 <LogEditor title={this.state.current}
-                    onImport={this.onImport}
                     onLoad={this.onEditorLoad}
                     ref="logEditor"/>
                 <LogDatePicker select={this.state.current}
@@ -39,19 +38,6 @@ var Page = React.createClass({
                     }.bind(this)}/>
             </div>
         );
-    },
-
-    onImport: function (content) {
-        var date = this.state.current;
-        Ltt.sdk.writeLogFile(date, content).then(function () {
-            Ltt.sdk.importLogContent(date, content).then(function () {
-                Notify.success('Save and Import success', {timeout: 1500});
-            }).catch(function () {
-                Notify.error('Import failed', {timeout: 3500});
-            });
-        }).catch(function (err) {
-            Notify.error('Save failed ', {timeout: 3500});
-        });
     },
 
     onEditorLoad: function () {

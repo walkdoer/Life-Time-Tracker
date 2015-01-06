@@ -19,7 +19,7 @@
     padding-top: 41px;
 }
 
-.ltt_c-logEditor-title{
+.ltt_c-logEditor-header{
     padding: 10px;
     background:#FFF;
     position: absolute;
@@ -27,6 +27,12 @@
     right: 0;
     left: 0;
     border-bottom: 1px solid #ECECEC;
+}
+
+.ltt_c-logEditor-header .fa-upload,
+.ltt_c-logEditor-header .fa-spin {
+    float: right;
+    margin-right: 10px;
 }
 .ltt_c-page-logEditor .ltt_c-logEditor #ltt-logEditor{
     height:100%;

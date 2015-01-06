@@ -4,12 +4,31 @@ var editorStore = store.namespace('LogEditor');
 var contentCache = {};
 //store key
 var SK_CONTENT = 'content';
+var Ltt = global.Ltt;
+var Notify = require('../Notify');
+
+
 var LogEditor = React.createClass({
 
+    getInitialState: function () {
+        return {
+            syncing: false
+        };
+    },
+
     render: function () {
+        var syncIcon = 'fa ';
+        if (this.state.syncing) {
+            syncIcon += 'fa-refresh fa-spin';
+        } else {
+            syncIcon += 'fa-upload';
+        }
         return (
             <div className="ltt_c-logEditor">
-                <div className="ltt_c-logEditor-title">{this.props.title}</div>
+                <div className="ltt_c-logEditor-header">
+                    <span className="ltt_c-logEditor-title">{this.props.title}</span>
+                    <i className={syncIcon}></i>
+                </div>
                 <pre id="ltt-logEditor"></pre>
             </div>
         );
@@ -30,12 +49,39 @@ var LogEditor = React.createClass({
             name: "import",
             bindKey: {win: "Ctrl-S", mac: "Command-S"},
             exec: function(editor) {
-                that.props.onImport(editor.getValue());
+                that.save(editor.getValue());
             }
         });
 
         this.editor = editor;
         this.props.onLoad(editor);
+    },
+
+    save: function (content) {
+        var that = this;
+        var title = this.props.title;
+        Ltt.sdk.writeLogFile(title, content).then(function () {
+            Ltt.sdk.importLogContent(title, content).then(function () {
+                Notify.success('Save and Import success', {timeout: 1500});
+            }).catch(function () {
+                Notify.error('Import failed', {timeout: 3500});
+            });
+            that.setState({syncing: true});
+            Ltt.sdk.backUpLogFile(title, content).then(function (result) {
+                console.log('update success from interface');
+                Notify.success('Save to evernote success', {timeout: 1500});
+                that.setState({syncing: false});
+            }).catch(function (err) {
+                console.log(err);
+                console.error(err.stack);
+                that.setState({syncing: false});
+                Notify.error('Save to evernote failed' + err.message, {timeout: 3500});
+            });
+        }).catch(function (err) {
+            console.log(err);
+            console.error(err.stack);
+            Notify.error('Save failed ', {timeout: 3500});
+        });
     },
 
     setValue: function (content) {
