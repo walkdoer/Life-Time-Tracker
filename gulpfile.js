@@ -32,7 +32,7 @@ var jsDestDir = buildDir;
 function buildScript(scriptsDir, main, destFile, buildDir, watch) {
     var props = {
         entries: [scriptsDir + '/' + main],
-        debug: true
+        debug: false
     };
     var bundler = watch ? watchify(browserify(props)) : browserify(props);
     bundler.transform(reactify);

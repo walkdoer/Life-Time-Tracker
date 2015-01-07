@@ -76,6 +76,11 @@ var LogEditor = React.createClass({
         this.readLog(this.props.title);
     },
 
+    componentWillUpdate: function () {
+        //get the editor position
+        this.currentPosition = this.editor.getCursorPosition();
+    },
+
     componentDidUpdate: function () {
         this.readLog(this.props.title);
     },
@@ -83,9 +88,13 @@ var LogEditor = React.createClass({
     readLog: function (title) {
         var editor = this.editor;
         if (!Ltt) { return; }
+        var pos = this.currentPosition;
         Ltt.sdk.readLogContent(title)
             .then(function (content) {
                 editor.setValue(content, -1);
+                if (pos) {
+                    editor.moveCursorToPosition(pos);
+                }
             })
             .catch(function (err) {
                 Notify.error('Open log content failed', {timeout: 3500});
@@ -118,12 +127,6 @@ var LogEditor = React.createClass({
             console.error(err.stack);
             Notify.error('Write file failed ', {timeout: 3500});
         });
-    },
-
-    setValue: function (content) {
-        editorStore(SK_CONTENT, content);
-        this.editor.setValue(content, -1);
-        this.editor.focus();
     }
 });
 
