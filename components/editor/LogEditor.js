@@ -63,13 +63,31 @@ var LogEditor = React.createClass({
                 Notify.error('Write file failed ', {timeout: 3500});
             });
         });
-        editor.commands.addCommand({
+
+        var commands = editor.commands;
+        commands.addCommand({
             name: "import",
             bindKey: {win: "Ctrl-S", mac: "Command-S"},
             exec: function(editor) {
                 that.save(editor.getValue());
             }
         });
+
+        commands.addCommand({
+            name: 'nextDay',
+            bindKey: {win: 'Ctrl-]', mac: 'Command-]'},
+            exec: function (editor) {
+                that.props.onNextDay(editor);
+            }
+        });
+
+        commands.addCommand({
+            name: 'prevDay',
+            bindKey: {win: 'Ctrl-[', mac: 'Command-['},
+            exec: function (editor) {
+                that.props.onPrevDay(editor);
+            }
+        })
 
         this.editor = editor;
         this.props.onLoad(editor);

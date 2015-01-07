@@ -30,17 +30,35 @@ var Page = React.createClass({
         return (
             <div className="ltt_c-page ltt_c-page-logEditor">
                 <LogEditor title={this.state.current}
+                    onNextDay={this.openNextDay}
+                    onPrevDay={this.openPrevDay}
                     ref="logEditor"/>
                 <LogDatePicker select={this.state.current}
-                    onDateChange={this.onDateChange}/>
+                    onDateChange={this.onDateChange}
+                    ref="datePicker"/>
             </div>
         );
     },
 
     onDateChange: function (date) {
+        console.log('date change');
         date = new Moment(date).format(DATE_FORMAT)
         this.setState({
             current: date
+        });
+    },
+
+    openPrevDay: function () {
+        var prevDay = new Moment(this.state.current).subtract(1, 'day')
+        this.setState({
+            current: prevDay.format(DATE_FORMAT)
+        });
+    },
+
+    openNextDay: function () {
+        var next = new Moment(this.state.current).add(1, 'day')
+        this.setState({
+            current: next.format(DATE_FORMAT)
         });
     }
 });
@@ -50,6 +68,10 @@ var LogDatePicker = React.createClass({
         return (
             <div className="ltt_c-page-logEditor-datepicker"></div>
         );
+    },
+
+    setDate: function (date) {
+        $(this.getDOMNode()).datepicker('setDate', this.props.select);
     },
 
     componentDidMount: function () {
@@ -63,7 +85,12 @@ var LogDatePicker = React.createClass({
         .on('changeDate', function (e) {
             var date = e.date;
             onDateChange(date);
-        }).datepicker('setDate', this.props.select);
+        }).datepicker('setDate', this.props.select, false);
+    },
+
+    componentDidUpdate: function () {
+        console.log('update');
+        $(this.getDOMNode()).datepicker('setDate', this.props.select, false);
     }
 });
 
