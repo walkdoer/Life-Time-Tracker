@@ -36,6 +36,7 @@ var LogEditor = React.createClass({
 
     componentDidMount: function () {
         var that = this;
+        var title = this.props.title;
         var editor = ace.edit("ltt-logEditor");
         editor.setTheme("ace/theme/github");
         editor.getSession().setMode("ace/mode/ltt");
@@ -44,6 +45,11 @@ var LogEditor = React.createClass({
         editor.on('change', function (e, editor) {
             var content = editor.getValue();
             editorStore(SK_CONTENT, content);
+            //when content change, persist to file in hardware
+            Ltt.sdk.writeLogFile(title, content).catch(function (err) {
+                console.error(err.stack);
+                Notify.error('Write file failed ', {timeout: 3500});
+            });
         });
         editor.commands.addCommand({
             name: "import",
@@ -62,14 +68,13 @@ var LogEditor = React.createClass({
         var title = this.props.title;
         Ltt.sdk.writeLogFile(title, content).then(function () {
             Ltt.sdk.importLogContent(title, content).then(function () {
-                Notify.success('Save and Import success', {timeout: 1500});
+                Notify.success('Import success', {timeout: 700});
             }).catch(function () {
                 Notify.error('Import failed', {timeout: 3500});
             });
             that.setState({syncing: true});
             Ltt.sdk.backUpLogFile(title, content).then(function (result) {
                 console.log('update success from interface');
-                Notify.success('Save to evernote success', {timeout: 1500});
                 that.setState({syncing: false});
             }).catch(function (err) {
                 console.log(err);
@@ -80,7 +85,7 @@ var LogEditor = React.createClass({
         }).catch(function (err) {
             console.log(err);
             console.error(err.stack);
-            Notify.error('Save failed ', {timeout: 3500});
+            Notify.error('Write file failed ', {timeout: 3500});
         });
     },
 
