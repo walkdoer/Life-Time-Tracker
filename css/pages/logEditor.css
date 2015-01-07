@@ -29,8 +29,7 @@
     border-bottom: 1px solid #ECECEC;
 }
 
-.ltt_c-logEditor-header .fa-upload,
-.ltt_c-logEditor-header .fa-spin {
+.ltt_c-logEditor-header .fa {
     float: right;
     margin-right: 10px;
 }

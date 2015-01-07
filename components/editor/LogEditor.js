@@ -7,6 +7,8 @@ var SK_CONTENT = 'content';
 var Ltt = global.Ltt;
 var Notify = require('../Notify');
 
+var NProgress = require('nprogress');
+var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
 
 var LogEditor = React.createClass({
 
@@ -18,16 +20,20 @@ var LogEditor = React.createClass({
 
     getInitialState: function () {
         return {
-            syncing: false
+            syncStatus: NO_SYNC
         };
     },
 
     render: function () {
         var syncIcon = 'fa ';
-        if (this.state.syncing) {
+        NProgress.configure({parent: '.ltt_c-logEditor-header', showSpinner: false});
+        var syncStatus = this.state.syncStatus;
+        if (syncStatus === SYNCING) {
             syncIcon += 'fa-refresh fa-spin';
-        } else {
+        } else if (syncStatus === NO_SYNC){
             syncIcon += 'fa-upload';
+        } else if (syncStatus === SYNC_ERROR) {
+            syncIcon += 'fa-exclamation-circle';
         }
         return (
             <div className="ltt_c-logEditor">
@@ -79,7 +85,7 @@ var LogEditor = React.createClass({
         if (!Ltt) { return; }
         Ltt.sdk.readLogContent(title)
             .then(function (content) {
-                editor.setValue(content);
+                editor.setValue(content, -1);
             })
             .catch(function (err) {
                 Notify.error('Open log content failed', {timeout: 3500});
@@ -89,24 +95,26 @@ var LogEditor = React.createClass({
     save: function (content) {
         var that = this;
         var title = this.props.title;
+        NProgress.start();
         Ltt.sdk.writeLogFile(title, content).then(function () {
+            NProgress.set(0.5);
             Ltt.sdk.importLogContent(title, content).then(function () {
-                Notify.success('Import success', {timeout: 700});
+                NProgress.done();
             }).catch(function () {
+                NProgress.done();
                 Notify.error('Import failed', {timeout: 3500});
             });
-            that.setState({syncing: true});
+            that.setState({syncStatus: SYNCING});
             Ltt.sdk.backUpLogFile(title, content).then(function (result) {
-                console.log('update success from interface');
-                that.setState({syncing: false});
+                that.setState({syncStatus: NO_SYNC});
             }).catch(function (err) {
-                console.log(err);
                 console.error(err.stack);
-                that.setState({syncing: false});
+                that.setState({syncStatus: SYNC_ERROR});
                 Notify.error('Save to evernote failed' + err.message, {timeout: 3500});
             });
         }).catch(function (err) {
             console.log(err);
+            NProgress.done();
             console.error(err.stack);
             Notify.error('Write file failed ', {timeout: 3500});
         });
