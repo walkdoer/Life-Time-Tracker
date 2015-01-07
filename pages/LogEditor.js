@@ -30,33 +30,18 @@ var Page = React.createClass({
         return (
             <div className="ltt_c-page ltt_c-page-logEditor">
                 <LogEditor title={this.state.current}
-                    onLoad={this.onEditorLoad}
                     ref="logEditor"/>
                 <LogDatePicker select={this.state.current}
-                    onDateChange={function (date) {
-                        this.openLog(new Moment(date).format(DATE_FORMAT));
-                    }.bind(this)}/>
+                    onDateChange={this.onDateChange}/>
             </div>
         );
     },
 
-    onEditorLoad: function () {
-        this.openLog(this.state.current);
-    },
-
-    openLog: function (date) {
+    onDateChange: function (date) {
+        date = new Moment(date).format(DATE_FORMAT)
         this.setState({
             current: date
         });
-        var editor = this.refs.logEditor;
-        if (!Ltt) { return; }
-        Ltt.sdk.readLogContent(date)
-            .then(function (content) {
-                editor.setValue(content);
-            })
-            .catch(function (err) {
-                Notify.error('Open log content failed', {timeout: 3500});
-            });
     }
 });
 
