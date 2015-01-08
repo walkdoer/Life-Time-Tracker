@@ -39,6 +39,7 @@
                 var win = this.getWindow();
                 gui.App.on('reopen', function () {
                     win.show();
+                    win.focus();
                 });
             },
 
@@ -68,12 +69,6 @@
 
             quit: function () {
                 var win = this.getWindow();
-                win.on('close', function() {
-                    // Hide the window to give user the feeling of closing immediately
-                    this.hide();
-                    // After closing the new window, close the main window.
-                    this.close(true);
-                });
                 win.close();
             }
         };
@@ -85,6 +80,13 @@
         //a series of init action to intialize components
         initMenu();
         initShortcut();
+        Ltt.getWindow().on('close', function(event) {
+            // Hide the window to give user the feeling of closing immediately
+            this.hide();
+            if (event === 'quit') {
+                this.close(true);
+            }
+        });
     }
 
     function initMenu() {

@@ -123,21 +123,26 @@ var LogEditor = React.createClass({
         var that = this;
         var title = this.props.title;
         NProgress.start();
+        //write to local filesystem
         Ltt.sdk.writeLogFile(title, content).then(function () {
-            NProgress.set(0.5);
+            NProgress.set(0.3);
+            //import into database, for stat purpose
             Ltt.sdk.importLogContent(title, content).then(function () {
-                NProgress.done();
+                NProgress.set(0.5);
+                //start back up log file after log import successfully
+                that.setState({syncStatus: SYNCING});
+                Ltt.sdk.backUpLogFile(title, content).then(function (result) {
+                    that.setState({syncStatus: NO_SYNC});
+                    NProgress.done();
+                }).catch(function (err) {
+                    console.error(err.stack);
+                    that.setState({syncStatus: SYNC_ERROR});
+                    NProgress.done();
+                    Notify.error('Save to evernote failed' + err.message, {timeout: 3500});
+                });
             }).catch(function () {
                 NProgress.done();
                 Notify.error('Import failed', {timeout: 3500});
-            });
-            that.setState({syncStatus: SYNCING});
-            Ltt.sdk.backUpLogFile(title, content).then(function (result) {
-                that.setState({syncStatus: NO_SYNC});
-            }).catch(function (err) {
-                console.error(err.stack);
-                that.setState({syncStatus: SYNC_ERROR});
-                Notify.error('Save to evernote failed' + err.message, {timeout: 3500});
             });
         }).catch(function (err) {
             console.log(err);
