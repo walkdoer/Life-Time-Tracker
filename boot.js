@@ -42,7 +42,8 @@ var routes = (
         <Route name="projects" path="/projects" handler={Projects}>
             <DefaultRoute name="projectIndex"  handler={ProjectIndex}/>
             <Route name="projectDetail" path="/projects/:projectId" handler={ProjectDetail}/>
-            <Route name="projectDetailTask" path="/projects/:projectId/tasks/:taskId" handler={ProjectDetail}/>
+            <Route name="projectDetailVersion" path="/projects/:projectId/versions/:versionId" handler={ProjectDetail}/>
+            <Route name="projectDetailTask" path="/projects/:projectId/versions/:versionId/tasks/:taskId" handler={ProjectDetail}/>
         </Route>
         <Route name="logEditor" path="/logEditor" handler={logEditor}/>
         <NotFoundRoute handler={Page404}/>

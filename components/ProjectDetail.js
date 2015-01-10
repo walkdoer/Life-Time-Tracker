@@ -27,7 +27,7 @@ var TaskPanel = require('./Task/TaskPanel');
 
 
 var ProjectDetail = React.createClass({
-    mixins: [initParams],
+    mixins: [initParams, Router.Navigation],
 
     getInitialState: function () {
         return extend({
@@ -42,7 +42,8 @@ var ProjectDetail = React.createClass({
 
     getStateFromParams: function () {
         return {
-            selectedTask: this.params.taskId
+            selectedTask: this.params.taskId || null,
+            versionId: this.params.versionId || null
         };
     },
 
@@ -65,20 +66,26 @@ var ProjectDetail = React.createClass({
                     return (<LogClass data={cls}/>);
                 });
             }
-            var versions;
+            var versions, lastVersion;
             if (!_.isEmpty(project.versions)) {
-                versions = (<select>
+                var currentVersionId = this.state.versionId;
+                if (!currentVersionId) {
+                    currentVersionId = 'all_versions';
+                }
+                versions = (<select onChange={this.onVersionChange} value={currentVersionId}>
+                        <option value="all_versions">All Versions</option>
                     {project.versions.map(function (ver) {
-                        return (<option value={ver.name}>{ver.name}</option>);
+                        return (<option value={ver._id}>{ver.name}</option>);
                     })}
                 </select>);
             }
+            var mProjectCreateTime = new Moment(project.createdTime);
             projectBasicInfo = (
                 <section className="ltt_c-projectDetail-basicInfo">
                     <h1>{project.name}<span className="ltt_c-projectDetail-logClasses">{logClasses}</span></h1>
                     <p className="ltt_c-projectDetail-tags">{tags}</p>
                     <p className="ltt_c-projectDetail-times">
-                        <span className="ltt-M2">create: {new Moment(project.createdTime).format(TIME_FORMAT)}</span>
+                        <span className="ltt-M2" title={mProjectCreateTime.format(TIME_FORMAT)}>Create: {mProjectCreateTime.fromNow()}</span>
                         <span className="ltt-M2"><i className="fa fa-child" title="last active"></i> {new Moment(project.lastActiveTime).fromNow()}</span>
                     </p>
                     {versions}
@@ -116,11 +123,23 @@ var ProjectDetail = React.createClass({
             </div>
         );
     },
+
+    getLastVersion: function (versions) {
+        if (!versions) {
+            return null;
+        }
+        var sortedResult = versions.sort(function (a, b) {
+            return new Moment(b.createTime).diff(new Moment(a.createTime));
+        });
+        return sortedResult[0];
+    },
+
     componentWillReceiveProps: function (nextProps) {
         this.setState(extend({
             loadingLog: true
         }, this.getStateFromParams()));
-        this.loadLogs(_.pick(this.params, ['projectId', 'taskId']));
+        this.loadLogs(_.pick(this.params, ['projectId', 'taskId', 'versionId']));
+        this.loadTasks(_.pick(this.params, ['projectId', 'versionId']));
     },
 
     componentDidMount: function () {
@@ -128,8 +147,6 @@ var ProjectDetail = React.createClass({
         var that = this;
         var loadProject = function (id) {
             return remoteStorage.get('/api/projects/' + projectId);
-        }, loadTasks = function (project) {
-            return remoteStorage.get('/api/tasks', {projectId: project._id});
         };
         loadProject(projectId)
             .then(function (res) {
@@ -138,13 +155,7 @@ var ProjectDetail = React.createClass({
                     loading: false,
                     project: project
                 });
-                loadTasks(project)
-                    .then(function (res) {
-                        that.setState({
-                            loadingTask: false,
-                            tasks: res.data
-                        });
-                    })
+                that.loadTasks(_.pick(that.params, ['projectId', 'versionId']));
                 that.loadLogs(_.pick(that.getParams(), ['projectId', 'taskId']));
             })
             .catch(function (err) {
@@ -163,6 +174,28 @@ var ProjectDetail = React.createClass({
                 });
             });
         return promise;
+    },
+
+    loadTasks: function (params) {
+        var that = this;
+        return remoteStorage.get('/api/tasks', params)
+                .then(function (res) {
+                    that.setState({
+                        loadingTask: false,
+                        tasks: res.data
+                    });
+                });
+    },
+
+    onVersionChange: function (e) {
+        var versions = this.state.project.versions;
+        var targetVersionId = e.target.value;
+        var version = _.find(versions, function (ver) { return ver._id === targetVersionId; });
+        var path = '/projects/' + this.state.project._id;
+        if (targetVersionId !== 'all_versions') {
+             path = path + '/versions/' + targetVersionId;
+        }
+        this.transitionTo(path);
     }
 
 });
