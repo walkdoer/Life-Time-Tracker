@@ -1,6 +1,4 @@
 .ltt_c-task{
-    padding: 15px;
-    position: relative;
 }
 
 .ltt_c-task a{
@@ -19,4 +17,9 @@
 .ltt_c-task-tag .fa{
     color: #fff;
     font-size: 8px;
+}
+
+.ltt_c-task-title{
+    position: relative;
+    padding:15px;
 }

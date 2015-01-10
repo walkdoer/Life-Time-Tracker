@@ -33,3 +33,14 @@
     height: 51px;
     background: #E5EEF7;
 }
+
+.ltt_c-taskPanel > .ltt_c-taskList{
+    min-height: 400px;
+    max-height: 562px;
+    width:  300px;
+    background: #FFF;
+    border: 1px solid #F2F2F2;
+    overflow-y: overlay;
+    margin: 0 20px 0 0;
+    padding: 0px;
+}

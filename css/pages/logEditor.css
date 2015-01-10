@@ -1,0 +1,86 @@
+.ltt_c-page-logEditor{
+    position: absolute;
+    height: 100%;
+    top: 0;
+    right: 0;
+    left: 0;
+    padding: 0px;
+    display:flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    -webkit-align-content: stretch;
+    align-content: stretch;
+}
+.ltt_c-page-logEditor .ltt_c-logEditor{
+    height: 100%;
+    flex: 1;
+    position: relative;
+    padding-top: 41px;
+}
+
+.ltt_c-logEditor-header{
+    padding: 10px;
+    background:#FFF;
+    position: absolute;
+    top:0;
+    right: 0;
+    left: 0;
+    border-bottom: 1px solid #ECECEC;
+}
+
+.ltt_c-logEditor-header .fa {
+    float: right;
+    margin-right: 10px;
+}
+.ltt_c-page-logEditor .ltt_c-logEditor #ltt-logEditor{
+    height:100%;
+    margin-bottom: 0px;
+    border: none;
+    border-radius: 0px;
+}
+
+.ltt_c-page-logEditor-datepicker{
+    width: 230px;
+    position: relative;
+    height: 100%;
+    border-left: 1px solid #ECECEC;
+}
+
+/*************************/
+
+
+.ltt_c-filterableList{
+    background: #181B1D;
+    color:#FFF;
+}
+
+.ltt_c-filterableList .ltt_c-searchBox {
+    background: #292d30;
+
+    border-bottom: 1px solid #3D3D3D;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+}
+
+.ltt_c-filterableList-list{
+    height: 100%;
+    width: 100%;
+}
+
+.ltt_c-filterableList-list-item{
+
+}
+.ltt_c-filterableList-list-item.selected{
+    color: rgb(255, 208, 208);
+    background: #292d30;
+}
+.ltt_c-filterableList-list-item:hover{
+    background: #292d30;
+}
+
+.ltt_c-filterableList-list-item-name{
+    padding: 10px;
+}

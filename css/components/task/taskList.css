@@ -1,8 +1,12 @@
 .ltt_c-taskList{
     list-style:none;
+    background: #FFF;
+    border: 1px solid #F2F2F2;
+    margin: 0;
+    padding: 0px;
 }
 
-.ltt_c-taskList .ltt_c-task{
+.ltt_c-taskList .ltt_c-task-title{
     background: #FFF;
     border-bottom: 1px solid #E2E2E2;
 }
