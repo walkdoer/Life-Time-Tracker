@@ -15,7 +15,13 @@ var TaskList = require('../Task/TaskList');
 var Task = React.createClass({
     render: function () {
         var task = this.props.data;
-        var url = '/projects/' + task.projectId + '/tasks/' + task._id;
+        var useVersion = this.props.useVersion;
+        var url;
+        if (useVersion && task.versionId) {
+            url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
+        } else {
+            url = '/projects/' + task.projectId + '/tasks/' + task._id;
+        }
         var className = "ltt_c-task";
         var progress;
         if (this.props.selected) {

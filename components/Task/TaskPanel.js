@@ -15,6 +15,7 @@ var TaskPanel = React.createClass({
         var todoTasks = [],
             doingTasks = [],
             completedTasks = [];
+        var props = this.props;
 
         tasks.forEach(function(task) {
             var bucket,
@@ -35,17 +36,17 @@ var TaskPanel = React.createClass({
             <div className="ltt_c-taskPanel">
                 <TaskList className={sortClass} name="todo">
                 {todoTasks.map(function (task) {
-                    return <Task ref={task._id} data={task} key={task._id} selected={task._id === selectedTask}/>
+                    return <Task ref={task._id} useVersion={props.useVersion} data={task} key={task._id} selected={task._id === selectedTask}/>
                 })}
                 </TaskList>
                 <TaskList className={sortClass} name="doing">
                 {doingTasks.map(function (task) {
-                    return <Task ref={task._id} data={task} key={task._id} selected={task._id === selectedTask} progress={true}/>
+                    return <Task ref={task._id} useVersion={props.useVersion} data={task} key={task._id} selected={task._id === selectedTask} progress={true}/>
                 })}
                 </TaskList>
                 <TaskList className={sortClass} name="complete">
                 {completedTasks.map(function (task) {
-                    return <Task ref={task._id} data={task} key={task._id} selected={task._id === selectedTask}/>
+                    return <Task ref={task._id} useVersion={props.useVersion} data={task} key={task._id} selected={task._id === selectedTask}/>
                 })}
                 </TaskList>
             </div>

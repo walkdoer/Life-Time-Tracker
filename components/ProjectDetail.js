@@ -99,7 +99,7 @@ var ProjectDetail = React.createClass({
                 taskLoading = (<LoadIndicator/>);
             }
 
-            var taskPanel = <TaskPanel tasks={this.state.tasks} selectedTask={this.state.selectedTask}/>
+            var taskPanel = <TaskPanel tasks={this.state.tasks} selectedTask={this.state.selectedTask} useVersion={!!this.state.versionId}/>
 
             if (this.state.loadingLog) {
                 logLoading = (<LoadIndicator/>);
