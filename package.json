@@ -28,7 +28,8 @@
     "he": "~0.5.0",
     "lodash": "~2.4.1",
     "store2": "~2.1.6",
-    "nprogress": "~0.1.6"
+    "nprogress": "~0.1.6",
+    "mousetrap": "~1.4.6"
   },
   "devDependencies": {
     "browserify": "~6.2.0",

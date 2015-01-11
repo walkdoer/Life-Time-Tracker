@@ -13,6 +13,7 @@ var React = require('react');
 var $ = require('jquery');window.$ = window.Jquery = $;
 // load everything for jquery ui
 require('jquery-ui');
+require('mousetrap');
 var Router = require('react-router');
 var Route = Router.Route;
 var Routes = Router.Routes;

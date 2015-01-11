@@ -21,3 +21,13 @@
 
 .ltt_c-projectDetail-logs {
 }
+
+.ltt_c-page-projects-filter{
+    display: flex;
+    justify-content: space-between;
+}
+
+.ltt_c-page-projects-filter-name{
+    width: 250px;
+    text-indent: 10px;
+}

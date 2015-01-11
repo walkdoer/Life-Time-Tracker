@@ -8,7 +8,7 @@ var Moment = require('moment');
 
 var ProjectIndex = React.createClass({
     render: function () {
-        return (<p>Projects</p>);
+        return (<p></p>);
     }
 });
 
