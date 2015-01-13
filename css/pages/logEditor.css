@@ -40,7 +40,7 @@
     border-radius: 0px;
 }
 
-.ltt_c-page-logEditor-datepicker{
+.ltt_c-page-logEditor aside{
     width: 230px;
     position: relative;
     height: 100%;
@@ -83,4 +83,16 @@
 
 .ltt_c-filterableList-list-item-name{
     padding: 10px;
+}
+
+
+.ltt_c-lastTime{
+    padding:10px;
+}
+
+.ltt_c-lastTime-name{
+    font-weight: fold;
+}
+.ltt_c-lastTime-time{
+
 }

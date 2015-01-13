@@ -14,7 +14,9 @@ var LogEditor = React.createClass({
 
     getDefaultProps: function () {
         return {
-            onLoad: function () {}
+            onLoad: function () {},
+            onChange: function () {},
+            onSave: function () {}
         };
     },
 
@@ -56,6 +58,7 @@ var LogEditor = React.createClass({
         editor.on('change', function (e, editor) {
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = editor.getValue();
+            that.props.onChange(content, editor);
             editorStore(SK_CONTENT, content);
             //when content change, persist to file in hardware
             Ltt.sdk.writeLogFile(title, content).catch(function (err) {
@@ -90,8 +93,9 @@ var LogEditor = React.createClass({
         })
 
         this.editor = editor;
-        this.props.onLoad(editor);
-        this.readLog(this.props.title);
+        this.readLog(this.props.title).then(function (content) {
+            that.props.onLoad(content);
+        });
     },
 
     componentWillUpdate: function () {
@@ -107,12 +111,13 @@ var LogEditor = React.createClass({
         var editor = this.editor;
         if (!Ltt) { return; }
         var pos = this.currentPosition;
-        Ltt.sdk.readLogContent(title)
+        return Ltt.sdk.readLogContent(title)
             .then(function (content) {
                 editor.setValue(content, -1);
                 if (pos) {
                     editor.moveCursorToPosition(pos);
                 }
+                return content;
             })
             .catch(function (err) {
                 Notify.error('Open log content failed', {timeout: 3500});
@@ -126,6 +131,7 @@ var LogEditor = React.createClass({
         NProgress.start();
         //write to local filesystem
         Ltt.sdk.writeLogFile(title, content).then(function () {
+            that.props.onSave(content);
             NProgress.set(0.3);
             //import into database, for stat purpose
             Ltt.sdk.importLogContent(title, content).then(function () {
