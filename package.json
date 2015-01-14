@@ -59,11 +59,18 @@
     "highchartsAdapter": "./bower_components/highcharts/adapters/standalone-framework.src.js",
     "bootstrap": "./bower_components/bootstrap/dist/js/bootstrap.js",
     "noty": "./node_modules/noty/js/noty/packaged/jquery.noty.packaged.js",
-    "chart": "./bower_components/chartjs/Chart.js"
+    "chart": "./bower_components/chartjs/Chart.js",
+    "typeahead": "./bower_components/typeahead.js/dist/typeahead.bundle.js"
   },
   "browserify-shim": {
     "noty": "noty",
     "chart": "chart",
+    "typeahead": {
+      "depends": [
+        "jquery:$"
+      ],
+      "exports": "typeahead"
+    },
     "highcharts": {
       "depends": [
         "highchartsAdapter:highchartsAdapter"

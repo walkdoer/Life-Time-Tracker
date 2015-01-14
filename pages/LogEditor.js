@@ -74,16 +74,12 @@ var Page = React.createClass({
 
     onSave: function (content) {
         var doingLog = Ltt.sdk.getDoingLog(this.state.current, content);
-        if (doingLog) {
-            this.updateLastTime(doingLog);
-        }
+        this.updateLastTime(doingLog);
     },
 
     onEditorLoad: function (content) {
         var doingLog = Ltt.sdk.getDoingLog(this.state.current, content);
-        if (doingLog) {
-            this.updateLastTime(doingLog);
-        }
+        this.updateLastTime(doingLog);
     },
 
     updateLastTime: function (doingLog) {

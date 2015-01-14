@@ -1,12 +1,14 @@
 var React = require('react');
 var store = require('store2');
 var editorStore = store.namespace('LogEditor');
+var _ = require('lodash');
+
 var contentCache = {};
 //store key
 var SK_CONTENT = 'content';
 var Ltt = global.Ltt;
 var Notify = require('../Notify');
-
+var Mt = window.Mousetrap;
 var NProgress = require('nprogress');
 var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
 
@@ -43,6 +45,9 @@ var LogEditor = React.createClass({
                     <span className="ltt_c-logEditor-title">{this.props.title}</span>
                     <i className={syncIcon}></i>
                 </div>
+                <div className="ltt_c-logEditor-projects ltt_c-logEditor-typeahead" ref="projects"></div>
+                <div className="ltt_c-logEditor-versions  ltt_c-logEditor-typeahead" ref="versions"></div>
+                <div className="ltt_c-logEditor-tasks  ltt_c-logEditor-typeahead" ref="tasks"></div>
                 <pre id="ltt-logEditor"></pre>
             </div>
         );
@@ -50,23 +55,55 @@ var LogEditor = React.createClass({
 
     componentDidMount: function () {
         var that = this;
+        this._initShortcut();
         var editor = ace.edit("ltt-logEditor");
         editor.setTheme("ace/theme/github");
-        editor.getSession().setMode("ace/mode/ltt");
+        var session = editor.getSession();
+        session.setMode("ace/mode/ltt");
+        //session.setUseWrapMode(true);
+        //editor.setBehavioursEnabled(true);
         //content = editorStore(SK_CONTENT);
         //editor.setValue(content);
         editor.on('change', function (e, editor) {
+            console.log(e);
+            var data = e.data;
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = editor.getValue();
             that.props.onChange(content, editor);
             editorStore(SK_CONTENT, content);
             //when content change, persist to file in hardware
+            if (data && data.action === "insertText") {
+                if (data.text === '<') {
+                    openInput(that.refs.projects);
+                    /*setTimeout(function () {
+                        editor.insert('>');
+                        pos = editor.getCursorPosition();
+                        pos.column--;
+                        editor.moveCursorToPosition(pos);
+                    }, 0);*/
+                } else if (data.text === '$') {
+                    openInput(that.refs.projects)
+                } else if (data.text === '(') {
+                    openInput(that.refs.tasks);
+                }
+            }
+
+            function openInput(ref) {
+                var pos = editor.getCursorPositionScreen();
+                var $inputHolder = $(ref.getDOMNode());
+                $inputHolder.show().css({
+                    top: 40 + 16 * pos.row,
+                    left: 60 + 2 * pos.column
+                });
+                $inputHolder.find('.typeahead').focus();
+            }
+            if (!Ltt) {return;}
             Ltt.sdk.writeLogFile(title, content).catch(function (err) {
                 console.error(err.stack);
                 Notify.error('Write file failed ', {timeout: 3500});
             });
         });
-
+        this._initTypehead();
         var commands = editor.commands;
         commands.addCommand({
             name: "import",
@@ -90,12 +127,106 @@ var LogEditor = React.createClass({
             exec: function (editor) {
                 that.props.onPrevDay(editor);
             }
-        })
+        });
 
         this.editor = editor;
         this.readLog(this.props.title).then(function (content) {
             that.props.onLoad(content);
         });
+    },
+
+    _initShortcut: function () {
+        var that = this;
+        Mt.bind('esc', function (e) {
+            console.log('esc');
+        });
+    },
+
+    _initTypehead: function () {
+        var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
+        var that = this;
+        Ltt && Ltt.sdk.projects().then(function(projects) {
+            console.log(projects);
+            createTypeahead('.ltt_c-logEditor-projects', '>',
+                substringMatcher(projects.map(function (project) {
+                    return _.pick(project, ['name', '_id']);
+                })),
+                function (project) {
+                    var projectId = project._id;
+                    Ltt.sdk.versions({projectId: projectId}).then(function (versions) {
+                        createTypeahead('.ltt_c-logEditor-versions', '$', versions.map(function (version) {
+                            return _.pick(version, ['name', '_id']);
+                        }), function (version) {
+                            var versionId = version._id;
+                            Ltt.sdk.tasks({projectId: projectId, versionId: versionId})
+                                .then(function (tasks) {
+                                    createTypeahead('.ltt_c-logEditor-tasks', '(', tasks.map(function (task) {
+                                        return _.pick(task, ['name', '_id']);
+                                    }));
+                                });
+                        });
+                    });
+                }
+            );
+        });
+        createTypeahead('.ltt_c-logEditor-projects', '>',
+            substringMatcher([{name: 'life-time-tracker', _id: 123123}].map(function (project) {
+                return _.pick(project, ['name', '_id']);
+            }))
+        );
+
+        function createTypeahead(selector, postfix, datasets, callback) {
+            var $holder = $(selector).empty();
+            $input = $('<input class="typeahead" type="text" placeholder="versions"/>');
+            $holder.append($input);
+            var projectTypeahead = $input.typeahead({
+                hint: true,
+                highlight: true,
+                minLength: 1
+            }, {
+                name: 'states',
+                displayKey: 'value',
+                source: datasets
+            }).on('typeahead:closed', function () {
+                that.hideTypeAhead();
+                that.editor.focus();
+            }).on('typeahead:selected', function (e, obj) {
+                that.hideTypeAhead();
+                that.editor.insert(obj.value + postfix);
+                setTimeout(function () {
+                    that.editor.focus();
+                }, 0);
+                callback(obj);
+            });
+        }
+        function substringMatcher (items) {
+            return function findMatches(q, cb) {
+                var matches, substrRegex;
+                // an array that will be populated with substring matches
+                matches = [];
+                // regex used to determine if a string contains the substring `q`
+                substrRegex = new RegExp(q, 'i');
+                // iterate through the pool of strings and for any string that
+                // contains the substring `q`, add it to the `matches` array
+                $.each(items, function(i, item) {
+                    if (substrRegex.test(item.name)) {
+                        // the typeahead jQuery plugin expects suggestions to a
+                        // JavaScript object, refer to typeahead docs for more info
+                        matches.push({
+                            value: item.name,
+                            _id: item._id
+                        });
+                    }
+                });
+                cb(matches);
+            };
+        };
+    },
+
+    hideTypeAhead: function () {
+        $(this.refs.projects.getDOMNode()).hide();
+        $(this.refs.versions.getDOMNode()).hide();
+        $(this.refs.tasks.getDOMNode()).hide();
     },
 
     componentWillUpdate: function () {
