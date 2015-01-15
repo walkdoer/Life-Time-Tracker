@@ -12,6 +12,7 @@ var buildDir = './build';
 var inject = require("gulp-inject");
 var rename = require('gulp-rename');
 var NwBuilder = require('node-webkit-builder');
+var gulpDebug = require('gulp-debug');
 
 function handleErrors(err) {
     var args = Array.prototype.slice.call(arguments);
@@ -44,6 +45,7 @@ function buildScript(scriptsDir, main, destFile, buildDir, watch) {
                 gutil.log('bundle done');
             })
             .pipe(source(destFile))
+            .pipe(gulpDebug())
             .pipe(gulp.dest(buildDir))
             .pipe(gulp.dest(scriptsDir));
     }
