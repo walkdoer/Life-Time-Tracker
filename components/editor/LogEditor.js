@@ -69,6 +69,7 @@ var LogEditor = React.createClass({
         this._initEditorCommand();
         this.readLog(this.props.title).then(function (content) {
             that.setValue(content);
+            that._highLightDoingLine();
             that.props.onLoad(content);
             that._listenToEditor();
         });
@@ -86,55 +87,16 @@ var LogEditor = React.createClass({
             if (data && data.action === "insertText") {
                 var pos = that.editor.getCursorPosition();
                 var lineContent = session.getLine(pos.row);
-                console.log(lineContent);
                 if (data.text === '<') {
                     openInput(that.refs.projects);
-                    /*setTimeout(function () {
-                        editor.insert('>');
-                        pos = editor.getCursorPosition();
-                        pos.column--;
-                        editor.moveCursorToPosition(pos);
-                    }, 0);*/
                 } else if (data.text === '$') {
                     openInput(that.refs.versions, lineContent).then(that._initVersionTypeahead.bind(that));
                 } else if (data.text === '(') {
                     openInput(that.refs.tasks, lineContent).then(that._initTaskTypeahead.bind(that));
                 }
             }
-            addDoingLogHighlight();
-            //editor.getSession().addMarker(range,"ace_active_line","background");
+            that._highLightDoingLine();
 
-            function getLineIndex (content, line){
-                var lines = content.split('\n');
-                for (var i = 0; i < lines.length; i++) {
-                    if (lines[i] === line) {
-                        return i;
-                    }
-                }
-            };
-
-            function addDoingLogHighlight() {
-                var doingLog = Ltt.sdk.getDoingLog(title, content);
-                var range, marker;
-                if (doingLog) {
-                    var index = getLineIndex(content, doingLog.origin);
-                    if (_.isNumber(index)) {
-                        if (that._doingLogIndex !== index) {
-                            removeHighlight(that._doingLogMarker);
-                            range = new Range(index, 0, index, Infinity);
-                            marker = session.addMarker(range, "ace_step", "fullLine");
-                            that._doingLogIndex = index;
-                            that._doingLogMarker = marker;
-                        }
-                    }
-                }
-            }
-
-            function removeHighlight(marker) {
-                if (marker) {
-                    session.removeMarker(marker);
-                }
-            }
 
             function openInput(ref, lineContent) {
 
@@ -156,6 +118,46 @@ var LogEditor = React.createClass({
                 Notify.error('Write file failed ', {timeout: 3500});
             });
         }, 300));
+    },
+
+    _highLightDoingLine: function () {
+        var editor = this.editor;
+        var title = this.props.title;
+        var session = this.editor.getSession();
+        var content = editor.getValue();
+        var doingLog = Ltt.sdk.getDoingLog(title, content);
+        var range, marker;
+        console.log('@@@@@@@@');
+        if (doingLog) {
+            var index = getLineIndex(content, doingLog.origin);
+            if (_.isNumber(index)) {
+                console.log('-----');
+                if (this._doingLogIndex !== index) {
+                    console.log('######');
+                    removeHighlight(this._doingLogMarker);
+                    range = new Range(index, 0, index, Infinity);
+                    marker = session.addMarker(range, "ace_step", "fullLine");
+                    this._doingLogIndex = index;
+                    this._doingLogMarker = marker;
+                }
+            }
+        } else {
+            removeHighlight(this._doingLogMarker);
+        }
+        function getLineIndex (content, line){
+            var lines = content.split('\n');
+            for (var i = 0; i < lines.length; i++) {
+                if (lines[i] === line) {
+                    return i;
+                }
+            }
+        };
+        function removeHighlight(marker) {
+            if (marker) {
+                session.removeMarker(marker);
+            }
+        }
+
     },
 
     _initEditorCommand: function () {
