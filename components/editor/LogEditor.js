@@ -11,6 +11,7 @@ var Notify = require('../Notify');
 var Mt = window.Mousetrap;
 var NProgress = require('nprogress');
 var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
+var Range = ace.require('ace/range').Range;
 
 var LogEditor = React.createClass({
 
@@ -64,7 +65,7 @@ var LogEditor = React.createClass({
         //session.setUseWrapMode(true);
         //editor.setBehavioursEnabled(true);
         //content = editorStore(SK_CONTENT);
-        this._initTypehead();
+        this._initProjectTypeahead();
         this._initEditorCommand();
         this.readLog(this.props.title).then(function (content) {
             that.setValue(content);
@@ -76,13 +77,16 @@ var LogEditor = React.createClass({
     _listenToEditor: function () {
         var that = this;
         this.editor.on('change', _.debounce(function (e, editor) {
-            console.log(e);
             var data = e.data;
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = editor.getValue();
             that.props.onChange(content, editor);
+            var session = that.editor.getSession();
             //when content change, persist to file in hardware
             if (data && data.action === "insertText") {
+                var pos = that.editor.getCursorPosition();
+                var lineContent = session.getLine(pos.row);
+                console.log(lineContent);
                 if (data.text === '<') {
                     openInput(that.refs.projects);
                     /*setTimeout(function () {
@@ -92,20 +96,59 @@ var LogEditor = React.createClass({
                         editor.moveCursorToPosition(pos);
                     }, 0);*/
                 } else if (data.text === '$') {
-                    openInput(that.refs.versions)
+                    openInput(that.refs.versions, lineContent).then(that._initVersionTypeahead.bind(that));
                 } else if (data.text === '(') {
-                    openInput(that.refs.tasks);
+                    openInput(that.refs.tasks, lineContent).then(that._initTaskTypeahead.bind(that));
+                }
+            }
+            addDoingLogHighlight();
+            //editor.getSession().addMarker(range,"ace_active_line","background");
+
+            function getLineIndex (content, line){
+                var lines = content.split('\n');
+                for (var i = 0; i < lines.length; i++) {
+                    if (lines[i] === line) {
+                        return i;
+                    }
+                }
+            };
+
+            function addDoingLogHighlight() {
+                var doingLog = Ltt.sdk.getDoingLog(title, content);
+                var range, marker;
+                if (doingLog) {
+                    var index = getLineIndex(content, doingLog.origin);
+                    if (_.isNumber(index)) {
+                        if (that._doingLogIndex !== index) {
+                            removeHighlight(that._doingLogMarker);
+                            range = new Range(index, 0, index, Infinity);
+                            marker = session.addMarker(range, "ace_step", "fullLine");
+                            that._doingLogIndex = index;
+                            that._doingLogMarker = marker;
+                        }
+                    }
                 }
             }
 
-            function openInput(ref) {
-                var pos = editor.getCursorPositionScreen();
-                var $inputHolder = $(ref.getDOMNode());
-                $inputHolder.show().css({
-                    top: 40 + 16 * pos.row,
-                    left: 60 + 5 * pos.column
+            function removeHighlight(marker) {
+                if (marker) {
+                    session.removeMarker(marker);
+                }
+            }
+
+            function openInput(ref, lineContent) {
+
+                return that._updateCurrentInfomation(lineContent).then(function () {
+                    var pos = editor.getCursorPositionScreen();
+                    var $inputHolder = $(ref.getDOMNode());
+                    $inputHolder.show().css({
+                        top: 40 + 16 * pos.row,
+                        left: 60 + 5 * pos.column
+                    });
+                    $inputHolder.find('.typeahead').focus();
+                }).catch(function (err) {
+                    console.error(err.stack);
                 });
-                $inputHolder.find('.typeahead').focus();
             }
             if (!Ltt) {return;}
             Ltt.sdk.writeLogFile(title, content).catch(function (err) {
@@ -151,77 +194,75 @@ var LogEditor = React.createClass({
         });
     },
 
-    _initTypehead: function () {
-        var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
+    _initProjectTypeahead: function () {
+        //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
         var that = this;
         Ltt && Ltt.sdk.projects().then(function(projects) {
             console.log(projects);
-            createTypeahead('.ltt_c-logEditor-projects', '>', 'projects',
+            that._createTypeahead('.ltt_c-logEditor-projects', '>', 'projects',
                 projects.map(function (project) {
-                    return _.pick(project, ['name', '_id']);
-                }),
-                function (project) {
-                    console.log(project);
-                    var projectId = project._id;
-                    Ltt.sdk.versions({projectId: projectId}).then(function (versions) {
-                        createTypeahead('.ltt_c-logEditor-versions', '$', 'versions', versions.map(function (version) {
-                            return _.pick(version, ['name', '_id']);
-                        }), function (version) {
-                            console.log(version);
-                            var versionId = version._id;
-                            Ltt.sdk.tasks({projectId: projectId, versionId: versionId})
-                                .then(function (tasks) {
-                                    createTypeahead('.ltt_c-logEditor-tasks', ')', 'tasks', tasks.map(function (task) {
-                                        return _.pick(task, ['name', '_id']);
-                                    }));
-                                });
-                        });
-                    });
-                }
+                    return _.pick(project, ['name', 'id']);
+                })
             );
         });
+    },
 
-        function createTypeahead(selector, postfix, placeholder, datasets, callback) {
-            var $holder = $(selector).empty();
-            $input = $('<input class="typeahead" type="text" placeholder="' + placeholder + '"/>');
-            $holder.append($input);
-            var projectTypeahead = $input.typeahead({
-                hint: true,
-                highlight: true,
-                minLength: 1
-            }, {
-                name: 'states',
-                displayKey: 'value',
-                source: substringMatcher(datasets)
-            }).on('typeahead:closed', function () {
-                that.hideTypeAhead();
-                that.editor.focus();
-                $input.typeahead('val', '');
-            }).on('typeahead:selected', function (e, obj) {
-                that.hideTypeAhead();
-                that.editor.insert(obj.value + postfix);
-                setTimeout(function () {
-                    that.editor.focus();
-                }, 0);
-                callback && callback(obj);
-            });
-        }
-        /*
-        createTypeahead('.ltt_c-logEditor-projects', '>', 'projects',
-            [{name: 'life-time-tracker', _id: 123123}].map(function (project) {
-                return _.pick(project, ['name', '_id']);
-            }),
-            function (item) {
-                createTypeahead('.ltt_c-logEditor-versions', '$', 'versions', [{name: '1.0.2'}].map(function (version) {
-                    return _.pick(version, ['name', '_id']);
-                }), function (version) {
-                    console.log(version);
-                    createTypeahead('.ltt_c-logEditor-tasks', '(', 'tasks', [{name: 'andrew rebone'}].map(function (task) {
-                        return _.pick(task, ['name', '_id']);
-                    }));
+    _initVersionTypeahead: function () {
+        var info = this._getCurrentLogInformation();
+        var that = this;
+        if (!info.projectId) { return; }
+        Ltt.sdk.versions({projectId: info.projectId}).then(function (versions) {
+            that._createTypeahead('.ltt_c-logEditor-versions', '$', 'versions',
+                versions.map(function (version) {
+                    version = _.pick(version, ['name', 'id']);
+                    return version;
+                })
+            );
+        });
+    },
+
+    _initTaskTypeahead: function () {
+        var info = this._getCurrentLogInformation();
+        console.log('lll', info);
+        var that = this;
+        if (info.projectId) {
+            Ltt.sdk.tasks({projectId: info.projectId, versionId: info.versionId})
+                .then(function (tasks) {
+                    that._createTypeahead('.ltt_c-logEditor-tasks', ')', 'tasks',
+                        tasks.map(function (task) {
+                            return _.pick(task, ['name', 'id']);
+                        })
+                    );
                 });
-            }
-        );*/
+        }
+    },
+
+    _createTypeahead: function createTypeahead(selector, postfix, placeholder, datasets, callback) {
+        var that = this;
+        var $holder = $(selector).empty();
+        $input = $('<input class="typeahead" type="text" placeholder="' + placeholder + '"/>');
+        $holder.append($input);
+        var projectTypeahead = $input.typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 1
+        }, {
+            name: 'states',
+            displayKey: 'value',
+            source: substringMatcher(datasets)
+        }).on('typeahead:closed', function () {
+            that.hideTypeAhead();
+            that.editor.focus();
+            $input.typeahead('val', '');
+        }).on('typeahead:selected', function (e, obj) {
+            that.hideTypeAhead();
+            that.editor.insert(obj.value + postfix);
+            setTimeout(function () {
+                that.editor.focus();
+            }, 0);
+            callback && callback(obj);
+        });
+        $input.focus();
         function substringMatcher (items) {
             return function findMatches(q, cb) {
                 var matches, substrRegex;
@@ -237,7 +278,7 @@ var LogEditor = React.createClass({
                         // JavaScript object, refer to typeahead docs for more info
                         matches.push({
                             value: item.name,
-                            _id: item._id
+                            id: item.id
                         });
                     }
                 });
@@ -279,7 +320,6 @@ var LogEditor = React.createClass({
         if (!Ltt) { return; }
         return Ltt.sdk.readLogContent(title)
             .then(function (content) {
-                console.log(content);
                 return content;
             })
             .catch(function (err) {
@@ -291,7 +331,6 @@ var LogEditor = React.createClass({
     save: function (content) {
         var that = this;
         var title = this.props.title;
-        console.log('######', title, content);
         NProgress.start();
         //write to local filesystem
         Ltt.sdk.writeLogFile(title, content).then(function () {
@@ -302,6 +341,9 @@ var LogEditor = React.createClass({
                 NProgress.done();
                 //start back up log file after log import successfully
                 that.setState({syncStatus: SYNCING});
+                //init the project typeahead component again because the projects
+                //may have change since the content may have changed
+                that._initProjectTypeahead();
                 Ltt.sdk.backUpLogFile(title, content).then(function (result) {
                     that.setState({syncStatus: NO_SYNC});
                 }).catch(function (err) {
@@ -309,8 +351,9 @@ var LogEditor = React.createClass({
                     that.setState({syncStatus: SYNC_ERROR});
                     Notify.error('Save to evernote failed' + err.message, {timeout: 3500});
                 });
-            }).catch(function () {
+            }).catch(function (err) {
                 NProgress.done();
+                console.error(err.stack);
                 Notify.error('Import failed', {timeout: 3500});
             });
         }).catch(function (err) {
@@ -319,6 +362,36 @@ var LogEditor = React.createClass({
             console.error(err.stack);
             Notify.error('Write file failed ', {timeout: 3500});
         });
+    },
+
+    _updateCurrentInfomation: function (currentLine) {
+        var includeNoTimeLog = true;
+        var that = this;
+        return Ltt.sdk.getDetailFromLogLineContent(this.props.title, currentLine)
+            .then(function (result) {
+                console.log('--------------', result);
+                that._currentLog = result;
+            });
+    },
+
+    _getCurrentLogInformation: function () {
+        var log = this._currentLog;
+        var info = {};
+        if (log) {
+            var project = log.project;
+            var version = log.version;
+            var task = log.task;
+            if (project) {
+                info.projectId = project.id;
+            }
+            if (version) {
+                info.versionId = version.id;
+            }
+            if (task) {
+                info.taskId = task.id;
+            }
+        }
+        return info;
     }
 });
 

@@ -42,8 +42,11 @@ var Header = React.createClass({
                 onClick={this.props.onEnterFullscreen}>
                 <i className="fa fa-expand"></i></button>);
         }
+        var style = {
+            "-webkit-app-region": "drag"
+        };
         return (
-            <header className="ltt_c-header">
+            <header className="ltt_c-header" style={style}>
                 <Logo title="LTT"/>
                 <div className="ltt_c-header-controls">
                     <div className="btn-group">
