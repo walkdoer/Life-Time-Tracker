@@ -127,13 +127,10 @@ var LogEditor = React.createClass({
         var content = editor.getValue();
         var doingLog = Ltt.sdk.getDoingLog(title, content);
         var range, marker;
-        console.log('@@@@@@@@');
         if (doingLog) {
             var index = getLineIndex(content, doingLog.origin);
             if (_.isNumber(index)) {
-                console.log('-----');
                 if (this._doingLogIndex !== index) {
-                    console.log('######');
                     removeHighlight(this._doingLogMarker);
                     range = new Range(index, 0, index, Infinity);
                     marker = session.addMarker(range, "ace_step", "fullLine");

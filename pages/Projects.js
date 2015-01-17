@@ -114,7 +114,13 @@ var Projects = React.createClass({
             var name = project.name;
             var py = pinyin.getCamelChars(name).toLowerCase();
             var fullPy = pinyin.getFullChars(name).toLowerCase();
-            return name.indexOf(text) >= 0 || fullPy.indexOf(text) >= 0 || py.indexOf(text) >= 0;
+            var tags = project.tags || [];
+            var matchTag = tags.some(function (tag) {
+                var tagPy = pinyin.getCamelChars(tag).toLowerCase();
+                var tagFullPy = pinyin.getFullChars(tag).toLowerCase();
+                return tag.indexOf(text) >= 0 || tagFullPy.indexOf(text) >= 0 || tagPy.indexOf(text) >= 0;
+            });
+            return name.indexOf(text) >= 0 || fullPy.indexOf(text) >= 0 || py.indexOf(text) >= 0 || matchTag;
         });
         this.setState({
             projects: result
