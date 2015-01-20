@@ -44,6 +44,7 @@
     width: 230px;
     position: relative;
     height: 100%;
+    overflow-y:auto;
     border-left: 1px solid #ECECEC;
 }
 
@@ -103,6 +104,13 @@
     z-index: 211;
 }
 
+.ltt_c-logEditor-typeahead .typeahead{
+  height: 16px; 
+  line-height:16px;
+  border: none;
+  background:transparent;
+}
+
 .ltt_c-logEditor-typeahead .tt-dropdown-menu{
     background: #FFF;
     border: 1px solid #ccc;
@@ -150,3 +158,44 @@
 .tt-suggestion p {
   margin: 0;
 }
+
+.ltt_c-projectInfo{}
+.ltt_c-projectInfo .ltt_c-taskInfo,
+.ltt_c-projectInfo .ltt_c-taskInfo.subtask{
+  padding-left: 8px;
+}
+.ltt_c-taskInfo-task-header,
+.ltt_c-projectInfo-project-header{
+  display:flex;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 10px;
+}
+
+.ltt_c-taskInfo-task-title,
+.ltt_c-projectInfo-title{
+  flex: 1;
+  padding: 0 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ltt_c-taskInfo-task .ltt_c-progress,
+.ltt_c-projectInfo-project .ltt_c-progress{
+  width: 80px;
+  margin-top: 15px;
+}
+.ltt_c-taskInfo .ltt_c-progress .ltt_c-progress-bar,
+.ltt_c-projectInfo .ltt_c-progress .ltt_c-progress-bar{
+  box-shadow: none;
+}
+
+
+.ltt_c-sidebar-splitline{
+  padding: 5px 0;
+  color: #939393;
+  border-bottom: 1px #ddd solid;
+  margin: 10px;
+}
+

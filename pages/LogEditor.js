@@ -4,15 +4,25 @@
 
 var React = require('react');
 var $ = require('jquery');
+var numeral = require('numeral');
+var Router = require('react-router');
+var _ = require('lodash');
 require('../libs/bootstrap-datepicker');
+var Link = Router.Link;
+/* Components */
 var remoteStorage = require('../components/storage.remote');
 var Moment = require('moment');
 var LogEditor = require('../components/editor/LogEditor');
 var SearchBox = require('../components/SearchBox');
 var Moment = require('moment');
 var Notify = require('../components/Notify');
+var Progress = require('../components/Progress');
 var SetIntervalMixin = require('../components/mixins/setInterval');
-var numeral = require('numeral');
+var DataAPI = require('../utils/DataAPI');
+var BindStore = require('../mixins/BindStore');
+
+/** Store */
+var ProjectStore = require('../stores/ProjectStore');
 
 var Ltt = global.Ltt;
 
@@ -25,7 +35,8 @@ var Page = React.createClass({
 
     getInitialState: function () {
         return {
-            current: new Moment().format(DATE_FORMAT)
+            current: new Moment().format(DATE_FORMAT),
+            projects: []
         };
     },
 
@@ -37,7 +48,7 @@ var Page = React.createClass({
                 <LogEditor title={this.state.current}
                     onNextDay={this.openNextDay}
                     onPrevDay={this.openPrevDay}
-                    onSave={this.onSave}
+                    onChange={this.onChange}
                     onLoad={this.onEditorLoad}
                     ref="logEditor"/>
                 <aside>
@@ -45,6 +56,8 @@ var Page = React.createClass({
                         onDateChange={this.onDateChange}
                         ref="datePicker"/>
                     <div className="lastTime" ref="lastTime"></div>
+                    <div className="ltt_c-sidebar-splitline">Projects</div>
+                    <ProjectInfo date={this.state.current}/>
                 </aside>
             </div>
         );
@@ -72,28 +85,38 @@ var Page = React.createClass({
         });
     },
 
-    onSave: function (content) {
-        var doingLog = Ltt.sdk.getDoingLog(this.state.current, content);
+
+    onChange: function (content) {
+        var doingLog = this.refs.logEditor.getDoingLog(this.state.current, content);
         this.updateLastTime(doingLog);
     },
 
     onEditorLoad: function (content) {
-        var doingLog = Ltt.sdk.getDoingLog(this.state.current, content);
+        var doingLog = this.refs.logEditor.getDoingLog(this.state.current, content);
         this.updateLastTime(doingLog);
     },
 
     updateLastTime: function (doingLog) {
         var lastTime = this.refs.lastTime.getDOMNode();
+        tickTime(doingLog);
         if (this.updateTimeIntervalId) {
             this.clearInterval(this.updateTimeIntervalId);
         }
         this.updateTimeIntervalId = this.setInterval(function () {
-            var content;
+            tickTime(doingLog);
+        }, 1000);
+
+        function tickTime(doingLog) {
+            var content, name;
             if (doingLog) {
                 var lastSeconds = new Moment().diff(new Moment(doingLog.start), 'second');
                 var task = doingLog.task,
                     project = doingLog.projects[0],
-                    subTask = doingLog.subTask;
+                    subTask = doingLog.subTask,
+                    tag = (doingLog.tags || []).join(',');
+                if (tag) {
+                    name = '[' + tag + '] ';
+                }
                 if (project) {
                     name = project.name
                 }
@@ -105,7 +128,9 @@ var Page = React.createClass({
                 }
                 content = (
                     <div className="ltt_c-lastTime">
-                        <span className="ltt_c-lastTime-name">{name}</span>
+                        <span className="ltt_c-lastTime-name">
+                            {name}
+                        </span>
                         <span className="ltt_c-lastTime-time">{numeral(lastSeconds).format('00:00:00')}</span>
                     </div>
                 );
@@ -113,7 +138,7 @@ var Page = React.createClass({
                 content = <i></i>;
             }
             React.renderComponent(content, lastTime);
-        }, 1000);
+        }
     }
 });
 
@@ -149,6 +174,115 @@ var LogDatePicker = React.createClass({
 });
 
 
+var ProjectInfo = React.createClass({
+
+    mixins: [BindStore(ProjectStore)],
+
+    getInitialState: function () {
+        return {
+            projects: []
+        };
+    },
+
+    componentWillReceiveProps: function (nextProps) {
+        var date = nextProps.date;
+        if (date !== this.props.date) {
+            DataAPI.getProjects({
+                start: date,
+                end: date
+            });
+        }
+    },
+
+    render: function () {
+        var projects = this.state.projects;
+        var date = this.props.date;
+        return (
+            <div className="ltt_c-projectInfo">
+                {projects.map(function (project) {
+                    return (
+                        <div className="ltt_c-projectInfo-project">
+                            <div className="ltt_c-projectInfo-project-header">
+                                <div className="ltt_c-projectInfo-title">
+                                    <Link to={'/projects/' + project._id}>{project.name}</Link>
+                                </div>
+                                <Progress max={100} value={project.progress}/>
+                            </div>
+                            <TaskInfo tasks={project.lastTasks} date={date}/>
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    },
+
+    componentDidMount: function () {
+        var date = this.props.date;
+        DataAPI.getProjects({
+            start: date,
+            end: date
+        });
+    },
+
+    getStateFromStores: function () {
+        return {
+            projects: ProjectStore.getData()
+        };
+    },
+
+});
+
+
+var TaskInfo = React.createClass({
+    getDefaultProps: function () {
+        return {
+            tasks: []
+        };
+    },
+
+    render: function () {
+        var className = 'ltt_c-taskInfo '
+        if (this.props.className) {
+             className += this.props.className;
+        }
+        var tasks = this.props.tasks;
+        var date = this.props.date;
+        if (date) {
+            tasks = tasks.filter(function (task) {
+                var lastActiveTime = new Moment(task.lastActiveTime);
+                if (lastActiveTime.format('YYYY-MM-DD') === date) {
+                    if (_.isEmpty(task.subTasks)) { return true; }
+                    task.subTasks = task.subTasks.filter(function (task) {
+                        var lastActiveTime = new Moment(task.lastActiveTime);
+                        return lastActiveTime.format('YYYY-MM-DD') === date;
+                    });
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+        }
+        return (
+            <div className={className}>
+                {tasks.map(function (task) {
+                    return (
+                        <div className="ltt_c-taskInfo-task">
+                            <div className="ltt_c-taskInfo-task-header">
+                                <div className="ltt_c-taskInfo-task-title">
+                                    {task.name}
+                                </div>
+                                <Progress max={100} value={task.progress}/>
+                            </div>
+                            <TaskInfo className="subtask" tasks={task.subTasks} date={date}/>
+                        </div>
+                    );
+                })}
+            </div>
+        )
+    }
+})
+
+/*
 var FilterableList = React.createClass({
 
     getDefaultProps: function () {
@@ -189,7 +323,7 @@ var ListItem = React.createClass({
     onClick: function (e) {
         this.props.onClick(e, this.props);
     }
-})
+})*/
 
 
 module.exports = Page;

@@ -13,6 +13,7 @@ var NProgress = require('nprogress');
 var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
 var Range = ace.require('ace/range').Range;
 
+
 var LogEditor = React.createClass({
 
     getDefaultProps: function () {
@@ -67,7 +68,7 @@ var LogEditor = React.createClass({
         //content = editorStore(SK_CONTENT);
         this._initProjectTypeahead();
         this._initEditorCommand();
-        this.readLog(this.props.title).then(function (content) {
+        Ltt && this.readLog(this.props.title).then(function (content) {
             that.setValue(content);
             that._highLightDoingLine();
             that.props.onLoad(content);
@@ -76,12 +77,13 @@ var LogEditor = React.createClass({
     },
 
     _listenToEditor: function () {
+        console.log('listen to editor');
         var that = this;
         this.editor.on('change', _.debounce(function (e, editor) {
+            console.log('change');
             var data = e.data;
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = editor.getValue();
-            that.props.onChange(content, editor);
             var session = that.editor.getSession();
             //when content change, persist to file in hardware
             if (data && data.action === "insertText") {
@@ -96,27 +98,26 @@ var LogEditor = React.createClass({
                 }
             }
             that._highLightDoingLine();
-
+            that.writeLog(title, content);
+            that.props.onChange(content, editor);
 
             function openInput(ref, lineContent) {
 
                 return that._updateCurrentInfomation(lineContent).then(function () {
                     var pos = editor.getCursorPositionScreen();
                     var $inputHolder = $(ref.getDOMNode());
-                    $inputHolder.show().css({
-                        top: 40 + 16 * pos.row,
-                        left: 60 + 5 * pos.column
-                    });
+                    var $input = $('.ace_text-input');
+                    var css = {
+                        top: parseInt($input.css('top')) + 40,
+                        left: $input.css('left'),
+                        height: 16
+                    };
+                    $inputHolder.show().css(css);
                     $inputHolder.find('.typeahead').focus();
                 }).catch(function (err) {
                     console.error(err.stack);
                 });
             }
-            if (!Ltt) {return;}
-            Ltt.sdk.writeLogFile(title, content).catch(function (err) {
-                console.error(err.stack);
-                Notify.error('Write file failed ', {timeout: 3500});
-            });
         }, 300));
     },
 
@@ -127,19 +128,27 @@ var LogEditor = React.createClass({
         var content = editor.getValue();
         var doingLog = Ltt.sdk.getDoingLog(title, content);
         var range, marker;
+        this._doingLog = doingLog;
         if (doingLog) {
             var index = getLineIndex(content, doingLog.origin);
             if (_.isNumber(index)) {
                 if (this._doingLogIndex !== index) {
                     removeHighlight(this._doingLogMarker);
-                    range = new Range(index, 0, index, Infinity);
-                    marker = session.addMarker(range, "ace_step", "fullLine");
                     this._doingLogIndex = index;
-                    this._doingLogMarker = marker;
+                    this._doingLogMarker = highlight(index);
+                } else if (!this._doingLogMarker) {
+                    this._doingLogMarker = highlight(index);
                 }
             }
         } else {
             removeHighlight(this._doingLogMarker);
+            this._doingLogMarker = null;
+        }
+
+        function highlight(index) {
+            var range = new Range(index, 0, index, Infinity);
+            var marker = session.addMarker(range, "ace_step", "fullLine");
+            return marker;
         }
         function getLineIndex (content, line){
             var lines = content.split('\n');
@@ -189,7 +198,6 @@ var LogEditor = React.createClass({
     _initShortcut: function () {
         var that = this;
         Mt.bind('esc', function (e) {
-            console.log('esc');
         });
     },
 
@@ -197,7 +205,6 @@ var LogEditor = React.createClass({
         //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
         var that = this;
         Ltt && Ltt.sdk.projects().then(function(projects) {
-            console.log(projects);
             that._createTypeahead('.ltt_c-logEditor-projects', '>', 'projects',
                 projects.map(function (project) {
                     return _.pick(project, ['name', 'id']);
@@ -222,7 +229,6 @@ var LogEditor = React.createClass({
 
     _initTaskTypeahead: function () {
         var info = this._getCurrentLogInformation();
-        console.log('lll', info);
         var that = this;
         if (info.projectId) {
             Ltt.sdk.tasks({projectId: info.projectId, versionId: info.versionId})
@@ -292,13 +298,25 @@ var LogEditor = React.createClass({
         $(this.refs.tasks.getDOMNode()).hide();
     },
 
+    shouldComponentUpdate: function (nextProps, nextState) {
+        var result = this.props.title !== nextProps.title ||
+            this.state.syncStatus !== nextState.syncStatus;
+
+        console.log('shold update: ' + result);
+        return result;
+    },
+
+
     componentWillUpdate: function () {
         //get the editor position
         this.currentPosition = this.editor.getCursorPosition();
     },
 
-    componentDidUpdate: function () {
+    componentDidUpdate: function (prevProps, prevState) {
         var that = this;
+        if (prevProps.title === this.props.title) {
+            return;
+        }
         this.readLog(this.props.title)
             .then(function (content) {
                 that.setValue(content);
@@ -326,10 +344,20 @@ var LogEditor = React.createClass({
             });
     },
 
+    writeLog: function (title, content) {
+        if (!Ltt) {return;}
+        Ltt.sdk.writeLogFile(title, content).catch(function (err) {
+            console.error(err.stack);
+            Notify.error('Write file failed ', {timeout: 3500});
+        });
+    },
+
 
     save: function (content) {
         var that = this;
         var title = this.props.title;
+        if (this.__saveing) { console.error('syncing'); return; }
+        this.__saveing = true;
         NProgress.start();
         //write to local filesystem
         Ltt.sdk.writeLogFile(title, content).then(function () {
@@ -338,25 +366,31 @@ var LogEditor = React.createClass({
             //import into database, for stat purpose
             Ltt.sdk.importLogContent(title, content).then(function () {
                 NProgress.done();
+                that.__saveing = false;
+                //don't need to sync if already syncing.
+                if (that.state.syncStatus === SYNCING) { return; }
                 //start back up log file after log import successfully
-                that.setState({syncStatus: SYNCING});
-                //init the project typeahead component again because the projects
                 //may have change since the content may have changed
-                that._initProjectTypeahead();
-                Ltt.sdk.backUpLogFile(title, content).then(function (result) {
-                    that.setState({syncStatus: NO_SYNC});
-                }).catch(function (err) {
-                    console.error(err.stack);
-                    that.setState({syncStatus: SYNC_ERROR});
-                    Notify.error('Save to evernote failed' + err.message, {timeout: 3500});
-                });
+                //use the timer to optimize the performerce
+                var timer = setTimeout(function () {
+                    that.setState({syncStatus: SYNCING});
+                    //init the project typeahead component again because the projects
+                    that._initProjectTypeahead();
+                    Ltt.sdk.backUpLogFile(title, content).then(function (result) {
+                        that.setState({syncStatus: NO_SYNC});
+                    }).catch(function (err) {
+                        console.error(err.stack);
+                        that.setState({syncStatus: SYNC_ERROR});
+                        Notify.error('Save to evernote failed' + err.message, {timeout: 3500});
+                    });
+                    clearTimeout(timer);
+                }, 500);
             }).catch(function (err) {
                 NProgress.done();
                 console.error(err.stack);
                 Notify.error('Import failed', {timeout: 3500});
             });
         }).catch(function (err) {
-            console.log(err);
             NProgress.done();
             console.error(err.stack);
             Notify.error('Write file failed ', {timeout: 3500});
@@ -368,7 +402,6 @@ var LogEditor = React.createClass({
         var that = this;
         return Ltt.sdk.getDetailFromLogLineContent(this.props.title, currentLine)
             .then(function (result) {
-                console.log('--------------', result);
                 that._currentLog = result;
             });
     },
@@ -391,6 +424,10 @@ var LogEditor = React.createClass({
             }
         }
         return info;
+    },
+
+    getDoingLog: function () {
+        return this._doingLog;
     }
 });
 

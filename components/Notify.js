@@ -23,7 +23,7 @@ var notify = function (type, defineOptions) {
             animation: animation
         };
         _.extend(defaultOptions, defineOptions);
-        options = _.extend(defaultOptions, defineOptions, options);
+        options = _.extend(defaultOptions, defineOptions || {}, options);
         noty(options);
     };
 };
