@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var extend = require('extend');
 
 
 
@@ -10,14 +11,14 @@ module.exports = {
         };
     },
 
-    getUserHighchartOptions: function() {
+    getUserHighchartOptions: function(chartType) {
         var options = {};
         if (this.props.legend === false) {
             options.legend = { enabled: false };
         }
         var type = this.props.type;
         if (type === 'stack') {
-            options = _.extend(options, {
+            options = extend(true, options, {
                 plotOptions: {
                     column: {
                         stacking: 'normal',
@@ -30,6 +31,18 @@ module.exports = {
                         }
                     }
                 },
+            });
+        }
+
+        if (this.props.dataLabels && chartType) {
+            var dataLabelsOptions = {};
+            dataLabelsOptions[chartType] = {
+                dataLabels: {
+                    enabled: true
+                }
+            };
+            extend(true, options, {
+                plotOptions: dataLabelsOptions
             });
         }
 

@@ -2,11 +2,15 @@
 'use strict';
 var React = require('react');
 var R = React.DOM;
+var _ = require('lodash');
+var extend = require('extend');
+
 var chart = require('./chart');
 var className = 'ltt_c-sleepPeriod';
 var remoteStorage = require('../storage.remote');
 var sleepPeriodConvertor = require('../../convertors/sleepPeriod');
 var LoadIndicator = require('../loadIndicator');
+
 var SleepPeriod = React.createClass({
     displayName: 'sleepPeriod',
     getInitialState: function () {
@@ -16,7 +20,8 @@ var SleepPeriod = React.createClass({
     },
     componentDidMount: function () {
         var that = this;
-        remoteStorage.get(this.props.url)
+        var params = extend({}, _.pick(this.props, ['start', 'end']));
+        remoteStorage.get(this.props.url, params)
             .then(function(result) {
                 if (!that.isMounted()) {
                     return;

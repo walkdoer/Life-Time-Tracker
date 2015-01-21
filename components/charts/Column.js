@@ -13,6 +13,11 @@ var CommonFunction = require('./CommonFunction');
 var Column = React.createClass({
     displayName: 'column',
     mixins: [ CommonFunction ],
+    getDefaultProps: function () {
+        return {
+            dataLabels: true
+        };
+    },
     render: function() {
         var className = 'ltt_c-chart ltt_c-chart-column';
         if (this.props.className) {
@@ -29,7 +34,7 @@ var Column = React.createClass({
             if (this.props.convert) {
                 data = convertor.dispose(data);
             }
-            var userHighchartOptions = this.getUserHighchartOptions();
+            var userHighchartOptions = this.getUserHighchartOptions('column');
             chart.column({
                 title: this.props.title,
                 $el: $(this.getDOMNode()),

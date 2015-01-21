@@ -12,7 +12,7 @@ exports.dispose = function (rawData) {
     var sleepTime = {
         name: '睡眠长度',
         type: 'column',
-        color: 'rgba(165,170,217,0.5)',
+        color: 'rgba(86, 116, 185, 0.34)',
         yAxis: 1,
         tooltip: {
             valueSuffix: 'hours',

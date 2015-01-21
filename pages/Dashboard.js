@@ -3,8 +3,10 @@
  */
 
 var React = require('react');
+var Moment = require('moment');
+
 var CalendarHeatMap = require('../components/charts/CalendarHeatMap');
-var SleepPeriod = require('../components/charts/SleepPeriod')
+var SleepPeriod = require('../components/charts/SleepPeriod');
 var Dashboard = React.createClass({
 
     render: function () {
@@ -21,7 +23,10 @@ var Dashboard = React.createClass({
                 </div>
                 <div className="ltt_c-page-com">
                     <p className="ltt_c-page-title">Sleep Period</p>
-                    <SleepPeriod title="Sleep Period" url="/api/sleepPeriods/2014"/>
+                    <SleepPeriod title="Last 30 Day's Sleep Period"
+                        url="/api/sleepPeriods"
+                        start={new Moment().subtract(30, 'days').toDate()}
+                        end={new Moment().toDate()}/>
                 </div>
             </div>
         );

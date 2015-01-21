@@ -32,7 +32,7 @@ var Line = React.createClass({
             });
         }
         if (data) {
-            chart.line({
+            var chart = chart.line({
                 title: this.props.title,
                 $el: $(this.getDOMNode()),
                 data: data
@@ -76,7 +76,12 @@ var Line = React.createClass({
                     }
                 }
             });
+            this.selectActiveSeries(chart.series);
         }
+    },
+
+    selectActiveSeries: function (series) {
+        console.log(series);
     }
 });
 

@@ -45,7 +45,7 @@ var Report = React.createClass({
                 trackedTime.push([dateTS, day.trackedTime]);
             });
             return [
-                { name: 'Sleep Time', data: sleepTime},
+                /*{ name: 'Sleep Time', data: sleepTime},取消sleepTime，这样更加易读*/
                 { name: 'Tracked Time', data: trackedTime},
                 { name: 'unTracked Time', data: unTrackedTime}
             ];

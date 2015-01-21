@@ -377,6 +377,7 @@ var LogEditor = React.createClass({
                     //init the project typeahead component again because the projects
                     that._initProjectTypeahead();
                     Ltt.sdk.backUpLogFile(title, content).then(function (result) {
+                        console.error('done');
                         that.setState({syncStatus: NO_SYNC});
                     }).catch(function (err) {
                         console.error(err.stack);
@@ -386,11 +387,13 @@ var LogEditor = React.createClass({
                     clearTimeout(timer);
                 }, 500);
             }).catch(function (err) {
+                that.__saveing = false;
                 NProgress.done();
                 console.error(err.stack);
                 Notify.error('Import failed', {timeout: 3500});
             });
         }).catch(function (err) {
+            that.__saveing = true;
             NProgress.done();
             console.error(err.stack);
             Notify.error('Write file failed ', {timeout: 3500});
