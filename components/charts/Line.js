@@ -4,7 +4,7 @@
 'use strict';
 var React = require('react');
 var R = React.DOM;
-var chart = require('./chart');
+var Chart = require('./chart');
 var _ = require('lodash');
 //var lineConvertor = require('../../convertors/line');
 var Line = React.createClass({
@@ -32,9 +32,10 @@ var Line = React.createClass({
             });
         }
         if (data) {
-            var chart = chart.line({
+            var $el = $(this.getDOMNode());
+            Chart.line({
                 title: this.props.title,
-                $el: $(this.getDOMNode()),
+                $el: $el,
                 data: data
             }, {
                 chart: {
@@ -76,12 +77,23 @@ var Line = React.createClass({
                     }
                 }
             });
+            var chart = $el.highcharts();
             this.selectActiveSeries(chart.series);
         }
     },
 
     selectActiveSeries: function (series) {
-        console.log(series);
+        series.sort(function (a, b) {
+            var aSum = a.data.reduce(function (sum, val) { return sum + val.y; }, 0);
+            var bSum = b.data.reduce(function (sum, val) { return sum + val.y; }, 0);
+            return bSum - aSum;
+        }).forEach(function (serie, index) {
+            if (index < 4) {
+                serie.show();
+            } else {
+                serie.hide();
+            }
+        });
     }
 });
 
