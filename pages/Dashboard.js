@@ -15,11 +15,8 @@ var Dashboard = React.createClass({
                 <div className="ltt_c-page-com">
                     <p className="ltt_c-page-title">Sport Cal-Heatmap</p>
                     <CalendarHeatMap
-                        url="/api/calendars/sport/2014"
-                        options= {{
-                            empty: "no sport data",
-                            filled: "{date} 运动时间 {count}分钟"
-                        }}/>
+                        empty="no sport data"
+                        filled="{date} 运动时间 {count}分钟"/>
                 </div>
                 <div className="ltt_c-page-com">
                     <p className="ltt_c-page-title">Sleep Period</p>

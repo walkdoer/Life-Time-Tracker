@@ -143,3 +143,19 @@ text.now
     border-width: 6px 6px 0;
     border-top-color: #222;
 }
+
+.ltt_c-calendarHeapMap{
+    position: relative;
+}
+.ltt_c-calendarHeapMap .calendar{
+    overflow: hidden;
+}
+.ltt_c-calendarHeapMap .btn{
+    padding: 0 8px;
+    font-size: 0.8rem
+}
+.ltt_c-calendarHeapMap .btn-group{
+    position: absolute;
+    top: -40px;
+    right: 0px;
+}

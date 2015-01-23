@@ -12,6 +12,7 @@ var Mt = window.Mousetrap;
 var NProgress = require('nprogress');
 var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
 var Range = ace.require('ace/range').Range;
+var DataAPI = require('../../utils/DataAPI');
 
 
 var LogEditor = React.createClass({
@@ -63,7 +64,7 @@ var LogEditor = React.createClass({
         editor.setTheme("ace/theme/github");
         var session = editor.getSession();
         session.setMode("ace/mode/ltt");
-        //session.setUseWrapMode(true);
+        session.setUseWrapMode(true);
         //editor.setBehavioursEnabled(true);
         //content = editorStore(SK_CONTENT);
         this._initProjectTypeahead();
@@ -376,7 +377,7 @@ var LogEditor = React.createClass({
                     that.setState({syncStatus: SYNCING});
                     //init the project typeahead component again because the projects
                     that._initProjectTypeahead();
-                    Ltt.sdk.backUpLogFile(title, content).then(function (result) {
+                    DataAPI.backUpLogFile(title, content).then(function (result) {
                         console.error('done');
                         that.setState({syncStatus: NO_SYNC});
                     }).catch(function (err) {

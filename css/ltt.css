@@ -139,3 +139,10 @@
 .scrollable {
      overflow-y: auto;
 }
+
+.btn{
+    border: 1px solid #ccc;
+    outline:none;
+    background-image: linear-gradient(to bottom, #FFFFFF 0%, #e0e0e0 100%);
+    display:inline-block;
+}
