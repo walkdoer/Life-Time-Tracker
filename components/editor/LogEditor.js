@@ -32,6 +32,7 @@ var LogEditor = React.createClass({
     },
 
     render: function () {
+        console.log('render component logEditor');
         var syncIcon = 'fa ';
         NProgress.configure({parent: '.ltt_c-logEditor-header', showSpinner: false});
         var syncStatus = this.state.syncStatus;
@@ -51,12 +52,15 @@ var LogEditor = React.createClass({
                 <div className="ltt_c-logEditor-projects ltt_c-logEditor-typeahead" ref="projects"></div>
                 <div className="ltt_c-logEditor-versions  ltt_c-logEditor-typeahead" ref="versions"></div>
                 <div className="ltt_c-logEditor-tasks  ltt_c-logEditor-typeahead" ref="tasks"></div>
-                <pre id="ltt-logEditor"></pre>
+                <Editor/>
             </div>
         );
     },
 
     componentDidMount: function () {
+        var start, end;
+        start = new Date().getTime();
+        console.log('component logEditor did mount');
         var that = this;
         this._initShortcut();
         var editor = ace.edit("ltt-logEditor");
@@ -69,19 +73,30 @@ var LogEditor = React.createClass({
         //content = editorStore(SK_CONTENT);
         this._initProjectTypeahead();
         this._initEditorCommand();
+        end = new Date().getTime();
+        console.log('ready to read Log ' + (end - start));
+        start = new Date().getTime();
         Ltt && this.readLog(this.props.title).then(function (content) {
+            end = new Date().getTime();
             that.setValue(content);
             that._highLightDoingLine();
             that.props.onLoad(content);
             that._listenToEditor();
+            console.log('read Log and init ace edtior' + (end - start));
         });
+    },
+
+    componentWillUnmount: function () {
+        var session = this.editor.getSession();
+        session.removeAllListeners('change');
     },
 
     _listenToEditor: function () {
         console.log('listen to editor');
         var that = this;
-        this.editor.on('change', _.debounce(function (e, editor) {
-            console.log('change');
+        var session = this.editor.getSession();
+        session.on('change', _.debounce(function (e, editor) {
+            console.log('editor content change');
             var data = e.data;
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = editor.getValue();
@@ -432,6 +447,16 @@ var LogEditor = React.createClass({
 
     getDoingLog: function () {
         return this._doingLog;
+    }
+});
+
+var Editor = React.createClass({
+    render: function () {
+        return <pre id="ltt-logEditor"></pre>;
+    },
+
+    shouldComponentUpdate: function () {
+        return false;
     }
 });
 
