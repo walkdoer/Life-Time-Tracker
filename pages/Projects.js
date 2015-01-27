@@ -120,7 +120,12 @@ var Projects = React.createClass({
                 var tagFullPy = pinyin.getFullChars(tag).toLowerCase();
                 return tag.indexOf(text) >= 0 || tagFullPy.indexOf(text) >= 0 || tagPy.indexOf(text) >= 0;
             });
-            return name.indexOf(text) >= 0 || fullPy.indexOf(text) >= 0 || py.indexOf(text) >= 0 || matchTag;
+            var matchClass = (project.classes || []).some(function (cls) {
+                var upperCode = cls.code.toUpperCase();
+                var upperText = text.toUpperCase();
+                return upperCode.indexOf(upperText) >= 0;
+            });
+            return name.indexOf(text) >= 0 || fullPy.indexOf(text) >= 0 || py.indexOf(text) >= 0 || matchTag || matchClass;
         });
         this.setState({
             projects: result

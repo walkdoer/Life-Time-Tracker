@@ -32,9 +32,11 @@ var LogEditor = React.createClass({
     },
 
     render: function () {
+        var start = new Date().getTime();
         console.log('render component logEditor');
         var syncIcon = 'fa ';
         NProgress.configure({parent: '.ltt_c-logEditor-header', showSpinner: false});
+        console.log('render config nprogress ' + (new Date().getTime() - start));
         var syncStatus = this.state.syncStatus;
         if (syncStatus === SYNCING) {
             syncIcon += 'fa-refresh fa-spin';
@@ -94,8 +96,9 @@ var LogEditor = React.createClass({
     _listenToEditor: function () {
         console.log('listen to editor');
         var that = this;
-        var session = this.editor.getSession();
-        session.on('change', _.debounce(function (e, editor) {
+        var editor = this.editor;
+        var session = editor.getSession();
+        session.on('change', _.debounce(function (e) {
             console.log('editor content change');
             var data = e.data;
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
@@ -219,6 +222,7 @@ var LogEditor = React.createClass({
 
     _initProjectTypeahead: function () {
         //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
+        var start = new Date().getTime();
         var that = this;
         Ltt && Ltt.sdk.projects().then(function(projects) {
             that._createTypeahead('.ltt_c-logEditor-projects', '>', 'projects',
@@ -226,6 +230,8 @@ var LogEditor = React.createClass({
                     return _.pick(project, ['name', 'id']);
                 })
             );
+            var end = new Date().getTime();
+            console.log('iniit project type ahead cost ' + (end - start))
         });
     },
 
@@ -259,6 +265,7 @@ var LogEditor = React.createClass({
     },
 
     _createTypeahead: function createTypeahead(selector, postfix, placeholder, datasets, callback) {
+        var start = new Date().getTime();
         var that = this;
         var $holder = $(selector).empty();
         $input = $('<input class="typeahead" type="text" placeholder="' + placeholder + '"/>');
@@ -278,12 +285,13 @@ var LogEditor = React.createClass({
         }).on('typeahead:selected', function (e, obj) {
             that.hideTypeAhead();
             that.editor.insert(obj.value + postfix);
-            setTimeout(function () {
+            var timer = setTimeout(function () {
                 that.editor.focus();
+                clearTimeout(timer);
             }, 0);
             callback && callback(obj);
         });
-        $input.focus();
+        //$input.focus();
         function substringMatcher (items) {
             return function findMatches(q, cb) {
                 var matches, substrRegex;
@@ -306,6 +314,7 @@ var LogEditor = React.createClass({
                 cb(matches);
             };
         };
+        console.log('_createTypeahead cost' + (new Date().getTime() - start));
     },
 
     hideTypeAhead: function () {
@@ -370,6 +379,7 @@ var LogEditor = React.createClass({
 
 
     save: function (content) {
+        var start = new Date().getTime();
         var that = this;
         var title = this.props.title;
         if (this.__saveing) { console.error('syncing'); return; }
@@ -377,31 +387,37 @@ var LogEditor = React.createClass({
         NProgress.start();
         //write to local filesystem
         Ltt.sdk.writeLogFile(title, content).then(function () {
+            console.log('write file cost' + (new Date().getTime() - start));
             that.props.onSave(content);
             NProgress.set(0.3);
             //import into database, for stat purpose
             Ltt.sdk.importLogContent(title, content).then(function () {
                 NProgress.done();
                 that.__saveing = false;
+                console.log('import cost' + (new Date().getTime() - start));
                 //don't need to sync if already syncing.
                 if (that.state.syncStatus === SYNCING) { return; }
-                //start back up log file after log import successfully
-                //may have change since the content may have changed
-                //use the timer to optimize the performerce
                 var timer = setTimeout(function () {
-                    that.setState({syncStatus: SYNCING});
-                    //init the project typeahead component again because the projects
-                    that._initProjectTypeahead();
-                    DataAPI.backUpLogFile(title, content).then(function (result) {
-                        console.error('done');
-                        that.setState({syncStatus: NO_SYNC});
-                    }).catch(function (err) {
-                        console.error(err.stack);
-                        that.setState({syncStatus: SYNC_ERROR});
-                        Notify.error('Save to evernote failed' + err.message, {timeout: 3500});
+                    //start back up log file after log import successfully
+                    //may have change since the content may have changed
+                    //use the timer to optimize the performerce
+                    console.log('start back' + (new Date().getTime() - start));
+                    that.setState({syncStatus: SYNCING}, function () {
+                        DataAPI.backUpLogFile(title, content).then(function (result) {
+                            console.error('done');
+                            that.setState({syncStatus: NO_SYNC}, function () {
+                                console.log('save total cost' + (new Date().getTime() - start));
+                                //init the project typeahead component again because the projects
+                                //that._initProjectTypeahead();
+                            });
+                        }).catch(function (err) {
+                            console.error(err.stack);
+                            that.setState({syncStatus: SYNC_ERROR});
+                            Notify.error('Save to evernote failed' + err.message, {timeout: 3500});
+                        });
                     });
                     clearTimeout(timer);
-                }, 500);
+                }, 200);
             }).catch(function (err) {
                 that.__saveing = false;
                 NProgress.done();
