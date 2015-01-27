@@ -81,8 +81,10 @@ var LogEditor = React.createClass({
         Ltt && this.readLog(this.props.title).then(function (content) {
             end = new Date().getTime();
             that.setValue(content);
-            that._highLightDoingLine();
+            var highLightIndex = that._highLightDoingLine();
+            editor.gotoLine(highLightIndex + 1, 5);
             that.props.onLoad(content);
+            editor.focus();
             that._listenToEditor();
             console.log('read Log and init ace edtior' + (end - start));
         });
@@ -148,8 +150,9 @@ var LogEditor = React.createClass({
         var doingLog = Ltt.sdk.getDoingLog(title, content);
         var range, marker;
         this._doingLog = doingLog;
+        var index;
         if (doingLog) {
-            var index = getLineIndex(content, doingLog.origin);
+            index = getLineIndex(content, doingLog.origin);
             if (_.isNumber(index)) {
                 if (this._doingLogIndex !== index) {
                     removeHighlight(this._doingLogMarker);
@@ -163,6 +166,7 @@ var LogEditor = React.createClass({
             removeHighlight(this._doingLogMarker);
             this._doingLogMarker = null;
         }
+        return index;
 
         function highlight(index) {
             var range = new Range(index, 0, index, Infinity);
@@ -342,9 +346,13 @@ var LogEditor = React.createClass({
         if (prevProps.title === this.props.title) {
             return;
         }
+        var editor = this.editor;
         this.readLog(this.props.title)
             .then(function (content) {
                 that.setValue(content);
+                var highLightIndex = that._highLightDoingLine();
+                editor.gotoLine(highLightIndex + 1, 5);
+                editor.focus();
             });
     },
 
