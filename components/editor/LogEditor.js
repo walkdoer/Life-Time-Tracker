@@ -228,7 +228,7 @@ var LogEditor = React.createClass({
         //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
         var start = new Date().getTime();
         var that = this;
-        Ltt && Ltt.sdk.projects().then(function(projects) {
+        Ltt && Ltt.sdk.projects({aggregate: false}).then(function(projects) {
             that._createTypeahead('.ltt_c-logEditor-projects', '>', 'projects',
                 projects.map(function (project) {
                     return _.pick(project, ['name', 'id']);
