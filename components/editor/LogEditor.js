@@ -82,7 +82,7 @@ var LogEditor = React.createClass({
             end = new Date().getTime();
             that.setValue(content);
             var highLightIndex = that._highLightDoingLine();
-            editor.gotoLine(highLightIndex + 1, 5);
+            editor.gotoLine(highLightIndex + 1, 6);
             that.props.onLoad(content);
             editor.focus();
             that._listenToEditor();
@@ -216,6 +216,15 @@ var LogEditor = React.createClass({
                 that.props.onPrevDay(editor);
             }
         });
+
+        commands.addCommand({
+            name: 'gotoDoingLog',
+            bindKey: {win: 'Ctrl-\\', mac: 'Command-\\'},
+            exec: function (editor) {
+                var index = that._doingLogIndex;
+                editor.gotoLine(index + 1, 6);
+            }
+        })
     },
 
     _initShortcut: function () {
