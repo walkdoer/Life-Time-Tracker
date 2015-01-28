@@ -21,7 +21,7 @@ var Nav = React.createClass({
             icon: 'fa fa-dashboard'
         }, {
             text: 'Reports',
-            key: 'reports/overview',
+            key: 'reports',
             path: 'reports',
             icon: 'fa fa-bar-chart'
         }, {

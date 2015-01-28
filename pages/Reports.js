@@ -17,6 +17,7 @@ var DATE_FORMAT = 'YYYY-MM-DD';
 var Reports = React.createClass({
     mixins: [Router.State, Router.Navigation],
     render: function () {
+        var defaultMenuIndex = 0;
         var menuItems = [{
             text: 'Overview',
             key: 'overview',
@@ -44,6 +45,10 @@ var Reports = React.createClass({
         var initialMenuItem = menuItems.filter(function (menuItem) {
             return menuItem.path === pathname;
         })[0];
+
+        if (!initialMenuItem) {
+            initialMenuItem = menuItems[defaultMenuIndex];
+        }
 
         return (
             <section className="ltt_c-page ltt_c-page-reports">
