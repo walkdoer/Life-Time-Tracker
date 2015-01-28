@@ -22,7 +22,6 @@ var NotFoundRoute = Router.NotFoundRoute;
 var DefaultRoute = Router.DefaultRoute;
 var Link = Router.Link;
 var OverviewReport = require('./reports/Overview');
-var Report = require('./reports/report');
 var App = require('./app');
 var Dashboard = require('./pages/Dashboard'),
     Logs = require('./pages/Logs'),
@@ -33,11 +32,16 @@ var Dashboard = require('./pages/Dashboard'),
     Reports = require('./pages/Reports'),
     logEditor = require('./pages/LogEditor');
 
+var OverviewReport = require('./reports/Overview');
+    TagsReport = require('./reports/TagsReport');
+
+
 var routes = (
     <Route name="app" path="/" handler={App}>
         <Route name="reports" path="/reports" handler={Reports}>
-            <Route name="report" path="/reports/:reportId" handler={Report}/>
-            <DefaultRoute handler={Report}/>
+            <Route name="report" path="/reports/overview" handler={OverviewReport}/>
+            <Route name="tags" path="/reports/tags" handler={TagsReport}/>
+            <DefaultRoute handler={OverviewReport}/>
         </Route>
         <Route name="dashboard" path="/dashboard" handler={Dashboard}/>
         <Route name="logs" path="/logs" handler={Logs}/>

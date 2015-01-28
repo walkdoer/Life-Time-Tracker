@@ -1,0 +1,6 @@
+.ltt_c-report{
+    height: 100%;
+    flex: 1;
+    overflow: overlay;
+    padding: 20px;
+}

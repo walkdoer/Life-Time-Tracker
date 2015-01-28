@@ -47,7 +47,7 @@ var Overview = React.createClass({
             report = (<MultiDayReport ref="report"  compare={this.state.compare}/>);
         }
         return (
-            <div className="ltt_c-report-overview">
+            <div className="ltt_c-report ltt_c-report-overview">
                 <ReportDateConfig
                     start= {this.state.start}
                     end= {this.state.end}

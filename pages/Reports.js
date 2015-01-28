@@ -17,13 +17,6 @@ var DATE_FORMAT = 'YYYY-MM-DD';
 var Reports = React.createClass({
     mixins: [Router.State, Router.Navigation],
     render: function () {
-        var params = this.getParams();
-        var reportId = params.reportId;
-        if (!reportId) {
-            //default report is overview
-            this.replaceWith('/reports/overview');
-            reportId = 'overview';
-        }
         var menuItems = [{
             text: 'Overview',
             key: 'overview',
@@ -36,8 +29,8 @@ var Reports = React.createClass({
             icon: 'fa fa-sun-o'
         }, {
             text: 'Tag',
-            key: 'tag',
-            path: '/reports/tag',
+            key: 'tags',
+            path: '/reports/tags',
             icon: 'fa fa-tag'
         }, {
             text: 'Project',
@@ -46,9 +39,12 @@ var Reports = React.createClass({
             icon: 'fa fa-rocket'
         }];
 
-        var initialMenuItem = menuItems.filter(function(menu) {
-            return menu.key === reportId;
+        var pathname = this.getPath();
+
+        var initialMenuItem = menuItems.filter(function (menuItem) {
+            return menuItem.path === pathname;
         })[0];
+
         return (
             <section className="ltt_c-page ltt_c-page-reports">
                 <Sidebar ref="sidebar">
