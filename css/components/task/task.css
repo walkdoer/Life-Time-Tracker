@@ -1,4 +1,5 @@
 .ltt_c-task{
+    position: relative;
 }
 
 .ltt_c-task a{
@@ -20,6 +21,15 @@
 }
 
 .ltt_c-task-title{
-    position: relative;
     padding:15px;
+}
+
+.ltt_c-task-timeInfo{
+    color: #ADADAD;
+    text-align: right;
+    padding: 5px;
+}
+
+.ltt_c-task-timeInfo .fa{
+    margin: 0 5px 0 8px;
 }

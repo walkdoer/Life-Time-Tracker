@@ -3,6 +3,7 @@
  */
 var React = require('react');
 var Router = require('react-router');
+var Moment = require('moment');
 var Link = Router.Link;
 var Q = require('q');
 var _ = require('lodash');
@@ -43,10 +44,20 @@ var Task = React.createClass({
         }
         return (
             <li className={className} data-id={task._id}>
+                <span className="ltt_c-task-tag"><i className="fa fa-ellipsis-v"></i></span>
                 <div className="ltt_c-task-title">
-                    <span className="ltt_c-task-tag"><i className="fa fa-ellipsis-v"></i></span>
                     <Link to={url}><span>{task.name}</span></Link>
                     {progress}
+                </div>
+                <div className="ltt_c-task-timeInfo">
+                    <span title={new Moment(task.createTime).format('YYYY-MM-DD HH:mm:ss')}>
+                        <i className="fa fa-plus" title="create time"></i>
+                        {new Moment(task.createTime).fromNow()}
+                    </span>
+                    <span title={new Moment(task.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
+                        <i className="fa fa-user" title="last active"></i>
+                        {new Moment(task.lastActiveTime).fromNow()}
+                    </span>
                 </div>
                 {subTaskList}
             </li>
