@@ -1,0 +1,16 @@
+.loadingMask{
+    opacity: 0.556;
+    top: 0;
+    left: 0;
+    z-index:999;
+    position: absolute;
+    background-color: #000;
+    zoom: 1;
+    cursor:wait;
+    text-align: center;
+    color: #fff;
+}
+
+.loadingMask .fa{
+    margin-right: 10px;
+}

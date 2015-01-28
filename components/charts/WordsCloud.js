@@ -11,8 +11,15 @@ module.exports = React.createClass({
         return <div className="ltt_c-chart ltt_c-chart-wordsCloud"></div>;
     },
 
+    componentDidUpdate: function () {
+        this.plot(this.props.words);
+    },
+
     componentDidMount: function () {
-        var words = this.props.words;
+        this.plot(this.props.words);
+    },
+
+    plot: function (words) {
         var $el = $(this.getDOMNode());
         this.width = $el.width();
         this.height = this.width * 0.5;
@@ -37,12 +44,10 @@ module.exports = React.createClass({
             .start();
     },
 
-    getMaxAndMin: function (words) {
-
-    },
 
     draw: function draw(words) {
         var fill = d3.scale.category20();
+        d3.select(this.getDOMNode()).select('svg').remove();
         d3.select(this.getDOMNode()).append("svg")
             .attr("width", this.width)
             .attr("height", this.height)

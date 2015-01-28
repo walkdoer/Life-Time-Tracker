@@ -52,8 +52,10 @@ var Projects = React.createClass({
                 <div className="ltt_c-page-projects-projectCards" style={projectCardsStyle}>
                     <div className="ltt_c-page-projects-filter">
                         <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
-                            onDateRangeChange={_.debounce(this.onDateRangeChange, 200)}/>
-                        <input ref="nameInput" type="text" placeholder="Filter with project name" className="ltt_c-page-projects-filter-name" onChange={this.filterProject}/>
+                            onDateRangeChange={this.onDateRangeChange}/>
+                        <input ref="nameInput" type="text" placeholder="Filter with project name"
+                            className="ltt_c-page-projects-filter-name"
+                            onChange={_.debounce(this.filterProject, 200)}/>
                     </div>
                     {loadingMsg}
                     {projectCards}

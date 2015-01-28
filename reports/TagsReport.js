@@ -9,6 +9,8 @@ var Moment = require('moment');
 /** components */
 var WordsCloud = require('../components/charts/WordsCloud');
 var remoteStorage = require('../components/storage.remote');
+var DateRangePicker = require('../components/DateRangePicker');
+var LoadingMask = require('../components/LoadingMask');
 
 /** constant */
 var DATE_FORMAT = 'YYYY-MM-DD';
@@ -18,17 +20,22 @@ module.exports = React.createClass({
 
     getInitialState: function () {
         return {
-            start: new Moment().subtract(1, 'month').toDate(),
-            end: new Moment().toDate(),
-            tags: []
+            startDate: new Moment().subtract(1, 'month').toDate(),
+            endDate: new Moment().toDate(),
+            tags: [],
+            loaded: false
         };
     },
 
     render: function () {
         return (
             <div className="ltt_c-report ltt_c-report-tags">
-                <p>tags</p>
+                <div>
+                     <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
+                            onDateRangeChange={this.onDateRangeChange}/>
+                </div>
                 {!_.isEmpty(this.state.tags) ? <WordsCloud words={this.adaptData(this.state.tags)}/> : null }
+                <LoadingMask loaded={this.state.loaded}/>
             </div>
         );
     },
@@ -43,14 +50,30 @@ module.exports = React.createClass({
     },
 
     componentDidMount: function () {
+        this.loadTags();
+    },
+
+    onDateRangeChange: function (start, end) {
+        this.setState({
+            startDate: start,
+            endDate: end,
+            loaded: false
+        }, function () {
+            this.loadTags();
+        });
+
+    },
+
+    loadTags: function () {
         var that = this;
         remoteStorage.get('/api/stats', {
-                start: new Moment(this.state.start).format(DATE_FORMAT),
-                end: new Moment(this.state.end).format(DATE_FORMAT)
+                start: new Moment(this.state.startDate).format(DATE_FORMAT),
+                end: new Moment(this.state.endDate).format(DATE_FORMAT)
             })
             .then(function (result) {
                 var data = result.data;
                 that.setState({
+                    loaded: true,
                     tags: data.tagTime
                 });
             })
