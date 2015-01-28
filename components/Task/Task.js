@@ -54,6 +54,10 @@ var Task = React.createClass({
                         <i className="fa fa-plus" title="create time"></i>
                         {new Moment(task.createTime).fromNow()}
                     </span>
+                    <span>
+                        <i className="fa fa-clock-o" title="total time"></i>
+                        {Moment.duration(task.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
+                    </span>
                     <span title={new Moment(task.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
                         <i className="fa fa-user" title="last active"></i>
                         {new Moment(task.lastActiveTime).fromNow()}

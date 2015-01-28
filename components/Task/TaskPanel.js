@@ -3,6 +3,7 @@
  */
 var React = require('react');
 var Router = require('react-router');
+var _ = require('lodash');
 var TaskList = require('./TaskList');
 var Task = require('./Task');
 var Notify = require('../Notify');
@@ -11,6 +12,7 @@ var TODO = 'todo', DOING = 'doing', COMPLETE = 'complete';
 var TaskPanel = React.createClass({
     render: function () {
         var tasks = this.props.tasks,
+            logs = this.props.logs,
             selectedTask = this.props.selectedTask;
         var todoTasks = [],
             doingTasks = [],
@@ -27,8 +29,32 @@ var TaskPanel = React.createClass({
             } else {
                 bucket = todoTasks;
             }
+            if (logs) {
+                task.totalTime = calculateTaskTime(task, logs);
+                if (!_.isEmpty(task.subTasks)) {
+                    task.subTasks.forEach(function (task) {
+                        task.totalTime = calculateTaskTime(task, logs);
+                    });
+                }
+            }
+
             bucket.push(task);
         });
+
+        function calculateTaskTime(task, logs) {
+            var time = 0;
+            if (!task || _.isEmpty(logs)) {
+                return null;
+            }
+            var taskId = task._id;
+            logs.forEach(function (log) {
+                var task = log.task;
+                if (task === taskId) {
+                    time += log.len;
+                }
+            });
+            return time;
+        }
 
         var sortClass = "ltt__sortable";
 

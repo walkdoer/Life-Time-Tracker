@@ -99,7 +99,7 @@ var ProjectDetail = React.createClass({
                 taskLoading = (<LoadIndicator/>);
             }
 
-            var taskPanel = <TaskPanel tasks={this.state.tasks} selectedTask={this.state.selectedTask} useVersion={!!this.state.versionId}/>
+            var taskPanel = <TaskPanel tasks={this.state.tasks} logs={this.state.logs} selectedTask={this.state.selectedTask} useVersion={!!this.state.versionId}/>
 
             if (this.state.loadingLog) {
                 logLoading = (<LoadIndicator/>);
@@ -166,6 +166,7 @@ var ProjectDetail = React.createClass({
 
     loadLogs: function (params) {
         var that = this;
+        params.populate = false;
         var promise = remoteStorage.get('/api/logs', params)
             .then(function (res) {
                 that.setState({
