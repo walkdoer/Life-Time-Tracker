@@ -5,19 +5,19 @@ Life Time Tracker
 
 Dashboard:
 
-[!Dashboard](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/dashboard.png)
+![Dashboard](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/dashboard.png)
 
 Log Editor:
 
-[!Log Editor](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/log_editor.png)
+![Log Editor](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/log_editor.png)
 
 Report
 
-[!Report](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/report.png)
+![Report](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/report.png)
 
 Project
 
-[!Project](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/project.png)
+![Project](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/project.png)
 
 ### 时间记录方式
 
