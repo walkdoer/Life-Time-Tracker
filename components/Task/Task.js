@@ -31,7 +31,7 @@ var Task = React.createClass({
         if (this.props.progress >= 0) {
             progress = (<Progress max={100} value={task.progress}/>);
         }
-        var subTasks = task.subTasks,
+        var subTasks = task.children,
             subTaskList = null;
         if (!_.isEmpty(subTasks)) {
             subTaskList = (

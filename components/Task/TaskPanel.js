@@ -31,8 +31,8 @@ var TaskPanel = React.createClass({
             }
             if (logs) {
                 task.totalTime = calculateTaskTime(task, logs);
-                if (!_.isEmpty(task.subTasks)) {
-                    task.subTasks.forEach(function (task) {
+                if (!_.isEmpty(task.children)) {
+                    task.children.forEach(function (task) {
                         task.totalTime = calculateTaskTime(task, logs);
                     });
                 }
