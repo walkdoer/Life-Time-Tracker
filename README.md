@@ -1,6 +1,26 @@
 Life Time Tracker
 =====================
 
+### 界面
+
+Dashboard:
+
+[!Dashboard](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/dashboard.png)
+
+Log Editor:
+
+[!Log Editor](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/log_editor.png)
+
+Report
+
+[!Report](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/report.png)
+
+Project
+
+[!Project](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/project.png)
+
+### 时间记录方式
+
 个人时间记录，每日记录一次。用于每周每月时间统计。
 
 ### 时间分类
