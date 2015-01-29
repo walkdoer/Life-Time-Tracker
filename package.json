@@ -51,7 +51,8 @@
     "gulp-rename": "~1.2.0",
     "gulp-react": "~2.0.0",
     "node-webkit-builder": "~1.0.4",
-    "gulp-debug": "~2.0.0"
+    "gulp-debug": "~2.0.0",
+    "gulp-clean": "~0.3.1"
   },
   "browser": {
     "d3": "./bower_components/d3/d3.min.js",

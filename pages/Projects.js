@@ -55,7 +55,10 @@ var Projects = React.createClass({
                             onDateRangeChange={this.onDateRangeChange}/>
                         <input ref="nameInput" type="text" placeholder="Filter with project name"
                             className="ltt_c-page-projects-filter-name"
-                            onChange={_.debounce(this.filterProject, 200)}/>
+                            onChange={function(e) {
+                                var text = e.target.value;
+                                this.filterProject(text);
+                            }.bind(this)}/>
                     </div>
                     {loadingMsg}
                     {projectCards}
@@ -107,9 +110,8 @@ var Projects = React.createClass({
             });
     },
 
-    filterProject: function (e) {
+    filterProject: function (text) {
         var pinyin = new Pinyin();
-        var text = e.target.value;
         text = text.trim();
         var result = [];
         result = this.allProjects.filter(function (project) {

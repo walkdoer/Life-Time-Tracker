@@ -7,6 +7,7 @@ var watchify = require('watchify');
 var watch = require('gulp-watch');
 var notify = require("gulp-notify");
 var react = require("gulp-react");
+var clean = require('gulp-clean');
 var scriptsDir = './';
 var buildDir = './build';
 var inject = require("gulp-inject");
@@ -119,16 +120,8 @@ gulp.task('sync', function() {
     ]).pipe(gulp.dest('./libs'));*/
 
     gulp.src([
-        './node_modules/lodash/**/*',
-    ]).pipe(gulp.dest('./build/node_modules/lodash/'));
-
-    gulp.src([
-        './node_modules/moment/**/*',
-    ]).pipe(gulp.dest('./build/node_modules/moment/'));
-
-    gulp.src([
-        './node_modules/ltt-nw/**/*',
-    ]).pipe(gulp.dest('./build/node_modules/ltt-nw/'));
+        './node_modules/**/*',
+    ]).pipe(gulp.dest('./build/node_modules'));
 
     var cssFiles = './css/**/*.css',
         images = './images/**/*',
@@ -184,6 +177,10 @@ gulp.task('build', function() {
     return buildScript(scriptsDir, main, mainDestFile, jsDestDir, false);
 });
 
+gulp.task('clean', function () {
+    return gulp.src('./build/node_modules', {read: false})
+        .pipe(clean());
+});
 
 gulp.task('nw', function () {
     var nw = new NwBuilder({
