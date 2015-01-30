@@ -304,7 +304,7 @@ var LogEditor = React.createClass({
             }, 0);
             callback && callback(obj);
         });
-        //$input.focus();
+        $input.focus();
         function substringMatcher (items) {
             return function findMatches(q, cb) {
                 var matches, substrRegex;
