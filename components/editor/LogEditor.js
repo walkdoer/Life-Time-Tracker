@@ -2,6 +2,7 @@ var React = require('react');
 var store = require('store2');
 var editorStore = store.namespace('LogEditor');
 var _ = require('lodash');
+var Q = require('q');
 
 var contentCache = {};
 //store key
@@ -36,7 +37,6 @@ var LogEditor = React.createClass({
         console.log('render component logEditor');
         var syncIcon = 'fa ';
         NProgress.configure({parent: '.ltt_c-logEditor-header', showSpinner: false});
-        console.log('render config nprogress ' + (new Date().getTime() - start));
         var syncStatus = this.state.syncStatus;
         if (syncStatus === SYNCING) {
             syncIcon += 'fa-refresh fa-spin';
@@ -113,21 +113,23 @@ var LogEditor = React.createClass({
                 if (data.text === '<') {
                     openInput(that.refs.projects);
                 } else if (data.text === '$') {
-                    openInput(that.refs.versions, lineContent).then(that._initVersionTypeahead.bind(that));
+                    openInput(that.refs.versions, lineContent,  that._initVersionTypeahead.bind(that));
                 } else if (data.text === '(') {
-                    openInput(that.refs.tasks, lineContent).then(that._initTaskTypeahead.bind(that));
+                    openInput(that.refs.tasks, lineContent, that._initTaskTypeahead.bind(that));
                 }
             }
             that._highLightDoingLine();
             that.writeLog(title, content);
             that.props.onChange(content, editor);
 
-            function openInput(ref, lineContent) {
+            function openInput(ref, lineContent, initFunction) {
 
-                return that._updateCurrentInfomation(lineContent).then(function () {
+                return that._updateCurrentInfomation(lineContent).then(initFunction).then(function (open) {
+                    if (open === false) { console.log('open = false'); return; }
                     var pos = editor.getCursorPositionScreen();
                     var $inputHolder = $(ref.getDOMNode());
                     var $input = $('.ace_text-input');
+                    console.log($input, $input.css('top'));
                     var css = {
                         top: parseInt($input.css('top')) + 40,
                         left: $input.css('left'),
@@ -237,7 +239,9 @@ var LogEditor = React.createClass({
         //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
         var start = new Date().getTime();
         var that = this;
-        Ltt && Ltt.sdk.projects({aggregate: false}).then(function(projects) {
+        return Ltt.sdk.projects({aggregate: false}).then(function(projects) {
+            //if not projects, then no need to create typeahead
+            if (_.isEmpty(projects)) { return Q(false); }
             that._createTypeahead('.ltt_c-logEditor-projects', '>', 'projects',
                 projects.map(function (project) {
                     return _.pick(project, ['name', 'id']);
@@ -251,8 +255,10 @@ var LogEditor = React.createClass({
     _initVersionTypeahead: function () {
         var info = this._getCurrentLogInformation();
         var that = this;
-        if (!info.projectId) { return; }
-        Ltt.sdk.versions({projectId: info.projectId}).then(function (versions) {
+        if (!info.projectId) { return Q(false); }
+        console.log('init version typeahead');
+        return Ltt.sdk.versions({projectId: info.projectId}).then(function (versions) {
+            if (_.isEmpty(versions)) { return Q(false); }
             that._createTypeahead('.ltt_c-logEditor-versions', '$', 'versions',
                 versions.map(function (version) {
                     version = _.pick(version, ['name', 'id']);
@@ -266,14 +272,17 @@ var LogEditor = React.createClass({
         var info = this._getCurrentLogInformation();
         var that = this;
         if (info.projectId) {
-            Ltt.sdk.tasks({projectId: info.projectId, versionId: info.versionId})
+            return Ltt.sdk.tasks({projectId: info.projectId, versionId: info.versionId, populate: false})
                 .then(function (tasks) {
+                    if (_.isEmpty(tasks)) { return Q(false); }
                     that._createTypeahead('.ltt_c-logEditor-tasks', ')', 'tasks',
                         tasks.map(function (task) {
                             return _.pick(task, ['name', 'id']);
                         })
                     );
                 });
+        } else {
+            return Q(false);
         }
     },
 
@@ -284,9 +293,9 @@ var LogEditor = React.createClass({
         $input = $('<input class="typeahead" type="text" placeholder="' + placeholder + '"/>');
         $holder.append($input);
         var projectTypeahead = $input.typeahead({
-            hint: true,
+            hint: false,
             highlight: true,
-            minLength: 1
+            minLength: 0
         }, {
             name: 'states',
             displayKey: 'value',
@@ -303,6 +312,12 @@ var LogEditor = React.createClass({
                 clearTimeout(timer);
             }, 0);
             callback && callback(obj);
+        });
+        $input.on('focus', function () {
+            console.log('input focus');
+            var ev = $.Event("keydown");
+            ev.keyCode = ev.which = 40;
+            $(this).trigger(ev);
         });
         $input.focus();
         function substringMatcher (items) {
@@ -327,7 +342,6 @@ var LogEditor = React.createClass({
                 cb(matches);
             };
         };
-        console.log('_createTypeahead cost' + (new Date().getTime() - start));
     },
 
     hideTypeAhead: function () {
@@ -340,7 +354,6 @@ var LogEditor = React.createClass({
         var result = this.props.title !== nextProps.title ||
             this.state.syncStatus !== nextState.syncStatus;
 
-        console.log('shold update: ' + result);
         return result;
     },
 
@@ -455,6 +468,7 @@ var LogEditor = React.createClass({
         return Ltt.sdk.getDetailFromLogLineContent(this.props.title, currentLine)
             .then(function (result) {
                 that._currentLog = result;
+                console.error('current log', result);
             });
     },
 
@@ -466,15 +480,16 @@ var LogEditor = React.createClass({
             var version = log.version;
             var task = log.task;
             if (project) {
-                info.projectId = project.id;
+                info.projectId = project.id || project._id.toString();
             }
             if (version) {
-                info.versionId = version.id;
+                info.versionId = version.id || version._id.toString();
             }
             if (task) {
-                info.taskId = task.id;
+                info.taskId = task.id || task._id.toString();
             }
         }
+        console.error('current info', info);
         return info;
     },
 
