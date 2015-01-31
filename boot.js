@@ -29,6 +29,7 @@ var Dashboard = require('./pages/Dashboard'),
     Projects = require('./pages/Projects'),
     ProjectDetail = require('./components/ProjectDetail'),
     ProjectIndex = require('./components/Project/ProjectIndex'),
+    LogList = require('./components/LogList'),
     ProjectTask = require('./components/Project/ProjectTask'),
     ProjectsNew = require('./pages/ProjectsNew'),
     Reports = require('./pages/Reports'),
@@ -56,7 +57,12 @@ var routes = (
         <Route name="logs" path="/logs" handler={Logs}/>
         <Route name="projects" path="/projects" handler={ProjectsNew}>
             <DefaultRoute name="projectIndex"  handler={ProjectIndex}/>
-            <Route name="projectTask" path=":projectId" handler={ProjectTask}/>
+            <Route name="projectTask" path=":projectId" handler={ProjectTask}>
+                <Route name="projectLogs" path="tasks/:taskId" handler={LogList}/>
+            </Route>
+            <Route name="projectVersionTask" path=":projectId/versions/:versionId" handler={ProjectTask}>
+                <Route name="taskLogs" path="tasks/:taskId" handler={LogList}/>
+            </Route>
         </Route>
         <Route name="logEditor" path="/logEditor" handler={logEditor}/>
         <NotFoundRoute handler={Page404}/>

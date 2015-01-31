@@ -23,11 +23,19 @@ module.exports = React.createClass({
     getInitialState: function () {
         var startDate = new Moment().startOf('month').toDate(),
             endDate = new Moment().endOf('day').toDate();
-        return {
+        return _.extend({
             loading: true,
             startDate: startDate,
             endDate: endDate,
             projects: []
+        }, this.getStateFromParams());
+    },
+
+    getStateFromParams: function () {
+        var params = this.getParams();
+        return {
+            versionId: params.versionId,
+            projectId: params.projectId
         };
     },
 
@@ -37,35 +45,21 @@ module.exports = React.createClass({
                 <aside className="ltt_c-page-projectsNew-sidebar">
                     <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
                             onDateRangeChange={this.onDateRangeChange}/>
-                    <input ref="nameInput" type="text" placeholder="name/classs/tag"
-                            className="ltt_c-page-projectsNew-filter-name"
-                            onChange={function(e) {
-                                var text = e.target.value;
-                                this.filterProject(text);
-                            }.bind(this)}/>
-                    <div className="ltt_c-page-projectsNew-sidebar-projectTree">
-                        {this.state.projects.map(this.renderProject)}
-                    </div>
+                    <FilterableProjects projects={this.state.projects}/>
                 </aside>
                 <main>
-                    <RouteHandler/>
+                    <RouteHandler {... _.pick(this.state, ['projectId', 'versionId'])}/>
                 </main>
             </section>
         );
     },
 
-    renderProject: function (project) {
-        return <ProjectNav project={project}/>
-    },
-
     componentDidMount: function () {
         this.loadProjects();
-        var input = this.refs.nameInput;
-        Mt.bind('command+f', function (e) {
-            e.preventDefault();
-            var $input = $(input.getDOMNode());
-            $input.focus();
-        });
+    },
+
+    componentWillReceiveProps: function () {
+        this.setState(this.getStateFromParams());
     },
 
     componentWillUnmount: function () {
@@ -94,13 +88,70 @@ module.exports = React.createClass({
                     projects: projects
                 });
             });
+    }
+
+
+});
+
+
+var FilterableProjects = React.createClass({
+    getDefaultProps: function () {
+        return {
+            projects: []
+        };
     },
+
+    getInitialState: function () {
+        return {
+            projects: this.props.projects
+        };
+    },
+
+    componentWillReceiveProps: function (nextProps) {
+        this.setState({
+            projects: nextProps.projects
+        });
+    },
+
+    componentDidMount: function () {
+        var input = this.refs.nameInput;
+        Mt.bind('command+f', function (e) {
+            e.preventDefault();
+            var $input = $(input.getDOMNode());
+            $input.focus();
+        });
+    },
+
+    render: function () {
+        console.log('render filterProject');
+        return (
+            <div className="ltt_c-page-projectsNew-FilterableList">
+                <input ref="nameInput" type="text" placeholder="name/classs/tag"
+                        className="ltt_c-page-projectsNew-filter-name"
+                        onChange={function(e) {
+                            var text = e.target.value;
+                            this.filterProject(text);
+                        }.bind(this)}/>
+                <div className="ltt_c-page-projectsNew-sidebar-projectTree">
+                    {this.state.projects.map(this.renderProject)}
+                </div>
+            </div>
+        );
+    },
+
+    renderProject: function (project) {
+        var projectId = this.state.projectId;
+        var isMatch = projectId === project._id;
+        var className = isMatch ? 'active' : null;
+        return <ProjectNav project={project} className={className} defaultIsOpen={isMatch}/>
+    },
+
 
     filterProject: function (text) {
         var pinyin = new Pinyin();
         text = text.trim();
         var result = [];
-        result = this.allProjects.filter(function (project) {
+        result = this.props.projects.filter(function (project) {
             var name = project.name;
             var py = pinyin.getCamelChars(name).toLowerCase();
             var fullPy = pinyin.getFullChars(name).toLowerCase();
@@ -121,8 +172,7 @@ module.exports = React.createClass({
             projects: result
         });
     }
-
-});
+})
 
 var ProjectNav = React.createClass({
   getInitialState: function () {
@@ -130,7 +180,7 @@ var ProjectNav = React.createClass({
   },
 
   getDefaultProps: function () {
-    return { isOpen: false };
+    return { defaultIsOpen: false };
   },
 
   componentWillReceiveProps: function (newProps) {
@@ -149,7 +199,7 @@ var ProjectNav = React.createClass({
       return (
         <li className="ltt_c-ProjectNav-Item" key={version._id}>
           <i className="fa fa-sitemap" title="version"></i>
-          <Link to="projectTask" params={params}>{version.name}</Link>
+          <Link to="projectVersionTask" params={params}>{version.name}</Link>
         </li>
       );
     }) : null;
@@ -157,10 +207,14 @@ var ProjectNav = React.createClass({
 
   render: function () {
     var project = this.props.project;
+    var className ="ltt_c-ProjectNav";
+    if (this.props.className) {
+        className += ' ' + this.props.className;
+    }
     var params = {projectId: project._id};
     var iconClassName = ('fa ' + (this.state.isOpen ? 'fa-folder-open-o' : 'fa-folder-o'));
     return (
-      <div className="ltt_c-ProjectNav">
+      <div className={className}>
         <h3 onClick={this.toggle}>
             <i className={iconClassName}/>
             <Link to="projectTask" params={params}>{project.name}</Link>
