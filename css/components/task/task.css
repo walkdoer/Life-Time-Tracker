@@ -33,3 +33,7 @@
 .ltt_c-task-timeInfo .fa{
     margin: 0 5px 0 8px;
 }
+
+.ltt_c-task .ltt_c-taskList{
+    margin-left:15px;
+}

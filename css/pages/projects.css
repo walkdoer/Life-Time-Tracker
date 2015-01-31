@@ -164,8 +164,15 @@
 
 .ltt_c-projectTask-logs{
   flex: 1;
-  padding:10px;
   background: #f6f6f6;
   height: 100%;
+  overflow-y: auto;
+}
+.ltt_c-projectTask-logs .ltt_c-LogList{
+  height:100%;
+}
+
+.ltt_c-LogList .ltt_c-log{
+  border-bottom: 1px solid #dcdcdc;
 }
 

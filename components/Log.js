@@ -69,9 +69,11 @@ var Log = React.createClass({
             });
         }
         var project = this.props.project;
-        if (project) {
-            if (project.version) {
+        if (_.isObject(project)) {
+            if (_.isObject(project.version)) {
                 var version = (<span className="ltt_c-log-project-version">{project.version}</span>);
+            } else {
+                version = null;
             }
             project = (
                 <span className="ltt_c-log-project">
@@ -82,12 +84,16 @@ var Log = React.createClass({
                     </a>
                 </span>
             );
+        } else {
+            project = null;
         }
         var task = this.props.task;
-        if (task) {
+        if (_.isObject(task)) {
             task = (
                 <span className="ltt_c-log-task"><i className="fa fa-tasks"></i>{task.name}</span>
             );
+        } else {
+            task = null;
         }
         return (
             <div className={className}  style={getLogInlineStyle(this.props)}>

@@ -65,7 +65,7 @@ module.exports = React.createClass({
                 });
             }
             var versions, lastVersion;
-            if (!_.isEmpty(project.versions)) {
+            if (false && !_.isEmpty(project.versions)) {
                 if (!currentVersionId) {
                     currentVersionId = 'all_versions';
                 }
@@ -92,7 +92,7 @@ module.exports = React.createClass({
         var logs;
         if (taskId) {
             logs = <aside className="ltt_c-projectTask-logs">
-                    <RouteHandler params={_.pick(this.state, ['projectId', 'taskId', 'versionId'])}/>
+                    <RouteHandler {... _.pick(this.state, ['projectId', 'taskId', 'versionId'])}/>
             </aside>
         }
         return (
@@ -105,6 +105,7 @@ module.exports = React.createClass({
                                 useVersion={!!currentVersionId}
                                 data={task}
                                 key={task._id}
+                                taskId={taskId}
                                 selected={task._id === taskId}/>
                         })}
                         <LoadingMask loaded={this.state.taskLoaded}/>
@@ -127,14 +128,19 @@ module.exports = React.createClass({
 
     componentWillReceiveProps: function (nextProps) {
         var that = this;
+        var params = this.getParams();
         //no need to load again
         if (nextProps.projectId === this.props.projectId &&
             nextProps.versionId === this.props.versionId) {
+            this.setState({
+                taskId: params.taskId
+            });
             return;
         }
         this.setState({
             projectLoaded: false,
-            taskLoaded: false
+            taskLoaded: false,
+            taskId: params.taskId
         }, function () {
             this.loadProject(nextProps.projectId);
             this.loadTasks(_.pick(nextProps, ['projectId', 'versionId']));

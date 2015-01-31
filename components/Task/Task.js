@@ -17,6 +17,7 @@ var Task = React.createClass({
     render: function () {
         var task = this.props.data;
         var useVersion = this.props.useVersion;
+        var taskId = this.props.taskId;
         var url;
         if (useVersion && task.versionId) {
             url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
@@ -35,9 +36,9 @@ var Task = React.createClass({
             subTaskList = null;
         if (!_.isEmpty(subTasks)) {
             subTaskList = (
-                <TaskList>
+                <TaskList className="subtask">
                     {subTasks.map(function (task) {
-                        return (<Task data={task} key={task.id}/>);
+                        return (<Task data={task} key={task.id} useVersion={useVersion} selected={task._id === taskId}/>);
                     })}
                 </TaskList>
             );

@@ -33,13 +33,22 @@ module.exports = React.createClass({
         );
     },
 
+    componentWillReceiveProps: function (nextProps) {
+        var that = this;
+        this.setState({
+            loaded: false
+        }, function () {
+            that.load();
+        });
+    },
+
     componentDidMount: function () {
         this.load();
     },
 
     load: function (date) {
         var that = this;
-        var params = _.extend({}, this.props.params);
+        var params = _.extend({}, _.pick(this.props, ['versionId', 'taskId', 'projectId']));
         params.populate = false;
         var promise = remoteStorage.get('/api/logs', params)
             .then(function (res) {
