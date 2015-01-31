@@ -264,7 +264,7 @@ var LogEditor = React.createClass({
                     version = _.pick(version, ['name', 'id']);
                     return version;
                 })
-            );
+            ); 
         });
     },
 

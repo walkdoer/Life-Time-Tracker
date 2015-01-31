@@ -29,12 +29,21 @@ var Dashboard = require('./pages/Dashboard'),
     Projects = require('./pages/Projects'),
     ProjectDetail = require('./components/ProjectDetail'),
     ProjectIndex = require('./components/Project/ProjectIndex'),
+    ProjectTask = require('./components/Project/ProjectTask'),
+    ProjectsNew = require('./pages/ProjectsNew'),
     Reports = require('./pages/Reports'),
     logEditor = require('./pages/LogEditor');
 
 var OverviewReport = require('./reports/Overview');
     TagsReport = require('./reports/TagsReport');
 
+/*        <Route name="projects" path="/projects" handler={Projects}>
+            <DefaultRoute name="projectIndex"  handler={ProjectIndex}/>
+            <Route name="projectDetail" path="/projects/:projectId" handler={ProjectDetail}/>
+            <Route name="projectDetailVersion" path="/projects/:projectId/versions/:versionId" handler={ProjectDetail}/>
+            <Route name="projectDetailTaskWithoutVersion" path="/projects/:projectId/tasks/:taskId" handler={ProjectDetail}/>
+            <Route name="projectDetailTask" path="/projects/:projectId/versions/:versionId/tasks/:taskId" handler={ProjectDetail}/>
+        </Route>*/
 
 var routes = (
     <Route name="app" path="/" handler={App}>
@@ -45,12 +54,9 @@ var routes = (
         </Route>
         <Route name="dashboard" path="/dashboard" handler={Dashboard}/>
         <Route name="logs" path="/logs" handler={Logs}/>
-        <Route name="projects" path="/projects" handler={Projects}>
+        <Route name="projects" path="/projects" handler={ProjectsNew}>
             <DefaultRoute name="projectIndex"  handler={ProjectIndex}/>
-            <Route name="projectDetail" path="/projects/:projectId" handler={ProjectDetail}/>
-            <Route name="projectDetailVersion" path="/projects/:projectId/versions/:versionId" handler={ProjectDetail}/>
-            <Route name="projectDetailTaskWithoutVersion" path="/projects/:projectId/tasks/:taskId" handler={ProjectDetail}/>
-            <Route name="projectDetailTask" path="/projects/:projectId/versions/:versionId/tasks/:taskId" handler={ProjectDetail}/>
+            <Route name="projectTask" path=":projectId" handler={ProjectTask}/>
         </Route>
         <Route name="logEditor" path="/logEditor" handler={logEditor}/>
         <NotFoundRoute handler={Page404}/>
