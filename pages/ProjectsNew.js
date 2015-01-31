@@ -45,7 +45,9 @@ module.exports = React.createClass({
                 <aside className="ltt_c-page-projectsNew-sidebar">
                     <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
                             onDateRangeChange={this.onDateRangeChange}/>
-                    <FilterableProjects projects={this.state.projects}/>
+                    <FilterableProjects projects={this.state.projects}
+                        projectId={this.state.projectId}
+                        versionId={this.state.versionId}/>
                 </aside>
                 <main>
                     <RouteHandler {... _.pick(this.state, ['projectId', 'versionId'])}/>
@@ -140,10 +142,11 @@ var FilterableProjects = React.createClass({
     },
 
     renderProject: function (project) {
-        var projectId = this.state.projectId;
+        var projectId = this.props.projectId;
         var isMatch = projectId === project._id;
         var className = isMatch ? 'active' : null;
-        return <ProjectNav project={project} className={className} defaultIsOpen={isMatch}/>
+        return <ProjectNav project={project} className={className}
+            defaultIsOpen={isMatch} versionId={this.props.versionId}/>
     },
 
 
@@ -194,10 +197,15 @@ var ProjectNav = React.createClass({
 
   renderItems: function () {
     var project = this.props.project;
+    var versionId = this.props.versionId;
     return this.state.isOpen ? (project.versions || []).map(function (version) {
         var params = {projectId: project._id, versionId: version._id};
+        var className = "ltt_c-ProjectNav-Item";
+        if (versionId === version._id) {
+            className += ' active';
+        }
       return (
-        <li className="ltt_c-ProjectNav-Item" key={version._id}>
+        <li className={className} key={version._id}>
           <i className="fa fa-sitemap" title="version"></i>
           <Link to="projectVersionTask" params={params}>{version.name}</Link>
         </li>

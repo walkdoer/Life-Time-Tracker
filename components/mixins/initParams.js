@@ -1,5 +1,6 @@
 var Router = require('react-router');
 var extend = require('extend');
+var _ = require('lodash');
 
 module.exports = {
     mixins: [Router.State],
@@ -14,5 +15,6 @@ module.exports = {
     },
     componentWillReceiveProps: function () {
         this.initParams();
+        /*if (_.isFunction(this.getStateFromParams()))*/
     }
 };

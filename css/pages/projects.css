@@ -114,6 +114,10 @@
 .ltt_c-ProjectNav-Item{
     padding: 5px 0px 3px 0px;
 }
+.ltt_c-ProjectNav-Item.active,
+.ltt_c-ProjectNav-Item.active a{
+  color: #5089B6;
+}
 
 .ltt_c-ProjectNav-Item a{
   display:inline-block;

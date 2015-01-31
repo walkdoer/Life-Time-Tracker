@@ -28,7 +28,7 @@ var TaskList = require('../Task/TaskList');
 var Task = require('../Task/Task');
 
 module.exports = React.createClass({
-    mixins: [initParams, Router.Navigation],
+    mixins: [Router.State, Router.Navigation],
 
     getInitialState: function () {
         return extend({
@@ -39,19 +39,18 @@ module.exports = React.createClass({
     },
 
     getStateFromParams: function () {
-        var params = this.params;
+        var params = this.getParams();
         return {
-            projectId: params.projectId || null,
-            taskId: params.taskId || null,
-            versionId: params.versionId || null
+            taskId: params.taskId || null
         };
     },
 
     render: function () {
+        console.log('render Project tasks');
         var loadingMsg, projectBasicInfo, taskList;
         var project = this.state.project;
         var taskId = this.state.taskId;
-        var currentVersionId = this.state.versionId;
+        var currentVersionId = this.props.versionId;
         if (project) {
             var tags = project.tags,
                 logClasses = project.classes;
@@ -118,7 +117,7 @@ module.exports = React.createClass({
     },
 
     componentDidMount: function () {
-        this.loadProject(this.state.projectId);
+        this.loadProject(this.props.projectId);
     },
 
     /*shouldComponentUpdate: function (nextProps, nextState) {
@@ -137,8 +136,8 @@ module.exports = React.createClass({
             projectLoaded: false,
             taskLoaded: false
         }, function () {
-            this.loadProject(this.params.projectId);
-            this.loadTasks(_.pick(that.params, ['projectId', 'versionId']));
+            this.loadProject(nextProps.projectId);
+            this.loadTasks(_.pick(nextProps, ['projectId', 'versionId']));
         });
     },
 
@@ -151,7 +150,7 @@ module.exports = React.createClass({
                     projectLoaded: true,
                     project: project
                 });
-                that.loadTasks(_.pick(that.params, ['projectId', 'versionId']));
+                that.loadTasks(_.pick(that.props, ['projectId', 'versionId']));
             })
             .catch(function (err) {
                 console.error(err.stack);
