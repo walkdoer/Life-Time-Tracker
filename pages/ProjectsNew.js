@@ -81,7 +81,8 @@ module.exports = React.createClass({
         this.setState({ loading: true });
         remoteStorage.get('/api/projects', {
             start: this.state.startDate,
-            end: this.state.endDate
+            end: this.state.endDate,
+            aggregate: false
         }).then(function (results) {
                 var projects = results.data;
                 that.allProjects = projects;
