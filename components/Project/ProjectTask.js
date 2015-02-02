@@ -167,6 +167,7 @@ module.exports = React.createClass({
 
     loadTasks: function (params) {
         var that = this;
+        params.calculateTimeConsume = true;
         return remoteStorage.get('/api/tasks', params)
                 .then(function (res) {
                     that.setState({
