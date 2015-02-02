@@ -46,9 +46,9 @@ module.exports = React.createClass({
     },
 
     render: function () {
-        console.log('render Project tasks');
         var loadingMsg, projectBasicInfo, taskList;
         var project = this.state.project;
+        var that = this;
         var taskId = this.state.taskId;
         var currentVersionId = this.props.versionId;
         if (project) {
@@ -102,10 +102,10 @@ module.exports = React.createClass({
                     <TaskList>
                         {this.state.tasks.map(function (task) {
                             return <Task ref={task._id}
-                                useVersion={!!currentVersionId}
                                 data={task}
                                 key={task._id}
                                 taskId={taskId}
+                                onClick={that.openTask}
                                 selected={task._id === taskId}/>
                         })}
                         <LoadingMask loaded={this.state.taskLoaded}/>
@@ -177,5 +177,15 @@ module.exports = React.createClass({
                 }).catch(function (err) {
                     console.error(err.stack);
                 });
+    },
+
+    openTask: function (e, task) {
+        var useVersion = !!this.props.versionId;
+        if (useVersion && task.versionId) {
+            url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
+        } else {
+            url = '/projects/' + task.projectId + '/tasks/' + task._id;
+        }
+        this.transitionTo(url);
     }
 });

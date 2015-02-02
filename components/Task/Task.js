@@ -2,11 +2,13 @@
  * @jsx React.DOM
  */
 var React = require('react');
+var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 var Router = require('react-router');
 var Moment = require('moment');
 var Link = Router.Link;
 var Q = require('q');
 var _ = require('lodash');
+
 
 /**components*/
 var Progress = require('../Progress');
@@ -14,43 +16,68 @@ var TaskList = require('../Task/TaskList');
 
 
 var Task = React.createClass({
+
+    getInitialState: function () {
+        return {
+            isOpen: this.props.defaultIsOpen,
+            selected: this.props.selected
+        };
+    },
+
+    getDefaultProps: function () {
+        return {
+            defaultIsOpen: true,
+            selected: false
+        };
+    },
+
+    componentWillReceiveProps: function (newProps) {
+        //if (!this.state.isOpen) {
+            this.setState({
+                isOpen: newProps.defaultIsOpen,
+                selected: newProps.selected
+            });
+        //}
+    },
+
+
     render: function () {
         var task = this.props.data;
-        var useVersion = this.props.useVersion;
         var taskId = this.props.taskId;
         var url;
-        if (useVersion && task.versionId) {
-            url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
-        } else {
-            url = '/projects/' + task.projectId + '/tasks/' + task._id;
-        }
-        var className = "ltt_c-task";
+        var that = this;
         var progress;
-        if (this.props.selected) {
-            className += ' selected';
-        }
         if (this.props.progress >= 0) {
             progress = (<Progress max={100} value={task.progress}/>);
         }
         var subTasks = task.children,
-            subTaskList = null;
-        if (!_.isEmpty(subTasks)) {
+            subTaskList = null,
+            hasSubTasks = !_.isEmpty(subTasks);
+        if (hasSubTasks && this.state.isOpen) {
             subTaskList = (
                 <TaskList className="subtask">
+                    <ReactCSSTransitionGroup transitionName="example">
                     {subTasks.map(function (task) {
-                        return (<Task data={task} key={task.id} useVersion={useVersion} selected={task._id === taskId}/>);
+                        return (<Task data={task} key={task.id} onClick={that.props.onClick} selected={task._id === taskId}/>);
                     })}
+                    </ReactCSSTransitionGroup>
                 </TaskList>
             );
         }
+        var openButton;
+        if (hasSubTasks) {
+            openButton = <div className="ltt_c-task-openButton" onClick={this.toggle}>
+                {<i className={'fa ' + (this.state.isOpen ? 'fa-chevron-down' : 'fa-chevron-right')}></i>}
+            </div>
+        }
+
         return (
-            <li className={className} data-id={task._id}>
-                <span className="ltt_c-task-tag"><i className="fa fa-ellipsis-v"></i></span>
-                <div className="ltt_c-task-title">
-                    <Link to={url}><span>{task.name}</span></Link>
+            <li className="ltt_c-task" data-id={task._id}>
+                <div className={"ltt_c-task-title" + (this.state.selected ? ' selected' : '')} onClick={this.select}>
+                    {openButton}
+                    <span>{task.name}</span>
                     {progress}
-                </div>
-                <div className="ltt_c-task-timeInfo">
+                     <div className="ltt_c-task-timeInfo">
                     <span title={new Moment(task.createTime).format('YYYY-MM-DD HH:mm:ss')}>
                         <i className="fa fa-plus" title="create time"></i>
                         {new Moment(task.createTime).fromNow()}
@@ -64,9 +91,24 @@ var Task = React.createClass({
                         {new Moment(task.lastActiveTime).fromNow()}
                     </span>
                 </div>
+                </div>
                 {subTaskList}
             </li>
         );
+    },
+
+    select: function (e) {
+        this.setState({
+            selected: true
+        }, function () {
+            this.props.onClick(e, this.props.data);
+        });
+    },
+
+    toggle: function () {
+        this.setState({
+            isOpen: !this.state.isOpen
+        });
     },
 
     get: function (attrName) {

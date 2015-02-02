@@ -1,19 +1,19 @@
 .ltt_c-task{
     position: relative;
+    transition: height .2s;
 }
 
 .ltt_c-task a{
     color:#333;
 }
 
-.ltt_c-task-tag{
+.ltt_c-task-openButton{
     position: absolute;
-    background: #6081AD;
     display: inline-block;
-    height: 100%;
     top: 0;
-    left: 0;
-    padding:10px 2px;
+    left: 4px;
+    padding: 10px 8px;
+    color: #747474;
 }
 .ltt_c-task-tag .fa{
     color: #fff;
@@ -21,8 +21,17 @@
 }
 
 .ltt_c-task-title{
-    padding:15px;
+    padding: 11px 15px 0px 27px;
+    border-left: 5px solid transparent;
+    border-bottom: 1px solid #F4F4F4;
+    transition: background-color .2s, border-color .2s;}
+
+.ltt_c-task-title:hover{
+    background: #F3FBFF;   
+    border-left: 5px solid #A1C9E1;
 }
+
+
 
 .ltt_c-task-timeInfo{
     color: #ADADAD;
@@ -35,5 +44,25 @@
 }
 
 .ltt_c-task .ltt_c-taskList{
-    margin-left:15px;
+    margin-left: 0px;
+}
+
+.example-enter {
+  opacity: 0.01;
+  height: 0px;
+  transition: opacity .5s ease-in, height .5s;
+}
+
+.example-enter.example-enter-active {
+  opacity: 1;
+}
+
+.example-leave {
+  opacity: 1;
+  transition: opacity .5s ease-in, height .5s;
+}
+
+.example-leave.example-leave-active {
+  opacity: 0.01;
+  height: 0px;
 }
