@@ -119,9 +119,9 @@ gulp.task('sync', function() {
         './bower_components/jquery-ui/jquery-ui.js'
     ]).pipe(gulp.dest('./libs'));*/
 
-    gulp.src([
-        './node_modules/**/*',
-    ]).pipe(gulp.dest('./build/node_modules'));
+    //gulp.src([
+//        './node_modules/**/*',
+  //  ]).pipe(gulp.dest('./build/node_modules'));
 
     var cssFiles = './css/**/*.css',
         images = './images/**/*',

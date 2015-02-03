@@ -47,49 +47,10 @@ module.exports = React.createClass({
     },
 
     render: function () {
-        var loadingMsg, projectBasicInfo, taskList;
+        var loadingMsg, taskList;
         var project = this.state.project;
         var that = this;
         var taskId = this.state.taskId;
-        var currentVersionId = this.props.versionId;
-        if (project) {
-            var tags = project.tags,
-                logClasses = project.classes;
-            if (!_.isEmpty(tags)) {
-                tags = tags.map(function (tag) {
-                    return (<Tag>{tag}</Tag>);
-                });
-            }
-            if (!_.isEmpty(logClasses)) {
-                logClasses = logClasses.map(function(cls) {
-                    return (<LogClass data={cls}/>);
-                });
-            }
-            var versions, lastVersion;
-            if (false && !_.isEmpty(project.versions)) {
-                if (!currentVersionId) {
-                    currentVersionId = 'all_versions';
-                }
-                versions = (<select onChange={this.onVersionChange} value={currentVersionId}>
-                        <option value="all_versions">All Versions</option>
-                    {project.versions.map(function (ver) {
-                        return (<option value={ver._id}>{ver.name}</option>);
-                    })}
-                </select>);
-            }
-            var mProjectCreateTime = new Moment(project.createdTime);
-            projectBasicInfo = (
-                <section className="ltt_c-projectDetail-basicInfo">
-                    <h1>{project.name}<span className="ltt_c-projectDetail-logClasses">{logClasses}</span></h1>
-                    <p className="ltt_c-projectDetail-tags">{tags}</p>
-                    <p className="ltt_c-projectDetail-times">
-                        <span className="ltt-M2" title={mProjectCreateTime.format(TIME_FORMAT)}>Create: {mProjectCreateTime.fromNow()}</span>
-                        <span className="ltt-M2"><i className="fa fa-child" title="last active"></i> {new Moment(project.lastActiveTime).fromNow()}</span>
-                    </p>
-                    {versions}
-                </section>
-            );
-        }
         var logs;
         if (taskId) {
             logs = <aside className="ltt_c-projectTask-logs">
@@ -100,7 +61,7 @@ module.exports = React.createClass({
         return (
             <div className="ltt_c-projectTask">
                 <main>
-                    <div className="ltt_c-projectDetail">{projectBasicInfo}</div>
+                    <div className="ltt_c-projectDetail"><ProjectInfo project={project} versionId={this.props.versionId}/></div>
                     <div className="ltt_c-projectTask-toolbar">
                         <div className="btn-group">
                         {[
@@ -126,11 +87,9 @@ module.exports = React.createClass({
                                 onClick={that.openTask}
                                 selected={task._id === taskId}/>
                         })}
-                        <LoadingMask loaded={this.state.taskLoaded}/>
                     </TaskList>
                 </main>
                 {logs}
-                <LoadingMask loaded={this.state.projectLoaded}/>
             </div>
         );
     },
@@ -184,6 +143,7 @@ module.exports = React.createClass({
             });
     },
 
+
     onTaskStatusChange: function (status, e) {
         this.setState({
             taskStatus: status
@@ -221,3 +181,84 @@ module.exports = React.createClass({
         this.transitionTo(url);
     }
 });
+
+
+var ProjectInfo = React.createClass({
+    getInitialState: function () {
+        return {
+            showProjectDetail: false
+        };
+    },
+
+    toggleProjectDetail: function () {
+        this.setState({
+            showProjectDetail: !this.state.showProjectDetail
+        });
+    },
+
+    render: function () {
+        var projectBasicInfo;
+        var project = this.props.project;
+        var currentVersionId = this.props.versionId;
+        if (project) {
+            var tags = project.tags,
+                logClasses = project.classes;
+            if (!_.isEmpty(tags)) {
+                tags = tags.map(function (tag) {
+                    return (<Tag>{tag}</Tag>);
+                });
+            }
+            if (!_.isEmpty(logClasses)) {
+                logClasses = logClasses.map(function(cls) {
+                    return (<LogClass data={cls}/>);
+                });
+            }
+            var versions, versionInfo, lastVersion;
+            if (!_.isEmpty(project.versions) && currentVersionId) {
+                var version = project.versions.filter(function (version) {
+                    return version._id === currentVersionId;
+                })[0];
+                if (version) {
+                    versionInfo = <p className="ltt_p-projectDetail-versionInfo">
+                        <span className="version-name"><i className="fa fa-sitemap">{version.name}</i></span>
+                        <span title={new Moment(version.createTime).format('YYYY-MM-DD HH:mm:ss')}>
+                            <i className="fa fa-plus" title="create time"></i>
+                            {new Moment(version.createTime).fromNow()}
+                        </span>
+                        <span title={new Moment(version.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
+                            <i className="fa fa-user" title="last active"></i>
+                            {new Moment(version.lastActiveTime).fromNow()}
+                        </span>
+                    </p>
+                }
+            }
+            var mProjectCreateTime = new Moment(project.createdTime);
+            var mProjectLastActiveTime = new Moment(project.lastActiveTime);
+            projectBasicInfo = (
+                <section className="ltt_c-projectDetail-basicInfo">
+                    <h1>{project.name}
+                        <span className="ltt_c-projectDetail-logClasses">{logClasses}</span>
+                        <span className="ltt_c-projectDetail-times">
+                            <span className="ltt-M2" title={mProjectCreateTime.format(TIME_FORMAT)}>
+                                <i className="fa fa-plus" title="create time"></i>{mProjectCreateTime.fromNow()}
+                            </span>
+                            <span className="ltt-M2" title={mProjectLastActiveTime.format(TIME_FORMAT)}>
+                                <i className="fa fa-child" title="last active"></i>{mProjectLastActiveTime.fromNow()}
+                            </span>
+                        </span>
+                    </h1>
+                    <span className="openDetail" onClick={this.toggleProjectDetail}>
+                        <i className={this.state.showProjectDetail ? "fa fa-chevron-circle-down" : "fa fa-chevron-circle-right"}></i>
+                    </span>
+                    {this.state.showProjectDetail ? <div className="ltt_c-projectDetail-basicInfo-detail">
+                        <p className="ltt_c-projectDetail-tags">{tags}</p>
+                    </div> : null}
+                    {versionInfo}
+                </section>
+            );
+        } else {
+            projectBasicInfo = <div></div>
+        }
+        return projectBasicInfo;
+    }
+})

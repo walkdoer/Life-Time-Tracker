@@ -152,6 +152,21 @@
   height: 100%;
 }
 
+.ltt_c-projectDetail-basicInfo{
+  position: relative;  
+}
+
+
+.ltt_c-projectDetail-basicInfo-detail{
+  padding-bottom: 10px;
+}
+.ltt_c-projectDetail-basicInfo .openDetail{
+  position:absolute;
+  top: 0;
+  right: 20px;
+  font-size: 1.53rem;
+}
+
 .ltt_c-projectTask main{
   flex: 2;
   padding:10px;

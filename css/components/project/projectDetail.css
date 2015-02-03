@@ -6,11 +6,25 @@
     font-weight: bold;
 }
 
+.ltt_c-projectDetail-times,
 .ltt_c-projectDetail-logClasses{
     font-size: 13px;
     display: inline-block;
     margin-left: 7px;
     color: #4B4B4B;
-    text-shadow: 0 0 1px #C8C8C8;
+    /* text-shadow: 0 0 1px #C8C8C8; */
     font-weight: 200;
+}
+.ltt_p-projectDetail-versionInfo{
+    color: #4B4B4B;
+    font-weight: 200;
+    background: #F2F2F2;
+    padding: 10px;
+    border-top: 1px solid #E4E3E3;
+    border-bottom: 1px solid #E2E2E2;
+    margin: 0 -10px 10px;
+}
+.ltt_p-projectDetail-versionInfo .fa,
+.ltt_c-projectDetail-times .fa{
+   margin: 0 5px;
 }

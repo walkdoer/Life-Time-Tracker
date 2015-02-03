@@ -42,8 +42,6 @@ module.exports = React.createClass({
         return (
             <section className="ltt_c-page ltt_c-page-projectsNew">
                 <aside className="ltt_c-page-projectsNew-sidebar">
-                    <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
-                            onDateRangeChange={this.onDateRangeChange}/>
                     <FilterableProjects projects={this.state.projects}
                         projectId={this.state.projectId}
                         versionId={this.state.versionId}/>
