@@ -51,8 +51,12 @@ var Task = React.createClass({
         var url;
         var that = this;
         var progress;
-        if (this.props.progress >= 0) {
-            progress = (<Progress max={100} value={task.progress}/>);
+        if (task.progress >= 0 ) {
+            if (task.progress < 100) {
+                progress = (<Progress max={100} value={task.progress}/>);
+            } else {
+                progress = (<span className="ltt_c-task-done"><i className="fa fa-check-circle"></i></span>)
+            }
         }
         var subTasks = task.children,
             subTaskList = null,
@@ -78,21 +82,21 @@ var Task = React.createClass({
                 <div className={"ltt_c-task-title" + (this.state.selected ? ' selected' : '')} onClick={this.select}>
                     {openButton}
                     <span>{task.name}</span>
-                    {progress}
                      <div className="ltt_c-task-timeInfo">
-                    <span title={new Moment(task.createTime).format('YYYY-MM-DD HH:mm:ss')}>
-                        <i className="fa fa-plus" title="create time"></i>
-                        {new Moment(task.createTime).fromNow()}
-                    </span>
-                    <span>
-                        <i className="fa fa-clock-o" title="total time"></i>
-                        {Moment.duration(task.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
-                    </span>
-                    <span title={new Moment(task.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
-                        <i className="fa fa-user" title="last active"></i>
-                        {new Moment(task.lastActiveTime).fromNow()}
-                    </span>
-                </div>
+                        <span title={new Moment(task.createTime).format('YYYY-MM-DD HH:mm:ss')}>
+                            <i className="fa fa-plus" title="create time"></i>
+                            {new Moment(task.createTime).fromNow()}
+                        </span>
+                        <span>
+                            <i className="fa fa-clock-o" title="total time"></i>
+                            {Moment.duration(task.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
+                        </span>
+                        <span title={new Moment(task.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
+                            <i className="fa fa-user" title="last active"></i>
+                            {new Moment(task.lastActiveTime).fromNow()}
+                        </span>
+                    </div>
+                    {progress}
                 </div>
                 {subTaskList}
             </li>

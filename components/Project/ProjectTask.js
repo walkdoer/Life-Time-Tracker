@@ -112,7 +112,7 @@ module.exports = React.createClass({
                             if (btn.status === taskStatus) {
                                 className += ' active';
                             }
-                            return <button className={className} 
+                            return <button className={className}
                                 onClick={that.onTaskStatusChange.bind(that, btn.status)}>{btn.label}</button>;
                         })}
                         </div>

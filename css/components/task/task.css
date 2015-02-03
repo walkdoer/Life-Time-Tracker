@@ -22,16 +22,31 @@
 
 .ltt_c-task-title{
     padding: 11px 15px 0px 27px;
+    position:relative;
     border-left: 5px solid transparent;
     border-bottom: 1px solid #F4F4F4;
     transition: background-color .2s, border-color .2s;
 }
+
+
 .ltt_c-task-title:hover{
     background: #F3FBFF;   
     border-left: 5px solid #A1C9E1;
 }
 
-
+.ltt_c-task-title .ltt_c-progress{
+  position:absolute;
+  right: 15px;
+  top:16px;
+  width: 30%;
+}
+.ltt_c-task-title .ltt_c-task-done{
+  position:absolute;
+  font-size: 1.6rem;
+  color: rgb(104, 209, 82);
+  top: 0px;
+  right: 20px;
+}
 
 .ltt_c-task-timeInfo{
     color: #ADADAD;
