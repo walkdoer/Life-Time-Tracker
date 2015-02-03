@@ -221,12 +221,21 @@ var LogEditor = React.createClass({
 
         commands.addCommand({
             name: 'gotoDoingLog',
-            bindKey: {win: 'Ctrl-\\', mac: 'Command-\\'},
+            bindKey: {win: 'Ctrl-/', mac: 'Command-/'},
             exec: function (editor) {
                 var index = that._doingLogIndex;
                 editor.gotoLine(index + 1, 6);
             }
-        })
+        });
+
+        commands.addCommand({
+            name: 'gotoToday',
+            bindKey: {win: 'Ctrl-\\', mac: 'Command-\\'},
+            exec: function (editor) {
+                console.log('goto today');
+                that.props.onGotoToday(editor);
+            }
+        });
     },
 
     _initShortcut: function () {

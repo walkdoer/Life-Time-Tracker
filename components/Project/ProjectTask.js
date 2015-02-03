@@ -34,6 +34,7 @@ module.exports = React.createClass({
         return extend({
             projectLoaded: false,
             taskLoaded: false,
+            taskStatus: 'doing',
             tasks: []
         }, this.getStateFromParams());
     },
@@ -95,10 +96,27 @@ module.exports = React.createClass({
                     <RouteHandler {... _.pick(this.state, ['projectId', 'taskId', 'versionId'])}/>
             </aside>
         }
+        var taskStatus = this.state.taskStatus;
         return (
             <div className="ltt_c-projectTask">
                 <main>
                     <div className="ltt_c-projectDetail">{projectBasicInfo}</div>
+                    <div className="ltt_c-projectTask-toolbar">
+                        <div className="btn-group">
+                        {[
+                            {label: 'All', status: 'all'},
+                            {label: 'Doing', status: 'doing'},
+                            {label: 'Done', status: 'done'}
+                        ].map(function (btn) {
+                            var className = "btn btn-xs";
+                            if (btn.status === taskStatus) {
+                                className += ' active';
+                            }
+                            return <button className={className} 
+                                onClick={that.onTaskStatusChange.bind(that, btn.status)}>{btn.label}</button>;
+                        })}
+                        </div>
+                    </div>
                     <TaskList>
                         {this.state.tasks.map(function (task) {
                             return <Task ref={task._id}
@@ -156,7 +174,9 @@ module.exports = React.createClass({
                     projectLoaded: true,
                     project: project
                 });
-                that.loadTasks(_.pick(that.props, ['projectId', 'versionId']));
+                that.loadTasks({
+                    status: that.state.taskStatus
+                });
             })
             .catch(function (err) {
                 console.error(err.stack);
@@ -164,9 +184,21 @@ module.exports = React.createClass({
             });
     },
 
+    onTaskStatusChange: function (status, e) {
+        this.setState({
+            taskStatus: status
+        }, function () {
+            this.loadTasks({
+                status: this.state.taskStatus
+            });
+        });
+    },
+
 
     loadTasks: function (params) {
         var that = this;
+        var defaultParams = _.pick(that.props, ['projectId', 'versionId']);
+        params = _.extend(defaultParams, params);
         params.calculateTimeConsume = true;
         return remoteStorage.get('/api/tasks', params)
                 .then(function (res) {

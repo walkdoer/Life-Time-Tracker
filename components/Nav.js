@@ -33,7 +33,7 @@ var Nav = React.createClass({
             text: 'Projects',
             key: 'projects',
             path: 'projects',
-            icon: 'fa fa-rocket'
+            icon: 'fa fa-tasks'
         }, {
             text: "Editor",
             key: "logEditor",

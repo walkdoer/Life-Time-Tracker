@@ -38,14 +38,14 @@ var Dashboard = require('./pages/Dashboard'),
 var OverviewReport = require('./reports/Overview');
     TagsReport = require('./reports/TagsReport');
 
-/*        <Route name="projects" path="/projects" handler={Projects}>
+/*
+<Route name="allProject" path="/projects" handler={Projects}>
             <DefaultRoute name="projectIndex"  handler={ProjectIndex}/>
-            <Route name="projectDetail" path="/projects/:projectId" handler={ProjectDetail}/>
-            <Route name="projectDetailVersion" path="/projects/:projectId/versions/:versionId" handler={ProjectDetail}/>
-            <Route name="projectDetailTaskWithoutVersion" path="/projects/:projectId/tasks/:taskId" handler={ProjectDetail}/>
-            <Route name="projectDetailTask" path="/projects/:projectId/versions/:versionId/tasks/:taskId" handler={ProjectDetail}/>
-        </Route>*/
-
+        </Route>
+<Route name="projectDetailVersion" path="/projects/:projectId/versions/:versionId" handler={ProjectDetail}/>
+<Route name="projectDetailTaskWithoutVersion" path="/projects/:projectId/tasks/:taskId" handler={ProjectDetail}/>
+<Route name="projectDetailTask" path="/projects/:projectId/versions/:versionId/tasks/:taskId" handler={ProjectDetail}/>
+*/
 var routes = (
     <Route name="app" path="/" handler={App}>
         <Route name="reports" path="/reports" handler={Reports}>
@@ -56,7 +56,7 @@ var routes = (
         <Route name="dashboard" path="/dashboard" handler={Dashboard}/>
         <Route name="logs" path="/logs" handler={Logs}/>
         <Route name="projects" path="/projects" handler={ProjectsNew}>
-            <DefaultRoute name="projectIndex"  handler={ProjectIndex}/>
+            <DefaultRoute name="tasksIndex"  handler={ProjectIndex}/>
             <Route name="projectTask" path=":projectId" handler={ProjectTask}>
                 <Route name="projectLogs" path="tasks/:taskId" handler={LogList}/>
             </Route>

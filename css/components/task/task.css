@@ -24,8 +24,8 @@
     padding: 11px 15px 0px 27px;
     border-left: 5px solid transparent;
     border-bottom: 1px solid #F4F4F4;
-    transition: background-color .2s, border-color .2s;}
-
+    transition: background-color .2s, border-color .2s;
+}
 .ltt_c-task-title:hover{
     background: #F3FBFF;   
     border-left: 5px solid #A1C9E1;

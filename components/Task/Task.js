@@ -32,12 +32,16 @@ var Task = React.createClass({
     },
 
     componentWillReceiveProps: function (newProps) {
-        //if (!this.state.isOpen) {
-            this.setState({
-                isOpen: newProps.defaultIsOpen,
+        //if user close the task, then should not open again
+        if (!this.isOpen) {
+            return this.setState({
                 selected: newProps.selected
             });
-        //}
+        }
+        this.setState({
+            isOpen: newProps.defaultIsOpen,
+            selected: newProps.selected
+        });
     },
 
 
@@ -56,18 +60,16 @@ var Task = React.createClass({
         if (hasSubTasks && this.state.isOpen) {
             subTaskList = (
                 <TaskList className="subtask">
-                    <ReactCSSTransitionGroup transitionName="example">
                     {subTasks.map(function (task) {
                         return (<Task data={task} key={task.id} onClick={that.props.onClick} selected={task._id === taskId}/>);
                     })}
-                    </ReactCSSTransitionGroup>
                 </TaskList>
             );
         }
         var openButton;
         if (hasSubTasks) {
             openButton = <div className="ltt_c-task-openButton" onClick={this.toggle}>
-                {<i className={'fa ' + (this.state.isOpen ? 'fa-chevron-down' : 'fa-chevron-right')}></i>}
+                {<i className={'ltt_c-task-openButton-icon fa ' + (this.state.isOpen ? 'fa-chevron-down' : 'fa-chevron-right')}></i>}
             </div>
         }
 
@@ -98,6 +100,12 @@ var Task = React.createClass({
     },
 
     select: function (e) {
+        var className = e.target.className;
+        if (className.indexOf('ltt_c-task-openButton') >= 0
+            || className.indexOf('ltt_c-task-openButton-icon') >= 0) {
+            e.stopPropagation();
+            return false;
+        }
         this.setState({
             selected: true
         }, function () {

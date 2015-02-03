@@ -6,6 +6,7 @@ var React = require('react');
 var $ = require('jquery');
 var numeral = require('numeral');
 var Router = require('react-router');
+var Mt = window.Mousetrap;
 var _ = require('lodash');
 require('../libs/bootstrap-datepicker');
 var Link = Router.Link;
@@ -46,8 +47,9 @@ var Page = React.createClass({
         return (
             <div className="ltt_c-page ltt_c-page-logEditor">
                 <LogEditor title={this.state.current}
-                    onNextDay={this.openNextDay}
-                    onPrevDay={this.openPrevDay}
+                    onNextDay={this.gotoNextDay}
+                    onPrevDay={this.gotoPrevDay}
+                    onGotoToday={this.gotoToday}
                     onChange={this.onChange}
                     onLoad={this.onEditorLoad}
                     ref="logEditor"/>
@@ -63,25 +65,44 @@ var Page = React.createClass({
         );
     },
 
+    componentWillMount: function () {
+        var that = this;
+        Mt.bind(['command+\'', 'ctrl+\''], function (e) {
+            e.preventDefault();
+            that.gotoToday();
+        });
+    },
+
+    componentWillUnmount: function () {
+        Mt.unbind(['command+\'', 'ctrl+\'']);
+    },
+
     onDateChange: function (date) {
-        console.log('date change');
         date = new Moment(date).format(DATE_FORMAT)
         this.setState({
             current: date
         });
     },
 
-    openPrevDay: function () {
+    gotoPrevDay: function () {
         var prevDay = new Moment(this.state.current).subtract(1, 'day')
         this.setState({
             current: prevDay.format(DATE_FORMAT)
         });
     },
 
-    openNextDay: function () {
+    gotoNextDay: function () {
         var next = new Moment(this.state.current).add(1, 'day')
         this.setState({
             current: next.format(DATE_FORMAT)
+        });
+    },
+
+    gotoToday: function () {
+        var today = new Moment().format(DATE_FORMAT)
+        console.log('goto today', today);
+        this.setState({
+            current: today
         });
     },
 
