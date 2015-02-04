@@ -123,8 +123,14 @@ var LogEditor = React.createClass({
             that.props.onChange(content, editor);
 
             function openInput(ref, lineContent, initFunction) {
-
-                return that._updateCurrentInfomation(lineContent).then(initFunction).then(function (open) {
+                console.log('open input start');
+                var start = new Date().getTime();
+                var promise
+                promise = that._updateCurrentInfomation(lineContent)
+                if (_.isFunction(initFunction)) {
+                    promise.then(initFunction);
+                }
+                return promise.then(function (open) {
                     if (open === false) { console.log('open = false'); return; }
                     var pos = editor.getCursorPositionScreen();
                     var $inputHolder = $(ref.getDOMNode());
@@ -135,8 +141,9 @@ var LogEditor = React.createClass({
                         left: $input.css('left'),
                         height: 16
                     };
-                    $inputHolder.show().css(css);
+                    $inputHolder.css(css).show();
                     $inputHolder.find('.typeahead').focus();
+                    console.log('open input end ' + (new Date().getTime() - start) );
                 }).catch(function (err) {
                     console.error(err.stack);
                 });
@@ -248,7 +255,7 @@ var LogEditor = React.createClass({
         //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
         var start = new Date().getTime();
         var that = this;
-        return Ltt.sdk.projects({aggregate: false}).then(function(projects) {
+        return Ltt.sdk.projects({aggregate: false, versions: false}).then(function(projects) {
             //if not projects, then no need to create typeahead
             if (_.isEmpty(projects)) { return Q(false); }
             that._createTypeahead('.ltt_c-logEditor-projects', '>', 'projects',
@@ -310,6 +317,7 @@ var LogEditor = React.createClass({
             displayKey: 'value',
             source: substringMatcher(datasets)
         }).on('typeahead:closed', function () {
+            console.log(postfix + 'close');
             that.hideTypeAhead();
             that.editor.focus();
             $input.typeahead('val', '');
@@ -324,6 +332,7 @@ var LogEditor = React.createClass({
         });
         $input.on('focus', function () {
             console.log('input focus');
+            $input.typeahead('val', '');
             var ev = $.Event("keydown");
             ev.keyCode = ev.which = 40;
             $(this).trigger(ev);
@@ -474,10 +483,12 @@ var LogEditor = React.createClass({
     _updateCurrentInfomation: function (currentLine) {
         var includeNoTimeLog = true;
         var that = this;
+        console.log('_updateCurrentInfomation start');
+        var start = new Date().getTime();
         return Ltt.sdk.getDetailFromLogLineContent(this.props.title, currentLine)
             .then(function (result) {
                 that._currentLog = result;
-                console.error('current log', result);
+                console.log('_updateCurrentInfomation end ' + (new Date().getTime() - start));
             });
     },
 
