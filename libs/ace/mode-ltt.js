@@ -99,6 +99,7 @@ ace.define("ace/mode/ltt",["require","exports","module","ace/lib/oop","ace/mode/
 
     var Mode = function() {
         this.$tokenizer = new Tokenizer(new ExampleHighlightRules().getRules());
+        this.$highlightRules = new ExampleHighlightRules();
     };
     oop.inherits(Mode, TextMode);
 

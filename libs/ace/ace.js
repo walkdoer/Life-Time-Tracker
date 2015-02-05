@@ -14828,6 +14828,7 @@ z-index: 8;\
 }\
 .ace_ltt_logClass{\
 color:blue;\
+font-weight: bold;\
 }\
 .ace_ltt_project{\
 color:#D8001B;\
@@ -14843,6 +14844,7 @@ color:#FDAF7E;\
 }\
 .ace_ltt_time{\
 color:#128d32;\
+font-weight: bold;\
 }\
 .ace_ltt_tag_start,\
 .ace_ltt_tag_end{\

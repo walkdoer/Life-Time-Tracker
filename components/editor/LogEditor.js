@@ -71,9 +71,40 @@ var LogEditor = React.createClass({
         var session = editor.getSession();
         session.setMode("ace/mode/ltt");
         session.setUseWrapMode(true);
+        var langTools = ace.require("ace/ext/language_tools");
+        editor.setOptions({
+            enableSnippets: false,
+            enableBasicAutocompletion: true,
+            enableLiveAutocompletion: false
+        });
+        // uses http://rhymebrain.com/api.html
+        var logCompleter = {
+            getCompletions: function(editor, session, pos, prefix, callback) {
+                var token = session.getTokenAt(pos.row, pos.column);
+                console.log(pos, prefix);
+                var line = session.getLine(pos.row);
+                if (token.type === 'text') {
+                    var tokenValue = token.value;
+                    if (tokenValue === '<') {
+                        that.getProjectCompletions(callback);
+                    } else if (tokenValue === '$') {
+                        that.getVersionCompletions(line, callback);
+                    } else if (tokenValue === '(') {
+                        that.getTaskCompletions(line, callback);
+                    }
+                }
+                //if (prefix.length === 0) { callback(null, []); return }
+                /*$.getJSON(
+                    "http://rhymebrain.com/talk?function=getRhymes&word=" + prefix,
+                    function(wordList) {
+                        // wordList like [{"word":"flow","freq":24,"score":300,"flags":"bc","syllables":"1"}]
+                    })*/
+            }
+        }
+        langTools.addCompleter(logCompleter);
         //editor.setBehavioursEnabled(true);
         //content = editorStore(SK_CONTENT);
-        this._initProjectTypeahead();
+        //this._initProjectTypeahead();
         this._initEditorCommand();
         end = new Date().getTime();
         console.log('ready to read Log ' + (end - start));
@@ -90,6 +121,61 @@ var LogEditor = React.createClass({
         });
     },
 
+    getProjectCompletions: function (cb) {
+        //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
+        console.log('getProjectCompletions start');
+        var start = new Date().getTime();
+        var that = this;
+        Ltt.sdk.projects({aggregate: false, versions: false}).then(function(projects) {
+            //if not projects, then no need to create typeahead
+            if (_.isEmpty(projects)) {cb(null, [])}
+            var end = new Date().getTime();
+            var completions = projects.map(function(proj) {
+                var score = new Date(proj.lastActiveTime).getTime()
+                return {name: proj.name, value: proj.name, score: score, meta: "project", identifierRegex:/[a-zA-Z_0-9\u00A2-\uFFFF]/}
+            });
+            console.log('getProjectCompletions end cost ' + (end - start))
+            cb(null, completions);
+        });
+    },
+
+    getVersionCompletions: function (line, cb) {
+        var that = this;
+        this._updateCurrentInfomation(line).then(function () {
+            var info = that._getCurrentLogInformation();
+            console.log(info);
+            if (!info.projectId) { return cb(null, []); }
+            return Ltt.sdk.versions({projectId: info.projectId}).then(function (versions) {
+                console.log('versions', versions);
+                if (_.isEmpty(versions)) { return cb(null, []); }
+                var completions = versions.map(function(ver) {
+                    var score = new Date(ver.lastActiveTime).getTime();
+                    return {name: ver.name, value: ver.name, score: score, meta: "version", identifierRegex:/[a-zA-Z_0-9\u00A2-\uFFFF]/}
+                });
+                cb(null, completions);
+            });
+        })
+    },
+
+    getTaskCompletions: function (line, cb) {
+        var that = this;
+        this._updateCurrentInfomation(line).then(function () {
+            var info = that._getCurrentLogInformation();
+            console.log(info);
+            if (!info.projectId) { return cb(null, []); }
+            return Ltt.sdk.tasks({projectId: info.projectId, versionId: info.versionId, populate: false})
+                .then(function (tasks) {
+                    console.log(tasks);
+                    if (_.isEmpty(tasks)) { return cb(null, []); }
+                    var completions = tasks.map(function(task) {
+                        var score = new Date(task.lastActiveTime).getTime();
+                        return {name: task.name, value: task.name, score: score, meta: "task", identifierRegex:/[a-zA-Z_0-9\u00A2-\uFFFF]/}
+                    });
+                    cb(null, completions);
+                });
+        });
+    },
+
     componentWillUnmount: function () {
         var session = this.editor.getSession();
         session.removeAllListeners('change');
@@ -100,14 +186,16 @@ var LogEditor = React.createClass({
         var that = this;
         var editor = this.editor;
         var session = editor.getSession();
-        session.on('change', _.debounce(function (e) {
+        editor.on('change', function (e) {
             console.log('editor content change');
+            var $cursor = $('.ace_text-input');
+            console.log('#' + $cursor.css('top'));
             var data = e.data;
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = editor.getValue();
             var session = that.editor.getSession();
             //when content change, persist to file in hardware
-            if (data && data.action === "insertText") {
+            /*if (data && data.action === "insertText") {
                 var pos = that.editor.getCursorPosition();
                 var lineContent = session.getLine(pos.row);
                 if (data.text === '<') {
@@ -117,7 +205,7 @@ var LogEditor = React.createClass({
                 } else if (data.text === '(') {
                     openInput(that.refs.tasks, lineContent, that._initTaskTypeahead.bind(that));
                 }
-            }
+            }*/
             that._highLightDoingLine();
             that.writeLog(title, content);
             that.props.onChange(content, editor);
@@ -125,30 +213,40 @@ var LogEditor = React.createClass({
             function openInput(ref, lineContent, initFunction) {
                 console.log('open input start');
                 var start = new Date().getTime();
-                var promise
-                promise = that._updateCurrentInfomation(lineContent)
+                var promise = Q(1);
+                var $cursor = $('.ace_text-input');
+                    console.log('##' + $cursor.css('top'));
+                if (lineContent) {
+                    promise = that._updateCurrentInfomation(lineContent);
+                }
                 if (_.isFunction(initFunction)) {
                     promise.then(initFunction);
                 }
                 return promise.then(function (open) {
                     if (open === false) { console.log('open = false'); return; }
-                    var pos = editor.getCursorPositionScreen();
-                    var $inputHolder = $(ref.getDOMNode());
-                    var $input = $('.ace_text-input');
-                    console.log($input, $input.css('top'));
-                    var css = {
-                        top: parseInt($input.css('top')) + 40,
-                        left: $input.css('left'),
-                        height: 16
-                    };
-                    $inputHolder.css(css).show();
-                    $inputHolder.find('.typeahead').focus();
-                    console.log('open input end ' + (new Date().getTime() - start) );
+                    var $cursor = $('.ace_text-input');
+                    console.log('###' + $cursor.css('top'));
+                    var timer = setTimeout(function () {
+                        var $inputHolder = $(ref.getDOMNode());
+                        var $input = $inputHolder.find('.typeahead');
+                        var $cursor = $('.ace_text-input');
+                        console.log('####' + $cursor.css('top'));
+                        var css = {
+                            top: parseInt($cursor.css('top')) + 40,
+                            left:  parseInt($cursor.css('left')),
+                            height: 16
+                        };
+                        $inputHolder.css(css).show();
+                        $input.typeahead('val', '');
+                        $input.focus();
+                        console.log('open input end ' + (new Date().getTime() - start) );
+                        clearTimeout(timer);
+                    }, 30);
                 }).catch(function (err) {
                     console.error(err.stack);
                 });
             }
-        }, 300));
+        });
     },
 
     _highLightDoingLine: function () {
@@ -251,57 +349,6 @@ var LogEditor = React.createClass({
         });
     },
 
-    _initProjectTypeahead: function () {
-        //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
-        var start = new Date().getTime();
-        var that = this;
-        return Ltt.sdk.projects({aggregate: false, versions: false}).then(function(projects) {
-            //if not projects, then no need to create typeahead
-            if (_.isEmpty(projects)) { return Q(false); }
-            that._createTypeahead('.ltt_c-logEditor-projects', '>', 'projects',
-                projects.map(function (project) {
-                    return _.pick(project, ['name', 'id']);
-                })
-            );
-            var end = new Date().getTime();
-            console.log('iniit project type ahead cost ' + (end - start))
-        });
-    },
-
-    _initVersionTypeahead: function () {
-        var info = this._getCurrentLogInformation();
-        var that = this;
-        if (!info.projectId) { return Q(false); }
-        console.log('init version typeahead');
-        return Ltt.sdk.versions({projectId: info.projectId}).then(function (versions) {
-            if (_.isEmpty(versions)) { return Q(false); }
-            that._createTypeahead('.ltt_c-logEditor-versions', '$', 'versions',
-                versions.map(function (version) {
-                    version = _.pick(version, ['name', 'id']);
-                    return version;
-                })
-            ); 
-        });
-    },
-
-    _initTaskTypeahead: function () {
-        var info = this._getCurrentLogInformation();
-        var that = this;
-        if (info.projectId) {
-            return Ltt.sdk.tasks({projectId: info.projectId, versionId: info.versionId, populate: false})
-                .then(function (tasks) {
-                    if (_.isEmpty(tasks)) { return Q(false); }
-                    that._createTypeahead('.ltt_c-logEditor-tasks', ')', 'tasks',
-                        tasks.map(function (task) {
-                            return _.pick(task, ['name', 'id']);
-                        })
-                    );
-                });
-        } else {
-            return Q(false);
-        }
-    },
-
     _createTypeahead: function createTypeahead(selector, postfix, placeholder, datasets, callback) {
         var start = new Date().getTime();
         var that = this;
@@ -332,7 +379,6 @@ var LogEditor = React.createClass({
         });
         $input.on('focus', function () {
             console.log('input focus');
-            $input.typeahead('val', '');
             var ev = $.Event("keydown");
             ev.keyCode = ev.which = 40;
             $(this).trigger(ev);
@@ -487,13 +533,14 @@ var LogEditor = React.createClass({
         var start = new Date().getTime();
         return Ltt.sdk.getDetailFromLogLineContent(this.props.title, currentLine)
             .then(function (result) {
-                that._currentLog = result;
                 console.log('_updateCurrentInfomation end ' + (new Date().getTime() - start));
+                that._currentLog = result;
             });
     },
 
     _getCurrentLogInformation: function () {
         var log = this._currentLog;
+        console.log(log);
         var info = {};
         if (log) {
             var project = log.project;
