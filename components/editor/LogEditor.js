@@ -190,8 +190,7 @@ var LogEditor = React.createClass({
     },
 
     componentWillUnmount: function () {
-        var session = this.editor.getSession();
-        session.removeAllListeners('change');
+       this._detachListenToEditor();
     },
 
     _listenToEditor: function () {
@@ -199,18 +198,22 @@ var LogEditor = React.createClass({
         var that = this;
         var editor = this.editor;
         var session = editor.getSession();
-        editor.on('change', _.debounce(function (e) {
+        session.on('change', _.debounce(function (e) {
             console.log('editor content change');
-            var $cursor = $('.ace_text-input');
-            console.log('#' + $cursor.css('top'));
-            var data = e.data;
+            console.log(e.data);
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
-            var content = editor.getValue();
-            var session = that.editor.getSession();
+            var content = session.getValue();
             that._highLightDoingLine();
             that.writeLog(title, content);
             that.props.onChange(content, editor);
-        }, 300));
+        }, 500));
+        console.log('listen to editro');
+    },
+
+    _detachListenToEditor: function () {
+        var session = this.editor.getSession();
+        session.removeAllListeners('change');
+        console.log('remove listeners');
     },
 
     _highLightDoingLine: function () {
@@ -313,70 +316,6 @@ var LogEditor = React.createClass({
         });
     },
 
-    _createTypeahead: function createTypeahead(selector, postfix, placeholder, datasets, callback) {
-        var start = new Date().getTime();
-        var that = this;
-        var $holder = $(selector).empty();
-        $input = $('<input class="typeahead" type="text" placeholder="' + placeholder + '"/>');
-        $holder.append($input);
-        var projectTypeahead = $input.typeahead({
-            hint: false,
-            highlight: true,
-            minLength: 0
-        }, {
-            name: 'states',
-            displayKey: 'value',
-            source: substringMatcher(datasets)
-        }).on('typeahead:closed', function () {
-            console.log(postfix + 'close');
-            that.hideTypeAhead();
-            that.editor.focus();
-            $input.typeahead('val', '');
-        }).on('typeahead:selected', function (e, obj) {
-            that.hideTypeAhead();
-            that.editor.insert(obj.value + postfix);
-            var timer = setTimeout(function () {
-                that.editor.focus();
-                clearTimeout(timer);
-            }, 0);
-            callback && callback(obj);
-        });
-        $input.on('focus', function () {
-            console.log('input focus');
-            var ev = $.Event("keydown");
-            ev.keyCode = ev.which = 40;
-            $(this).trigger(ev);
-        });
-        $input.focus();
-        function substringMatcher (items) {
-            return function findMatches(q, cb) {
-                var matches, substrRegex;
-                // an array that will be populated with substring matches
-                matches = [];
-                // regex used to determine if a string contains the substring `q`
-                substrRegex = new RegExp(q, 'i');
-                // iterate through the pool of strings and for any string that
-                // contains the substring `q`, add it to the `matches` array
-                $.each(items, function(i, item) {
-                    if (substrRegex.test(item.name)) {
-                        // the typeahead jQuery plugin expects suggestions to a
-                        // JavaScript object, refer to typeahead docs for more info
-                        matches.push({
-                            value: item.name,
-                            id: item.id
-                        });
-                    }
-                });
-                cb(matches);
-            };
-        };
-    },
-
-    hideTypeAhead: function () {
-        $(this.refs.projects.getDOMNode()).hide();
-        $(this.refs.versions.getDOMNode()).hide();
-        $(this.refs.tasks.getDOMNode()).hide();
-    },
 
     shouldComponentUpdate: function (nextProps, nextState) {
         var result = this.props.title !== nextProps.title ||
@@ -397,12 +336,14 @@ var LogEditor = React.createClass({
             return;
         }
         var editor = this.editor;
+        this._detachListenToEditor();
         this.readLog(this.props.title)
             .then(function (content) {
                 that.setValue(content);
                 var highLightIndex = that._highLightDoingLine();
                 editor.gotoLine(highLightIndex + 1, 5);
                 editor.focus();
+                that._listenToEditor();
             });
     },
 
