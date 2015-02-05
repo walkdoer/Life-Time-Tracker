@@ -83,15 +83,22 @@ var LogEditor = React.createClass({
                 var token = session.getTokenAt(pos.row, pos.column);
                 console.log(pos, prefix);
                 var line = session.getLine(pos.row);
-                if (token.type === 'text') {
+                var tokenType = token.type;
+                if (tokenType === 'text') {
                     var tokenValue = token.value;
                     if (tokenValue === '<') {
-                        that.getProjectCompletions(callback);
+                        that.getProjectCompletions(line, callback);
                     } else if (tokenValue === '$') {
                         that.getVersionCompletions(line, callback);
                     } else if (tokenValue === '(') {
                         that.getTaskCompletions(line, callback);
                     }
+                } else if (tokenType === 'ltt_version'){
+                    that.getVersionCompletions(line, callback);
+                } else if (tokenType === 'ltt_project') {
+                    that.getProjectCompletions(line, callback);
+                } else if (tokenType === 'ltt_task') {
+                    that.getTaskCompletions(line, callback);
                 }
                 //if (prefix.length === 0) { callback(null, []); return }
                 /*$.getJSON(
@@ -121,7 +128,7 @@ var LogEditor = React.createClass({
         });
     },
 
-    getProjectCompletions: function (cb) {
+    getProjectCompletions: function (line, cb) {
         //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
         console.log('getProjectCompletions start');
         var start = new Date().getTime();
@@ -132,7 +139,7 @@ var LogEditor = React.createClass({
             var end = new Date().getTime();
             var completions = projects.map(function(proj) {
                 var score = new Date(proj.lastActiveTime).getTime()
-                return {name: proj.name, value: proj.name, score: score, meta: "project", identifierRegex:/[a-zA-Z_0-9\u00A2-\uFFFF]/}
+                return {name: proj.name, value: proj.name, score: score, meta: "project"};
             });
             console.log('getProjectCompletions end cost ' + (end - start))
             cb(null, completions);
@@ -141,6 +148,11 @@ var LogEditor = React.createClass({
 
     getVersionCompletions: function (line, cb) {
         var that = this;
+        /*return cb(null, [
+            {name: '0.1.0', value: '0.1.0', score: 1, meta: "version"},
+            {name: '0.1.1', value: '0.1.1', score: 2, meta: "version"},
+            {name: '0.1.2', value: '0.1.2', score: 3, meta: "version"}
+        ]);*/
         this._updateCurrentInfomation(line).then(function () {
             var info = that._getCurrentLogInformation();
             console.log(info);
@@ -149,8 +161,9 @@ var LogEditor = React.createClass({
                 console.log('versions', versions);
                 if (_.isEmpty(versions)) { return cb(null, []); }
                 var completions = versions.map(function(ver) {
+                    console.log(ver);
                     var score = new Date(ver.lastActiveTime).getTime();
-                    return {name: ver.name, value: ver.name, score: score, meta: "version", identifierRegex:/[a-zA-Z_0-9\u00A2-\uFFFF]/}
+                    return {name: ver.name, value: ver.name, score: score, meta: "version"}
                 });
                 cb(null, completions);
             });
@@ -186,7 +199,7 @@ var LogEditor = React.createClass({
         var that = this;
         var editor = this.editor;
         var session = editor.getSession();
-        editor.on('change', function (e) {
+        editor.on('change', _.debounce(function (e) {
             console.log('editor content change');
             var $cursor = $('.ace_text-input');
             console.log('#' + $cursor.css('top'));
@@ -194,59 +207,10 @@ var LogEditor = React.createClass({
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = editor.getValue();
             var session = that.editor.getSession();
-            //when content change, persist to file in hardware
-            /*if (data && data.action === "insertText") {
-                var pos = that.editor.getCursorPosition();
-                var lineContent = session.getLine(pos.row);
-                if (data.text === '<') {
-                    openInput(that.refs.projects);
-                } else if (data.text === '$') {
-                    openInput(that.refs.versions, lineContent,  that._initVersionTypeahead.bind(that));
-                } else if (data.text === '(') {
-                    openInput(that.refs.tasks, lineContent, that._initTaskTypeahead.bind(that));
-                }
-            }*/
             that._highLightDoingLine();
             that.writeLog(title, content);
             that.props.onChange(content, editor);
-
-            function openInput(ref, lineContent, initFunction) {
-                console.log('open input start');
-                var start = new Date().getTime();
-                var promise = Q(1);
-                var $cursor = $('.ace_text-input');
-                    console.log('##' + $cursor.css('top'));
-                if (lineContent) {
-                    promise = that._updateCurrentInfomation(lineContent);
-                }
-                if (_.isFunction(initFunction)) {
-                    promise.then(initFunction);
-                }
-                return promise.then(function (open) {
-                    if (open === false) { console.log('open = false'); return; }
-                    var $cursor = $('.ace_text-input');
-                    console.log('###' + $cursor.css('top'));
-                    var timer = setTimeout(function () {
-                        var $inputHolder = $(ref.getDOMNode());
-                        var $input = $inputHolder.find('.typeahead');
-                        var $cursor = $('.ace_text-input');
-                        console.log('####' + $cursor.css('top'));
-                        var css = {
-                            top: parseInt($cursor.css('top')) + 40,
-                            left:  parseInt($cursor.css('left')),
-                            height: 16
-                        };
-                        $inputHolder.css(css).show();
-                        $input.typeahead('val', '');
-                        $input.focus();
-                        console.log('open input end ' + (new Date().getTime() - start) );
-                        clearTimeout(timer);
-                    }, 30);
-                }).catch(function (err) {
-                    console.error(err.stack);
-                });
-            }
-        });
+        }, 300));
     },
 
     _highLightDoingLine: function () {
