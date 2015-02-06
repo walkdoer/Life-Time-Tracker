@@ -54,17 +54,26 @@ var LogEditor = React.createClass({
                 <div className="ltt_c-logEditor-projects ltt_c-logEditor-typeahead" ref="projects"></div>
                 <div className="ltt_c-logEditor-versions  ltt_c-logEditor-typeahead" ref="versions"></div>
                 <div className="ltt_c-logEditor-tasks  ltt_c-logEditor-typeahead" ref="tasks"></div>
-                <Editor/>
+                <Editor ref="editor"/>
             </div>
         );
     },
 
     componentDidMount: function () {
         var start, end;
-        start = new Date().getTime();
-        console.log('component logEditor did mount');
         var that = this;
-        this._initShortcut();
+        var editor = this._initEditor();
+        this.readLog(this.props.title).then(function (content) {
+            that.setValue(content);
+            that.props.onLoad(content);
+            editor.focus();
+            that.gotoDoingLogLine();
+            that._listenToEditor();
+        });
+    },
+
+    _initEditor: function () {
+        var that = this;
         var editor = ace.edit("ltt-logEditor");
         this.editor = editor;
         editor.setTheme("ace/theme/github");
@@ -81,7 +90,6 @@ var LogEditor = React.createClass({
         var logCompleter = {
             getCompletions: function(editor, session, pos, prefix, callback) {
                 var token = session.getTokenAt(pos.row, pos.column);
-                console.log(pos, prefix);
                 var line = session.getLine(pos.row);
                 var tokenType = token.type;
                 if (tokenType === 'text') {
@@ -100,12 +108,6 @@ var LogEditor = React.createClass({
                 } else if (tokenType === 'ltt_task') {
                     that.getTaskCompletions(line, callback);
                 }
-                //if (prefix.length === 0) { callback(null, []); return }
-                /*$.getJSON(
-                    "http://rhymebrain.com/talk?function=getRhymes&word=" + prefix,
-                    function(wordList) {
-                        // wordList like [{"word":"flow","freq":24,"score":300,"flags":"bc","syllables":"1"}]
-                    })*/
             }
         }
         langTools.addCompleter(logCompleter);
@@ -113,18 +115,63 @@ var LogEditor = React.createClass({
         //content = editorStore(SK_CONTENT);
         //this._initProjectTypeahead();
         this._initEditorCommand();
-        end = new Date().getTime();
-        console.log('ready to read Log ' + (end - start));
-        start = new Date().getTime();
-        Ltt && this.readLog(this.props.title).then(function (content) {
-            end = new Date().getTime();
-            that.setValue(content);
-            var highLightIndex = that._highLightDoingLine();
-            editor.gotoLine(highLightIndex + 1, 6);
-            that.props.onLoad(content);
-            editor.focus();
-            that._listenToEditor();
-            console.log('read Log and init ace edtior' + (end - start));
+        return editor;
+    },
+
+    _destroyEditor: function () {
+        console.log('Destroy editor start');
+        if (this.editor) {
+            this.editor.destroy();
+            this.refs.editor.getDOMNode().innerHTML = '';
+            this.editor = null;
+            console.log('Destroy editor end');
+        }
+    },
+
+    _initEditorCommand: function () {
+        var that = this;
+        var editor = this.editor;
+        var commands = editor.commands;
+        commands.addCommand({
+            name: "import",
+            bindKey: {win: "Ctrl-S", mac: "Command-S"},
+            exec: function(editor) {
+                that.save(editor.getValue());
+            }
+        });
+
+        commands.addCommand({
+            name: 'nextDay',
+            bindKey: {win: 'Ctrl-]', mac: 'Command-]'},
+            exec: function (editor) {
+                that.props.onNextDay(editor);
+            }
+        });
+
+        commands.addCommand({
+            name: 'prevDay',
+            bindKey: {win: 'Ctrl-[', mac: 'Command-['},
+            exec: function (editor) {
+                that.props.onPrevDay(editor);
+            }
+        });
+
+        commands.addCommand({
+            name: 'gotoDoingLog',
+            bindKey: {win: 'Ctrl-/', mac: 'Command-/'},
+            exec: function (editor) {
+                var index = that._doingLogIndex;
+                editor.gotoLine(index + 1, 6);
+            }
+        });
+
+        commands.addCommand({
+            name: 'gotoToday',
+            bindKey: {win: 'Ctrl-\\', mac: 'Command-\\'},
+            exec: function (editor) {
+                console.log('goto today');
+                that.props.onGotoToday(editor);
+            }
         });
     },
 
@@ -190,7 +237,7 @@ var LogEditor = React.createClass({
     },
 
     componentWillUnmount: function () {
-       this._detachListenToEditor();
+       this._destroyEditor();
     },
 
     _listenToEditor: function () {
@@ -206,7 +253,7 @@ var LogEditor = React.createClass({
             that._highLightDoingLine();
             that.writeLog(title, content);
             that.props.onChange(content, editor);
-        }, 500));
+        }, 200));
         console.log('listen to editro');
     },
 
@@ -217,6 +264,7 @@ var LogEditor = React.createClass({
     },
 
     _highLightDoingLine: function () {
+        if (!Ltt) {return;}
         var editor = this.editor;
         var title = this.props.title;
         var session = this.editor.getSession();
@@ -240,6 +288,7 @@ var LogEditor = React.createClass({
             removeHighlight(this._doingLogMarker);
             this._doingLogMarker = null;
         }
+        console.log('doing log index = ' + index);
         return index;
 
         function highlight(index) {
@@ -263,52 +312,6 @@ var LogEditor = React.createClass({
 
     },
 
-    _initEditorCommand: function () {
-        var that = this;
-        var editor = this.editor;
-        var commands = editor.commands;
-        commands.addCommand({
-            name: "import",
-            bindKey: {win: "Ctrl-S", mac: "Command-S"},
-            exec: function(editor) {
-                that.save(editor.getValue());
-            }
-        });
-
-        commands.addCommand({
-            name: 'nextDay',
-            bindKey: {win: 'Ctrl-]', mac: 'Command-]'},
-            exec: function (editor) {
-                that.props.onNextDay(editor);
-            }
-        });
-
-        commands.addCommand({
-            name: 'prevDay',
-            bindKey: {win: 'Ctrl-[', mac: 'Command-['},
-            exec: function (editor) {
-                that.props.onPrevDay(editor);
-            }
-        });
-
-        commands.addCommand({
-            name: 'gotoDoingLog',
-            bindKey: {win: 'Ctrl-/', mac: 'Command-/'},
-            exec: function (editor) {
-                var index = that._doingLogIndex;
-                editor.gotoLine(index + 1, 6);
-            }
-        });
-
-        commands.addCommand({
-            name: 'gotoToday',
-            bindKey: {win: 'Ctrl-\\', mac: 'Command-\\'},
-            exec: function (editor) {
-                console.log('goto today');
-                that.props.onGotoToday(editor);
-            }
-        });
-    },
 
     _initShortcut: function () {
         var that = this;
@@ -320,45 +323,46 @@ var LogEditor = React.createClass({
     shouldComponentUpdate: function (nextProps, nextState) {
         var result = this.props.title !== nextProps.title ||
             this.state.syncStatus !== nextState.syncStatus;
+        if (this.props.title !== nextProps.title) {
+            this._destroyEditor();
+        }
 
         return result;
     },
 
-
-    componentWillUpdate: function () {
-        //get the editor position
-        this.currentPosition = this.editor.getCursorPosition();
-    },
 
     componentDidUpdate: function (prevProps, prevState) {
         var that = this;
         if (prevProps.title === this.props.title) {
             return;
         }
-        var editor = this.editor;
-        this._detachListenToEditor();
+        this._initEditor();
         this.readLog(this.props.title)
             .then(function (content) {
+                var editor = that.editor;
                 that.setValue(content);
-                var highLightIndex = that._highLightDoingLine();
-                editor.gotoLine(highLightIndex + 1, 5);
                 editor.focus();
+                that.gotoDoingLogLine();
                 that._listenToEditor();
             });
+    },
+
+    gotoDoingLogLine: function () {
+        var highLightIndex = this._highLightDoingLine();
+        var editor = this.editor;
+        if (_.isNumber(highLightIndex)) {
+            editor.gotoLine(highLightIndex + 1, 5);
+        }
     },
 
     setValue: function (content) {
         var editor = this.editor;
         editor.setValue(content, -1);
-        var pos = this.currentPosition;
-        if (pos) {
-            editor.moveCursorToPosition(pos);
-        }
     },
 
     readLog: function (title) {
         var editor = this.editor;
-        if (!Ltt) { return; }
+        if (!Ltt) { return Q(''); }
         return Ltt.sdk.readLogContent(title)
             .then(function (content) {
                 return content;
