@@ -32,6 +32,7 @@ var Dashboard = require('./pages/Dashboard'),
     LogList = require('./components/LogList'),
     ProjectTask = require('./components/Project/ProjectTask'),
     ProjectsNew = require('./pages/ProjectsNew'),
+    ClassesReport = require('./reports/ClassesReport'),
     Reports = require('./pages/Reports'),
     logEditor = require('./pages/LogEditor');
 
@@ -51,6 +52,7 @@ var routes = (
         <Route name="reports" path="/reports" handler={Reports}>
             <Route name="report" path="/reports/overview" handler={OverviewReport}/>
             <Route name="tags" path="/reports/tags" handler={TagsReport}/>
+            <Route name="classses" path="/reports/classes" handler={ClassesReport}/>
             <DefaultRoute handler={OverviewReport}/>
         </Route>
         <Route name="dashboard" path="/dashboard" handler={Dashboard}/>
