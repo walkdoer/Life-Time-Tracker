@@ -21,6 +21,7 @@
     color: #EAEAEA;
     display:flex;
     justify-content: space-between;
+    z-index: 999;
 }
 .ltt-footer .btn-group{
     padding: 4px 8px;
@@ -152,12 +153,15 @@
 .ltt_c-outerContainer{
     display: flex;
     flex: 1;
+    height: 100%;
     padding-top: 50px;
 }
 .ltt_c-innerContainer{
     flex: 1;
     overflow: overlay;
     position: relative;
+    height: 100%;
+    padding-bottom: 30px;
 }
 
 .scrollable {
