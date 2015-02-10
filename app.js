@@ -22,6 +22,9 @@ var Nav = require('./components/Nav');
 /* Const */
 var NAV_OPEN = 'ltt__navOpen';
 
+/** Utils */
+var DataAPI = require('./utils/DataAPI');
+
 var App = React.createClass({
 
 
@@ -51,6 +54,7 @@ var App = React.createClass({
                         <RouteHandler/>
                     </section>
                 </div>
+                <Footer/>
             </div>
         );
     },
@@ -94,5 +98,50 @@ var App = React.createClass({
     },
 
 });
+
+
+var Footer = React.createClass({
+
+    getInitialState: function () {
+        return {
+            projectCount: 0
+        };
+    },
+
+    render: function () {
+        return (
+            <footer className="ltt-footer">
+                <div className="btn-group">
+                    <button className="btn btn-xs"><i className="fa fa-plus"></i></button>
+                </div>
+                <div className="ltt_c-appInfo">
+                    <span className="ltt_c-appInfo-projectCount">
+                        <i className="fa fa-rocket"></i>
+                        <span className="ltt_c-number">{this.state.projectCount}</span>
+                    </span>
+                    <span className="ltt_c-appInfo-taskCount">
+                        <i className="fa fa-tasks"></i>
+                        <span className="ltt_c-number">{this.state.taskCount}</span>
+                    </span>
+                    <span className="ltt_c-appInfo-logCount">
+                        <i className="fa fa-file"></i>
+                        <span className="ltt_c-number">{this.state.logCount}</span>
+                    </span>
+                </div>
+            </footer>
+        );
+    },
+
+    componentDidMount: function () {
+        var that = this;
+        this.loadAppInfo().then(function (info) {
+            that.setState(info);
+        });
+    },
+
+    loadAppInfo: function () {
+        return DataAPI.getAppInfo();
+    }
+})
 
 module.exports = App;

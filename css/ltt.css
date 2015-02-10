@@ -1,6 +1,8 @@
 
 .ltt{
+    display: flex;
     height: 100%;
+    flex-direction: column;
 }
 .ltt a:hover{
     text-decoration:none;
@@ -9,6 +11,29 @@
 .ltt-M3 { margin: 3px; }
 .ltt-M4 { margin: 4px; }
 .ltt-M5 { margin: 5px; }
+
+.ltt-footer{
+    height:30px;
+    background: linear-gradient(to bottom, #636363 0%,#323232 100%);
+    border-top: 1px solid #999999;
+    line-height: 30px;
+    font-size: 12px;
+    color: #EAEAEA;
+    display:flex;
+    justify-content: space-between;
+}
+.ltt-footer .btn-group{
+    padding: 4px 8px;
+}
+.ltt-footer .btn{
+    background: linear-gradient(to bottom, #636363 0%,#323232 100%);
+    border: 1px solid #434141;
+    color: #ccc;
+}
+.ltt-footer .ltt_c-appInfo{
+    display:flex;
+    margin:  0 10px;
+}
 
 .ltt-row {
     margin-top: 10px;
@@ -126,11 +151,10 @@
 
 .ltt_c-outerContainer{
     display: flex;
-    height: 100%;
+    flex: 1;
     padding-top: 50px;
 }
 .ltt_c-innerContainer{
-    height: 100%;
     flex: 1;
     overflow: overlay;
     position: relative;

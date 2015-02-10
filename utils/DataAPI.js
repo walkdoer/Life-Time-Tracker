@@ -2,8 +2,9 @@ var server = require('../conf/config').server;
 var ServerAction = require('../actions/ServerAction');
 var Q = require('q');
 var isNodeWebkit = true;
+
 try {
-    var a = global.process;
+    var a = global.process.version;
 } catch (err) {
     isNodeWebkit = false;
 }
@@ -19,6 +20,12 @@ function url(src) {
 
 
 module.exports = {
+
+    getAppInfo: function () {
+        return get(url('/appInfo')).then(function (res) {
+            return res;
+        });
+    },
 
     getProjects: function (query) {
         return get(url('/projects'), query).then(function (res) {
