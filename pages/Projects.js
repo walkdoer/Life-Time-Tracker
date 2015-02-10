@@ -8,12 +8,16 @@ var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
 var Moment = require('moment');
 var _ = require('lodash');
+var swal = require('sweetalert');
 var Mt = window.Mousetrap;
 /*components*/
-var ProjectCards = require('../components/ProjectCards');
 var remoteStorage = require('../components/storage.remote');
 var DateRangePicker = require('../components/DateRangePicker');
 var Pinyin = require('../components/Pinyin');
+var ProjectCard = require('../components/Project/ProjectCard');
+var Notify = require('../components/Notify');
+var DataAPI = require('../utils/DataAPI');
+var LoadingMask = require('../components/LoadingMask');
 
 
 var Projects = React.createClass({
@@ -31,6 +35,7 @@ var Projects = React.createClass({
     },
 
     render: function () {
+        var that = this;
         var projectCards, loadingMsg,
             isIndex = this.isIndex();
         if (isIndex) {
@@ -46,7 +51,7 @@ var Projects = React.createClass({
         var projectCardsStyle = {
             display: isIndex ? 'block' : 'none'
         };
-        projectCards = (<ProjectCards projects={this.state.projects} ref="projectCards"/>);
+
         return (
             <section className="ltt_c-page ltt_c-page-projects">
                 <div className="ltt_c-page-projects-projectCards" style={projectCardsStyle}>
@@ -60,8 +65,20 @@ var Projects = React.createClass({
                                 this.filterProject(text);
                             }.bind(this)}/>
                     </div>
-                    {loadingMsg}
-                    {projectCards}
+                    <div className="ltt_c-page-projects-projectCards" style={this.props.style} ref="projectCards">
+                        <LoadingMask loaded={!this.state.loading}/>
+                        {this.state.projects.map(function (project) {
+                            return (
+                                <ProjectCard
+                                    data={project} key={project._id}
+                                    onDelete={function (project, e) {
+                                        if (window.confirm("Are you sure to delete")) {
+                                            this.deleteProject(project);
+                                        }
+                                    }.bind(that, project)}/>
+                                );
+                        })}
+                    </div>
                 </div>
                 <RouteHandler/>
             </section>
@@ -69,7 +86,7 @@ var Projects = React.createClass({
     },
 
     isIndex: function () {
-        return this.isActive('projectIndex');
+        return this.isActive('projectManage');
     },
 
     componentDidMount: function () {
@@ -101,12 +118,26 @@ var Projects = React.createClass({
             start: this.state.startDate,
             end: this.state.endDate
         }).then(function (results) {
-                var projects = results.data;
-                that.allProjects = projects;
-                that.setState({
-                    loading: false,
-                    projects: projects
-                });
+            var projects = results.data;
+            that.allProjects = projects;
+            that.setState({
+                loading: false,
+                projects: projects
+            });
+        }).fail(function (err) {
+            console.error(err.stack);
+        });
+    },
+
+    deleteProject: function (project) {
+        var that = this;
+        return DataAPI.deleteProject(project)
+            .then(function (result) {
+                that.loadProjects();
+                var msg = _.template('Remove: Version(<%=removeVersionCount%>) Task(<%=removeTaskCount%>)')(result);
+                Notify.success(msg);
+            }).fail(function (err) {
+                Notify.error('delete fail ' + err.message);
             });
     },
 

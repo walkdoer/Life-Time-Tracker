@@ -109,13 +109,16 @@ gulp.task('buildHTML', function() {
 //sync resources file
 gulp.task('sync', function() {
     gutil.log('Watching file...');
-    /*
+    
     gulp.src([
         './bower_components/bootstrap/dist/css/bootstrap.css',
         './bower_components/bootstrap/dist/css/bootstrap-theme.css',
-        './bower_components/jquery-ui/jquery-ui.css'
-    ]).pipe(gulp.dest('./css/lib')).pipe(gulp.dest('./node_modules/ltt-addLog/css/lib'));
-    gulp.src([
+        './bower_components/jquery-ui/jquery-ui.css',
+        './bower_components/sweetalert/lib/sweet-alert.css'
+    ])
+    .pipe(gulp.dest('./css/lib'));
+    //.pipe(gulp.dest('./node_modules/ltt-addLog/css/lib'));
+    /*gulp.src([
         './bower_components/jquery-ui/jquery-ui.js'
     ]).pipe(gulp.dest('./libs'));*/
 

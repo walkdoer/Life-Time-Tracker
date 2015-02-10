@@ -66,6 +66,9 @@ var routes = (
                 <Route name="taskLogs" path="tasks/:taskId" handler={LogList}/>
             </Route>
         </Route>
+
+        <Route name="projectManage" path="/projectManage" handler={ProjectsNew} handler={Projects}></Route>
+        
         <Route name="logEditor" path="/logEditor" handler={logEditor}/>
         <NotFoundRoute handler={Page404}/>
         <DefaultRoute handler={Dashboard}/>

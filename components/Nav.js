@@ -31,6 +31,11 @@ var Nav = React.createClass({
             icon: 'fa fa-file'
         }, {
             text: 'Projects',
+            key: 'projectManage',
+            path: 'projectManage',
+            icon: 'fa fa-rocket'
+        }, {
+            text: 'Tasks',
             key: 'projects',
             path: 'projects',
             icon: 'fa fa-tasks'

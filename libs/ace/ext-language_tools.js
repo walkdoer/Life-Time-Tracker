@@ -1802,6 +1802,9 @@ var completers = [snippetCompleter, textCompleter, keyWordCompleter];
 exports.setCompleters = function(val) {
     completers = val || [];
 };
+exports.resetCompleters =  function () {
+    completers = [snippetCompleter, textCompleter, keyWordCompleter];
+}
 exports.addCompleter = function(completer) {
     completers.push(completer);
 };

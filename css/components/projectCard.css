@@ -18,7 +18,9 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-
+.ltt_c-projectCard-delete{
+    float:right;
+}
 
 .ltt_c-projectCard h1 a {
     color:#333;

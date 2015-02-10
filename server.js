@@ -32,6 +32,7 @@ app.use(morgan('combined'));
 app.use('/', express.static(path.join(__dirname, './')));
 app.get('/api/*', redirectGet);
 app.post('/api/*', redirectPOST);
+app.delete('/api/*', redirectDelete);
 
 
 function redirectGet(req, res) {
@@ -79,6 +80,33 @@ function redirectPOST(req, res) {
         }
     }).on('error', function(e) {
         console.log('problem with request: ' + e.message);
+        res.status(500).send(e);
+    });
+}
+
+
+function redirectDelete(req, res) {
+    var data = '',
+        path = req.url;
+    var apiHost = 'http://localhost:3333/';
+    var apiUrl = path.slice(5);
+    console.log('[Delete Request]' + apiHost + apiUrl);
+    http.delete(apiHost + apiUrl, function (response) {
+        console.log('STATUS: ' + response.statusCode);
+        response.on('data', function(chunk) {
+            data += chunk;
+        });
+        response.on('end', function (){
+            //the api's response content is json string,so need to parse to object
+            try {
+                res.send(JSON.parse(data));
+            } catch (e) {
+                console.error(data);
+                res.status(500).send('Ltt服务器发生错误');
+            }
+        });
+    }).on('error', function(e) {
+        console.log('problem with delete request: ' + e.message);
         res.status(500).send(e);
     });
 }

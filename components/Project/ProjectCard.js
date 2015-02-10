@@ -36,30 +36,46 @@ var ProjectCard = React.createClass({
         var logClasses = logClasses.map(function(cls) {
             return (<LogClass data={cls}/>);
         });
+        var versions = projectData.versions,
+            lastVersion, lastVersionData;
+        if (!_.isEmpty(versions)) {
+            lastVersionData = projectData.versions[0];
+            var linkVersionParams = {
+                projectId: projectData._id,
+                versionId: lastVersionData._id
+            };
+            lastVersion = (
+                <span className="ltt_c-projectCard-lastVersion" title="version">
+                    <i className="fa fa-sitemap" title="version"></i>
+                    <Link to="projectVersionTask" params={linkVersionParams}>{lastVersionData.name}</Link>
+                </span>
+            )
+        }
         var lastTasks;
         if (projectData.lastTasks) {
             lastTasks = projectData.lastTasks.map(function (task) {
+                var href = '/projects/' + projectData._id;
+                if (lastVersionData) {
+                    href += '/versions/' + lastVersionData._id;
+                }
+                href += '/tasks/' + task._id;
                 return (
                     <li className="ltt_c-projectCard-task">
-                        <i className="fa fa-angle-right"></i>{task.name}
+                        <i className="fa fa-angle-right"></i>
+                        <Link to={href}>{task.name}</Link>
                     </li>
                 );
             });
         }
-        var versions = projectData.versions,
-            lastVersion;
-        if (!_.isEmpty(versions)) {
-            lastVersion = (
-                <span className="ltt_c-projectCard-lastVersion" title="version">
-                    <i className="fa fa-sitemap" title="version"></i>{projectData.versions[0].name}
-                </span>
-            )
-        }
+
 
         /* <p className="ltt_c-projectCard-logClasses">{logClasses}</p> */
         return (
             <div className="ltt_c-projectCard">
-                <h1><Link to={'/projects/' + projectData._id}>{projectData.name}</Link></h1>
+                <h1>
+                    <Link to={'/projects/' + projectData._id}>{projectData.name}</Link>
+                    <span className="ltt_c-projectCard-delete" onClick={this.props.onDelete}><i className="fa fa-close" title="delete project"></i></span>
+                </h1>
                 <div>
                     <span className="ltt_c-projectCard-lastActiveTime">{new Moment(projectData.lastActiveTime).fromNow()}</span>
                     {lastVersion}

@@ -1,17 +1,33 @@
 var server = require('../conf/config').server;
 var ServerAction = require('../actions/ServerAction');
 var Q = require('q');
+var isNodeWebkit = true;
+try {
+    var a = global.process;
+} catch (err) {
+    isNodeWebkit = false;
+}
+
+
+function url(src) {
+    if (isNodeWebkit) {
+        return 'http://localhost:3333' + src;
+    } else {
+        return server + '/api' + src;
+    }
+}
+
 
 module.exports = {
 
     getProjects: function (query) {
-        return get('/api/projects', query).then(function (res) {
+        return get(url('/projects'), query).then(function (res) {
             ServerAction.receiveProjects(res);
         });
     },
 
     backUpLogFile: function (date, content) {
-        return post('/api/backUpLogFile', {date: date, content: content});
+        return post(url('/backUpLogFile'), {date: date, content: content});
     },
 
     /**
@@ -21,14 +37,28 @@ module.exports = {
      * @return {Promise}
      */
     calendar: function (calType, params) {
-        return get('/api/calendars/' + calType, params);
+        return get(url('/calendars/' + calType), params);
+    },
+
+    deleteProject: function (project) {
+        var deferred = Q.defer();
+        $.ajax({
+            type:'delete',
+            url: url('/projects/' + project._id),
+            success: function (result) {
+                deferred.resolve(result);
+            },
+            error: function (err) {
+                deferred.reject(err);
+            }
+        });
+        return deferred.promise;
     }
 };
 
 
-function get(path, query) {
+function get(url, query) {
     var deferred = Q.defer();
-    var url = server + path;
     $.get(url, query)
      .done(function (res) {
         deferred.resolve(res);
@@ -40,9 +70,8 @@ function get(path, query) {
     return deferred.promise;
 }
 
-function post(path, data) {
+function post(url, data) {
     var deferred = Q.defer();
-    var url = server + path;
     $.post(url, data)
      .done(function (res) {
         deferred.resolve(res);

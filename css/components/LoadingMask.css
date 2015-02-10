@@ -4,11 +4,11 @@
     left: 0;
     z-index:999;
     position: absolute;
-    background-color: #000;
+    background-color: #FEFEFE;
     zoom: 1;
     cursor:wait;
     text-align: center;
-    color: #fff;
+    color: #1E1E1E;
 }
 
 .loadingMask .fa{

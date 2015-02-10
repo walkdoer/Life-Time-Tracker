@@ -81,6 +81,7 @@ var LogEditor = React.createClass({
         session.setMode("ace/mode/ltt");
         session.setUseWrapMode(true);
         var langTools = ace.require("ace/ext/language_tools");
+        langTools.resetCompleters();
         editor.setOptions({
             enableSnippets: false,
             enableBasicAutocompletion: true,
@@ -404,7 +405,7 @@ var LogEditor = React.createClass({
                     //start back up log file after log import successfully
                     //may have change since the content may have changed
                     //use the timer to optimize the performerce
-                    console.log('start back' + (new Date().getTime() - start));
+                    console.log('start backup' + (new Date().getTime() - start));
                     that.setState({syncStatus: SYNCING}, function () {
                         DataAPI.backUpLogFile(title, content).then(function (result) {
                             console.error('done');

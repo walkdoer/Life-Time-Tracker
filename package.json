@@ -62,7 +62,8 @@
     "bootstrap": "./bower_components/bootstrap/dist/js/bootstrap.js",
     "noty": "./node_modules/noty/js/noty/packaged/jquery.noty.packaged.js",
     "chart": "./bower_components/chartjs/Chart.js",
-    "typeahead": "./bower_components/typeahead.js/dist/typeahead.bundle.js"
+    "typeahead": "./bower_components/typeahead.js/dist/typeahead.bundle.js",
+    "sweetalert": "./bower_components/sweetalert/lib/sweet-alert.js"
   },
   "browserify-shim": {
     "noty": "noty",
