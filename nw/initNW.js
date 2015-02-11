@@ -72,20 +72,22 @@
                 win.close();
             }
         };
-        Ltt.init();
-        Ltt.sdk = sdk;
-        root = global;
-        root.Ltt = Ltt;
-        root.nwGui = gui;
-        //a series of init action to intialize components
-        initMenu();
-        initShortcut();
-        Ltt.getWindow().on('close', function(event) {
-            // Hide the window to give user the feeling of closing immediately
-            this.hide();
-            if (event === 'quit') {
-                this.close(true);
-            }
+        sdk.startServer().then(function () {
+            Ltt.init();
+            Ltt.sdk = sdk;
+            root = global;
+            root.Ltt = Ltt;
+            root.nwGui = gui;
+            //a series of init action to intialize components
+            initMenu();
+            initShortcut();
+            Ltt.getWindow().on('close', function(event) {
+                // Hide the window to give user the feeling of closing immediately
+                this.hide();
+                if (event === 'quit') {
+                    this.close(true);
+                }
+            });
         });
     }
 
@@ -94,13 +96,13 @@
         var menubar = new gui.Menu({ type: "menubar" });
         menubar.createMacBuiltin("My App");
         var menus = [{
-            name: 'Data',
+            label: 'Data',
             items: [{
-                name: 'Import Data',
-                handler: function() {}
+                label: 'Import Data',
+                click: function() {}
             }, {
-                name: 'Sync From Evernote',
-                handler: function () {
+                label: 'Sync From Evernote',
+                click: function () {
                     sdk.syncEvernote()
                         .then(function (result) {
                             alert(result);
@@ -108,52 +110,57 @@
                 }
             }]
         }, {
-            name: 'Server',
+            label: 'Server',
             items: [{
-                name: 'Start Server',
-                handler: function () {
+                label: 'Start Server',
+                enabled: !sdk.isServerRunning(),
+                key: 'S',
+                click: function () {
                     console.log('start server');
+                    var menu = this;
                     sdk.startServer()
                         .then(function () {
                             console.log('server started');
+                            menu.enabled = false;
                         })
                         .fail(function () {
                             console.error('start server fail');
                         });
                 }
             }, {
-                name: 'Stop Server',
-                handler: function () {
+                label: 'Stop Server',
+                key: 'C',
+                enabled: sdk.isServerRunning(),
+                click: function () {
                     console.log('stop server');
                     sdk.stopServer();
                 }
             }]
         }, {
-            name: 'File',
+            label: 'File',
             items: [{
-                name: 'Import Data',
-                handler: function() {}
+                label: 'Import Data',
+                click: function() {
+
+                }
             }, {
-                name: 'Create Note',
-                handler: function() {
+                label: 'Create Note',
+                click: function() {
 
                 }
             }]
         }];
         menus.forEach(function (menu) {
-            var name = menu.name;
+            var label = menu.label;
             var submenu = new gui.Menu();
             var items = menu.items;
             if (!_.isEmpty(items)) {
                 items.forEach(function (item) {
-                    submenu.append(new gui.MenuItem({
-                        label: item.name,
-                        click: item.handler
-                    }));
+                    submenu.append(new gui.MenuItem(item));
                 });
             }
             menubar.append(new gui.MenuItem({
-                label: name,
+                label: label,
                 submenu: submenu
             }));
         });
