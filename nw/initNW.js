@@ -108,6 +108,27 @@
                 }
             }]
         }, {
+            name: 'Server',
+            items: [{
+                name: 'Start Server',
+                handler: function () {
+                    console.log('start server');
+                    sdk.startServer()
+                        .then(function () {
+                            console.log('server started');
+                        })
+                        .fail(function () {
+                            console.error('start server fail');
+                        });
+                }
+            }, {
+                name: 'Stop Server',
+                handler: function () {
+                    console.log('stop server');
+                    sdk.stopServer();
+                }
+            }]
+        }, {
             name: 'File',
             items: [{
                 name: 'Import Data',
