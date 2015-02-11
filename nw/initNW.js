@@ -122,6 +122,7 @@
                         .then(function () {
                             console.log('server started');
                             menu.enabled = false;
+                            getMenu(menubar, ['Server', 'Stop Server']).enabled = true;
                         })
                         .fail(function () {
                             console.error('start server fail');
@@ -134,6 +135,8 @@
                 click: function () {
                     console.log('stop server');
                     sdk.stopServer();
+                    this.enabled = false;
+                    getMenu(menubar, ['Server', 'Start Server']).enabled = true;
                 }
             }]
         }, {
@@ -164,6 +167,25 @@
                 submenu: submenu
             }));
         });
+
+        function getMenu(parentMenu, path) {
+            var menuItems = parentMenu.items;
+            var lastIndex = path.length - 1;
+            var target = null;
+            path.forEach(function (node, index) {
+                if (!menuItems) {return;}
+                var menu = menuItems.filter(function (menuItem) {
+                    return menuItem.label === node;
+                })[0];
+                if (index === lastIndex) {
+                    target = menu;
+                }
+                if (menu && menu.submenu) {
+                    menuItems = menu.submenu.items;
+                }
+            });
+            return target;
+        }
         win.menu = menubar;
     }
 
