@@ -25,21 +25,38 @@ module.exports = React.createClass({
         var logs = this.state.logs.map(function (log, index) {
             return Log(log);
         });
+        var style;
+        if (this.state.isHidden) {
+            style= {
+                display: 'none'
+            };
+        }
         return (
-            <div className="ltt_c-LogList">
-                {logs}
-                <LoadingMask loaded={this.state.loaded}/>
-            </div>
+            <aside className="ltt_c-projectTask-logs" style={style}>
+                <div className="ltt_c-LogList">
+                    <div className="ltt_c-LogList-header">
+                        <input type="text" placeHolder="filter log" className="searchInput"/>
+                        <span className="closeWindow" onClick={this.hide} title="close">
+                            <i className="fa fa-close"></i>
+                        </span>
+                    </div>
+                    {logs}
+                    <LoadingMask loaded={this.state.loaded}/>
+                </div>
+            </aside>
         );
     },
 
     componentWillReceiveProps: function (nextProps) {
         var that = this;
-        this.setState({
-            loaded: false
-        }, function () {
-            that.load();
-        });
+        if (!_.isEqual(nextProps, this.props)) {
+            this.setState({
+                loaded: false,
+                isHidden: false,
+            }, function () {
+                that.load();
+            });
+        }
     },
 
     componentDidMount: function () {
@@ -58,5 +75,11 @@ module.exports = React.createClass({
                 });
             });
         return promise;
+    },
+
+    hide: function () {
+        this.setState({
+            isHidden: true
+        });
     }
 });

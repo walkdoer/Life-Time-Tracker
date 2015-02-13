@@ -26,6 +26,7 @@ var remoteStorage = require('../storage.remote');
 var LoadingMask = require('../LoadingMask');
 var TaskList = require('../Task/TaskList');
 var Task = require('../Task/Task');
+var LogList = require('../LogList');
 
 module.exports = React.createClass({
     mixins: [Router.State, Router.Navigation],
@@ -41,9 +42,7 @@ module.exports = React.createClass({
 
     getStateFromParams: function () {
         var params = this.getParams();
-        return {
-            taskId: params.taskId || null
-        };
+        return params;
     },
 
     render: function () {
@@ -52,10 +51,12 @@ module.exports = React.createClass({
         var that = this;
         var taskId = this.state.taskId;
         var logs;
-        if (taskId) {
-            logs = <aside className="ltt_c-projectTask-logs">
-                    <RouteHandler {... _.pick(this.state, ['projectId', 'taskId', 'versionId'])}/>
-            </aside>
+        if ((taskId || this.state.taskLoaded && _.isEmpty(this.state.tasks))
+            && !this.state.closeLogList) {
+            if (!taskId) {
+                RouteHandler = LogList;
+            }
+            logs = <RouteHandler {... _.pick(this.state, ['projectId', 'taskId', 'versionId'])} isHidden={false}/>
         }
         var taskStatus = this.state.taskStatus;
         return (
@@ -112,16 +113,15 @@ module.exports = React.createClass({
             this.setState({
                 taskId: params.taskId
             });
-            return;
+        } else {
+            this.setState(_.extend({
+                projectLoaded: false,
+                taskLoaded: false
+            }, params), function () {
+                this.loadProject(nextProps.projectId);
+                this.loadTasks(_.pick(nextProps, ['projectId', 'versionId']));
+            });
         }
-        this.setState({
-            projectLoaded: false,
-            taskLoaded: false,
-            taskId: params.taskId
-        }, function () {
-            this.loadProject(nextProps.projectId);
-            this.loadTasks(_.pick(nextProps, ['projectId', 'versionId']));
-        });
     },
 
     loadProject: function (projectId) {
