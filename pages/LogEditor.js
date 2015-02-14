@@ -55,6 +55,7 @@ var Page = React.createClass({
                     onGotoToday={this.gotoToday}
                     onChange={this.onChange}
                     onLoad={this.onEditorLoad}
+                    onSave={this.onSave}
                     ref="logEditor"/>
                 <aside>
                     <LogDatePicker select={this.state.current}
@@ -113,6 +114,10 @@ var Page = React.createClass({
         console.log('chnage and fire doingLog');
         var doingLog = this.refs.logEditor.getDoingLog(this.state.current, content);
         Bus.emit(EVENT.DOING_LOG, doingLog);
+    },
+
+    onSave: function () {
+        Bus.emit(EVENT.UPDATE_APP_INFO);
     },
 
     onEditorLoad: function (content) {

@@ -19,6 +19,12 @@ var Notify = require('../components/Notify');
 var DataAPI = require('../utils/DataAPI');
 var LoadingMask = require('../components/LoadingMask');
 
+/** Utils */
+var Bus = require('../utils/Bus');
+
+/** Constants */
+var EVENT = require('../constants/EventConstant');
+
 
 var Projects = React.createClass({
     mixins: [Router.State],
@@ -135,6 +141,7 @@ var Projects = React.createClass({
             .then(function (result) {
                 that.loadProjects();
                 var msg = _.template('Remove: Version(<%=removeVersionCount%>) Task(<%=removeTaskCount%>)')(result);
+                Bus.emit(EVENT.UPDATE_APP_INFO);
                 Notify.success(msg);
             }).fail(function (err) {
                 Notify.error('delete fail ' + err.message);

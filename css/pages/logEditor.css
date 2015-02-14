@@ -89,12 +89,15 @@
 
 .ltt_c-lastTime{
 }
-
-.ltt_c-lastTime-name{
-    font-weight: fold;
+.ltt_c-lastTime .fa{
+  margin-right: 4px;
 }
-.ltt_c-lastTime-time{
-
+.ltt_c-lastTime-name{
+    margin-right: 4px;
+}
+.ltt_c-lastTime-name:after{
+  content: ":";
+  margin-left: 2px;
 }
 
 .ltt_c-logEditor-typeahead{

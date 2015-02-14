@@ -141,24 +141,27 @@ var Footer = React.createClass({
     },
 
     componentWillMount: function () {
-        console.log('add bus event');
         this.updateLastTimeToken = this.updateLastTime.bind(this);
         Bus.addListener(EVENT.DOING_LOG, this.updateLastTimeToken);
+        Bus.addListener(EVENT.UPDATE_APP_INFO, this.loadAppInfo);
     },
 
     componentDidMount: function () {
         var that = this;
-        this.loadAppInfo().then(function (info) {
-            that.setState(info);
-        });
+        this.loadAppInfo();
     },
 
     componentWillUnmount: function () {
         Bus.removeListener(EVENT.DOING_LOG, this.updateLastTimeToken);
+        Bus.removeListener(EVENT.UPDATE_APP_INFO, this.loadAppInfo);
     },
 
     loadAppInfo: function () {
-        return DataAPI.getAppInfo();
+        var that = this;
+        console.log('load app info');
+        return DataAPI.getAppInfo().then(function (info) {
+            that.setState(info);
+        });
     },
 
 
@@ -195,6 +198,7 @@ var Footer = React.createClass({
                 }
                 content = (
                     <div className="ltt_c-lastTime">
+                        <i className="fa fa-clock-o"/>
                         <span className="ltt_c-lastTime-name">
                             {name}
                         </span>

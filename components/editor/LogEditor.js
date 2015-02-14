@@ -395,11 +395,11 @@ var LogEditor = React.createClass({
         //write to local filesystem
         Ltt.sdk.writeLogFile(title, content).then(function () {
             console.log('write file cost' + (new Date().getTime() - start));
-            that.props.onSave(content);
             NProgress.set(0.3);
             //import into database, for stat purpose
             Ltt.sdk.importLogContent(title, content).then(function () {
                 NProgress.done();
+                that.props.onSave(content);
                 that.__saveing = false;
                 console.log('import cost' + (new Date().getTime() - start));
                 //don't need to sync if already syncing.
