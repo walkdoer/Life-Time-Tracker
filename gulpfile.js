@@ -36,7 +36,7 @@ function buildScript(scriptsDir, main, destFile, buildDir, watch) {
         entries: [scriptsDir + '/' + main],
         debug: !gulp.env.production
     };
-    var bundler = watch ? watchify(browserify(props)) : browserify(props);
+    var bundler = watch ? watchify(browserify(props, watchify.args), watchify.args) : browserify(props, watchify.args);
     bundler.transform(reactify);
 
     function rebundle() {
@@ -47,8 +47,8 @@ function buildScript(scriptsDir, main, destFile, buildDir, watch) {
             })
             .pipe(source(destFile))
             .pipe(gulpDebug())
-            .pipe(gulp.dest(buildDir))
-            .pipe(gulp.dest(scriptsDir));
+            .pipe(gulp.dest(buildDir));
+            //.pipe(gulp.dest(scriptsDir));
     }
     bundler.on('update', function() {
         rebundle();

@@ -9,10 +9,12 @@ var React = require('react');
 var $ = require('jquery');window.$ = window.Jquery = $;
 var addons = require('react/addons').addons;
 var cx = addons.classSet;
+var numeral = require('numeral');
 var Ltt = global.Ltt;
 var Router = require('react-router');
 var State = Router.State;
 var RouteHandler = Router.RouteHandler;
+var Moment = require('moment');
 
 
 /** Components */
@@ -21,9 +23,11 @@ var Nav = require('./components/Nav');
 
 /* Const */
 var NAV_OPEN = 'ltt__navOpen';
+var EVENT = require('./constants/EventConstant');
 
 /** Utils */
 var DataAPI = require('./utils/DataAPI');
+var Bus = require('./utils/Bus');
 
 var App = React.createClass({
 
@@ -99,8 +103,11 @@ var App = React.createClass({
 
 });
 
+var SetIntervalMixin = require('./components/mixins/setInterval');
 
 var Footer = React.createClass({
+
+    mixins: [SetIntervalMixin],
 
     getInitialState: function () {
         return {
@@ -114,6 +121,7 @@ var Footer = React.createClass({
                 <div className="btn-group">
                     <button className="btn btn-xs"><i className="fa fa-plus"></i></button>
                 </div>
+                <div className="lastTime" ref="lastTime"></div>
                 <div className="ltt_c-appInfo">
                     <span className="ltt_c-appInfo-projectCount">
                         <i className="fa fa-rocket"></i>
@@ -132,6 +140,12 @@ var Footer = React.createClass({
         );
     },
 
+    componentWillMount: function () {
+        console.log('add bus event');
+        this.updateLastTimeToken = this.updateLastTime.bind(this);
+        Bus.addListener(EVENT.DOING_LOG, this.updateLastTimeToken);
+    },
+
     componentDidMount: function () {
         var that = this;
         this.loadAppInfo().then(function (info) {
@@ -139,8 +153,59 @@ var Footer = React.createClass({
         });
     },
 
+    componentWillUnmount: function () {
+        Bus.removeListener(EVENT.DOING_LOG, this.updateLastTimeToken);
+    },
+
     loadAppInfo: function () {
         return DataAPI.getAppInfo();
+    },
+
+
+    updateLastTime: function (doingLog) {
+        console.log(doingLog);
+        var lastTime = this.refs.lastTime.getDOMNode();
+        tickTime(doingLog);
+        if (this.updateTimeIntervalId) {
+            this.clearInterval(this.updateTimeIntervalId);
+        }
+        this.updateTimeIntervalId = this.setInterval(function () {
+            tickTime(doingLog);
+        }, 1000);
+
+        function tickTime(doingLog) {
+            var content, name;
+            if (doingLog) {
+                var lastSeconds = new Moment().diff(new Moment(doingLog.start), 'second');
+                var task = doingLog.task,
+                    project = doingLog.projects[0],
+                    subTask = doingLog.subTask,
+                    tag = (doingLog.tags || []).join(',');
+                if (tag) {
+                    name = '[' + tag + '] ';
+                }
+                if (project) {
+                    name = project.name
+                }
+                if (task) {
+                    name += ' ' + task.name;
+                }
+                if (subTask) {
+                    name += ' ' + subTask.name;
+                }
+                content = (
+                    <div className="ltt_c-lastTime">
+                        <span className="ltt_c-lastTime-name">
+                            {name}
+                        </span>
+                        <span className="ltt_c-lastTime-time">{numeral(lastSeconds).format('00:00:00')}</span>
+                    </div>
+                );
+            } else {
+                content = <i></i>;
+            }
+            React.renderComponent(content, lastTime);
+        }
     }
 })
 

@@ -65,10 +65,13 @@ var LogEditor = React.createClass({
         var editor = this._initEditor();
         this.readLog(this.props.title).then(function (content) {
             that.setValue(content);
+            that.gotoDoingLogLine();
             that.props.onLoad(content);
             editor.focus();
-            that.gotoDoingLogLine();
             that._listenToEditor();
+        }).fail(function (err) {
+            console.error(err);
+            console.error(err.stack);
         });
     },
 
