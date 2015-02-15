@@ -80,6 +80,7 @@ var LogEditor = React.createClass({
         var editor = ace.edit("ltt-logEditor");
         this.editor = editor;
         editor.setTheme("ace/theme/github");
+        //editor.renderer.setShowGutter(false); //hide the linenumbers
         var session = editor.getSession();
         session.setMode("ace/mode/ltt");
         session.setUseWrapMode(true);

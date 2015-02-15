@@ -1,9 +1,5 @@
 .ltt_c-page-logEditor{
-    position: absolute;
     height: 100%;
-    top: 0;
-    right: 0;
-    left: 0;
     padding: 0px;
     display:flex;
     display: -webkit-flex;
