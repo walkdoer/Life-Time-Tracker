@@ -88,6 +88,9 @@
                     this.close(true);
                 }
             });
+        }).fail(function(err) {
+            console.error(err);
+            alert('Start Server Error');
         });
     }
 

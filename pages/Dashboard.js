@@ -7,6 +7,7 @@ var Moment = require('moment');
 
 var CalendarHeatMap = require('../components/charts/CalendarHeatMap');
 var SleepPeriod = require('../components/charts/SleepPeriod');
+var MonthCountDown = require('../components/charts/MonthCountDown');
 var Dashboard = React.createClass({
 
     render: function () {
@@ -24,6 +25,10 @@ var Dashboard = React.createClass({
                         url="/api/sleepPeriods"
                         start={new Moment().subtract(30, 'days').toDate()}
                         end={new Moment().toDate()}/>
+                </div>
+                <div className="ltt_c-page-com">
+                    <MonthCountDown width={350} height={250} padding={0}
+                        itemPadding={2} lifeYear={70} birthday='1989-10-23'/>
                 </div>
             </div>
         );

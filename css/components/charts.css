@@ -11,3 +11,8 @@
 .ltt_c-chart-wordsCloud{
     width: 100%;
 }
+
+.ltt_c-chart-MonthCountDown h1{
+    font-size:1.34rem;
+    font-weight: bold;
+}
