@@ -1,5 +1,5 @@
 .ltt_c-chart{
-    height: 300px;
+    min-height: 300px;
 }
 
 .ltt_c-chart canvas{

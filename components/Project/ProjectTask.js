@@ -28,6 +28,9 @@ var TaskList = require('../Task/TaskList');
 var Task = require('../Task/Task');
 var LogList = require('../LogList');
 
+/** components/charts */
+var TreeMap = require('../charts/TreeMap');
+
 module.exports = React.createClass({
     mixins: [Router.State, Router.Navigation],
 
@@ -62,7 +65,7 @@ module.exports = React.createClass({
         return (
             <div className="ltt_c-projectTask">
                 <main>
-                    <div className="ltt_c-projectDetail"><ProjectInfo project={project} versionId={this.props.versionId}/></div>
+                    <div className="ltt_c-projectDetail"><ProjectInfo ref="projectInfo" project={project} versionId={this.props.versionId}/></div>
                     <div className="ltt_c-projectTask-toolbar">
                         <div className="btn-group">
                         {[
@@ -119,7 +122,7 @@ module.exports = React.createClass({
                 taskLoaded: false
             }, params), function () {
                 this.loadProject(nextProps.projectId);
-                this.loadTasks(_.pick(nextProps, ['projectId', 'versionId']));
+                //this.loadTasks(_.pick(nextProps, ['projectId', 'versionId']));
             });
         }
     },
@@ -165,10 +168,45 @@ module.exports = React.createClass({
                     that.setState({
                         taskLoaded: true,
                         tasks: res.data
+                    }, function () {
+                        this.plotTreeMap();
                     });
                 }).catch(function (err) {
                     console.error(err.stack);
                 });
+    },
+
+    plotTreeMap: function () {
+        var root = {
+            name: this.state.project.name,
+            children: []
+        };
+        var parentTask = {
+            children: this.state.tasks
+        };
+        var children = root.children;
+        var queue = [].concat(this.state.tasks);
+        var task, node = root;
+        while (queue.length) {
+            children = node.children;
+            task = queue.pop();
+            if (children.length === parentTask.children.length) {
+                children = parentNode.children;
+            }
+            newNode = {
+                name: task.name,
+                size: task.totalTime
+            };
+            children.push(newNode);
+            if (!_.isEmpty(task.children)) {
+                queue = queue.concat(task.children);
+                newNode.children = [];
+                parentTask = task;
+                parentNode = node;
+                node = newNode;
+            }
+        }
+        this.refs.projectInfo.plotTreeMap(root);
     },
 
     openTask: function (e, task) {
@@ -254,11 +292,16 @@ var ProjectInfo = React.createClass({
                         <p className="ltt_c-projectDetail-tags">{tags}</p>
                     </div> : null}
                     {versionInfo}
+                    <TreeMap ref="treeMap" title={"Time TreeMap of " + project.name}/>
                 </section>
             );
         } else {
             projectBasicInfo = <div></div>
         }
         return projectBasicInfo;
+    },
+
+    plotTreeMap: function (root) {
+        this.refs.treeMap.plot(root);
     }
 })
