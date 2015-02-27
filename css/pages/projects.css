@@ -152,6 +152,10 @@
   height: 100%;
 }
 
+.ltt_c-projectTask .ltt_c-chart-TreeMap{
+  margin:10px 0px;
+}
+
 .ltt_c-projectDetail-basicInfo{
   position: relative;
 }

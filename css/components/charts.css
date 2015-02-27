@@ -1,7 +1,10 @@
 .ltt_c-chart{
     min-height: 300px;
 }
-
+.ltt_c-chart-title{
+    font-size:1.22rem;
+    padding: 10px;
+}
 .ltt_c-chart canvas{
     background: #FFF;
     width: 100% !important;

@@ -38,6 +38,7 @@ module.exports = React.createClass({
         return extend({
             projectLoaded: false,
             taskLoaded: false,
+            openTreeMap: false,
             taskStatus: 'doing',
             tasks: []
         }, this.getStateFromParams());
@@ -65,7 +66,9 @@ module.exports = React.createClass({
         return (
             <div className="ltt_c-projectTask">
                 <main>
-                    <div className="ltt_c-projectDetail"><ProjectInfo ref="projectInfo" project={project} versionId={this.props.versionId}/></div>
+                    <div className="ltt_c-projectDetail">
+                        <ProjectInfo ref="projectInfo" project={project} versionId={this.props.versionId}/>
+                    </div>
                     <div className="ltt_c-projectTask-toolbar">
                         <div className="btn-group">
                         {[
@@ -81,7 +84,11 @@ module.exports = React.createClass({
                                 onClick={that.onTaskStatusChange.bind(that, btn.status)}>{btn.label}</button>;
                         })}
                         </div>
+                        <div className="btn-group" style={{float: 'right'}}>
+                            <button className="btn btn-xs" onClick={this.openTreeMap}>TreeMap</button>
+                        </div>
                     </div>
+                    {this.state.openTreeMap ? <TreeMap ref="treeMap" title={"Time TreeMap of " + project.name}/> : null }
                     <TaskList>
                         {this.state.tasks.map(function (task) {
                             return <Task ref={task._id}
@@ -168,8 +175,6 @@ module.exports = React.createClass({
                     that.setState({
                         taskLoaded: true,
                         tasks: res.data
-                    }, function () {
-                        this.plotTreeMap();
                     });
                 }).catch(function (err) {
                     console.error(err.stack);
@@ -207,7 +212,17 @@ module.exports = React.createClass({
                 currentNode = newNode;
             }
         }
-        this.refs.projectInfo.plotTreeMap(root);
+        this.refs.treeMap.plot(root);
+    },
+
+    openTreeMap: function () {
+        this.setState({
+            openTreeMap: !this.state.openTreeMap
+        }, function () {
+            if (this.state.openTreeMap) {
+                this.plotTreeMap();
+            }
+        });
     },
 
     openTask: function (e, task) {
@@ -293,16 +308,11 @@ var ProjectInfo = React.createClass({
                         <p className="ltt_c-projectDetail-tags">{tags}</p>
                     </div> : null}
                     {versionInfo}
-                    <TreeMap ref="treeMap" title={"Time TreeMap of " + project.name}/>
                 </section>
             );
         } else {
             projectBasicInfo = <div></div>
         }
         return projectBasicInfo;
-    },
-
-    plotTreeMap: function (root) {
-        this.refs.treeMap.plot(root);
     }
 })
