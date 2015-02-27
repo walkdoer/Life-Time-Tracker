@@ -1,5 +1,6 @@
 .ltt_c-chart-TreeMap{
     min-height: 300px;
+    background: #ddd;
 }
 .ltt_c-chart-TreeMap-node {
   border: solid 1px white;
@@ -8,4 +9,44 @@
   overflow: hidden;
   position: absolute;
   text-indent: 2px;
+}
+
+.ltt_c-chart-TreeMap text {
+  pointer-events: none;
+}
+
+.ltt_c-chart-TreeMap .grandparent text {
+  font-weight: bold;
+}
+
+.ltt_c-chart-TreeMap rect {
+  fill: none;
+  stroke: #fff;
+}
+
+.ltt_c-chart-TreeMap rect.parent,
+.ltt_c-chart-TreeMap .grandparent rect {
+  stroke-width: 2px;
+}
+
+.ltt_c-chart-TreeMap .grandparent rect {
+  fill: orange;
+}
+
+.ltt_c-chart-TreeMap .grandparent:hover rect {
+  fill: #ee9700;
+}
+
+.ltt_c-chart-TreeMap .children rect.parent,
+.ltt_c-chart-TreeMap .grandparent rect {
+  cursor: pointer;
+}
+
+.ltt_c-chart-TreeMap .children rect.parent {
+  fill: #bbb;
+  fill-opacity: .5;
+}
+
+.ltt_c-chart-TreeMap .children:hover rect.child {
+  fill: #bbb;
 }

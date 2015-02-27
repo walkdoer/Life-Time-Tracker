@@ -195,7 +195,7 @@ module.exports = React.createClass({
             }
             newNode = {
                 name: task.name,
-                size: task.totalTime
+                value: task.totalTime
             };
             children.push(newNode);
             if (!_.isEmpty(task.children)) {
