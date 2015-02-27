@@ -186,12 +186,13 @@ module.exports = React.createClass({
         };
         var children = root.children;
         var queue = [].concat(this.state.tasks);
-        var task, node = root;
+        var task, currentNode = root;
         while (queue.length) {
-            children = node.children;
+            children = currentNode.children;
             task = queue.pop();
             if (children.length === parentTask.children.length) {
                 children = parentNode.children;
+                currentNode = parentNode;
             }
             newNode = {
                 name: task.name,
@@ -202,8 +203,8 @@ module.exports = React.createClass({
                 queue = queue.concat(task.children);
                 newNode.children = [];
                 parentTask = task;
-                parentNode = node;
-                node = newNode;
+                parentNode = currentNode;
+                currentNode = newNode;
             }
         }
         this.refs.projectInfo.plotTreeMap(root);

@@ -13,6 +13,7 @@
 
 .ltt_c-chart-TreeMap text {
   pointer-events: none;
+  overflow: hidden;
 }
 
 .ltt_c-chart-TreeMap .grandparent text {
