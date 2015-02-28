@@ -21,6 +21,12 @@ module.exports = React.createClass({
         };
     },
 
+    getDefaultProps: function () {
+        return {
+            onHidden: function () {}
+        };
+    },
+
     render: function () {
         var logs = this.state.logs.map(function (log, index) {
             return Log(log);
@@ -80,6 +86,8 @@ module.exports = React.createClass({
     hide: function () {
         this.setState({
             isHidden: true
+        }, function () {
+            this.props.onHidden();
         });
     }
 });

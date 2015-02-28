@@ -7,6 +7,7 @@ var Moment = require('moment');
 var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
 var Link = Router.Link;
+var Q = require('q');
 var _ = require('lodash');
 
 var extend = require('extend');
@@ -52,6 +53,7 @@ module.exports = React.createClass({
     render: function () {
         var loadingMsg, taskList;
         var project = this.state.project;
+        var version;
         var that = this;
         var taskId = this.state.taskId;
         var logs;
@@ -60,14 +62,22 @@ module.exports = React.createClass({
             if (!taskId) {
                 RouteHandler = LogList;
             }
-            logs = <RouteHandler {... _.pick(this.state, ['projectId', 'taskId', 'versionId'])} isHidden={false}/>
+            logs = <RouteHandler {... _.pick(this.state, ['projectId', 'taskId', 'versionId'])}
+                onHidden={this.onLogListHidden}
+                isHidden={false}/>
         }
         var taskStatus = this.state.taskStatus;
+        var currentVersionId = this.props.versionId;
+        if (project) {
+            version = project.versions.filter(function (version) {
+                return version._id === currentVersionId;
+            })[0];
+        }
         return (
             <div className="ltt_c-projectTask">
                 <main>
                     <div className="ltt_c-projectDetail">
-                        <ProjectInfo ref="projectInfo" project={project} versionId={this.props.versionId}/>
+                        <ProjectInfo ref="projectInfo" project={project} versionId={currentVersionId}/>
                     </div>
                     <div className="ltt_c-projectTask-toolbar">
                         <div className="btn-group">
@@ -88,7 +98,8 @@ module.exports = React.createClass({
                             <button className="btn btn-xs" onClick={this.openTreeMap}>TreeMap</button>
                         </div>
                     </div>
-                    {this.state.openTreeMap ? <TreeMap ref="treeMap" title={"Time TreeMap of " + project.name}/> : null }
+                    {this.state.openTreeMap ? <TreeMap ref="treeMap"
+                        title={"Time TreeMap of " + project.name + (version ? '-' + version.name : '')}/> : null }
                     <TaskList>
                         {this.state.tasks.map(function (task) {
                             return <Task ref={task._id}
@@ -145,6 +156,8 @@ module.exports = React.createClass({
                 });
                 that.loadTasks({
                     status: that.state.taskStatus
+                }).then(function () {
+                    that.plotTreeMap();
                 });
             })
             .catch(function (err) {
@@ -155,30 +168,43 @@ module.exports = React.createClass({
 
 
     onTaskStatusChange: function (status, e) {
+        var that = this;
         this.setState({
             taskStatus: status
         }, function () {
             this.loadTasks({
                 status: this.state.taskStatus
+            }).then(function () {
+                if (that.state.openTreeMap) {
+                    that.plotTreeMap();
+                }
             });
         });
     },
 
+    onLogListHidden: function () {
+        this.plotTreeMap();
+    },
+
 
     loadTasks: function (params) {
+        var deferred = Q.defer();
         var that = this;
         var defaultParams = _.pick(that.props, ['projectId', 'versionId']);
         params = _.extend(defaultParams, params);
         params.calculateTimeConsume = true;
-        return remoteStorage.get('/api/tasks', params)
-                .then(function (res) {
-                    that.setState({
-                        taskLoaded: true,
-                        tasks: res.data
-                    });
-                }).catch(function (err) {
-                    console.error(err.stack);
+        remoteStorage.get('/api/tasks', params)
+            .then(function (res) {
+                that.setState({
+                    taskLoaded: true,
+                    tasks: res.data
+                }, function () {
+                    deferred.resolve(res.data);
                 });
+            }).catch(function (err) {
+                deferred.reject(err);
+            });
+        return deferred.promise;
     },
 
     plotTreeMap: function () {

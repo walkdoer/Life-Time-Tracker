@@ -11,6 +11,10 @@
   text-indent: 2px;
 }
 
+.ltt_c-chart-TreeMap-content{
+  width: 100%;
+}
+
 .ltt_c-chart-TreeMap text {
   pointer-events: none;
   overflow: hidden;

@@ -31,14 +31,16 @@ module.exports = React.createClass({
 
     plot: function (root){
         if (!root) {return;}
+        var $svg = $(this.getDOMNode()).find('.ltt_c-chart-TreeMap-content');
+        $svg.empty();
         var margin = {
                 top: 20,
                 right: 0,
                 bottom: 0,
                 left: 0
             },
-            width = this.props.width,
-            height = this.props.height - margin.top - margin.bottom,
+            width = $svg.width() || this.props.width,
+            height = (this.props.height * width / this.props.width) - margin.top - margin.bottom,
             formatNumber = d3.format(",d"),
             transitioning;
 
@@ -60,8 +62,6 @@ module.exports = React.createClass({
             .ratio(height / width * 0.5 * (1 + Math.sqrt(5)))
             .round(false);
 
-        var $svg = $(this.getDOMNode()).find('.ltt_c-chart-TreeMap-content');
-        $svg.empty();
         var svg = d3.select($svg[0])
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.bottom + margin.top)
