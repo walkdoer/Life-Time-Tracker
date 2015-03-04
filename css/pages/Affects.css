@@ -1,0 +1,82 @@
+.ltt_c-page-Affects{
+    height: 100%;
+    display: flex;
+    padding:0px;
+}
+.ltt_c-page-Affects-content{
+    flex: 5;
+    height: 100%;
+    padding: 10px 20px;
+}
+
+.ltt_c-page-Affects-sidebar{
+    flex: 2;
+    height: 100%;
+    background: #EEEEEE;
+    border-left: 1px solid #dcdcdc;
+}
+
+.ltt_c-page-Affects .tab-content{
+    /*padding-top:10px;*/
+}
+
+.ltt_c-AffectsList{
+
+}
+
+.ltt_c-AffectsList-item{
+    width: 50%;
+    height: 100px;
+    display:inline-block;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    line-height:100px;
+    text-align:center;
+    background:#FFF;
+}
+
+.ltt_c-AffectsList-add{
+    font-size:1.6rem;
+}
+
+.ltt_c-page-Affects-content-header{
+    height: 38px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ltt_c-page-Affects-content-header-title{
+    font-size:1.2rem;
+    line-height: 38px;
+}
+
+.ltt_c-page-Affects-content-header .new-record{
+    border-radius: 54px;
+    background: #FF9C54;
+    padding: 4px 8px;
+    color: #fff;
+    border: 1px solid #ED8E48;
+}
+.ltt_c-RecordModal h1{
+    font-size:1.4rem;
+}
+
+.ltt_c-RecordModal .affectList{
+    margin:10px;
+}
+
+.ltt_c-RecordModal .affectList .ltt_c-AffectRange{
+    margin:10px auto;
+}
+
+.ltt_c-AffectRange{
+    display:flex;
+}
+
+.ltt_c-AffectRange input[type=range]{
+    flex:1;
+}
+
+.ltt_c-AffectRange label{
+    margin-right:10px;
+}

@@ -44,6 +44,11 @@ var Nav = React.createClass({
             key: "logEditor",
             path: "logEditor",
             icon: "fa fa-edit"
+        }, {
+            text: 'Affects',
+            key: 'affects',
+            path: "affects",
+            icon: "fa fa-heartbeat"
         }];
         //var isActive = this.isActive(this.props.to, this.props.params, this.props.query);
         return (

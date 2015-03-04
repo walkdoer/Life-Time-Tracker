@@ -23,20 +23,25 @@ var DefaultRoute = Router.DefaultRoute;
 var Link = Router.Link;
 var OverviewReport = require('./reports/Overview');
 var App = require('./app');
+
+/** Pages */
 var Dashboard = require('./pages/Dashboard'),
     Logs = require('./pages/Logs'),
     Page404 = require('./pages/Page404'),
-    Projects = require('./pages/Projects'),
-    ProjectDetail = require('./components/ProjectDetail'),
+    ProjectsNew = require('./pages/ProjectsNew'),
+    Reports = require('./pages/Reports'),
+    logEditor = require('./pages/LogEditor'),
+    Affects = require('./pages/Affects'),
+    Projects = require('./pages/Projects');
+
+/** Components */
+var ProjectDetail = require('./components/ProjectDetail'),
     ProjectIndex = require('./components/Project/ProjectIndex'),
     LogList = require('./components/LogList'),
-    ProjectTask = require('./components/Project/ProjectTask'),
-    ProjectsNew = require('./pages/ProjectsNew'),
-    ClassesReport = require('./reports/ClassesReport'),
-    Reports = require('./pages/Reports'),
-    logEditor = require('./pages/LogEditor');
+    ProjectTask = require('./components/Project/ProjectTask');
 
-var OverviewReport = require('./reports/Overview');
+var OverviewReport = require('./reports/Overview'),
+    ClassesReport = require('./reports/ClassesReport'),
     TagsReport = require('./reports/TagsReport');
 
 /*
@@ -68,8 +73,8 @@ var routes = (
         </Route>
 
         <Route name="projectManage" path="/projectManage" handler={ProjectsNew} handler={Projects}></Route>
-        
         <Route name="logEditor" path="/logEditor" handler={logEditor}/>
+        <Route name="affects" path="/affects" handler={Affects}/>
         <NotFoundRoute handler={Page404}/>
         <DefaultRoute handler={Dashboard}/>
     </Route>
