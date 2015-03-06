@@ -10,7 +10,7 @@
 }
 
 .ltt_c-page-Affects-sidebar{
-    flex: 2;
+    flex: 1;
     height: 100%;
     background: #EEEEEE;
     border-left: 1px solid #dcdcdc;
@@ -24,15 +24,12 @@
 
 }
 
-.ltt_c-AffectsList-item{
-    width: 50%;
-    height: 100px;
-    display:inline-block;
-    border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    line-height:100px;
+.ltt_c-AffectsList .ltt_c-Affect,
+.ltt_c-AffectsList-add{
+    border-bottom: 1px solid #E9E9E9;
     text-align:center;
     background:#FFF;
+    padding: 10px;
 }
 
 .ltt_c-AffectsList-add{
@@ -79,4 +76,27 @@
 
 .ltt_c-AffectRange label{
     margin-right:10px;
+}
+
+
+
+.ltt_c-Affect.editing label{
+    display: none;
+}
+
+.ltt_c-Affect label{
+    font-weight: normal;
+}
+.ltt_c-Affect input{
+    border: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.ltt_c-AffectsList-add input{
+    height:30px;
+    width:100%;
+    margin: 0px;
+    text-align: center;
+    font-size: 0.9rem;
 }

@@ -60,6 +60,26 @@ module.exports = {
             }
         });
         return deferred.promise;
+    },
+
+    Affect: {
+        load: function (params) {
+            return get(url('/affects'), params);
+        },
+
+        create: function (affect) {
+            return post(url('/affects'), affect);
+        },
+
+        destroy: function (affect) {
+            //todo
+        }
+    },
+
+    AffectRecord: {
+        create: function (record) {
+            return post(url('/affectRecords'), record);
+        }
     }
 };
 
@@ -79,13 +99,19 @@ function get(url, query) {
 
 function post(url, data) {
     var deferred = Q.defer();
-    $.post(url, data)
-     .done(function (res) {
-        deferred.resolve(res);
-     }).fail(function (err) {
-        console.error(err.stack);
-        deferred.reject(err);
-     });
+    $.ajax({
+        url: url,
+        data: data,
+        type: 'post',
+        dataType: 'json',
+        success:function (res) {
+            deferred.resolve(res);
+        },
+        error: function (err) {
+            console.error(err.stack);
+            deferred.reject(err);
+        }
+    });
 
     return deferred.promise;
 }
