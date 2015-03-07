@@ -26,15 +26,46 @@ var Notify = require('../components/Notify');
 
 var AffectAction = require('../actions/AffectAction');
 var AffectStore = require('../stores/AffectStore');
+var AffectConstant = require('../constants/AffectConstant');
 
 /** utils */
 var DataAPI = require('../utils/DataAPI');
 
-var positiveAffects, negativeAffects;
 
 module.exports = React.createClass({
 
+    getInitialState: function () {
+        return this.getStateFromStore();
+    },
+
+    getStateFromStore: function () {
+        return {
+            loaded: AffectStore.loaded,
+            loadError: AffectStore.loadError,
+            positiveAffects: AffectStore.positiveAffects,
+            negativeAffects: AffectStore.negativeAffects
+        };
+    },
+
+    componentDidMount: function () {
+        AffectStore.addChangeListener(this._onStoreChange);
+        AffectAction.load();
+    },
+
+    _onStoreChange: function () {
+        this.setState(this.getStateFromStore());
+    },
+
+    componentWillUnmount: function () {
+        AffectStore.removeChangeListener(this._onStoreChange);
+    },
+
     render: function () {
+        var positiveAffects = this.state.positiveAffects;
+        var negativeAffects = this.state.negativeAffects;
+
+        var from = new Moment().startOf('week').toDate(),
+            to = new Moment().endOf('week').toDate();
 
         return <div className="ltt_c-page ltt_c-page-Affects">
             <div className="ltt_c-page-Affects-content">
@@ -46,12 +77,153 @@ module.exports = React.createClass({
                         <Button bsSize="medium">New Record</Button>
                     </ModalTrigger>
                 </div>
+                <Grid className="ltt_c-page-Affects-content-chart">
+                    <Row>
+                        {positiveAffects.map(function (affect) {
+                            return <Col><WeekAffectLine affect={affect} from={from} to={to}/></Col>
+                        })}
+                    </Row>
+
+                    <Row>
+                        {negativeAffects.map(function (affect) {
+                            return <Col><WeekAffectLine affect={affect} from={from} to={to}/></Col>
+                        })}
+                    </Row>
+                </Grid>
             </div>
             <Aside/>
         </div>
     }
 });
 
+var Grid = React.createClass({
+
+    render: function () {
+        var className = "ltt_c-Grid";
+        if (this.props.className) {
+            className += ' ' +  this.props.className;
+        }
+        return <div {...this.props} className={className}>{this.props.children}</div>
+    }
+});
+
+var Row = React.createClass({
+
+    render: function () {
+        var className = "ltt_c-Row";
+        if (this.props.className) {
+            className += ' ' +  this.props.className;
+        }
+        return <div {...this.props} className={className}>{this.props.children}</div>
+    }
+});
+
+
+var Col = React.createClass({
+
+    render: function () {
+        var className = "ltt_c-Col";
+        if (this.props.className) {
+            className += + ' ' +  this.props.className;
+        }
+        return <div {...this.props} className={className}>{this.props.children}</div>
+    }
+});
+
+var WeekAffectLine = React.createClass({
+
+    render: function () {
+        return (
+            <div className="ltt_c-chart-WeekAffectLine">
+            </div>
+        );
+    },
+
+    componentDidMount: function () {
+        var that = this;
+        DataAPI.AffectRecord.load({
+            affectId: this.props.affect._id,
+            from: this.props.from,
+            to: this.props.to
+        }).then(function (data) {
+            that.plot(data);
+        })
+    },
+    plot: function (data) {
+        var affect = this.props.affect;
+        $(this.getDOMNode()).highcharts({
+            chart: {
+                type: 'spline'
+            },
+            title: {
+                text: affect.name + ' : 一周情绪走势'
+            },
+            subtitle: {
+                text: new Moment(this.props.from).format('MM-DD') + ' ~ ' + new Moment(this.props.to).format('MM-DD')
+            },
+            xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: { // don't display the dummy year
+                    hour: '%I %p',
+                    minute: '%I:%M %p'
+                },
+                title: {
+                    enabled: true,
+                    text: 'Hours of the Day'
+                },
+            },
+            yAxis: {
+                title: {
+                    text: 'Affect Score'
+                },
+                min: -5,
+                max: 5
+            },
+            tooltip: {
+                headerFormat: '<b>{series.name}</b><br>',
+                //pointFormat: '{point.x:%e. %b}: {point.y}'
+            },
+
+            plotOptions: {
+                spline: {
+                    marker: {
+                        enabled: true
+                    }
+                }
+            },
+
+            series: this.getSeries(data)
+        });
+    },
+
+
+    getSeries: function (data) {
+        var today = new Moment().format('YYYY-MM-DD ');
+        var series = [];
+        data.forEach(function (affectRecord) {
+            var createTime = new Moment(affectRecord.createTime);
+            var day = createTime.day();
+            var serie = series.filter(function (serie) {
+                return serie.name === day;
+            })[0];
+            console.log(today + createTime.format('HH:mm:ss'))
+            var newDate = new Moment(today + createTime.format('HH:mm:ss'));
+            var item = [
+                newDate.unix() * 1000,
+                affectRecord.score
+            ];
+            if (serie) {
+                serie.data.push(item);
+            } else {
+                series.push({
+                    name: day,
+                    data: [item]
+                });
+            }
+        });
+        return series;
+    }
+});
 
 var Aside = React.createClass({
 
@@ -61,8 +233,6 @@ var Aside = React.createClass({
 
     getStateFromStore: function () {
 
-        positiveAffects = AffectStore.positiveAffects;
-        negativeAffects =  AffectStore.negativeAffects;
         return {
             loaded: AffectStore.loaded,
             loadError: AffectStore.loadError,
@@ -89,13 +259,6 @@ var Aside = React.createClass({
         </aside>
     },
 
-    getInitialState: function () {
-        return {
-            positiveAffects: AffectStore.positiveAffects,
-            negativeAffects: AffectStore.negativeAffects
-        };
-    },
-
     componentDidMount: function () {
         AffectStore.addChangeListener(this._onStoreChange);
         AffectAction.load();
@@ -103,6 +266,10 @@ var Aside = React.createClass({
 
     _onStoreChange: function () {
         this.setState(this.getStateFromStore());
+    },
+
+    componentWillUnmount: function () {
+        AffectStore.removeChangeListener(this._onStoreChange);
     }
 })
 
@@ -116,9 +283,8 @@ var RecordModal = React.createClass({
 
     _initScore: function () {
         var record = {};
-        positiveAffects.forEach(initScore);
-
-        negativeAffects.forEach(initScore);
+        this.props.positiveAffects.forEach(initScore);
+        this.props.negativeAffects.forEach(initScore);
 
         function initScore(affect) {
             record[affect._id] = 0;
@@ -140,13 +306,13 @@ var RecordModal = React.createClass({
                 <div className="modal-body">
                     <h1>Positive</h1>
                     <div className="affectList">
-                        {positiveAffects.map(function (affect){
+                        {this.props.positiveAffects.map(function (affect){
                             return <AffectRange affect={affect} onChange={that._onValueChange}/>;
                         })}
                     </div>
                     <h1>Negative</h1>
                     <div className="affectList">
-                        {negativeAffects.map(function (affect){
+                        {this.props.negativeAffects.map(function (affect){
                             return <AffectRange affect={affect} onChange={that._onValueChange}/>;
                         })}
                     </div>
@@ -218,7 +384,7 @@ var AffectsList = React.createClass({
                 return <Affect affect={affect}/>
             })}
             <div className="ltt_c-AffectsList-item ltt_c-AffectsList-add">
-                <AffectTextInput onSave={this.newAffect}/>
+                <AffectTextInput onSave={this.newAffect} placeholder="Add New Affect"/>
             </div>
         </div>
     },

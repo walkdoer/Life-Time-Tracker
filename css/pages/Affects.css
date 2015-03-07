@@ -7,6 +7,20 @@
     flex: 5;
     height: 100%;
     padding: 10px 20px;
+    overflow-y: auto;
+}
+
+.ltt_c-page-Affects-content .ltt_c-Col{
+    width: 50%;
+    padding:5px;
+    display: inline-block;
+}
+
+.ltt_c-page-Affects-content .ltt_c-Col .ltt_c-chart-WeekAffectLine{
+    width: 100%;
+    height:300px;
+    background:#FFF;
+    border: 1px solid #ccc;
 }
 
 .ltt_c-page-Affects-sidebar{

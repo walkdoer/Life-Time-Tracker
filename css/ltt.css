@@ -1,4 +1,6 @@
-
+.container{
+    width:100%;
+}
 .ltt{
     display: flex;
     height: 100%;

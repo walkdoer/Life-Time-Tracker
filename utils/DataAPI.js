@@ -79,6 +79,10 @@ module.exports = {
     AffectRecord: {
         create: function (record) {
             return post(url('/affectRecords'), record);
+        },
+
+        load: function (params) {
+            return get(url('/affectRecords'), params);
         }
     }
 };
