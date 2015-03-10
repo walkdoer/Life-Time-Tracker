@@ -3,6 +3,12 @@ var numeral = require('numeral');
 
 var Progress = React.createClass({
 
+    getDefaultProps: function () {
+        return {
+            showNumber: true
+        };
+    },
+
     render: function () {
         var value = numeral(this.props.value).value();
         var max = numeral(this.props.max).value();
@@ -29,9 +35,14 @@ var Progress = React.createClass({
             barStyle.width = progress + '%';
             barStyle.float = 'left';
         }
+        var number, numberStyle;
+        if (this.props.showNumber) {
+            numberStyle = {};
+            number = <span className="ltt_c-progress-number" style={numberStyle}>{progress}</span>;
+        }
         return (
             <div className="ltt_c-progress" style={style}>
-                <div className="ltt_c-progress-bar" style={barStyle}></div>
+                <div className="ltt_c-progress-bar" style={barStyle} title={progress}>{number}</div>
             </div>
         );
     }

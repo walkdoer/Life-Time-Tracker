@@ -14,7 +14,7 @@ var NProgress = require('nprogress');
 var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
 var Range = ace.require('ace/range').Range;
 var DataAPI = require('../../utils/DataAPI');
-
+var progressTpl = _.template('<%=progress%>%');
 
 var LogEditor = React.createClass({
 
@@ -191,7 +191,7 @@ var LogEditor = React.createClass({
             var end = new Date().getTime();
             var completions = projects.map(function(proj) {
                 var score = new Date(proj.lastActiveTime).getTime()
-                return {name: proj.name, value: proj.name, score: score, meta: "project"};
+                return {name: proj.name, value: proj.name, score: score, meta: progressTpl(proj)};
             });
             console.log('getProjectCompletions end cost ' + (end - start))
             cb(null, completions);
@@ -213,9 +213,13 @@ var LogEditor = React.createClass({
                 console.log('versions', versions);
                 if (_.isEmpty(versions)) { return cb(null, []); }
                 var completions = versions.map(function(ver) {
-                    console.log(ver);
                     var score = new Date(ver.lastActiveTime).getTime();
-                    return {name: ver.name, value: ver.name, score: score, meta: "version"}
+                    return {
+                        name: ver.name,
+                        value: ver.name,
+                        score: score,
+                        meta: progressTpl(ver)
+                    };
                 });
                 cb(null, completions);
             });
@@ -230,11 +234,16 @@ var LogEditor = React.createClass({
             if (!info.projectId) { return cb(null, []); }
             return Ltt.sdk.tasks({projectId: info.projectId, versionId: info.versionId, populate: false})
                 .then(function (tasks) {
-                    console.log(tasks);
                     if (_.isEmpty(tasks)) { return cb(null, []); }
                     var completions = tasks.map(function(task) {
                         var score = new Date(task.lastActiveTime).getTime();
-                        return {name: task.name, value: task.name, score: score, meta: "task", identifierRegex:/[a-zA-Z_0-9\u00A2-\uFFFF]/}
+                        return {
+                            name: task.name,
+                            value: task.name,
+                            score: score,
+                            meta: progressTpl(task),
+                            identifierRegex:/[a-zA-Z_0-9\u00A2-\uFFFF]/
+                        }
                     });
                     cb(null, completions);
                 });
