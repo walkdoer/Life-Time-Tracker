@@ -105,12 +105,16 @@ var LogEditor = React.createClass({
                         that.getVersionCompletions(line, callback);
                     } else if (tokenValue === '(') {
                         that.getTaskCompletions(line, callback);
+                    } else if (tokenValue === '$') {
+                        that.getTaskCompletions(line, callback);
                     }
                 } else if (tokenType === 'ltt_version'){
                     that.getVersionCompletions(line, callback);
                 } else if (tokenType === 'ltt_project') {
                     that.getProjectCompletions(line, callback);
                 } else if (tokenType === 'ltt_task') {
+                    that.getTaskCompletions(line, callback);
+                } else if (tokenType === 'ltt_subTask') {
                     that.getTaskCompletions(line, callback);
                 }
             }
@@ -218,7 +222,7 @@ var LogEditor = React.createClass({
                         name: ver.name,
                         value: ver.name,
                         score: score,
-                        meta: progressTpl(ver)
+                        meta: 'version'
                     };
                 });
                 cb(null, completions);
@@ -232,9 +236,10 @@ var LogEditor = React.createClass({
             var info = that._getCurrentLogInformation();
             console.log(info);
             if (!info.projectId) { return cb(null, []); }
-            return Ltt.sdk.tasks({projectId: info.projectId, versionId: info.versionId, populate: false})
+            return Ltt.sdk.tasks({projectId: info.projectId, versionId: info.versionId, populate: false, parent: info.taskId})
                 .then(function (tasks) {
                     if (_.isEmpty(tasks)) { return cb(null, []); }
+                    console.log(tasks);
                     var completions = tasks.map(function(task) {
                         var score = new Date(task.lastActiveTime).getTime();
                         return {
