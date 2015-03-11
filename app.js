@@ -169,19 +169,28 @@ var Footer = React.createClass({
 
 
     updateLastTime: function (doingLog) {
-        console.log(doingLog);
+        var that = this;
         var lastTime = this.refs.lastTime.getDOMNode();
-        tickTime(doingLog);
         if (this.updateTimeIntervalId) {
             this.clearInterval(this.updateTimeIntervalId);
         }
-        var prevNotifyMoment;
+        if (!doingLog) {return tickTime(doingLog);}
+        var start = new Moment(doingLog.start);
+        var notifyId = start.unix();
+        tickTime(doingLog);
         this.updateTimeIntervalId = this.setInterval(function () {
+            var notifyInfo = that.notifyInfo;
+            //check if this doing log is notify before
+            if (notifyInfo && notifyInfo.id !== notifyId) {
+                console.log('new');
+                that.notifyInfo = notifyInfo = null;
+            }
             tickTime(doingLog);
-            var start = new Moment(doingLog.start);
+            var prevNotifyMoment = notifyInfo ? notifyInfo.time : null;
             var lastMinutes = new Moment().diff(start, 'minute');
-            var needNotify = prevNotifyMoment ? new Moment().diff(prevNotifyMoment, 'minute') > 10 : true;
-            if (lastMinutes > 30 && needNotify) {
+            //remind again after first remind
+            var needNotify = prevNotifyMoment ? new Moment().diff(prevNotifyMoment, 'minute') > 15 : true;
+            if (lastMinutes > 45 && needNotify) {
                 var message = '',
                     task = doingLog.task,
                     project = doingLog.projects[0],
@@ -202,12 +211,25 @@ var Footer = React.createClass({
                 Ltt.sdk.notify({
                     title: '😁' + '你已经工作了' + start.fromNow(true),
                     subtitle: '可以休息一下啦',
-                    icon: path.join(__dirname, '/images/me.jpg'),
+                    icon: path.join(__dirname, './images/me.jpg'),
                     sound: true,
                     wait: false,
                     message: message
+                }, {
+                    click: function () {
+                        alert('test');
+                    }
                 });
-                prevNotifyMoment = new Moment();
+                if (!notifyInfo) {
+                    that.notifyInfo = {
+                        time: new Moment(),
+                        count: 1,
+                        id: notifyId
+                    }
+                } else {
+                    notifyInfo.count++;
+                    notifyInfo.time = new Moment();
+                }
             }
         }, 1000);
 
@@ -247,5 +269,18 @@ var Footer = React.createClass({
         }
     }
 });
+
+
+var NotifyCenter = function () {
+    this.messageQueue = [];
+};
+
+
+NotifyCenter.prototype = {
+    constructor: NotifyCenter,
+    notify: function (msg, options) {
+
+    }
+}
 
 module.exports = App;
