@@ -15,7 +15,8 @@ var Router = require('react-router');
 var State = Router.State;
 var RouteHandler = Router.RouteHandler;
 var Moment = require('moment');
-
+var _ = require('lodash');
+var path = require('path');
 
 /** Components */
 var Header = require('./components/Header');
@@ -28,6 +29,8 @@ var EVENT = require('./constants/EventConstant');
 /** Utils */
 var DataAPI = require('./utils/DataAPI');
 var Bus = require('./utils/Bus');
+
+
 
 var App = React.createClass({
 
@@ -172,8 +175,40 @@ var Footer = React.createClass({
         if (this.updateTimeIntervalId) {
             this.clearInterval(this.updateTimeIntervalId);
         }
+        var prevNotifyMoment;
         this.updateTimeIntervalId = this.setInterval(function () {
             tickTime(doingLog);
+            var start = new Moment(doingLog.start);
+            var lastMinutes = new Moment().diff(start, 'minute');
+            var needNotify = prevNotifyMoment ? new Moment().diff(prevNotifyMoment, 'minute') > 10 : true;
+            if (lastMinutes > 30 && needNotify) {
+                var message = '',
+                    task = doingLog.task,
+                    project = doingLog.projects[0],
+                    subTask = doingLog.subTask,
+                    tag = (doingLog.tags || []).join(',');
+                if (tag) {
+                    message = '[' + tag + '] ';
+                }
+                if (project) {
+                    message = project.name
+                }
+                if (task) {
+                    message += ' ' + task.name;
+                }
+                if (subTask) {
+                    message += ' ' + subTask.name;
+                }
+                Ltt.sdk.notify({
+                    title: '😁' + '你已经工作了' + start.fromNow(true),
+                    subtitle: '可以休息一下啦',
+                    icon: path.join(__dirname, '/images/me.jpg'),
+                    sound: true,
+                    wait: false,
+                    message: message
+                });
+                prevNotifyMoment = new Moment();
+            }
         }, 1000);
 
         function tickTime(doingLog) {
@@ -211,6 +246,6 @@ var Footer = React.createClass({
             React.renderComponent(content, lastTime);
         }
     }
-})
+});
 
 module.exports = App;
