@@ -27,7 +27,18 @@ var Bar = React.createClass({
         );
     },
 
+    componentDidMount: function () {
+        this.setData(this.props.data);
+    },
+
+    componentWillReceiveProps: function (nextProps) {
+        this.setData(nextProps.data);
+    },
+
     setData: function(data) {
+        if (!data) {
+            return;
+        }
         this.props.data = data;
         var userHighchartOptions = this.getUserHighchartOptions('bar');
         chart.bar({

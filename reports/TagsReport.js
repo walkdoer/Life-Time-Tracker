@@ -11,6 +11,7 @@ var WordsCloud = require('../components/charts/WordsCloud');
 var remoteStorage = require('../components/storage.remote');
 var DateRangePicker = require('../components/DateRangePicker');
 var LoadingMask = require('../components/LoadingMask');
+var Bar = require('../components/charts/Bar');
 
 /** constant */
 var DATE_FORMAT = 'YYYY-MM-DD';
@@ -28,6 +29,7 @@ module.exports = React.createClass({
     },
 
     render: function () {
+        var  tagBarHeight = this.state.tags.length * 30;
         return (
             <div className="ltt_c-report ltt_c-report-tags">
                 <div>
@@ -35,6 +37,9 @@ module.exports = React.createClass({
                             onDateRangeChange={this.onDateRangeChange}/>
                 </div>
                 {!_.isEmpty(this.state.tags) ? <WordsCloud words={this.adaptData(this.state.tags)}/> : null }
+                <div style={{height: tagBarHeight}}>
+                    <Bar data={this.state.tags}/>
+                </div>
                 <LoadingMask loaded={this.state.loaded}/>
             </div>
         );
