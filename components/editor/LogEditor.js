@@ -97,8 +97,9 @@ var LogEditor = React.createClass({
                 var token = session.getTokenAt(pos.row, pos.column);
                 var line = session.getLine(pos.row);
                 var tokenType = token.type;
+                var tokenValue = token.value;
+                console.log('tokenValue:' + tokenValue + ' prefix:' + prefix);
                 if (tokenType === 'text') {
-                    var tokenValue = token.value;
                     if (tokenValue === '<') {
                         that.getProjectCompletions(line, callback);
                     } else if (tokenValue === '$') {
@@ -116,6 +117,8 @@ var LogEditor = React.createClass({
                     that.getTaskCompletions(line, callback);
                 } else if (tokenType === 'ltt_subTask') {
                     that.getTaskCompletions(line, callback);
+                } else if (tokenType === 'ltt_tag') {
+                    that.getTagCompletions(prefix, callback);
                 }
             }
         }
@@ -184,6 +187,21 @@ var LogEditor = React.createClass({
         });
     },
 
+    getTagCompletions: function (prefix, cb) {
+        console.log('get tag completions start');
+        var that = this;
+        Ltt.sdk.tags({name: prefix}).then(function (tags) {
+            if (_.isEmpty(tags)) {
+                return cb(null, []);
+            }
+            var completions = tags.map(function (tag) {
+                return {name: tag.name, value: tag.name, meta: 'tag'};
+            });
+            console.log('tags :' + completions);
+            cb(null, completions);
+        });
+    },
+
     getProjectCompletions: function (line, cb) {
         //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
         console.log('getProjectCompletions start');
@@ -191,7 +209,7 @@ var LogEditor = React.createClass({
         var that = this;
         Ltt.sdk.projects({aggregate: false, versions: false}).then(function(projects) {
             //if not projects, then no need to create typeahead
-            if (_.isEmpty(projects)) {cb(null, [])}
+            if (_.isEmpty(projects)) {return cb(null, [])}
             var end = new Date().getTime();
             var completions = projects.map(function(proj) {
                 var score = new Date(proj.lastActiveTime).getTime()
