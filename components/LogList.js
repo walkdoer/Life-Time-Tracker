@@ -29,7 +29,7 @@ module.exports = React.createClass({
 
     render: function () {
         var logs = this.state.logs.map(function (log, index) {
-            return <Log {... log} showDate={false}/>;
+            return <Log {... log}/>;
         });
         var style;
         if (this.state.isHidden) {
@@ -71,7 +71,9 @@ module.exports = React.createClass({
 
     load: function (date) {
         var that = this;
-        var params = _.extend({}, _.pick(this.props, ['versionId', 'taskId', 'projectId']));
+        var params = _.extend({
+            sort: 'date: -1'
+        }, _.pick(this.props, ['versionId', 'taskId', 'projectId']));
         params.populate = false;
         var promise = remoteStorage.get('/api/logs', params)
             .then(function (res) {
