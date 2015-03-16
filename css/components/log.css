@@ -1,6 +1,6 @@
 .ltt_c-log {
     background:#FFF;
-    padding: 10px 0;
+    padding: 10px 10px;
     /*border-left: 8px solid #FFFFFF;*/
 }
 
@@ -59,7 +59,7 @@
 }
 
 .ltt_c-log-origin {
-    color: #939393;
+    color: #BCBCBC;
     padding-left: 10px;
     margin: 0px;
 }
@@ -122,4 +122,9 @@
 .ltt_c-log-task .fa{
     margin-right: 2px;
     font-size: 0.8rem;
+}
+
+.ltt_c-log-detailToggler{
+    position:absolute;
+    right: 10px;
 }

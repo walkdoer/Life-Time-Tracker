@@ -1,8 +1,11 @@
 var React = require('react');
+var cx = React.addons.classSet;
 var R = React.DOM;
 var Moment = require('moment');
 var _ = require('lodash');
 var Tag = require('./Tag');
+var Progress = require('./Progress');
+
 var Time = React.createClass({
     displayName: 'time',
 
@@ -46,6 +49,20 @@ var LogClass = React.createClass({
 
 var Log = React.createClass({
     displayName: 'log',
+
+    getDefaultProps: function () {
+        return {
+            showDate: true,
+            showTime: true,
+            showProgress: true
+        }
+    },
+
+    getInitialState: function () {
+        return {
+            showDetail: false
+        }
+    },
 
     render: function() {
 
@@ -95,17 +112,33 @@ var Log = React.createClass({
         } else {
             task = null;
         }
+        var progress = this.props.progress;
+
+        if (progress) {
+            progress = <Progress max={100} value={progress.subTask || progress.task}/>
+        }
+
+        var detail = <div class="ltt_c-log-detail">
+            <LogClass value={this.props.classes}/>
+            {project}
+            {task}
+            {tags}
+        </div>
         return (
             <div className={className}  style={getLogInlineStyle(this.props)}>
-                <Time value={this.props.start} type='date'/>
-                <Time value={this.props.start} type='time'/>
-                <Time value={this.props.end} type='time'/>
+                <span className="ltt_c-log-detailToggler" onClick={this.toggleDetail}>
+                    <i className={cx({
+                        fa: true,
+                        'fa-angle-down': this.state.showDetail,
+                        'fa-angle-up': !this.state.showDetail
+                    })}></i>
+                </span>
+                {this.props.showDate ? <Time value={this.props.start} type='date'/> : null}
+                {this.props.showTime ? <Time value={this.props.start} type='time'/> : null }
+                {this.props.showTime ? <Time value={this.props.end} type='time'/> : null }
+                {this.props.showProgress ? progress : null}
                 <span className="ltt_c-log-len">{getTimeLength(this.props.len)}</span>
-                <LogClass value={this.props.classes}/>
-                {project}
-                {task}
-                {tags}
-                <span>progress:{JSON.stringify(this.props.progress)}</span>
+                {this.state.showDetail ? detail : null}
                 <Origin value={this.props.content}/>
             </div>
         );
@@ -128,6 +161,12 @@ var Log = React.createClass({
                 return (val / 60).toFixed(1) + ' hours';
             }
         }
+    },
+
+    toggleDetail: function () {
+        this.setState({
+            showDetail: !this.state.showDetail
+        });
     }
 
 });

@@ -29,7 +29,7 @@ module.exports = React.createClass({
 
     render: function () {
         var logs = this.state.logs.map(function (log, index) {
-            return Log(log);
+            return <Log {... log} showDate={false}/>;
         });
         var style;
         if (this.state.isHidden) {
