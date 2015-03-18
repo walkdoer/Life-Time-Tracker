@@ -4,11 +4,19 @@
 
 var React = require('react');
 var Moment = require('moment');
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 
+/** Components */
 var CalendarHeatMap = require('../components/charts/CalendarHeatMap');
 var SleepPeriod = require('../components/charts/SleepPeriod');
 var MonthCountDown = require('../components/charts/MonthCountDown');
+
+/** Utils */
+var DataAPI = require('../utils/DataAPI');
+
 var Dashboard = React.createClass({
+
+    mixins: [PureRenderMixin],
 
     render: function () {
         return (
@@ -16,6 +24,7 @@ var Dashboard = React.createClass({
                 <div className="ltt_c-page-com">
                     <p className="ltt_c-page-title">Sport Cal-Heatmap</p>
                     <CalendarHeatMap
+                        data={this.loadSportData}
                         empty="no sport data"
                         filled="{date} 运动时间 {count}分钟"/>
                 </div>
@@ -32,6 +41,14 @@ var Dashboard = React.createClass({
                 </div>
             </div>
         );
+    },
+
+
+    loadSportData: function () {
+        return DataAPI.calendar('sport', {
+            start: new Moment().startOf('month').subtract(1, 'year').toDate(),
+            end: new Moment().endOf('month').toDate()
+        });
     }
 
 });

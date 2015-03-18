@@ -146,6 +146,7 @@ text.now
 
 .ltt_c-calendarHeapMap{
     position: relative;
+    min-height: 205px;
 }
 .ltt_c-calendarHeapMap .calendar{
     overflow: hidden;

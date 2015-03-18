@@ -21,7 +21,7 @@ var path = require('path');
 /** Components */
 var Header = require('./components/Header');
 var Nav = require('./components/Nav');
-
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 /* Const */
 var NAV_OPEN = 'ltt__navOpen';
 var EVENT = require('./constants/EventConstant');

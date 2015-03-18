@@ -9,6 +9,8 @@ var Router = require('react-router');
 var Mt = window.Mousetrap;
 var _ = require('lodash');
 require('../libs/bootstrap-datepicker');
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
+
 var Link = Router.Link;
 /* Components */
 var remoteStorage = require('../components/storage.remote');
@@ -36,6 +38,8 @@ var DATE_FORMAT = 'YYYY-MM-DD';
 
 
 var Page = React.createClass({
+
+    mixins: [PureRenderMixin],
 
     getInitialState: function () {
         return {
