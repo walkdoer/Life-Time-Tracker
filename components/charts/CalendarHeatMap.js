@@ -33,7 +33,7 @@ var CalendarHeatMap = React.createClass({
 
     renderCalendar: function (data) {
         this.data = data;
-        this.calendar = createCalHealMap.call(this, data, this.props);
+        this.calendar = createCalHealMap.call(this, data, this.getDrawOptions());
         this.redrawHandler = _.debounce(this.redraw, 300);
         $(window).on('resize', this.redrawHandler);
     },
@@ -58,7 +58,11 @@ var CalendarHeatMap = React.createClass({
     redraw: function () {
         var data = this.data
         $(this.getDOMNode()).find('.calendar').empty();
-        this.calendar = createCalHealMap.call(this, data, this.props);
+        this.calendar = createCalHealMap.call(this, data, this.getDrawOptions());
+    },
+
+    getDrawOptions: function () {
+        return _.omit(this.props, 'data');
     },
 
     next: function () {

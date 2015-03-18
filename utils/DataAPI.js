@@ -2,6 +2,7 @@ var server = require('../conf/config').server;
 var ServerAction = require('../actions/ServerAction');
 var Q = require('q');
 var isNodeWebkit = true;
+var _ = require('lodash');
 
 try {
     var a = global.process.version;
@@ -44,7 +45,14 @@ module.exports = {
      * @return {Promise}
      */
     calendar: function (calType, params) {
-        return get(url('/calendars/' + calType), params);
+        var defaulParams;
+        if (calType === 'sport') {
+            defaulParams = {classes: 'SPR'};
+        } else if (calType === 'meditation'){
+            defaulParams = {tags: 'meditation'};
+        }
+        params = _.extend({}, defaulParams, params);
+        return get(url('/calendars'), params);
     },
 
     deleteProject: function (project) {

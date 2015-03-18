@@ -149,7 +149,6 @@ text.now
     min-height: 205px;
 }
 .ltt_c-calendarHeapMap .calendar{
-    overflow: hidden;
 }
 .ltt_c-calendarHeapMap .btn{
     padding: 0 8px;
