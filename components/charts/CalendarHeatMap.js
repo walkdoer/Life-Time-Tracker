@@ -4,36 +4,38 @@ var moment = require('moment');
 var Q = require('q');
 var CalHeatMap = require('../../libs/cal-heatmap');
 var _ = require('lodash');
-var LoadIndicator = require('../LoadIndicator');
+var LoadingMask = require('../LoadingMask');
 var server = require('../../conf/config').server;
 var DataAPI = require('../../utils/DataAPI');
+
 
 var CalendarHeatMap = React.createClass({
     displayName: 'calendarHeatMap',
 
-    getDefaultProps: function () {
-        return {
-            startDate: new moment().startOf('month').subtract(1, 'year').toDate(),
-            endDate: new moment().endOf('month').toDate()
-        };
-    },
-
     getInitialState: function () {
         return {
-            msg: 'loading'
+            loaded: false
         };
     },
     componentDidMount: function () {
         var that = this;
-        DataAPI.calendar('sport', {
-            start: this.props.startDate,
-            end: this.props.endDate
-        }).then(function (data) {
-            that.data = data;
-            that.calendar = createCalHealMap.call(that, data, that.props);
-            that.redrawHandler = _.debounce(that.redraw, 300);
-            $(window).on('resize', that.redrawHandler);
-        });
+        if (_.isFunction(this.props.data)) {
+            this.props.data()
+                .then(function (data) {
+                    that.setState({loaded: true}, function () {
+                        this.renderCalendar(data);
+                    });
+                });
+        } else {
+            this.renderCalendar(data);
+        }
+    },
+
+    renderCalendar: function (data) {
+        this.data = data;
+        this.calendar = createCalHealMap.call(this, data, this.props);
+        this.redrawHandler = _.debounce(this.redraw, 300);
+        $(window).on('resize', this.redrawHandler);
     },
 
     componentWillUnmount: function () {
@@ -48,6 +50,7 @@ var CalendarHeatMap = React.createClass({
                     <button className="btn btn-xs" onClick={this.next}><i className="fa fa-angle-right" title="next"></i></button>
                 </div>
                 <div className="calendar"></div>
+                <LoadingMask loaded={this.state.loaded}/>
             </div>
         );
     },
@@ -78,8 +81,8 @@ var CalendarHeatMap = React.createClass({
     if (!data) {return;}
     data.forEach(function(val) {
         var seconds = new Date(val.date).getTime() / 1000;
-        if (val.sportTime > 0) {
-            renderData[seconds] = val.sportTime;
+        if (val.count > 0) {
+            renderData[seconds] = val.count;
         }
     });
     var $el = $(that.getDOMNode()).find('.calendar');
