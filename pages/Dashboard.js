@@ -35,10 +35,17 @@ var Dashboard = React.createClass({
                         start={new Moment().subtract(30, 'days').toDate()}
                         end={new Moment().toDate()}/>
                 </div>
-                 <div className="ltt_c-page-com">
+                <div className="ltt_c-page-com">
                     <p className="ltt_c-page-title">Meditation</p>
                     <CalendarHeatMap
                         data={this.loadMeditationCalendar}
+                        empty="do not meditate this day"
+                        filled="{date} meditate {count}"/>
+                </div>
+                <div className="ltt_c-page-com">
+                    <p className="ltt_c-page-title">Thinking</p>
+                    <CalendarHeatMap
+                        data={this.loadThinkingCalendar}
                         empty="do not meditate this day"
                         filled="{date} meditate {count}"/>
                 </div>
@@ -52,17 +59,27 @@ var Dashboard = React.createClass({
 
 
     loadSportCalendar: function () {
-        return DataAPI.calendar('sport', {
+        return DataAPI.calendar({
             start: new Moment().startOf('month').subtract(1, 'year').toDate(),
-            end: new Moment().endOf('month').toDate()
+            end: new Moment().endOf('month').toDate(),
+            classes: 'SPR'
         });
     },
 
 
     loadMeditationCalendar: function () {
-        return DataAPI.calendar('meditation', {
+        return DataAPI.calendar({
             start: new Moment().startOf('month').subtract(1, 'year').toDate(),
-            end: new Moment().endOf('month').toDate()
+            end: new Moment().endOf('month').toDate(),
+            tags: 'meditation'
+        });
+    },
+
+    loadThinkingCalendar: function () {
+        return DataAPI.calendar({
+            start: new Moment().startOf('month').subtract(1, 'year').toDate(),
+            end: new Moment().endOf('month').toDate(),
+            classes: 'TK'
         });
     }
 

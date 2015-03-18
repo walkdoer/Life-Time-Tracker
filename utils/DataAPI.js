@@ -44,14 +44,7 @@ module.exports = {
      * @param  {Object} params  start, end
      * @return {Promise}
      */
-    calendar: function (calType, params) {
-        var defaulParams;
-        if (calType === 'sport') {
-            defaulParams = {classes: 'SPR'};
-        } else if (calType === 'meditation'){
-            defaulParams = {tags: 'meditation'};
-        }
-        params = _.extend({}, defaulParams, params);
+    calendar: function (params) {
         return get(url('/calendars'), params);
     },
 
