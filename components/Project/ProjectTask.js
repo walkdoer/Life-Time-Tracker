@@ -191,6 +191,7 @@ module.exports = React.createClass({
         var deferred = Q.defer();
         var that = this;
         var defaultParams = _.pick(that.props, ['projectId', 'versionId']);
+        defaultParams.parent = "null";
         params = _.extend(defaultParams, params);
         params.calculateTimeConsume = true;
         remoteStorage.get('/api/tasks', params)
