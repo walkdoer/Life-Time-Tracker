@@ -29,7 +29,7 @@ var Dashboard = React.createClass({
         return (
             <div className="ltt_c-page ltt_c-page-dashboard">
                 <div className="ltt_c-page-com">
-                    <RecentActivity initialTab={'yesterday'}/>
+                    <RecentActivity initialTab={'today'}/>
                 </div>
                 <div className="ltt_c-page-com">
                     <p className="ltt_c-page-title">Sport Cal-Heatmap</p>
@@ -120,7 +120,7 @@ var RecentActivity = React.createClass({
         return (
             <div class="ltt_c-RecentActivity">
                 <p className="ltt_c-page-title">Recent Activity</p>
-                <TabbedArea activeKey={this.state.currentTab} animation={false} onSelect={this.handleTabSelect}>
+                <TabbedArea defaultActiveKey={this.props.initialTab} activeKey={this.state.currentTab} animation={false} onSelect={this.handleTabSelect}>
                     <TabPane eventKey="yesterday" tab="Yesterday">
                         {this.renderPane('yesterday')}
                     </TabPane>
@@ -136,11 +136,11 @@ var RecentActivity = React.createClass({
         );
     },
 
-    renderPane: function (type, data) {
+    renderPane: function (type) {
         var data = this.state[type + 'Task'];
         return (
             <div className="ltt_c-RecentActivity-content">
-               {this.renderButtonGroup()}
+               {this.renderButtonGroup(type)}
                <TaskList>
                     {!_.isEmpty(data) ? data.map(function (task) {
                         return <Task data={task}
@@ -151,11 +151,11 @@ var RecentActivity = React.createClass({
         );
     },
 
-    renderButtonGroup: function () {
+    renderButtonGroup: function (type) {
         return (
             <div className="btn-group">
-                <button className="btn btn-xs" onClick={this.loadDoing}>Doing</button>
-                <button className="btn btn-xs" onClick={this.loadDone}>Done</button>
+                <button className="btn btn-xs" onClick={this.loadDoing.bind(this, type)}>Doing</button>
+                <button className="btn btn-xs" onClick={this.loadDone.bind(this, type)}>Done</button>
             </div>
         );
     },
@@ -171,7 +171,7 @@ var RecentActivity = React.createClass({
     loadTask: function (type, params) {
         var that = this;
         this.setState({loaded: false});
-        params = _.extend({status: 'doing'}, params);
+        params = _.extend({status: 'doing', calculateTimeConsume: true}, params);
         if (type === 'yesterday') {
             params.start = new Moment().subtract(1, 'day').startOf('day').toDate();
             params.end = new Moment().subtract(1, 'day').endOf('day').toDate();
@@ -189,11 +189,12 @@ var RecentActivity = React.createClass({
         });
     },
 
-    loadDoing: function () {
+    loadDoing: function (type) {
+        this.loadTask(type, {status: 'doing'});
     },
 
-    loadDone: function () {
-
+    loadDone: function (type) {
+        this.loadTask(type, {status: 'done'});
     }
 });
 

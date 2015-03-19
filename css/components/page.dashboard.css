@@ -6,7 +6,8 @@
 .ltt_c-RecentActivity-content .btn-group{
     position: absolute;
     top: 10px;
-    right: 10px;
+    z-index: 4;
+    right: 20px;
 }
 
 
@@ -14,4 +15,8 @@
     position:absolute;
     top:45%;
     left: 45%;
+}
+
+.ltt_c-RecentActivity-content .ltt_c-taskList{
+    padding-top: 30px;
 }
