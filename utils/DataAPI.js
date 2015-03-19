@@ -85,6 +85,12 @@ module.exports = {
         load: function (params) {
             return get(url('/affectRecords'), params);
         }
+    },
+
+    Task: {
+        load: function (params) {
+            return get(url('/tasks'), params);
+        }
     }
 };
 

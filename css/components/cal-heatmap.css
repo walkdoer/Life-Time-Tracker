@@ -146,10 +146,11 @@ text.now
 
 .ltt_c-calendarHeapMap{
     position: relative;
-    min-height: 205px;
+    /* min-height: 205px; */
 }
 .ltt_c-calendarHeapMap .calendar{
     /* overflow: hidden; */
+    min-height: 135px;
 }
 .ltt_c-calendarHeapMap .btn{
     padding: 0 8px;

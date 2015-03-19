@@ -1,0 +1,17 @@
+.ltt_c-RecentActivity-content{
+    position:relative;
+    min-height:200px;
+}
+
+.ltt_c-RecentActivity-content .btn-group{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+
+.ltt_c-RecentActivity-content .empty-task{
+    position:absolute;
+    top:45%;
+    left: 45%;
+}

@@ -189,8 +189,8 @@ gulp.task('nw', function () {
     var nw = new NwBuilder({
         files: [ './build/**/**'],
         platforms: ['osx64'],
-        buildDir: './production'
-        /*version: '0.11.6'*/
+        buildDir: './production',
+        version: '0.12.0-rc1'
     });
     // Log stuff you want
     nw.on('log', function (msg) {
