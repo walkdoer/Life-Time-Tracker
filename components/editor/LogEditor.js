@@ -14,6 +14,7 @@ var NProgress = require('nprogress');
 var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
 var Range = ace.require('ace/range').Range;
 var DataAPI = require('../../utils/DataAPI');
+
 var progressTpl = _.template('<%=progress%>%');
 
 var LogEditor = React.createClass({
@@ -181,10 +182,17 @@ var LogEditor = React.createClass({
             name: 'gotoToday',
             bindKey: {win: 'Ctrl-\\', mac: 'Command-\\'},
             exec: function (editor) {
-                console.log('goto today');
                 that.props.onGotoToday(editor);
             }
         });
+
+        commands.addCommand({
+            name: 'onCtrlO',
+            bindKey: {win: 'Ctrl-o', mac: 'Command-o'},
+            exec: function (editor) {
+                that.props.onCtrlO(editor);
+            }
+        })
     },
 
     getTagCompletions: function (prefix, cb) {

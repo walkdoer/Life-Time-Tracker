@@ -10,8 +10,12 @@ var Mt = window.Mousetrap;
 var _ = require('lodash');
 require('../libs/bootstrap-datepicker');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
-
+var ReactBootStrap = require('react-bootstrap');
+var Modal = ReactBootStrap.Modal;
+var ModalTrigger = ReactBootStrap.ModalTrigger;
+var Button = ReactBootStrap.Button;
 var Link = Router.Link;
+
 /* Components */
 var remoteStorage = require('../components/storage.remote');
 var Moment = require('moment');
@@ -37,6 +41,7 @@ var Ltt = global.Ltt;
 var DATE_FORMAT = 'YYYY-MM-DD';
 
 
+
 var Page = React.createClass({
 
     mixins: [PureRenderMixin],
@@ -57,6 +62,7 @@ var Page = React.createClass({
                     onNextDay={this.gotoNextDay}
                     onPrevDay={this.gotoPrevDay}
                     onGotoToday={this.gotoToday}
+                    onCtrlO={this.openGotoDayWindow}
                     onChange={this.onChange}
                     onLoad={this.onEditorLoad}
                     onSave={this.onSave}
@@ -65,6 +71,7 @@ var Page = React.createClass({
                     <LogDatePicker select={this.state.current}
                         onDateChange={this.onDateChange}
                         ref="datePicker"/>
+                    <ModalTrigger modal={<DateGoToWindow onGoto={this.gotoDate}/>} ref="dateGoToWindow"><span></span></ModalTrigger>
                     <div className="ltt_c-sidebar-splitline">Projects</div>
                     <ProjectInfo date={this.state.current}/>
                 </aside>
@@ -77,6 +84,10 @@ var Page = React.createClass({
         Mt.bind(['command+\'', 'ctrl+\''], function (e) {
             e.preventDefault();
             that.gotoToday();
+        });
+        Mt.bind(['command+o', 'ctrl+o'], function (e) {
+            e.preventDefault();
+            that.openGotoDayWindow();
         });
     },
 
@@ -113,6 +124,17 @@ var Page = React.createClass({
         });
     },
 
+    gotoDate: function (date) {
+        date = new Moment(date).format(DATE_FORMAT)
+        this.setState({
+            current: date
+        });
+    },
+
+    openGotoDayWindow: function () {
+        this.refs.dateGoToWindow.show();
+    },
+
 
     onChange: function (content) {
         console.log('chnage and fire doingLog');
@@ -130,6 +152,64 @@ var Page = React.createClass({
         Bus.emit(EVENT.DOING_LOG, doingLog);
     }
 });
+
+
+var DateGoToWindow = React.createClass({
+
+    getDefaultProps: function () {
+        return {
+            onGoto: function () {}
+        }
+    },
+
+    getInitialState: function () {
+        return {
+            date: ''
+        };
+    },
+
+    render: function () {
+        var inputBoxStyle = {'text-indent': '10px', 'padding': '2px 10px 2px 0'};
+        return (
+            <Modal {...this.props} title="Goto any day" bsStyle="primary" animation={false}>
+                <div className="modal-body">
+                  <input type="text" placeholder="YYYY-MM-DD" value={this.state.value} style={inputBoxStyle}
+                    ref="input" onChange={this.onDateChange} onKeyDown={this.onKeyDown}/>
+                </div>
+                <div className="modal-footer">
+                  <Button onClick={this.props.onRequestHide}>Close</Button>
+                  <Button bsStyle="primary" onClick={this.goto}>Goto</Button>
+                </div>
+            </Modal>
+        );
+    },
+
+    onDateChange: function (e) {
+        this.setState({
+            date: e.target.value
+        });
+    },
+
+    onKeyDown: function (e) {
+        var ENTER = 13;
+        if( e.keyCode == ENTER ) {
+            this.goto();
+        }
+    },
+
+    componentDidMount: function () {
+        $(this.refs.input.getDOMNode()).focus();
+    },
+
+    goto: function () {
+        var date = new Moment(this.state.date);
+        if (date.isValid()) {
+            this.props.onGoto(date.toDate());
+            this.props.onRequestHide();
+        }
+    }
+
+})
 
 var LogDatePicker = React.createClass({
     render: function () {
