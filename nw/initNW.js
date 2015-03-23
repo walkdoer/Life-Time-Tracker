@@ -63,8 +63,15 @@
              * close application window
              */
             close: function() {
-                var win = this.getWindow();
-                win.hide();
+                var that = this;
+                if (this.isFullscreen()) {
+                    this.leaveFullscreen();
+                    setTimeout(function () {
+                        that.getWindow().hide();
+                    }, 1500);
+                } else {
+                    this.getWindow().close();
+                }
             },
 
             quit: function () {

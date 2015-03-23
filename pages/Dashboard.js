@@ -21,6 +21,15 @@ var LoadingMask = require('../components/LoadingMask');
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
 
+/**
+ <div className="ltt_c-page-com">
+                    <p className="ltt_c-page-title">Sleep Period</p>
+                    <SleepPeriod title="Last 30 Day's Sleep Period"
+                        url="/api/sleepPeriods"
+                        start={new Moment().subtract(30, 'days').toDate()}
+                        end={new Moment().toDate()}/>
+                </div>
+ */
 var Dashboard = React.createClass({
 
     mixins: [PureRenderMixin],
@@ -37,13 +46,6 @@ var Dashboard = React.createClass({
                         data={this.loadSportCalendar}
                         empty="no sport data"
                         filled="{date} 运动时间 {count}分钟"/>
-                </div>
-                <div className="ltt_c-page-com">
-                    <p className="ltt_c-page-title">Sleep Period</p>
-                    <SleepPeriod title="Last 30 Day's Sleep Period"
-                        url="/api/sleepPeriods"
-                        start={new Moment().subtract(30, 'days').toDate()}
-                        end={new Moment().toDate()}/>
                 </div>
                 <div className="ltt_c-page-com">
                     <p className="ltt_c-page-title">Meditation</p>
