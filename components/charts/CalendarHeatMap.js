@@ -14,7 +14,8 @@ var CalendarHeatMap = React.createClass({
 
     getInitialState: function () {
         return {
-            loaded: false
+            loaded: false,
+            data: []
         };
     },
     componentDidMount: function () {
@@ -22,12 +23,10 @@ var CalendarHeatMap = React.createClass({
         if (_.isFunction(this.props.data)) {
             this.props.data()
                 .then(function (data) {
-                    that.setState({loaded: true}, function () {
+                    that.setState({loaded: true, data: data}, function () {
                         this.renderCalendar(data);
                     });
                 });
-        } else {
-            this.renderCalendar(data);
         }
     },
 
@@ -45,6 +44,7 @@ var CalendarHeatMap = React.createClass({
     render: function() {
         return (
             <div className="ltt_c-calendarHeapMap">
+                {this.getStreakInfo(this.state.data)}
                 <div className="btn-group">
                     <button className="btn btn-xs" onClick={this.prev}><i className="fa fa-angle-left" title="previous"></i></button>
                     <button className="btn btn-xs" onClick={this.next}><i className="fa fa-angle-right" title="next"></i></button>
@@ -71,6 +71,39 @@ var CalendarHeatMap = React.createClass({
 
     prev: function () {
         this.calendar.previous();
+    },
+
+    getStreakInfo: function (data) {
+        var currentStreak = 0, longestStreak = 0, currentStreakSpan, longestStreakSpan;
+        var streaks = [], prevDate;
+        data.forEach(function (item, index) {
+            var mDate = new moment(item.date);
+            var count = item.count;
+            if (prevDate && mDate.diff(prevDate, 'day') === 1) {
+                currentStreak++;
+            } else {
+                if (currentStreak > 0) {
+                    streaks.push(currentStreak);
+                }
+                currentStreak = 1;
+            }
+            prevDate = mDate;
+        });
+        //get the longest streak
+        longestStreak = Math.max.apply(Math, streaks) || 0;
+
+        if (currentStreak >= 0) {
+            currentStreakSpan = <span className="streakItem">Current Streak: {currentStreak}</span>
+        }
+        if (longestStreak >= 0) {
+            longestStreakSpan = <span className="streakItem">Longest Streak: {longestStreak}</span>
+        }
+        return (
+            <div className="ltt_c-calendarHeapMap-streak">
+                {currentStreakSpan}
+                {longestStreakSpan}
+            </div>
+        );
     }
 });
 

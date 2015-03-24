@@ -148,6 +148,17 @@ text.now
     position: relative;
     /* min-height: 205px; */
 }
+
+.ltt_c-calendarHeapMap-streak{
+    position:absolute;
+    bottom: -6px;
+    right:5px;
+    color: #717171;
+}
+
+.ltt_c-calendarHeapMap-streak .streakItem{
+    margin-right:10px;
+}
 .ltt_c-calendarHeapMap .calendar{
     /* overflow: hidden; */
     min-height: 135px;
