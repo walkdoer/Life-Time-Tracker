@@ -132,6 +132,18 @@ var RecentActivity = React.createClass({
                     <TabPane eventKey="weekly" tab="Weekly">
                         {this.renderPane('weekly')}
                     </TabPane>
+                    <TabPane eventKey="last_three_day" tab="Last Three Day">
+                        {this.renderPane('last_three_day')}
+                    </TabPane>
+                    <TabPane eventKey="last_seven_day" tab="Last Seven Days">
+                        {this.renderPane('last_seven_day')}
+                    </TabPane>
+                    <TabPane eventKey="monthly" tab="Monthly">
+                        {this.renderPane('monthly')}
+                    </TabPane>
+                    <TabPane eventKey="last_month" tab="Last Month">
+                        {this.renderPane('last_month')}
+                    </TabPane>
                     <LoadingMask loaded={this.state.loaded} />
                 </TabbedArea>
             </div>
@@ -182,6 +194,18 @@ var RecentActivity = React.createClass({
             params.end = new Moment().endOf('week').toDate();
         } else if ( type === 'today') {
             params.start = new Moment().startOf('day').toDate();
+            params.end = new Moment().endOf('day').toDate();
+        } else if ( type === 'monthly') {
+            params.start = new Moment().startOf('month').toDate();
+            params.end = new Moment().endOf('month').toDate();
+        } else if ( type === 'last_seven_day') {
+            params.start = new Moment().subtract(7, 'day').startOf('day').toDate();
+            params.end = new Moment().endOf('day').toDate();
+        } else if ( type === 'last_three_day') {
+            params.start = new Moment().subtract(3, 'day').startOf('day').toDate();
+            params.end = new Moment().endOf('day').toDate();
+        } else if (type === 'last_month') {
+            params.start = new Moment().subtract(1, 'month').startOf('day').toDate();
             params.end = new Moment().endOf('day').toDate();
         }
         DataAPI.Task.load(params).then(function (tasks) {
