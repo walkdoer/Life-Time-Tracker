@@ -38,6 +38,10 @@ module.exports = {
         return post(url('/backUpLogFile'), {date: date, content: content});
     },
 
+    checkSyncStatus: function () {
+        return get(url('/checkSyncStatus'));
+    },
+
     /**
      * get calendar data
      * @param  {String} calType calendar type

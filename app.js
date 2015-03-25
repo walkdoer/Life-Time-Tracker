@@ -17,6 +17,9 @@ var RouteHandler = Router.RouteHandler;
 var Moment = require('moment');
 var _ = require('lodash');
 var path = require('path');
+var ReactBootStrap = require('react-bootstrap');
+var OverlayTrigger = ReactBootStrap.OverlayTrigger;
+var Popover = ReactBootStrap.Popover;
 
 /** Components */
 var Header = require('./components/Header');
@@ -114,7 +117,8 @@ var Footer = React.createClass({
 
     getInitialState: function () {
         return {
-            projectCount: 0
+            projectCount: 0,
+            unsyncDate: []
         };
     },
 
@@ -126,6 +130,7 @@ var Footer = React.createClass({
                 </div>
                 <div className="lastTime" ref="lastTime"></div>
                 <div className="ltt_c-appInfo">
+                    {this.renderUnSyncInfo()}
                     <span className="ltt_c-appInfo-projectCount">
                         <i className="fa fa-rocket"></i>
                         <span className="ltt_c-number">{this.state.projectCount}</span>
@@ -143,6 +148,28 @@ var Footer = React.createClass({
         );
     },
 
+    renderUnSyncInfo: function () {
+        var unsyncDateInfo;
+        if (this.state.unsyncDate.length > 0) {
+            var popOver = (
+                <Popover title="Unsync dates">
+                    {this.state.unsyncDate.map(function (date) {
+                        return <p className="ltt_c-appInfo-unsyncDate-date">{date}</p>
+                    })}
+                </Popover>
+            );
+            unsyncDateInfo = (
+                <OverlayTrigger trigger="click" placement="top" overlay={popOver}>
+                    <span className="ltt_c-appInfo-unsyncDate">
+                        <i className="fa fa-asterisk" style={{color: 'red'}}></i>
+                        <span className="ltt_c-number">{this.state.unsyncDate.length}</span>
+                    </span>
+                </OverlayTrigger>
+            );
+        }
+        return unsyncDateInfo;
+    },
+
     componentWillMount: function () {
         this.updateLastTimeToken = this.updateLastTime.bind(this);
         Bus.addListener(EVENT.DOING_LOG, this.updateLastTimeToken);
@@ -152,6 +179,7 @@ var Footer = React.createClass({
     componentDidMount: function () {
         var that = this;
         this.loadAppInfo();
+        this.checkSyncStatus();
     },
 
     componentWillUnmount: function () {
@@ -164,6 +192,15 @@ var Footer = React.createClass({
         console.log('load app info');
         return DataAPI.getAppInfo().then(function (info) {
             that.setState(info);
+        });
+    },
+
+    checkSyncStatus: function () {
+        var that = this;
+        return DataAPI.checkSyncStatus().then(function (unsyncDate) {
+            that.setState({
+                unsyncDate: unsyncDate
+            });
         });
     },
 

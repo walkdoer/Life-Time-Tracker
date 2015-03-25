@@ -38,6 +38,10 @@
     margin:  0 10px;
 }
 
+.ltt_c-appInfo-unsyncDate{
+    cursor: pointer;
+}
+
 .ltt-row {
     margin-top: 10px;
     margin-bottom: 10px;
