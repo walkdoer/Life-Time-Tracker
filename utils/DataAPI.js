@@ -38,6 +38,10 @@ module.exports = {
         return post(url('/backUpLogFile'), {date: date, content: content});
     },
 
+    backUpLogFileByDate: function (date) {
+        return get(url('/backUpLogFileByDate'), {date: date});
+    },
+
     checkSyncStatus: function () {
         return get(url('/checkSyncStatus'));
     },

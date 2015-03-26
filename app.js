@@ -150,11 +150,15 @@ var Footer = React.createClass({
 
     renderUnSyncInfo: function () {
         var unsyncDateInfo;
+        var that = this;
         if (this.state.unsyncDate.length > 0) {
             var popOver = (
                 <Popover title="Unsync dates">
                     {this.state.unsyncDate.map(function (date) {
-                        return <p className="ltt_c-appInfo-unsyncDate-date">{date}</p>
+                        return <p className="ltt_c-appInfo-unsyncDate-date">
+                            {date}
+                            <i className="fa fa-refresh" onClick={that.backUpLogFileByDate.bind(that, date)}></i>
+                        </p>
                     })}
                 </Popover>
             );
@@ -170,10 +174,22 @@ var Footer = React.createClass({
         return unsyncDateInfo;
     },
 
+    backUpLogFileByDate: function (date) {
+        var that = this;
+        DataAPI.backUpLogFileByDate(date).then(function () {
+            var unsyncDate = that.state.unsyncDate;
+            unsyncDate = _.without(unsyncDate, date);
+            that.setState({
+                unsyncDate: unsyncDate
+            });
+        });
+    },
+
     componentWillMount: function () {
         this.updateLastTimeToken = this.updateLastTime.bind(this);
         Bus.addListener(EVENT.DOING_LOG, this.updateLastTimeToken);
         Bus.addListener(EVENT.UPDATE_APP_INFO, this.loadAppInfo);
+        Bus.addListener(EVENT.CHECK_SYNC_STATUS, this.checkSyncStatus);
     },
 
     componentDidMount: function () {
@@ -185,6 +201,7 @@ var Footer = React.createClass({
     componentWillUnmount: function () {
         Bus.removeListener(EVENT.DOING_LOG, this.updateLastTimeToken);
         Bus.removeListener(EVENT.UPDATE_APP_INFO, this.loadAppInfo);
+        Bus.removeListener(EVENT.CHECK_SYNC_STATUS, this.checkSyncStatus);
     },
 
     loadAppInfo: function () {

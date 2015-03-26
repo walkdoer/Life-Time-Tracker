@@ -144,6 +144,7 @@ var Page = React.createClass({
 
     onSave: function () {
         Bus.emit(EVENT.UPDATE_APP_INFO);
+        Bus.emit(EVENT.CHECK_SYNC_STATUS);
     },
 
     onEditorLoad: function (content) {
