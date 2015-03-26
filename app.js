@@ -163,7 +163,7 @@ var Footer = React.createClass({
                 </Popover>
             );
             unsyncDateInfo = (
-                <OverlayTrigger trigger="click" placement="top" overlay={popOver}>
+                <OverlayTrigger trigger="click" placement="top" overlay={popOver} ref="overlayTrigger">
                     <span className="ltt_c-appInfo-unsyncDate">
                         <i className="fa fa-asterisk" style={{color: 'red'}}></i>
                         <span className="ltt_c-number">{this.state.unsyncDate.length}</span>
@@ -181,6 +181,8 @@ var Footer = React.createClass({
             unsyncDate = _.without(unsyncDate, date);
             that.setState({
                 unsyncDate: unsyncDate
+            }, function () {
+                this.refs.overlayTrigger.updateOverlayPosition();
             });
         });
     },
