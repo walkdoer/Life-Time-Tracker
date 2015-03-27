@@ -216,17 +216,25 @@
   display: flex;
   height: 30px;
   line-height: 30px;
-  background-color: #fff;
+  background-color: #ECECEC;
   border-bottom: 1px solid #dcdcdc;
 }
 
 .ltt_c-LogList-header .searchInput{
   flex: 1;
   border:none;
-  border-right: 1px solid #dcdcdc;
+  text-indent: 10px;
+  font-weight: bold;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .ltt_c-LogList-header .closeWindow{
   text-align: center;
   font-size: 1.13rem;
   width: 30px;
+}
+
+.ltt_c-taskDetail-logs{
+  border-top:1px solid #dcdcdc;
 }
