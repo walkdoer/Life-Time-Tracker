@@ -7,7 +7,7 @@ var $ = require('jquery');
 require('../../libs/bootstrap-datepicker');
 var Moment = require('moment');
 var _ = require('lodash');
-
+require("datetimepicker");
 var RB = require('react-bootstrap');
 var Row = RB.Row;
 var Col = RB.Col;
@@ -16,7 +16,10 @@ var Col = RB.Col;
 var Log = require('../Log');
 var remoteStorage = require('../storage.remote');
 var LoadingMask = require('../LoadingMask');
-require("datetimepicker");
+var Notify = require('../Notify');
+
+/** Utils */
+var DataAPI = require('../../utils/DataAPI');
 
 module.exports = React.createClass({
 
@@ -34,7 +37,8 @@ module.exports = React.createClass({
     },
 
     render: function () {
-        
+        var task = this.props.task;
+
         return (
             <aside className="ltt_c-projectTask-logs">
                 <div className="ltt_c-LogList">
@@ -46,20 +50,28 @@ module.exports = React.createClass({
                     </div>
                     <div className="ltt_c-taskDetail-dateInfo">
                         <Row className="ltt_c-taskDetail-dateInfo-item">
-                          <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Defer until</Col>
-                          <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}><DateTimePicker name="deferUntil" ref="deferUntil"/></Col>
+                            <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Defer until</Col>
+                            <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
+                                <DateTimePicker name="deferUntil" ref="deferUntil" onChange={this.updateTime} value={task.deferUntil}/>
+                            </Col>
                         </Row>
                         <Row className="ltt_c-taskDetail-dateInfo-item">
-                          <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Complete</Col>
-                          <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}><DateTimePicker name="completeTime" ref="completeTime"/></Col>
+                            <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Complete</Col>
+                            <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
+                                <DateTimePicker name="completeTime" ref="completeTime" onChange={this.updateTime} value={task.completeTime}/>
+                            </Col>
                         </Row>
                         <Row className="ltt_c-taskDetail-dateInfo-item">
-                          <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Estimated Time</Col>
-                          <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}><DateTimePicker name="estimatedTime" ref="estimatedTime"/></Col>
+                            <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Estimated Time</Col>
+                            <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
+                                <input type="text" name="estimatedTime" ref="estimatedTime" onChange={this.updateTime} value={task.estimatedTime}/>
+                            </Col>
                         </Row>
                         <Row className="ltt_c-taskDetail-dateInfo-item">
-                          <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Due Time</Col>
-                          <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}><DateTimePicker name="dueTime" ref="dueTime"/></Col>
+                            <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Due Time</Col>
+                            <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
+                                <DateTimePicker name="dueTime" ref="dueTime" onChange={this.updateTime} value={task.dueTime}/>
+                            </Col>
                         </Row>
                     </div>
                     {this.renderLogs()}
@@ -75,10 +87,22 @@ module.exports = React.createClass({
         })}</div>
     },
 
+    updateTime: function (timeInfo) {
+        var name = timeInfo.name;
+        var date = timeInfo.date;
+        var changedValue = {id: this.props.task._id};
+        changedValue[name] = date;
+        DataAPI.Task.update(changedValue).then(function(result) {
+            console.info('success', result);
+        }).catch(function (err) {
+            console.log(err);
+            Notify.error('fail to change date');
+        });
+    },
+
     componentWillReceiveProps: function (nextProps) {
         var that = this;
         if (!_.isEqual(nextProps, this.props)) {
-            console.log(nextProps);
             this.setState({
                 loaded: false
             }, function () {
@@ -113,7 +137,14 @@ module.exports = React.createClass({
     }
 });
 
+var EMPTY_FUN = function () {};
 var DateTimePicker = React.createClass({
+
+    getDefaultProps: function () {
+        return {
+            onChange: EMPTY_FUN
+        };
+    },
 
     render: function () {
         return (
@@ -126,6 +157,17 @@ var DateTimePicker = React.createClass({
 
 
     componentDidMount: function () {
-        $(this.getDOMNode()).datetimepicker()
+        var that = this;
+        var $el = $(this.getDOMNode());
+        $el.datetimepicker().on('dp.hide', function (e) {
+            var date = e.date;
+            var date2 = $el.datetimepicker('date');
+            console.log(date, date2);
+            that.props.onChange({
+                name: that.props.name,
+                date: date.toDate()
+            });
+        });
+        $el.data('DateTimePicker').date(new Moment(this.props.value).toDate());
     }
 });

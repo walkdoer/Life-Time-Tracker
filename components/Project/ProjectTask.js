@@ -162,7 +162,8 @@ module.exports = React.createClass({
         console.log('render');
         if (this.state.openTaskDetail) {
             return <TaskDetail  {... _.pick(this.state, ['projectId', 'taskId', 'versionId'])}
-                onHidden={this.onLogListHidden}/>
+                onHidden={this.onLogListHidden}
+                task={this.currentTask}/>
         }
     },
 
@@ -265,6 +266,7 @@ module.exports = React.createClass({
         } else {
             url = '/projects/' + task.projectId + '/tasks/' + task._id;
         }
+        this.currentTask = task;
         this.transitionTo(url);
         this.setState({
             openTaskDetail: true

@@ -98,6 +98,10 @@ module.exports = {
     Task: {
         load: function (params) {
             return get(url('/tasks'), params);
+        },
+
+        update: function (params) {
+            return post(url('/tasks/' + params.id), params);
         }
     }
 };
