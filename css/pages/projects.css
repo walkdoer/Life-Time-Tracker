@@ -189,6 +189,21 @@
   height: 100%;
   overflow-y: auto;
 }
+
+.ltt_c-taskDetail-dateInfo-item{
+  margin-top:10px;
+  margin-bottom:10px;
+}
+
+.ltt_c-taskDetail-dateInfo-item-label{
+  text-indent: 10px;
+}
+.ltt_c-taskDetail-dateInfo-item-input{
+  padding-right: 50px;
+}
+.ltt_c-taskDetail-dateInfo-item-input input[type=text]{
+  text-indent:10px;
+}
 .ltt_c-projectTask-logs .ltt_c-LogList{
   height:100%;
 }

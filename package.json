@@ -64,11 +64,13 @@
     "noty": "./node_modules/noty/js/noty/packaged/jquery.noty.packaged.js",
     "chart": "./bower_components/chartjs/Chart.js",
     "typeahead": "./bower_components/typeahead.js/dist/typeahead.bundle.js",
-    "sweetalert": "./bower_components/sweetalert/lib/sweet-alert.js"
+    "sweetalert": "./bower_components/sweetalert/lib/sweet-alert.js",
+    "datetimepicker": "./bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js"
   },
   "browserify-shim": {
     "noty": "noty",
     "chart": "chart",
+    "datetimepicker": "datetimepicker",
     "typeahead": {
       "depends": [
         "jquery:$"

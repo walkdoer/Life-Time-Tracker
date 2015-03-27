@@ -28,6 +28,7 @@ var LoadingMask = require('../LoadingMask');
 var TaskList = require('../Task/TaskList');
 var Task = require('../Task/Task');
 var LogList = require('../LogList');
+var TaskDetail = require('../Task/TaskDetail');
 
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
@@ -40,6 +41,7 @@ module.exports = React.createClass({
             projectLoaded: false,
             taskLoaded: false,
             openTreeMap: false,
+            openTaskDetail: false,
             taskStatus: 'doing',
             tasks: []
         }, this.getStateFromParams());
@@ -56,16 +58,6 @@ module.exports = React.createClass({
         var version;
         var that = this;
         var taskId = this.state.taskId;
-        var logs;
-        if ((taskId || this.state.taskLoaded && _.isEmpty(this.state.tasks))
-            && !this.state.closeLogList) {
-            if (!taskId) {
-                RouteHandler = LogList;
-            }
-            logs = <RouteHandler {... _.pick(this.state, ['projectId', 'taskId', 'versionId'])}
-                onHidden={this.onLogListHidden}
-                isHidden={false}/>
-        }
         var taskStatus = this.state.taskStatus;
         var currentVersionId = this.props.versionId;
         if (project) {
@@ -111,7 +103,7 @@ module.exports = React.createClass({
                         })}
                     </TaskList>
                 </main>
-                {logs}
+                {this.renderTaskDetail()}
             </div>
         );
     },
@@ -166,6 +158,14 @@ module.exports = React.createClass({
             });
     },
 
+    renderTaskDetail: function () {
+        console.log('render');
+        if (this.state.openTaskDetail) {
+            return <TaskDetail  {... _.pick(this.state, ['projectId', 'taskId', 'versionId'])}
+                onHidden={this.onLogListHidden}/>
+        }
+    },
+
 
     onTaskStatusChange: function (status, e) {
         var that = this;
@@ -183,7 +183,11 @@ module.exports = React.createClass({
     },
 
     onLogListHidden: function () {
-        this.plotTreeMap();
+        this.setState({
+            openTaskDetail: false
+        }, function () {
+            this.plotTreeMap();
+        });
     },
 
 
@@ -209,6 +213,7 @@ module.exports = React.createClass({
     },
 
     plotTreeMap: function () {
+        if (!this.refs.treeMap) {return;}
         var root = {
             name: this.state.project.name,
             children: []
@@ -253,6 +258,7 @@ module.exports = React.createClass({
     },
 
     openTask: function (e, task) {
+        console.log('open task');
         var useVersion = !!this.props.versionId;
         if (useVersion && task.versionId) {
             url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
@@ -260,6 +266,9 @@ module.exports = React.createClass({
             url = '/projects/' + task.projectId + '/tasks/' + task._id;
         }
         this.transitionTo(url);
+        this.setState({
+            openTaskDetail: true
+        });
     }
 });
 
