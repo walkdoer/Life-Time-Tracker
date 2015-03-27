@@ -50,6 +50,12 @@ module.exports = React.createClass({
                     </div>
                     <div className="ltt_c-taskDetail-dateInfo">
                         <Row className="ltt_c-taskDetail-dateInfo-item">
+                            <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Estimated</Col>
+                            <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
+                                <input type="text" name="estimatedTime" ref="estimatedTime" onChange={this.updateEstimatedTime} value={task.estimatedTime}/>
+                            </Col>
+                        </Row>
+                        <Row className="ltt_c-taskDetail-dateInfo-item">
                             <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Defer until</Col>
                             <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
                                 <DateTimePicker name="deferUntil" ref="deferUntil" onChange={this.updateTime} value={task.deferUntil}/>
@@ -59,12 +65,6 @@ module.exports = React.createClass({
                             <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Complete</Col>
                             <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
                                 <DateTimePicker name="completeTime" ref="completeTime" onChange={this.updateTime} value={task.completeTime}/>
-                            </Col>
-                        </Row>
-                        <Row className="ltt_c-taskDetail-dateInfo-item">
-                            <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Estimated Time</Col>
-                            <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
-                                <input type="text" name="estimatedTime" ref="estimatedTime" onChange={this.updateTime} value={task.estimatedTime}/>
                             </Col>
                         </Row>
                         <Row className="ltt_c-taskDetail-dateInfo-item">
@@ -97,6 +97,19 @@ module.exports = React.createClass({
         }).catch(function (err) {
             console.log(err);
             Notify.error('fail to change date');
+        });
+    },
+
+    updateEstimatedTime: function (e) {
+        var value = e.target.value;
+        DataAPI.Task.update({
+            id: this.props.task._id,
+            estimatedTime: parseInt(value, 10)
+        }).then(function(result) {
+            console.info('success', result);
+        }).catch(function (err) {
+            console.log(err);
+            Notify.error('fail to updateEstimatedTime');
         });
     },
 
@@ -160,9 +173,15 @@ var DateTimePicker = React.createClass({
         var that = this;
         var $el = $(this.getDOMNode());
         $el.datetimepicker().on('dp.hide', function (e) {
+            console.log('dp.hide');
             var date = e.date;
-            var date2 = $el.datetimepicker('date');
-            console.log(date, date2);
+            that.props.onChange({
+                name: that.props.name,
+                date: date.toDate()
+            });
+        }).on('dp.change', function (e) {
+            console.log('dp.change');
+            var date = e.date;
             that.props.onChange({
                 name: that.props.name,
                 date: date.toDate()
