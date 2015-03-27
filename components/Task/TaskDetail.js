@@ -96,9 +96,11 @@ module.exports = React.createClass({
         var name = timeInfo.name;
         var date = timeInfo.date;
         var changedValue = {id: this.props.task._id};
+        var that = this;
         changedValue[name] = date;
         DataAPI.Task.update(changedValue).then(function(result) {
             console.info('success', result);
+            that.props.onChange(result);
         }).catch(function (err) {
             Notify.error('fail to change date');
         });
@@ -123,6 +125,7 @@ module.exports = React.createClass({
             that.setState({
                 estimatedTime: result.estimatedTime
             });
+            that.props.onChange(result);
         }).catch(function (err) {
             Notify.error('fail to updateEstimatedTime');
         });
@@ -284,17 +287,12 @@ var DateTimePicker = React.createClass({
     componentDidMount: function () {
         var that = this;
         var $el = $(this.getDOMNode());
-        $el.datetimepicker().on('dp.hide', function (e) {
+        $el.datetimepicker().on('dp.change', function (e) {
             var date = e.date;
+            if (date && date.isSame(e.oldDate)) {console.log('same');return;}
             that.props.onChange({
                 name: that.props.name,
-                date: date.toDate()
-            });
-        }).on('dp.change', function (e) {
-            var date = e.date;
-            that.props.onChange({
-                name: that.props.name,
-                date: date.toDate()
+                date: date ? date.toDate() : 'null'
             });
         });
         if (this.props.value) {

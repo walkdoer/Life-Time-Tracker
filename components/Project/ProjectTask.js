@@ -33,6 +33,10 @@ var TaskDetail = require('../Task/TaskDetail');
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
 
+
+/** Utils */
+var Util = require('../../utils/Util');
+
 module.exports = React.createClass({
     mixins: [Router.State, Router.Navigation],
 
@@ -163,7 +167,27 @@ module.exports = React.createClass({
         if (this.state.openTaskDetail) {
             return <TaskDetail  {... _.pick(this.state, ['projectId', 'taskId', 'versionId'])}
                 onHidden={this.onLogListHidden}
+                onChange={this.onTaskChange}
                 task={this.currentTask}/>
+        }
+    },
+
+    onTaskChange: function (task) {
+        var tasks = this.state.tasks;
+        var taskId = task._id;
+        var target;
+        Util.walkTree({children: tasks}, function (taskItem) {
+            if (taskItem._id === taskId) {
+                target = taskItem;
+                return false;
+            }
+        });
+        if (target) {
+            console.info('update lop');
+            _.extend(target, task);
+            this.setState({
+                tasks: tasks
+            });
         }
     },
 
