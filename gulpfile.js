@@ -126,7 +126,7 @@ gulp.task('sync', function() {
 //        './node_modules/**/*',
   //  ]).pipe(gulp.dest('./build/node_modules'));
 
-    var cssFiles = './css/**/*.css',
+    var cssFiles = './css/**/*',
         images = './images/**/*',
         fonts = './fonts/**/*',
         lttNw = './node_modules/ltt-nw/**/*',
