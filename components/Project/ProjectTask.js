@@ -46,6 +46,7 @@ module.exports = React.createClass({
             taskLoaded: false,
             openTreeMap: false,
             openTaskDetail: false,
+            markedFilter: false,
             taskStatus: 'doing',
             tasks: []
         }, this.getStateFromParams());
@@ -77,18 +78,22 @@ module.exports = React.createClass({
                     </div>
                     <div className="ltt_c-projectTask-toolbar">
                         <div className="btn-group">
-                        {[
-                            {label: 'All', status: 'all'},
-                            {label: 'Doing', status: 'doing'},
-                            {label: 'Done', status: 'done'}
-                        ].map(function (btn) {
-                            var className = "btn btn-xs";
-                            if (btn.status === taskStatus) {
-                                className += ' active';
-                            }
-                            return <button className={className}
-                                onClick={that.onTaskStatusChange.bind(that, btn.status)}>{btn.label}</button>;
-                        })}
+                            {[
+                                {label: 'All', status: 'all'},
+                                {label: 'Doing', status: 'doing'},
+                                {label: 'Done', status: 'done'}
+                            ].map(function (btn) {
+                                var className = "btn btn-xs";
+                                if (btn.status === taskStatus) {
+                                    className += ' active';
+                                }
+                                return <button className={className}
+                                    onClick={that.onTaskStatusChange.bind(that, btn.status)}>{btn.label}</button>;
+                            })}
+                        </div>
+                        <div className="btn-group">
+                            <button className={"btn btn-xs " + (this.state.markedFilter ? 'active' : '')}
+                                onClick={that.onTaskMarkedFilter}><i className="fa fa-flag"></i></button>
                         </div>
                         <div className="btn-group" style={{float: 'right'}}>
                             <button className="btn btn-xs" onClick={this.openTreeMap}>TreeMap</button>
@@ -210,6 +215,27 @@ module.exports = React.createClass({
         });
     },
 
+    onTaskMarkedFilter: function () {
+        var that = this;
+        this.setState({
+            markedFilter: !this.state.markedFilter
+        }, function () {
+            var markedFilter = this.state.markedFilter;
+            var params = {
+                status: this.state.taskStatus,
+                marked: markedFilter
+            };
+            if (markedFilter) {
+                params.parent = undefined;
+            }
+            this.loadTasks(params).then(function () {
+                if (that.state.openTreeMap) {
+                    that.plotTreeMap();
+                }
+            });
+        })
+    },
+
     onLogListHidden: function () {
         this.setState({
             openTaskDetail: false
@@ -224,7 +250,7 @@ module.exports = React.createClass({
         var that = this;
         var defaultParams = _.pick(that.props, ['projectId', 'versionId']);
         defaultParams.parent = "null";
-        params = _.extend(defaultParams, params);
+        params = _.extend({}, defaultParams, params);
         params.calculateTimeConsume = true;
         remoteStorage.get('/api/tasks', params)
             .then(function (res) {

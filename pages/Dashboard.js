@@ -185,7 +185,7 @@ var RecentActivity = React.createClass({
     loadTask: function (type, params) {
         var that = this;
         this.setState({loaded: false});
-        params = _.extend({status: 'doing', calculateTimeConsume: true}, params);
+        params = _.extend({status: 'doing', calculateTimeConsume: true, parent: null, populate: true}, params);
         if (type === 'yesterday') {
             params.start = new Moment().subtract(1, 'day').startOf('day').toDate();
             params.end = new Moment().subtract(1, 'day').endOf('day').toDate();
