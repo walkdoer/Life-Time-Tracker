@@ -116,7 +116,9 @@ module.exports = React.createClass({
     updateEstimatedTime: function (time) {
         var time = this.inspectTime(time);
         var that = this;
-        if (time === undefined) {return;}
+        if (time === undefined) {
+            time = 'null';
+        }
         DataAPI.Task.update({
             id: this.props.task._id,
             estimatedTime: time

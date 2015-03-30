@@ -176,15 +176,17 @@ module.exports = React.createClass({
         var tasks = this.state.tasks;
         var taskId = task._id;
         var target;
+        //locate the task in task tree
         Util.walkTree({children: tasks}, function (taskItem) {
             if (taskItem._id === taskId) {
                 target = taskItem;
                 return false;
             }
         });
+        //if task located, then update it with changed value
         if (target) {
             console.info('update lop');
-            _.extend(target, task);
+            _.extend(target, _.omit(task, 'children'));
             this.setState({
                 tasks: tasks
             });
