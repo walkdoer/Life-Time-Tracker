@@ -13,21 +13,27 @@ var _ = require('lodash');
 /**components*/
 var Progress = require('../Progress');
 var TaskList = require('../Task/TaskList');
+var DataAPI = require('../../utils/DataAPI');
 
+/** Constant */
+var EMPTY_FUN = function () {};
 
 var Task = React.createClass({
 
     getInitialState: function () {
         return {
             isOpen: this.props.defaultIsOpen,
-            selected: this.props.selected
+            selected: this.props.selected,
+            marked: this.props.data.marked
         };
     },
 
     getDefaultProps: function () {
         return {
             defaultIsOpen: true,
-            selected: false
+            selected: false,
+            onTaskChange: EMPTY_FUN
+            //onUnMark: EMPTY_FUN
         };
     },
 
@@ -82,7 +88,10 @@ var Task = React.createClass({
                 <div className={"ltt_c-task-title" + (this.state.selected ? ' selected' : '')} onClick={this.select}>
                     {openButton}
                     <span>{task.name}</span>
-                     <div className="ltt_c-task-timeInfo">
+                    <span className={"ltt_c-task-mark " + (this.state.marked ? 'marked': '')} onClick={this.toggleMark}>
+                        <i className={this.state.marked ? 'fa fa-flag' : 'fa fa-flag-o'}></i>
+                    </span>
+                    <div className="ltt_c-task-timeInfo">
                         <span title={new Moment(task.createTime).format('YYYY-MM-DD HH:mm:ss')}>
                             <i className="fa fa-plus" title="create time"></i>
                             {new Moment(task.createTime).fromNow()}
@@ -114,6 +123,18 @@ var Task = React.createClass({
             selected: true
         }, function () {
             this.props.onClick(e, this.props.data);
+        });
+    },
+
+    toggleMark: function (e) {
+        e.stopPropagation();
+        this.setState({
+            marked: !this.state.marked
+        }, function () {
+            var that = this;
+            DataAPI.Task.update({id: this.props.data._id, marked: this.state.marked}).then(function (task) {
+                that.props.onTaskChange(task);
+            });
         });
     },
 

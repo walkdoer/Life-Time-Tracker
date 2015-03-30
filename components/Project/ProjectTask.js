@@ -102,6 +102,7 @@ module.exports = React.createClass({
                                 data={task}
                                 key={task._id}
                                 taskId={taskId}
+                                onTaskChange={this.onTaskChange}
                                 onClick={that.openTask}
                                 selected={task._id === taskId}/>
                         })}
