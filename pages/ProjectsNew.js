@@ -16,16 +16,24 @@ var DateRangePicker = require('../components/DateRangePicker');
 var Pinyin = require('../components/Pinyin');
 
 
+var config = require('../conf/config');
+
+
 module.exports = React.createClass({
     mixins: [Router.State],
 
-    getInitialState: function () {
-        var startDate = new Moment().startOf('year').toDate(),
+    getDefaultProps: function () {
+        var startDate = new Moment(config.birthday).toDate(),
             endDate = new Moment().endOf('day').toDate();
+        return {
+            startDate: startDate,
+            endDate: endDate
+        };
+    },
+
+    getInitialState: function () {
         return _.extend({
             loading: true,
-            startDate: startDate,
-            endDate: endDate,
             projects: []
         }, this.getStateFromParams());
     },
@@ -77,8 +85,8 @@ module.exports = React.createClass({
         var that = this;
         this.setState({ loading: true });
         remoteStorage.get('/api/projects', {
-            start: this.state.startDate,
-            end: this.state.endDate,
+            start: this.props.startDate,
+            end: this.props.endDate,
             aggregate: false
         }).then(function (results) {
                 var projects = results.data;
