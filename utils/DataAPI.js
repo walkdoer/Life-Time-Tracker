@@ -22,6 +22,10 @@ function url(src) {
 
 module.exports = {
 
+    stat: function (params) {
+        return get(url('/stats'), params);
+    },
+
     getAppInfo: function () {
         return get(url('/appInfo')).then(function (res) {
             return res;

@@ -9,6 +9,7 @@ var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var ReactBootStrap = require('react-bootstrap');
 var TabbedArea = ReactBootStrap.TabbedArea;
 var TabPane = ReactBootStrap.TabPane;
+var numeral = require('numeral');
 
 /** Components */
 var CalendarHeatMap = require('../components/charts/CalendarHeatMap');
@@ -30,6 +31,8 @@ var DataAPI = require('../utils/DataAPI');
                         end={new Moment().toDate()}/>
                 </div>
  */
+
+var DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 var Dashboard = React.createClass({
 
     mixins: [PureRenderMixin],
@@ -37,6 +40,7 @@ var Dashboard = React.createClass({
     render: function () {
         return (
             <div className="ltt_c-page ltt_c-page-dashboard">
+                <Board/>
                 <div className="ltt_c-page-com">
                     <RecentActivity initialTab={'today'}/>
                 </div>
@@ -96,6 +100,103 @@ var Dashboard = React.createClass({
     }
 
 });
+var logClasses = [
+    { value: 'SPR', text : '体育'},
+    { value: 'WK', text : '工作'},
+    { value: 'NT', text : '一般事务'},
+    { value: 'STU', text : '学习'},
+    { value: 'BRK', text : '休息'},
+    { value: 'TK', text : '思考'}
+];
+
+var Board = React.createClass({
+
+    getInitialState: function () {
+        return {
+            loaded: false
+        };
+    },
+
+    render: function () {
+        var today = this.state.today;
+        var yesterday = this.state.yesterday;
+        var logClassTime, yesterDayLogClassTime;
+        if (today) {
+            logClassTime = today.classTime;
+        }
+        if (yesterday) {
+            yesterDayLogClassTime = yesterday.classTime;
+        }
+        return (
+            <div className="ltt_c-Board">
+                {logClasses.map(function (logClass) {
+                    var time = 0, yesterdayTime;
+                    var code = logClass.value;
+                    var data;
+                    if (!_.isEmpty(logClassTime)) {
+                        data = logClassTime.filter(function(item) {
+                            return item.code === code;
+                        })[0];
+                        if (data) {
+                            time = data.count;
+                        }
+                    }
+                    if (!_.isEmpty(yesterDayLogClassTime)) {
+                        data = yesterDayLogClassTime.filter(function(item) {
+                            return item.code === code;
+                        })[0];
+                        if (data) {
+                            yesterdayTime = data.count;
+                        }
+                    }
+                    var progressNumber, progressPercentage, progress;
+                    console.log(yesterdayTime);
+                    if (yesterdayTime > 0) {
+                        progressNumber = time - yesterdayTime;
+                        progressPercentage = progressNumber / yesterdayTime;
+                        progress = (
+                            <span className={progressNumber > 0 ? 'rise' : (progressNumber < 0 ? 'down' : 'equal')}>
+                                <i className={"fa fa-" + (progressNumber > 0 ? 'long-arrow-up' :
+                                    (progressNumber < 0 ? 'long-arrow-down' : 'minus'))}></i>
+                                {numeral(progressPercentage).format('0.0')}%
+                            </span>
+                        );
+                    }
+                    return (
+                        <div className="ltt_c-Board-item">
+                            <p className="ltt_c-Board-item-number">{time}</p>
+                            <p className="ltt_c-Board-item-name">{logClass.text}</p>
+                            <p className="ltt_c-Board-item-change">{progress}</p>
+                        </div>
+                    );
+                })}
+                <LoadingMask loaded={this.state.loaded}/>
+            </div>
+        );
+    },
+
+    componentDidMount: function (argument) {
+        var that = this;
+        DataAPI.stat({
+            start: new Moment().startOf('day').format(DATE_FORMAT),
+            end: new Moment().endOf('day').format(DATE_FORMAT)
+        }).then(function (statResult) {
+            that.setState({
+                loaded: true,
+                today: statResult
+            });
+        }).then(function () {
+            return DataAPI.stat({
+                start: new Moment().subtract(1, 'day').startOf('day').format(DATE_FORMAT),
+                end: new Moment().subtract(1, 'day').endOf('day').format(DATE_FORMAT)
+            });
+        }).then(function (statResult) {
+            that.setState({
+                yesterday: statResult
+            });
+        });
+    }
+})
 
 var RecentActivity = React.createClass({
 

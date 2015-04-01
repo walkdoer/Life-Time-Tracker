@@ -20,3 +20,41 @@
 .ltt_c-RecentActivity-content .ltt_c-taskList{
     padding-top: 30px;
 }
+
+
+.ltt_c-Board{
+    display: flex;
+    height: 120px;
+    background: #FFF;
+    margin-bottom: 20px;
+}
+
+.ltt_c-Board-item{
+    flex: 1;
+    text-align: center;
+    border-right: 1px solid #F2F2F2;
+}
+.ltt_c-Board-item p {
+    margin-bottom:0px;
+}
+
+.ltt_c-Board-item-change .fa{
+    margin-right: 5px;
+}
+
+.ltt_c-Board-item-change .rise{
+    color:green;
+}
+.ltt_c-Board-item-change .down{
+    color:red;
+}
+
+
+.ltt_c-Board-item-number{
+    font-size: 2.5rem;
+    margin-top: 10px;
+}
+
+.ltt_c-Board-item:last-child{
+    border-right: 0px;
+}

@@ -9,6 +9,9 @@ var Q = require('q');
 var _ = require('lodash');
 var remoteStorage = require('../components/storage.remote');
 
+/** utils */
+var DataAPI = require('../utils/DataAPI');
+
 /* Reports */
 var DayReport = require('./DayReport');
 var MultiDayReport = require('./MultiDayReport');
@@ -121,26 +124,25 @@ var Overview = React.createClass({
 
     loadReportData: function () {
         var def = Q.defer();
-        var api = '/api/stats';
         if (!this.state.compare) {
-            remoteStorage.get(api, {
-                    start: new Moment(this.state.start).format(DATE_FORMAT),
-                    end: new Moment(this.state.end).format(DATE_FORMAT)
-                })
-                .then(function (result) {
-                    def.resolve(result);
-                })
-                .catch(function (err) {
-                    def.reject(err);
-                });
+            DataAPI.stat({
+                start: new Moment(this.state.start).format(DATE_FORMAT),
+                end: new Moment(this.state.end).format(DATE_FORMAT)
+            })
+            .then(function (result) {
+                def.resolve({data: result});
+            })
+            .catch(function (err) {
+                def.reject(err);
+            });
         } else {
             Q.allSettled([
-                remoteStorage.get(api, {
+                DataAPI.stat({
                     start: new Moment(this.state.start).format(DATE_FORMAT),
                     end: new Moment(this.state.end).format(DATE_FORMAT)
                 }),
 
-                remoteStorage.get(api, {
+                DataAPI.stat({
                     start: new Moment(this.state.compareStart).format(DATE_FORMAT),
                     end: new Moment(this.state.compareEnd).format(DATE_FORMAT)
                 })
@@ -155,7 +157,7 @@ var Overview = React.createClass({
                     });
                 }
                 def.resolve(promises.map(function (promise) {
-                    return promise.value;
+                    return {data: promise.value};
                 }));
             });
         }
