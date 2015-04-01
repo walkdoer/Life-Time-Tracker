@@ -14,6 +14,14 @@ var TaskList = require('../Task/TaskList');
 var DataAPI = require('../../utils/DataAPI');
 
 var ProjectIndex = React.createClass({
+
+    getInitialState: function () {
+        return {
+            markedTask: []
+        };
+    },
+
+
     render: function () {
         var markedTask = this.state.markedTask;
         return (
