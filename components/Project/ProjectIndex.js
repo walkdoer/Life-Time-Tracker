@@ -25,8 +25,8 @@ var ProjectIndex = React.createClass({
     render: function () {
         var markedTask = this.state.markedTask;
         return (
-            <div>
-                <h1>Marked Tasks</h1>
+            <div className="ltt_c-page-projectsNew-index">
+                <h3>Marked Tasks</h3>
                 <TaskList>
                     {markedTask.map(function (task) {
                         return <Task data={task}
