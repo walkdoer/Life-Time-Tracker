@@ -8,7 +8,7 @@ var chart = require('./chart');
 var helper = require('./helper');
 var convertor = require('../../convertors/column');
 var compareConvertor = require('../../convertors/compareColumn');
-var _ = require('underscore');
+var _ = require('lodash');
 var CommonFunction = require('./CommonFunction');
 var Column = React.createClass({
     displayName: 'column',

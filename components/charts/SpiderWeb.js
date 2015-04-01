@@ -5,9 +5,9 @@
 var React = require('react');
 var R = React.DOM;
 var chart = require('./chart');
-var Chart = require('chartjs');
+var Chart = require('chart.js');
 var helper = require('./helper');
-var _ = require('underscore');
+var _ = require('lodash');
 var CommonFunction = require('./CommonFunction');
 var extend = require('extend');
 //convertors
