@@ -32,7 +32,8 @@ var Dashboard = require('./pages/Dashboard'),
     Reports = require('./pages/Reports'),
     logEditor = require('./pages/LogEditor'),
     Affects = require('./pages/Affects'),
-    Projects = require('./pages/Projects');
+    Projects = require('./pages/Projects'),
+    Goals = require('./pages/Goals');
 
 /** Components */
 var ProjectDetail = require('./components/ProjectDetail'),
@@ -75,6 +76,7 @@ var routes = (
         <Route name="projectManage" path="/projectManage" handler={ProjectsNew} handler={Projects}></Route>
         <Route name="logEditor" path="/logEditor" handler={logEditor}/>
         <Route name="affects" path="/affects" handler={Affects}/>
+        <Route name="goals" path="/goals" handler={Goals}/>
         <NotFoundRoute handler={Page404}/>
         <DefaultRoute handler={Dashboard}/>
     </Route>

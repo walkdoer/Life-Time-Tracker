@@ -80,6 +80,14 @@
             }
         };
         sdk.startServer().then(function () {
+            initApp();
+        }).fail(function(err) {
+            initApp();
+            alert('Start Server Error');
+        });
+
+
+        function initApp() {
             Ltt.init();
             Ltt.sdk = sdk;
             root = global;
@@ -95,10 +103,7 @@
                     this.close(true);
                 }
             });
-        }).fail(function(err) {
-            console.error(err);
-            alert('Start Server Error');
-        });
+        }
     }
 
     function initMenu() {
