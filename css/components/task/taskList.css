@@ -7,7 +7,7 @@
 .ltt_c-taskList .ltt_c-task{
     background: #FFF;
     /* border: 1px solid #E2E2E2; */
-    margin: 10px 0px;
+    margin: 0 0 10px 0;
 }
 
 .ltt_c-taskList.subtask .ltt_c-task{

@@ -17,6 +17,7 @@ var ENTER_KEY_CODE = 13;
 /** Components */
 var LoadingMask = require('../components/LoadingMask');
 var Notify = require('../components/Notify');
+var GoalList = require('../components/Goal/GoalList');
 
 /** Actions */
 
@@ -27,7 +28,21 @@ var DataAPI = require('../utils/DataAPI');
 module.exports = React.createClass({
 
     getInitialState: function () {
-        return {};
+        return {
+            goals: [{
+                id: '1',
+                name: '每周跑步',
+                estimatedTime: 200,
+                filter: {tag: ['跑步']},
+                granularity: 'week'
+            }, {
+                id: '2',
+                name: '每月读书',
+                estimatedTime: 1800,
+                filter: {tag: ['rb']},
+                granularity: 'month'
+            }]
+        };
     },
 
 
@@ -35,8 +50,17 @@ module.exports = React.createClass({
         return (
             <div className="ltt_c-page-Goals">
                 <h3>Goals</h3>
+                <GoalList goals={this.state.goals}/>
             </div>
         );
+    },
+
+    componentDidMount: function () {
+        this.loadGoals();
+    },
+
+    loadGoals: function () {
+
     }
 
 });

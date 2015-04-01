@@ -1,6 +1,7 @@
 .ltt_c-RecentActivity-content{
     position:relative;
     min-height:200px;
+    padding-top: 15px;
 }
 
 .ltt_c-RecentActivity-content .btn-group{

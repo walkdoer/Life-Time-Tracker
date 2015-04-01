@@ -157,6 +157,9 @@
   display: flex;
   height: 100%;
 }
+.ltt_c-projectTask-toolbar{
+  margin-bottom:15px;
+}
 
 .ltt_c-projectTask .ltt_c-chart-TreeMap{
   margin:10px 0px;

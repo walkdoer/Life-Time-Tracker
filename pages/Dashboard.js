@@ -158,7 +158,7 @@ var Board = React.createClass({
                             <span className={progressNumber > 0 ? 'rise' : (progressNumber < 0 ? 'down' : 'equal')}>
                                 <i className={"fa fa-" + (progressNumber > 0 ? 'long-arrow-up' :
                                     (progressNumber < 0 ? 'long-arrow-down' : 'minus'))}></i>
-                                {numeral(progressPercentage).format('0.0')}%
+                                {numeral(progressPercentage * 100).format('0.0')}%
                             </span>
                         );
                     }
