@@ -45,15 +45,10 @@ module.exports = React.createClass({
         </DropdownButton>
         return (
             <div className={cx({"ltt_c-GoalCard": true, editing: this.state.editing})}>
-                <div className="ltt_c-GoalCard-content">
-                    <h3 className>{goal.name}</h3>
-                    <span className="ltt_c-GoalCard-granularity">{goal.granularity}</span>
-                    <Progress className="ltt_c-GoalCard-progress" max={goal.estimatedTime} value={this.state.progress}/>
-                </div>
-                <div className="ltt_c-GoalCard-edit">
-                    <Input type='text' buttonAfter={innerDropdown} />
-                    <pre id={ID_PREFIX + goal.id} className="ltt_c-GoalCard-filterEditor"></pre>
-                </div>
+                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-title">{goal.name}</div>
+                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity">{goal.granularity}</div>
+                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-activities">recent activities</div>
+                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-progress"><Progress className="ltt_c-GoalCard-progress" max={goal.estimatedTime} value={this.state.progress}/></div>
                 <span className="ltt_c-GoalCard-editBtn" onClick={this.editing}><i className="fa fa-pencil-square"></i></span>
             </div>
         )

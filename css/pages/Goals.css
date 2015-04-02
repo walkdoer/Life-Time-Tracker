@@ -3,57 +3,70 @@
 }
 
 
+.ltt_c-page-Goals .ltt_c-GoalList{
+    border: 1px solid #dcdcdc;
+}
+
 .ltt_c-page-Goals .ltt_c-GoalList .ltt_c-GoalCard{
-    float: left;
-    width: 23%;
-    margin: 1%;
     background: #FFFFFF;
-    border-radius: 5px;
-    box-shadow: 0 0 1px #AFAFAF;
-    height: 200px;
+    border-bottom: 1px solid #dcdcdc;
+    height: 80px;
+    line-height: 80px;
     position: relative;
 }
 
+.ltt_c-page-Goals .ltt_c-GoalList .ltt_c-GoalCard:last-child{
+    border-bottom: 0px;
+}
+
+
+
 .ltt_c-GoalCard {
-    width: 20%;
-    height: 100px;
-    padding: 10px;
+    display: flex;
 }
 
 
 .ltt_c-GoalCard-granularity{
-    position: absolute;
-    top: 5px;
-    right: 10px;
+    width: 70px;
 }
 
-.ltt_c-GoalCard h3 {
+.ltt_c-GoalCard-progress{
+    flex: 4;
+    padding: 25px 10px 25px 10px;
+}
+.ltt_c-GoalCard-progress .ltt_c-progress{
+    height:30px;
+    line-height:30px;
+}
+
+.ltt_c-GoalCard-title{
+    flex: 3;
     font-size: 15px;
     font-weight: bold;
-    margin: 0px;
     text-indent: 5px;
-    margin-bottom: 5px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
+.ltt_c-GoalCard-activities{
+    flex: 4;
+    background: #F6F6F6
+}
+
+.ltt_c-GoalCard-item{
+    border-right:1px solid #dcdcdc;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ltt_c-GoalCard-item:last-child{
+    border-right:0px;
+}
 
 .ltt_c-GoalCard-filterEditor{
     height: 115px;
     margin: 10px 0;
-}
-.ltt_c-GoalCard-content{
-    display: block;
-}
-.ltt_c-GoalCard-edit{
-    display: none;
-}
-.ltt_c-GoalCard.editing .ltt_c-GoalCard-content{
-    display: none;
-}
-.ltt_c-GoalCard.editing .ltt_c-GoalCard-edit{
-    display: block;
 }
 
 

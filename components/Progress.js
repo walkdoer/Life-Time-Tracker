@@ -38,7 +38,7 @@ var Progress = React.createClass({
         var number, numberStyle;
         if (this.props.showNumber) {
             numberStyle = {};
-            number = <span className="ltt_c-progress-number" style={numberStyle}>{progress}</span>;
+            number = <span className="ltt_c-progress-number" style={numberStyle}>{numeral(progress).format('0.0')}</span>;
         }
         return (
             <div className="ltt_c-progress" style={style}>
