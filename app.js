@@ -20,6 +20,8 @@ var path = require('path');
 var ReactBootStrap = require('react-bootstrap');
 var OverlayTrigger = ReactBootStrap.OverlayTrigger;
 var Popover = ReactBootStrap.Popover;
+var Button = ReactBootStrap.Button;
+var Badge = ReactBootStrap.Badge;
 
 /** Components */
 var Header = require('./components/Header');
@@ -151,15 +153,26 @@ var Footer = React.createClass({
     renderUnSyncInfo: function () {
         var unsyncDateInfo;
         var that = this;
-        if (this.state.unsyncDate.length > 0) {
+        var hideMore;
+        var unsyncDateLen = this.state.unsyncDate.length;
+        if (unsyncDateLen > 0) {
+            if (unsyncDateLen > 5 ) {
+                hideMore = <p style={{margin: '3', 'text-align': 'center'}}>...</p>;
+            }
             var popOver = (
                 <Popover title="Unsync dates">
-                    {this.state.unsyncDate.map(function (date) {
+                    <Button bsStyle='primary' bsSize='xsmall' onClick={this.backUpAllLogFile}>
+                        <i className={cx({"fa fa-refresh": true, "fa-spin": this.state.syncingAll})} style={{'margin-right': '4px'}}></i>
+                        Backup All<Badge>{unsyncDateLen}</Badge>
+                    </Button>
+                    {this.state.unsyncDate.slice(0, 5).map(function (date) {
                         return <p className="ltt_c-appInfo-unsyncDate-date">
                             {date}
-                            <i className="fa fa-refresh" onClick={that.backUpLogFileByDate.bind(that, date)}></i>
+                            <i className="fa fa-refresh" style={{'margin-left': '4px'}}
+                             onClick={that.backUpLogFileByDate.bind(that, date)}></i>
                         </p>
                     })}
+                    {hideMore}
                 </Popover>
             );
             unsyncDateInfo = (
@@ -183,6 +196,17 @@ var Footer = React.createClass({
                 unsyncDate: unsyncDate
             }, function () {
                 this.refs.overlayTrigger.updateOverlayPosition();
+            });
+        });
+    },
+
+    backUpAllLogFile: function () {
+        this.setState({
+            syncingAll: true
+        }, function () {
+            var that = this;
+            this.state.unsyncDate.forEach(function (date) {
+                that.backUpLogFileByDate(date);
             });
         });
     },
