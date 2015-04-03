@@ -30,17 +30,38 @@ module.exports = React.createClass({
     _plot: function () {
         var $el = $(this.getDOMNode());
         var lineData = [{
-            name:'',
+            name: this.props.name,
             data: this._getLineData()
         }];
-        console.log(lineData);
+        var title = this._getTitle();
         Chart.line({
-            title: this.props.title,
             $el: $el,
             data: lineData
         }, {
+            title: {
+                text: title,
+                style: {
+                    'font-size': '12px',
+                    'font-weight': 'bold'
+                }
+            },
             chart: {
                 type: 'areaspline'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.y}</b><br/>',
+                valueSuffix: ' minutes',
+                shared: true,
+                dateTimeLabelFormats: { // don't display the dummy year
+                    millisecond: '%Y-%m-%d %H:%M:%S.%L',
+                    second: '%Y-%m-%d %H:%M:%S',
+                    minute: '%Y-%m-%d %H:%M',
+                    hour: '%Y-%m-%d %H:%M',
+                    day: '%Y-%m-%d %H:%M',
+                    week: '%Y-%m-%d %H:%M',
+                    month: '%Y-%m-%d %H:%M',
+                    year: '%Y-%m-%d %H:%M'
+                }
             },
             plotOptions: {
                 areaspline: {
@@ -65,6 +86,11 @@ module.exports = React.createClass({
             },
             xAxis: {
                 type: 'datetime',
+                /*labels: {
+                    format: '{value:%Y-%m-%d}',
+                    rotation: 90,
+                    align: 'left'
+                },*/
                 dateTimeLabelFormats: { // don't display the dummy year
                     millisecond: '%H:%M:%S.%L',
                     second: '%H:%M:%S',
@@ -87,5 +113,21 @@ module.exports = React.createClass({
         }).map(function (log) {
             return [new Moment(log.start).unix() * 1000, log.len];
         });
+    },
+
+    _getTitle: function () {
+        var logs = this.props.logs;
+        if (_.isEmpty(logs)) {
+            return '';
+        }
+        var data = logs.slice(0).sort(function (a, b) {
+            return new Date(a.start).getTime() - new Date(b.start).getTime();
+        });
+
+        var minDate = data[0].date;
+        var maxDate = data[data.length - 1].date;
+        var days = new Moment(maxDate).diff(minDate, 'day');
+
+        return 'Total ' + data.length + ' logs' + (days > 0 ? ' Cross ' + days + ' days' : '');
     }
 });

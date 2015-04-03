@@ -80,7 +80,7 @@ module.exports = React.createClass({
                             </Col>
                         </Row>
                     </div>
-                    <LogLine logs={this.state.logs}/>
+                    {!_.isEmpty(this.state.logs) ? <LogLine logs={this.state.logs} name={task.name}/> : null}
                     {this.renderLogs()}
                     <LoadingMask loaded={this.state.loaded}/>
                 </div>
