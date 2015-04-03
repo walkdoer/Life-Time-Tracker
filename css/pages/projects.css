@@ -170,6 +170,9 @@
 }
 
 
+
+
+
 .ltt_c-projectDetail-basicInfo-detail{
   padding-bottom: 10px;
 }
@@ -200,6 +203,15 @@
 .ltt_c-taskDetail-dateInfo-item{
   margin-top:10px;
   margin-bottom:10px;
+}
+
+.ltt_c-taskDetail .ltt_c-chart-LogLine{
+  border-top:1px #dcdcdc solid;
+  padding-top: 15px;
+  height: 150px;
+  max-height: 150px;
+  min-height: 150px;
+  background: #FFF;
 }
 
 .ltt_c-taskDetail-dateInfo-item-label{

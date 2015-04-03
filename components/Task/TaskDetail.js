@@ -17,6 +17,7 @@ var Log = require('../Log');
 var remoteStorage = require('../storage.remote');
 var LoadingMask = require('../LoadingMask');
 var Notify = require('../Notify');
+var LogLine = require('../charts/LogLine');
 
 /** Utils */
 var DataAPI = require('../../utils/DataAPI');
@@ -42,7 +43,7 @@ module.exports = React.createClass({
         var task = this.props.task;
 
         return (
-            <aside className="ltt_c-projectTask-logs">
+            <aside className="ltt_c-projectTask-logs ltt_c-taskDetail">
                 <div className="ltt_c-LogList" key={task._id}>
                     <div className="ltt_c-LogList-header">
                         <span className="searchInput">{task.name}</span>
@@ -79,6 +80,7 @@ module.exports = React.createClass({
                             </Col>
                         </Row>
                     </div>
+                    <LogLine logs={this.state.logs}/>
                     {this.renderLogs()}
                     <LoadingMask loaded={this.state.loaded}/>
                 </div>

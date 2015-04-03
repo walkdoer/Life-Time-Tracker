@@ -22,6 +22,7 @@ var OverlayTrigger = ReactBootStrap.OverlayTrigger;
 var Popover = ReactBootStrap.Popover;
 var Button = ReactBootStrap.Button;
 var Badge = ReactBootStrap.Badge;
+var Q = require('q');
 
 /** Components */
 var Header = require('./components/Header');
@@ -189,7 +190,7 @@ var Footer = React.createClass({
 
     backUpLogFileByDate: function (date) {
         var that = this;
-        DataAPI.backUpLogFileByDate(date).then(function () {
+        return DataAPI.backUpLogFileByDate(date).then(function () {
             var unsyncDate = that.state.unsyncDate;
             unsyncDate = _.without(unsyncDate, date);
             that.setState({
@@ -201,12 +202,17 @@ var Footer = React.createClass({
     },
 
     backUpAllLogFile: function () {
+        var that = this;
         this.setState({
             syncingAll: true
         }, function () {
             var that = this;
-            this.state.unsyncDate.forEach(function (date) {
+            Q.allSettled(this.state.unsyncDate.map(function (date) {
                 that.backUpLogFileByDate(date);
+            })).then(function () {
+                that.setState({
+                    syncingAll: false
+                });
             });
         });
     },

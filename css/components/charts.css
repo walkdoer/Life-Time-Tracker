@@ -20,3 +20,8 @@
     font-size:1.34rem;
     font-weight: bold;
 }
+
+.ltt_c-chart-LogLine {
+    height: 100px;
+    background:#FFF;
+}
