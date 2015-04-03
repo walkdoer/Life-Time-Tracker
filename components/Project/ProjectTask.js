@@ -9,6 +9,7 @@ var RouteHandler = Router.RouteHandler;
 var Link = Router.Link;
 var Q = require('q');
 var _ = require('lodash');
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 
 var extend = require('extend');
 
@@ -38,7 +39,8 @@ var TreeMap = require('../charts/TreeMap');
 var Util = require('../../utils/Util');
 
 module.exports = React.createClass({
-    mixins: [Router.State, Router.Navigation],
+
+    mixins: [PureRenderMixin, Router.State, Router.Navigation],
 
     getInitialState: function () {
         return extend({
@@ -53,11 +55,12 @@ module.exports = React.createClass({
     },
 
     getStateFromParams: function () {
-        var params = this.getParams();
+        var params = this.getRequestParams();
         return params;
     },
 
     render: function () {
+        console.log('render projectTask');
         var loadingMsg, taskList;
         var project = this.state.project;
         var version;
@@ -127,18 +130,28 @@ module.exports = React.createClass({
             nextProps.versionId !== this.props.versionId;
     },*/
 
+    getRequestParams: function () {
+        return _.extend({
+            projectId: null,
+            versionId: null,
+            taskId: null
+        }, this.getParams());
+    },
+
     componentWillReceiveProps: function (nextProps) {
         var that = this;
-        var params = this.getParams();
+        var params = this.getRequestParams();
         //no need to load again
         if (nextProps.projectId === this.props.projectId &&
             nextProps.versionId === this.props.versionId) {
             this.setState({
-                taskId: params.taskId
+                taskId: params.taskId,
+                versionId: params.versionId
             });
         } else {
             this.setState(_.extend({
                 projectLoaded: false,
+                openTaskDetail: false,
                 taskLoaded: false
             }, params), function () {
                 this.loadProject(nextProps.projectId);
@@ -171,7 +184,7 @@ module.exports = React.createClass({
     renderTaskDetail: function () {
         console.log('render');
         if (this.state.openTaskDetail) {
-            return <TaskDetail  {... _.pick(this.state, ['projectId', 'taskId', 'versionId'])}
+            return <TaskDetail  {... _.pick(this.state, ['projectId', 'versionId'])}
                 onHidden={this.onLogListHidden}
                 onChange={this.onTaskChange}
                 task={this.currentTask}/>

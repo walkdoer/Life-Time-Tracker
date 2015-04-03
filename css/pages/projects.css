@@ -198,6 +198,7 @@
   background: #f6f6f6;
   height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .ltt_c-taskDetail-dateInfo-item{

@@ -167,7 +167,7 @@ module.exports = React.createClass({
                 loaded: false,
                 estimatedTime: task ? task.estimatedTime : null
             }, function () {
-                that.load();
+                that.load(_.extend(_.pick(nextProps, ['versionId', 'projectId']), {taskId: task._id}));
             });
         }
     },
@@ -177,11 +177,13 @@ module.exports = React.createClass({
     },
 
 
-    load: function (date) {
+    load: function (params) {
         var that = this;
+        var task = this.props.task;
         var params = _.extend({
-            sort: 'date: -1'
-        }, _.pick(this.props, ['versionId', 'taskId', 'projectId']));
+            sort: 'date: -1',
+            taskId: task._id
+        }, _.pick(this.props, ['versionId', 'projectId']), params);
         params.populate = false;
         var promise = remoteStorage.get('/api/logs', params)
             .then(function (res) {
