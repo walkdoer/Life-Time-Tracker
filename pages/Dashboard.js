@@ -21,6 +21,7 @@ var LoadingMask = require('../components/LoadingMask');
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
+var Util = require('../utils/Util');
 
 /**
  <div className="ltt_c-page-com">
@@ -287,28 +288,7 @@ var RecentActivity = React.createClass({
         var that = this;
         this.setState({loaded: false});
         params = _.extend({status: 'doing', calculateTimeConsume: true, parent: null, populate: true}, params);
-        if (type === 'yesterday') {
-            params.start = new Moment().subtract(1, 'day').startOf('day').toDate();
-            params.end = new Moment().subtract(1, 'day').endOf('day').toDate();
-        } else if (type === 'weekly') {
-            params.start = new Moment().startOf('week').toDate();
-            params.end = new Moment().endOf('week').toDate();
-        } else if ( type === 'today') {
-            params.start = new Moment().startOf('day').toDate();
-            params.end = new Moment().endOf('day').toDate();
-        } else if ( type === 'monthly') {
-            params.start = new Moment().startOf('month').toDate();
-            params.end = new Moment().endOf('month').toDate();
-        } else if ( type === 'last_seven_day') {
-            params.start = new Moment().subtract(7, 'day').startOf('day').toDate();
-            params.end = new Moment().endOf('day').toDate();
-        } else if ( type === 'last_three_day') {
-            params.start = new Moment().subtract(3, 'day').startOf('day').toDate();
-            params.end = new Moment().endOf('day').toDate();
-        } else if (type === 'last_month') {
-            params.start = new Moment().subtract(1, 'month').startOf('day').toDate();
-            params.end = new Moment().endOf('day').toDate();
-        }
+        _.extend(params, Util.toDate(type));
         DataAPI.Task.load(params).then(function (tasks) {
             var data = {loaded: true};
             data[ type + 'Task'] = tasks;

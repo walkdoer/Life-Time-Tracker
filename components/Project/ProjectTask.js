@@ -38,6 +38,7 @@ var TreeMap = require('../charts/TreeMap');
 /** Utils */
 var Util = require('../../utils/Util');
 
+
 module.exports = React.createClass({
 
     mixins: [PureRenderMixin, Router.State, Router.Navigation],
@@ -50,6 +51,7 @@ module.exports = React.createClass({
             openTaskDetail: false,
             markedFilter: false,
             taskStatus: 'doing',
+            period: 'all',
             tasks: []
         }, this.getStateFromParams());
     },
@@ -67,6 +69,7 @@ module.exports = React.createClass({
         var that = this;
         var taskId = this.state.taskId;
         var taskStatus = this.state.taskStatus;
+        var period = this.state.period;
         var currentVersionId = this.props.versionId;
         if (project) {
             version = project.versions.filter(function (version) {
@@ -86,7 +89,7 @@ module.exports = React.createClass({
                                 {label: 'Doing', status: 'doing'},
                                 {label: 'Done', status: 'done'}
                             ].map(function (btn) {
-                                var className = "btn btn-xs";
+                                var className = "btn btn-xs btn-default";
                                 if (btn.status === taskStatus) {
                                     className += ' active';
                                 }
@@ -95,7 +98,24 @@ module.exports = React.createClass({
                             })}
                         </div>
                         <div className="btn-group">
-                            <button className={"btn btn-xs " + (this.state.markedFilter ? 'active' : '')}
+                            {[
+                                {label: 'Yesterday', value: 'yesterday'},
+                                {label: 'Today', value: 'today'},
+                                {label: 'Week', value: 'week'},
+                                {label: 'Month', value: 'month'},
+                                {label: 'Year', value: 'year'},
+                                {label: 'All', value: 'all'},
+                            ].map(function (btn) {
+                                var className = "btn btn-xs btn-default";
+                                if (btn.value === period) {
+                                    className += ' active';
+                                }
+                                return <button className={className}
+                                    onClick={that.onPeriodChange.bind(that, btn.value)}>{btn.label}</button>;
+                            })}
+                        </div>
+                        <div className="btn-group">
+                            <button className={"btn btn-xs btn-default " + (this.state.markedFilter ? 'active' : '')}
                                 onClick={that.onTaskMarkedFilter}><i className="fa fa-flag"></i></button>
                         </div>
                         <div className="btn-group" style={{float: 'right'}}>
@@ -131,11 +151,22 @@ module.exports = React.createClass({
     },*/
 
     getRequestParams: function () {
-        return _.extend({
+        var defaultParams = {
             projectId: null,
             versionId: null,
             taskId: null
-        }, this.getParams());
+        };
+        if (this.state) {
+            var period = this.state.period;
+            var dateParams = Util.toDate(period);
+            var markedFilter = this.state.markedFilter;
+            if (markedFilter) {
+                defaultParams.parent = undefined;
+            }
+            defaultParams.marked = markedFilter;
+            defaultParams.status = this.state.taskStatus;
+        }
+        return _.extend(defaultParams, this.getParams(), dateParams);
     },
 
     componentWillReceiveProps: function (nextProps) {
@@ -169,9 +200,7 @@ module.exports = React.createClass({
                     projectLoaded: true,
                     project: project
                 });
-                that.loadTasks({
-                    status: that.state.taskStatus
-                }).then(function () {
+                that.loadTasks(that.getRequestParams()).then(function () {
                     that.plotTreeMap();
                 });
             })
@@ -218,9 +247,20 @@ module.exports = React.createClass({
         this.setState({
             taskStatus: status
         }, function () {
-            this.loadTasks({
-                status: this.state.taskStatus
-            }).then(function () {
+            this.loadTasks(this.getRequestParams()).then(function () {
+                if (that.state.openTreeMap) {
+                    that.plotTreeMap();
+                }
+            });
+        });
+    },
+
+    onPeriodChange: function (period) {
+        var that = this;
+        this.setState({
+            period: period
+        }, function () {
+            this.loadTasks(this.getRequestParams()).then(function () {
                 if (that.state.openTreeMap) {
                     that.plotTreeMap();
                 }
@@ -233,15 +273,7 @@ module.exports = React.createClass({
         this.setState({
             markedFilter: !this.state.markedFilter
         }, function () {
-            var markedFilter = this.state.markedFilter;
-            var params = {
-                status: this.state.taskStatus,
-                marked: markedFilter
-            };
-            if (markedFilter) {
-                params.parent = undefined;
-            }
-            this.loadTasks(params).then(function () {
+            this.loadTasks(this.getRequestParams()).then(function () {
                 if (that.state.openTreeMap) {
                     that.plotTreeMap();
                 }
