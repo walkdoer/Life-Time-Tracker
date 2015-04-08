@@ -22,6 +22,7 @@ var EMPTY_FUN = function () {};
 var LoadingMask = require('../components/LoadingMask');
 var Notify = require('../components/Notify');
 var GoalList = require('../components/Goal/GoalList');
+var TimeInput = require('../components/TimeInput');
 
 /** Actions */
 var GoalAction = require('../actions/GoalAction');
@@ -106,7 +107,7 @@ var CreateAddGoalModal = React.createClass({
             <Modal {...this.props} bsStyle="primary" title="记录情绪" animation={true}>
                 <div className="modal-body">
                     <Input type='text' label='Name' placeholder='Enter text' value={this.state.name} onChange={this.onNameChange} ref="name"/>
-                    <Input type='text' label='EstimatedTime' placeholder='any time you want' value={this.state.estimatedTime}/>
+                    <TimeInput type='text' label='EstimatedTime' placeholder='any time you want' value={this.state.estimatedTime}/>
                     <pre id="ltt_c-CreateAddGoalModal-filterEditor" className="ltt_c-CreateAddGoalModal-filterEditor"/>
                 </div>
                 <div className="modal-footer">
