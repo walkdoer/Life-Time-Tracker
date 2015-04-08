@@ -12,7 +12,10 @@ var Progress = React.createClass({
     render: function () {
         var value = numeral(this.props.value).value();
         var max = numeral(this.props.max).value();
-        var progress = value / max * 100;
+        var progress = 0;
+        if (max !== 0) {
+            progress = value / max * 100;
+        }
         if (value > max) {
             progress = 100;
         }

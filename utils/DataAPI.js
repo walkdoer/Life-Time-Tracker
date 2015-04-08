@@ -107,6 +107,21 @@ module.exports = {
         update: function (params) {
             return post(url('/tasks/' + params.id), params);
         }
+    },
+
+    Goal: {
+
+        create: function (goal) {
+            return post(url('/goals'), goal);
+        },
+
+        load: function (params) {
+            return get(url('/goals'), params);
+        },
+
+        update: function (params) {
+            return post(url('/goals/' + params.id), params);
+        }
     }
 };
 
