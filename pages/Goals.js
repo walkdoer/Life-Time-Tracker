@@ -13,6 +13,7 @@ var Input = ReactBootStrap.Input;
 var ReactPropTypes = React.PropTypes;
 var numeral = require('numeral');
 var cx = require('react/lib/cx');
+var _ = require('lodash');
 
 /** constant */
 var ENTER_KEY_CODE = 13;
@@ -107,7 +108,10 @@ var CreateAddGoalModal = React.createClass({
             <Modal {...this.props} bsStyle="primary" title="记录情绪" animation={true}>
                 <div className="modal-body">
                     <Input type='text' label='Name' placeholder='Enter text' value={this.state.name} onChange={this.onNameChange} ref="name"/>
-                    <TimeInput type='text' label='EstimatedTime' placeholder='any time you want' value={this.state.estimatedTime}/>
+                    <TimeInput type='text' label='EstimatedTime' placeholder='any time you want'
+                        value={this.state.estimatedTime}
+                        onChange={this.onEstimatedTimeChange}/>
+                    {this.renderGranularity()}
                     <pre id="ltt_c-CreateAddGoalModal-filterEditor" className="ltt_c-CreateAddGoalModal-filterEditor"/>
                 </div>
                 <div className="modal-footer">
@@ -118,8 +122,37 @@ var CreateAddGoalModal = React.createClass({
         );
     },
 
+    renderGranularity: function () {
+        var that = this;
+        var granularity = this.state.granularity;
+        return (
+            <div className="btn-group">
+                {[
+                    {label: 'Day', value: 'day'},
+                    {label: 'Week', value: 'week'},
+                    {label: 'Month', value: 'month'},
+                    {label: 'Year', value: 'year'},
+                ].map(function (btn) {
+                    var className = "btn btn-xs btn-default";
+                    if (btn.value === granularity) {
+                        className += ' active';
+                    }
+                    return <button className={className}
+                        onClick={that.onGranularityChange.bind(that, btn.value)}>{btn.label}</button>;
+                })}
+            </div>
+        );
+    },
+
+    onGranularityChange: function (value) {
+        this.setState({
+            granularity: value
+        });
+    },
+
     initEditor: function () {
         var goal = this.props.goal;
+        var that = this;
         var editor = ace.edit('ltt_c-CreateAddGoalModal-filterEditor');
         this.editor = editor;
         editor.setTheme("ace/theme/github");
@@ -132,10 +165,32 @@ var CreateAddGoalModal = React.createClass({
             enableBasicAutocompletion: true,
             enableLiveAutocompletion: false
         });
+        session.on('change', _.debounce(function (e) {
+            var content = session.getValue();
+            content = content.trim();
+            var data = {
+                filter: content,
+                filterParseSuccess: that._isFilterValid(content)
+            };
+            console.log(data);
+            that.setState(data);
+        }, 200));
     },
 
     getGoal: function () {
+        if (this.state.filterParseSuccess === false) {
+            return null;
+        }
         return this.state;
+    },
+
+    _isFilterValid: function (filterStr) {
+        try {
+            JSON.parse(filterStr);
+            return true;
+        } catch (e) {
+            return false;
+        }
     },
 
     onNameChange: function () {
@@ -144,8 +199,17 @@ var CreateAddGoalModal = React.createClass({
         });
     },
 
+    onEstimatedTimeChange: function (time) {
+        this.setState({
+            estimatedTime: time
+        });
+    },
+
     _onSave: function () {
-        this.props.onSave(this.getGoal());
+        var goal = this.getGoal();
+        if (goal) {
+            this.props.onSave(goal);
+        }
     },
 
     componentDidMount: function () {

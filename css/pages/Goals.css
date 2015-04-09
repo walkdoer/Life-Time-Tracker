@@ -48,17 +48,18 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-
-.ltt_c-GoalCard-activities{
-    flex: 4;
-    background: #F6F6F6
-}
-
 .ltt_c-GoalCard-item{
     border-right:1px solid #dcdcdc;
     padding-left: 10px;
     padding-right: 10px;
 }
+.ltt_c-GoalCard-activities{
+    flex: 4;
+    background: #F6F6F6;
+    padding: 0px;
+}
+
+
 
 .ltt_c-GoalCard-item:last-child{
     border-right:0px;
@@ -80,4 +81,10 @@
 .ltt_c-GoalCard-editBtn:hover{
     color:#32F;
     cursor: pointer;
+}
+
+.ltt_c-GoalCard .ltt_c-chart-LogLine{
+    height: 80px;
+    min-height: 80px;
+    max-height: 80px;
 }

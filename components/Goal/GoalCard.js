@@ -18,6 +18,8 @@ var MenuItem = RB.MenuItem;
 /**components*/
 var Progress = require('../Progress');
 var DataAPI = require('../../utils/DataAPI');
+var LogLine = require('../charts/LogLine');
+var LoadingMask = require('../LoadingMask');
 
 /** Constant */
 var EMPTY_FUN = function () {};
@@ -26,7 +28,10 @@ module.exports = React.createClass({
 
     getInitialState: function () {
         return {
-            progress: 0
+            progress: 0,
+            activitiesLoaded: false,
+            activitiesLoadFailed: false,
+            activities: []
         };
     },
 
@@ -46,7 +51,13 @@ module.exports = React.createClass({
             <div className={cx({"ltt_c-GoalCard": true, editing: this.state.editing})}>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-title">{goal.name}</div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity">{goal.granularity}</div>
-                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-activities">recent activities</div>
+                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-activities">
+                    {this.state.activitiesLoadFailed ?
+                        'Load Activity Failed' :
+                        (goal.filter ? <LogLine logs={this.state.activities} title={false} xAxisLabel={false}/> : null)
+                    }
+                    <LoadingMask loaded={this.state.activitiesLoaded}/>
+                </div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-progress">
                     <Progress className="ltt_c-GoalCard-progress" max={goal.estimatedTime || 0} value={this.state.progress || 0}/>
                 </div>
@@ -57,11 +68,46 @@ module.exports = React.createClass({
 
     componentDidMount: function () {
         //this.calculateProgress();
+        var goal = this.props.goal;
+        var filter;
+        if (goal && (filter = goal.filter)) {
+            this.loadActivities(JSON.parse(filter));
+        } else {
+            this.setState({
+                activitiesLoaded: true
+            });
+        }
+    },
+
+    loadActivities: function (filter) {
+        console.log(filter);
+        var that = this;
+        var params = _.extend({
+            sort: 'date: -1',
+            populate: false
+        }, filter);
+        DataAPI.Log.load(params)
+            .then(function (data) {
+                that.setState({
+                    activitiesLoaded: true,
+                    activities: data
+                }, function () {
+                    this.calculateProgress();
+                });
+            }).fail(function (err) {
+                that.setState({
+                    activitiesLoaded: true,
+                    activitiesLoadFailed: true
+                })
+            });
     },
 
     calculateProgress: function () {
+        var totalTime = this.state.activities.reduce(function (total, log) {
+            return total + (log.len || 0);
+        }, 0);
         this.setState({
-            progress: 40
+            progress: totalTime
         });
     }
 });

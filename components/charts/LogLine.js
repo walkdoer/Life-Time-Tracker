@@ -9,6 +9,7 @@ module.exports = React.createClass({
 
     getDefaultProps: function () {
         return {
+            xAxisLabel: true,
             logs: []
         };
     },
@@ -29,24 +30,18 @@ module.exports = React.createClass({
 
     _plot: function () {
         var $el = $(this.getDOMNode());
-        var lineData = [{
+        var data = [{
             name: this.props.name,
             data: this._getLineData()
         }];
         var title = this._getTitle();
-        Chart.line({
-            $el: $el,
-            data: lineData
-        }, {
+        var options = {
             title: {
                 text: title,
                 style: {
                     'font-size': '12px',
                     'font-weight': 'bold'
                 }
-            },
-            chart: {
-                type: 'areaspline'
             },
             tooltip: {
                 pointFormat: '{series.name}: <b>{point.y}</b><br/>',
@@ -102,7 +97,14 @@ module.exports = React.createClass({
                     year: '%Y'
                 }
             }
-        });
+        };
+        if (this.props.xAxisLabel === false) {
+            options.xAxis.labels = _.extend({}, options.xAxis.labels, {enabled: false});
+        }
+        Chart.column({
+            $el: $el,
+            data: data
+        }, options);
     },
 
 
@@ -116,6 +118,9 @@ module.exports = React.createClass({
     },
 
     _getTitle: function () {
+        if (this.props.title === false) {
+            return false;
+        }
         var logs = this.props.logs;
         if (_.isEmpty(logs)) {
             return '';

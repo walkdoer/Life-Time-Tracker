@@ -75,6 +75,12 @@ module.exports = {
         return deferred.promise;
     },
 
+    Log: {
+        load: function (params) {
+            return get(url('/logs'), params);
+        }
+    },
+
     Affect: {
         load: function (params) {
             return get(url('/affects'), params);
