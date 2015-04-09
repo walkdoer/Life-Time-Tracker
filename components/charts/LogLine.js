@@ -100,6 +100,10 @@ module.exports = React.createClass({
         };
         if (this.props.xAxisLabel === false) {
             options.xAxis.labels = _.extend({}, options.xAxis.labels, {enabled: false});
+            options.xAxis.tickWidth = 0;
+        }
+        if (this.props.yAxisLabel === false) {
+            options.yAxis.gridLineWidth = 0;
         }
         Chart.column({
             $el: $el,

@@ -21,6 +21,9 @@ var DataAPI = require('../../utils/DataAPI');
 var LogLine = require('../charts/LogLine');
 var LoadingMask = require('../LoadingMask');
 
+/** Utils */
+var Util = require('../../utils/Util');
+
 /** Constant */
 var EMPTY_FUN = function () {};
 
@@ -54,7 +57,7 @@ module.exports = React.createClass({
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-activities">
                     {this.state.activitiesLoadFailed ?
                         'Load Activity Failed' :
-                        (goal.filter ? <LogLine logs={this.state.activities} title={false} xAxisLabel={false}/> : null)
+                        (goal.filter ? <LogLine logs={this.state.activities} title={false} xAxisLabel={false} yAxisLabel={false}/> : null)
                     }
                     <LoadingMask loaded={this.state.activitiesLoaded}/>
                 </div>
@@ -80,12 +83,14 @@ module.exports = React.createClass({
     },
 
     loadActivities: function (filter) {
-        console.log(filter);
+        var goal = this.props.goal;
+        var dateInfo = Util.toDate(goal.granularity);
         var that = this;
         var params = _.extend({
             sort: 'date: -1',
             populate: false
-        }, filter);
+        }, dateInfo, filter);
+        console.log(params);
         DataAPI.Log.load(params)
             .then(function (data) {
                 that.setState({
