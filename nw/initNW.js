@@ -3,6 +3,9 @@
     var isNodeWebkit = false;
     var root = this;
     var Ltt;
+    if (typeof require !== 'undefined') {
+        isNodeWebkit = true;
+    }
     if (!isNodeWebkit) {
         console.log('init Ltt Api for browser invironment');
         Ltt = {
@@ -17,10 +20,6 @@
     var path = require('path');
     var _ = require('lodash');
 
-
-    if (typeof require !== 'undefined') {
-        isNodeWebkit = true;
-    }
 
 
     /**
@@ -110,6 +109,7 @@
             Ltt.sdk = sdk;
             root = global;
             root.Ltt = Ltt;
+            window.Ltt = Ltt;
             root.nwGui = gui;
             //a series of init action to intialize components
             initMenu();
