@@ -92,3 +92,7 @@
   opacity: 0.01;
   height: 0px;
 }
+
+.ltt_c-task .fa-external-link{
+  margin-left: 5px;
+}

@@ -1226,7 +1226,7 @@ exports.parForEach = function(array, fn, callback) {
     }
 };
 
-var ID_REGEX = /[a-zA-Z_0-9\.\u00A2-\uFFFF]/;
+var ID_REGEX = /[a-zA-Z_0-9\$\-\u00A2-\uFFFF]/;
 
 exports.retrievePrecedingIdentifier = function(text, pos, regex) {
     regex = regex || ID_REGEX;
@@ -1802,11 +1802,11 @@ var completers = [snippetCompleter, textCompleter, keyWordCompleter];
 exports.setCompleters = function(val) {
     completers = val || [];
 };
-exports.resetCompleters =  function () {
-    completers = [snippetCompleter, textCompleter, keyWordCompleter];
-}
 exports.addCompleter = function(completer) {
     completers.push(completer);
+};
+exports.resetCompleters =  function () {
+    completers = [snippetCompleter, textCompleter, keyWordCompleter];
 };
 exports.textCompleter = textCompleter;
 exports.keyWordCompleter = keyWordCompleter;

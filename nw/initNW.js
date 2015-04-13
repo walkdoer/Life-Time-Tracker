@@ -2,9 +2,21 @@
     'use strict';
     var isNodeWebkit = false;
     var root = this;
+    var Ltt;
+    if (!isNodeWebkit) {
+        console.log('init Ltt Api for browser invironment');
+        Ltt = {
+            openExternalLink: function (link) {
+                window.open(link, '_blank');
+            }
+        };
+        window.Ltt = Ltt;
+        return;
+    }
     var sdk = require('ltt-sdk');
     var path = require('path');
     var _ = require('lodash');
+
 
     if (typeof require !== 'undefined') {
         isNodeWebkit = true;
@@ -30,10 +42,10 @@
         var fileSrc = 'file:///' + path.resolve('./' + fileName);
         return fileSrc;
     }
-
     if (isNodeWebkit === true) {
         var gui = require('nw.gui');
-        var Ltt = {
+        console.log('init Ltt Api for node-webkit invironment');
+        Ltt = {
 
             init: function () {
                 var win = this.getWindow();
@@ -77,6 +89,12 @@
             quit: function () {
                 var win = this.getWindow();
                 win.close();
+            },
+
+            openExternalLink: function (link) {
+                if (link) {
+                    gui.Shell.openExternal(link);
+                }
             }
         };
         sdk.startServer().then(function () {

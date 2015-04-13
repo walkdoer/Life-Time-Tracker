@@ -60,6 +60,12 @@ ace.define("ace/mode/ltt_highlight_rules",["require","exports","module","ace/lib
                         token: "ltt_tag_start",
                         regex: "\\[",
                         push: "tags"
+                    },
+
+                    {
+                        token: 'ltt_link',
+                        //regex: "(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\d\/\w \.-]*)*\/?"
+                        regex: "(http|https|ftp)\://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*"
                     }
                 ],
                 tags: [

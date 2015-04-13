@@ -14846,6 +14846,10 @@ color:#FDAF7E;\
 color:#128d32;\
 font-weight: bold;\
 }\
+.ace_ltt_link{\
+color:#E29500;\
+text-decoration: underline;\
+}\
 .ace_ltt_tag_start,\
 .ace_ltt_tag_end{\
 color:#6B84E2;\

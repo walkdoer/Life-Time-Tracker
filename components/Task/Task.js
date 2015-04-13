@@ -82,12 +82,18 @@ var Task = React.createClass({
                 {<i className={'ltt_c-task-openButton-icon fa ' + (this.state.isOpen ? 'fa-chevron-down' : 'fa-chevron-right')}></i>}
             </div>
         }
+        var link;
+        console.log(task.attributes);
+        if (task.attributes && (link = task.attributes.link)) {
+            link = <span onClick={this.openTaskExternalLink.bind(this, link)} title={link}><i className="fa fa-external-link"></i></span>
+        }
 
         return (
             <li className="ltt_c-task" data-id={task._id}>
                 <div className={"ltt_c-task-title" + (this.state.selected ? ' selected' : '')} onClick={this.select}>
                     {openButton}
                     <span>{task.name}</span>
+                    {link}
                     <span className={"ltt_c-task-mark " + (this.state.marked ? 'marked': '')} onClick={this.toggleMark}>
                         <i className={this.state.marked ? 'fa fa-flag' : 'fa fa-flag-o'}></i>
                     </span>
@@ -178,6 +184,11 @@ var Task = React.createClass({
 
     start: function () {
         return this.update({progress: 0});
+    },
+
+    openTaskExternalLink: function (link) {
+        console.log('openExternalLink', link);
+        Ltt.openExternalLink(link);
     }
 });
 
