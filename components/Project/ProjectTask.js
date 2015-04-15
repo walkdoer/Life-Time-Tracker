@@ -10,6 +10,7 @@ var Link = Router.Link;
 var Q = require('q');
 var _ = require('lodash');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
+var Mt = window.Mousetrap;
 
 var extend = require('extend');
 
@@ -30,6 +31,7 @@ var TaskList = require('../Task/TaskList');
 var Task = require('../Task/Task');
 var LogList = require('../LogList');
 var TaskDetail = require('../Task/TaskDetail');
+var Notify = require('../Notify');
 
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
@@ -37,6 +39,7 @@ var TreeMap = require('../charts/TreeMap');
 
 /** Utils */
 var Util = require('../../utils/Util');
+var DataAPI = require('../../utils/DataAPI');
 
 
 module.exports = React.createClass({
@@ -143,6 +146,35 @@ module.exports = React.createClass({
 
     componentDidMount: function () {
         this.loadProject(this.props.projectId);
+        Mt.bind(['command+d', 'ctrl+d'], this.onDeleteTask.bind(this));
+    },
+
+    onDeleteTask: function (e) {
+        e.preventDefault();
+        console.log('delete task', this.currentTask);
+        if (this.currentTask) {
+            this.deleteTask(this.currentTask);
+        }
+    },
+
+    deleteTask: function (task) {
+        var that = this;
+        if (!task) {
+            return;
+        }
+        this.setState({
+            openTaskDetail: false
+        });
+        DataAPI.Task.delete(task).then(function () {
+            that.loadTasks(that.getRequestParams());
+        }).catch(function (err) {
+            console.error(err.stack);
+            Notify.error('删除Task失败');
+        });
+    },
+
+    componentWillUnmount: function () {
+        Mt.unbind(['command+delete', 'ctrl+delete'], this.onDeleteTask);
     },
 
     /*shouldComponentUpdate: function (nextProps, nextState) {
@@ -211,7 +243,7 @@ module.exports = React.createClass({
     },
 
     renderTaskDetail: function () {
-        console.log('render');
+        console.log('render task detail', this.currentTask);
         if (this.state.openTaskDetail) {
             return <TaskDetail  {... _.pick(this.state, ['projectId', 'versionId'])}
                 onHidden={this.onLogListHidden}
@@ -356,19 +388,24 @@ module.exports = React.createClass({
         });
     },
 
-    openTask: function (e, task) {
-        console.log('open task');
+    selectTask: function (task) {
+        this.currentTask = task;
+    },
+
+    openTask: function (task) {
+        if (!task) {return;}
         var useVersion = !!this.props.versionId;
         if (useVersion && task.versionId) {
             url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
         } else {
             url = '/projects/' + task.projectId + '/tasks/' + task._id;
         }
-        this.currentTask = task;
+        this.selectTask(task);
         this.transitionTo(url);
         this.setState({
             openTaskDetail: true
         });
+        console.log('open task', task);
     }
 });
 

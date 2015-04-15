@@ -71,7 +71,8 @@ var Task = React.createClass({
             subTaskList = (
                 <TaskList className="subtask">
                     {subTasks.map(function (task) {
-                        return (<Task data={task} key={task.id} onClick={that.props.onClick} selected={task._id === taskId}/>);
+                        return (<Task {... _.pick(that.props, ['onClick', 'onDoubleClick'])}data={task} key={task.id}
+                            selected={task._id === taskId}/>);
                     })}
                 </TaskList>
             );
@@ -83,14 +84,13 @@ var Task = React.createClass({
             </div>
         }
         var link;
-        console.log(task.attributes);
         if (task.attributes && (link = task.attributes.link)) {
             link = <span onClick={this.openTaskExternalLink.bind(this, link)} title={link}><i className="fa fa-external-link"></i></span>
         }
 
         return (
-            <li className="ltt_c-task" data-id={task._id}>
-                <div className={"ltt_c-task-title" + (this.state.selected ? ' selected' : '')} onClick={this.select}>
+            <li className="ltt_c-task" data-id={task._id} onDoubleClick={this.props.onDoubleClick} onClick={this.select}>
+                <div className={"ltt_c-task-title" + (this.state.selected ? ' selected' : '')}>
                     {openButton}
                     <span>{task.name}</span>
                     {link}
@@ -128,7 +128,7 @@ var Task = React.createClass({
         this.setState({
             selected: true
         }, function () {
-            this.props.onClick(e, this.props.data);
+            this.props.onClick(this.props.data, e);
         });
     },
 

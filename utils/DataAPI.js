@@ -112,6 +112,11 @@ module.exports = {
 
         update: function (params) {
             return post(url('/tasks/' + params.id), params);
+        },
+
+        delete: function (params) {
+            console.log('delete ajax task' + params._id);
+            return deleteObj(url('/tasks/' + params._id));
         }
     },
 
@@ -152,6 +157,24 @@ function post(url, data) {
         data: data,
         type: 'post',
         dataType: 'json',
+        success:function (res) {
+            deferred.resolve(res);
+        },
+        error: function (err) {
+            console.error(err.stack);
+            deferred.reject(err);
+        }
+    });
+
+    return deferred.promise;
+}
+
+function deleteObj(url, data) {
+    var deferred = Q.defer();
+    $.ajax({
+        url: url,
+        data: data,
+        type: 'delete',
         success:function (res) {
             deferred.resolve(res);
         },

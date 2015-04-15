@@ -287,7 +287,7 @@ var RecentActivity = React.createClass({
     loadTask: function (type, params) {
         var that = this;
         this.setState({loaded: false});
-        params = _.extend({status: 'doing', calculateTimeConsume: true, parent: null, populate: true}, params);
+        params = _.extend({status: 'doing', calculateTimeConsume: true, parent: 'null', populate: true}, params);
         _.extend(params, Util.toDate(type));
         DataAPI.Task.load(params).then(function (tasks) {
             var data = {loaded: true};
