@@ -7,6 +7,9 @@ var $ = require('jquery');
 require('../libs/bootstrap-datepicker');
 var remoteStorage = require('../components/storage.remote');
 var Moment = require('moment');
+var Select2 = require('select2');
+var extend = require('extend');
+var _ = require('lodash');
 
 /* components */
 var Log = require('../components/Log');
@@ -14,12 +17,17 @@ var DatePicker = require('../components/DatePicker');
 
 /* utils */
 var DataAPI = require('../utils/DataAPI');
+/*    <DatePicker
+onChange={this.onDateChange}
+className="ltt_c-page-logs-date"/>*/
 
 var Logs = React.createClass({
 
     getInitialState: function () {
+        this._filterParams = {};
         return {
-            logs: []
+            logs: [],
+            tags: []
         };
     },
 
@@ -29,9 +37,6 @@ var Logs = React.createClass({
         });
         return (
             <div className="ltt_c-page ltt_c-page-logs">
-                <DatePicker
-                    onChange={this.searchLogs}
-                    className="ltt_c-page-logs-date"/>
                 {this.renderFilters()}
                 <div className="ltt_c-page-logs-list">
                     {logs}
@@ -41,23 +46,24 @@ var Logs = React.createClass({
     },
 
 
-    searchLogs: function (date) {
+    /*onDateChange: function (date) {
         var that = this;
-        remoteStorage.get('/api/logs/' + new Moment(date).format('YYYY/MM/DD'))
-            .then(function (result) {
-                that.setState({
-                    logs: result.data
-                });
-            }).catch(function (err) {
-                console.error(err.stack);
-            });
-    },
+        this.setFilter({
+            start: new Moment(date).startOf('day').toDate(),
+            end: new Moment(date).endOf('day').toDate(),
+        });
+        this.loadLogs();
+    },*/
 
 
     renderFilters: function () {
         return (
             <div className="ltt_c-page-logs-filters">
-                tags: <select className="filter-tags" ref="tagFilter" multiple="multiple"></select>
+                Tags: <select className="filter-tags" ref="tagFilter" multiple="multiple">
+                    {this.state.tags.map(function (tag) {
+                        return <option value={tag.name}>{tag.name}</option>
+                    })}
+                </select>
             </div>
         );
     },
@@ -70,9 +76,38 @@ var Logs = React.createClass({
                 tags: tags
             }, function () {
                 console.log(that.refs.tagFilter);
-                $(that.refs.tagFilter).select2();
+                var $select = $(that.refs.tagFilter.getDOMNode());
+                $select.select2();
+                $select.on('change', function (e) {
+                    var tags = e.val;
+                    if (!_.isEmpty(tags)) {
+                        that.setFilter({tags: tags.join(',')});
+                        that.loadLogs();
+                    }
+                });
             });
         });
+    },
+
+    loadLogs: function () {
+        var that = this;
+        this.queryLogs(that.getFilter()).then(function (logs) {
+            that.setState({
+                logs: logs
+            });
+        });
+    },
+
+    queryLogs: function (params) {
+        return DataAPI.Log.load(params);
+    },
+
+    setFilter: function (filter) {
+        extend(this._filterParams, filter);
+    },
+
+    getFilter: function () {
+        return this._filterParams;
     }
 });
 

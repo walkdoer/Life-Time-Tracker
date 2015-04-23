@@ -138,7 +138,7 @@ var browserifyTask = function (options) {
         vendorsBundler.bundle()
           .on('error', gutil.log)
           .pipe(source('vendors.js'))
-          .pipe(gulpif(true/*!options.development*/, streamify(uglify())))
+          .pipe(gulpif(!options.development, streamify(uglify())))
           .pipe(gulp.dest(options.dest))
           .pipe(notify(function () {
             console.log('VENDORS bundle built in ' + (Date.now() - start) + 'ms');

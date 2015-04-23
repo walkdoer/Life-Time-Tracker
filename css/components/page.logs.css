@@ -3,3 +3,10 @@
     text-indent: 10px;
     font-size: 1.14rem;
 }
+
+
+.ltt_c-page-logs .filter-tags{
+    margin-top:15px;
+    margin-bottom: 15px;
+    width: 50%;
+}
