@@ -2,19 +2,11 @@
  * @jsx React.DOM
 */
 
-// var _ = require('lodash');
-// var $ = require('jquery');window.jQuery = window.$ = $;
-// var Highcharts = require('highcharts');
-// var d3 =require('d3');
-// var moment = require('moment');
-// var nv =require('nvd3');
-// var bootstrap = require('bootstrap');
 var React = require('react');
 var $ = require('jquery');window.$ = window.Jquery = window.jQuery = $;
 // load everything for jquery ui
 require('jquery-ui');
 require('mousetrap');
-require('typeahead');
 var Router = require('react-router');
 var Route = Router.Route;
 var Routes = Router.Routes;

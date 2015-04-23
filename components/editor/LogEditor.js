@@ -443,6 +443,7 @@ var LogEditor = React.createClass({
                 that.props.onSave(content);
                 that.__saveing = false;
                 console.log('import cost' + (new Date().getTime() - start));
+                /*
                 //don't need to sync if already syncing.
                 if (that.state.syncStatus === SYNCING) { return; }
                 var timer = setTimeout(function () {
@@ -465,7 +466,7 @@ var LogEditor = React.createClass({
                         });
                     });
                     clearTimeout(timer);
-                }, 200);
+                }, 200);*/
             }).catch(function (err) {
                 that.__saveing = false;
                 NProgress.done();

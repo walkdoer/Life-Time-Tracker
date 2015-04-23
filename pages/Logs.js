@@ -7,8 +7,14 @@ var $ = require('jquery');
 require('../libs/bootstrap-datepicker');
 var remoteStorage = require('../components/storage.remote');
 var Moment = require('moment');
+
+/* components */
 var Log = require('../components/Log');
 var DatePicker = require('../components/DatePicker');
+
+/* utils */
+var DataAPI = require('../utils/DataAPI');
+
 var Logs = React.createClass({
 
     getInitialState: function () {
@@ -26,12 +32,15 @@ var Logs = React.createClass({
                 <DatePicker
                     onChange={this.searchLogs}
                     className="ltt_c-page-logs-date"/>
+                {this.renderFilters()}
                 <div className="ltt_c-page-logs-list">
                     {logs}
                 </div>
             </div>
         );
     },
+
+
     searchLogs: function (date) {
         var that = this;
         remoteStorage.get('/api/logs/' + new Moment(date).format('YYYY/MM/DD'))
@@ -42,7 +51,33 @@ var Logs = React.createClass({
             }).catch(function (err) {
                 console.error(err.stack);
             });
+    },
+
+
+    renderFilters: function () {
+        return (
+            <div className="ltt_c-page-logs-filters">
+                tags: <select className="filter-tags" ref="tagFilter" multiple="multiple"></select>
+            </div>
+        );
+    },
+
+    componentDidMount: function () {
+        var that = this;
+        DataAPI.Tag.load().then(function (tags) {
+            console.log('tags length:' + tags.length);
+            that.setState({
+                tags: tags
+            }, function () {
+                console.log(that.refs.tagFilter);
+                $(that.refs.tagFilter).select2();
+            });
+        });
     }
 });
+
+
+
+
 
 module.exports = Logs;

@@ -133,6 +133,12 @@ module.exports = {
         update: function (params) {
             return post(url('/goals/' + params.id), params);
         }
+    },
+
+    Tag: {
+        load: function (params) {
+            return get(url('/tags'), params);
+        }
     }
 };
 

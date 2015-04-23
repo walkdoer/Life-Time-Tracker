@@ -12,6 +12,7 @@
   "dependencies": {
     "body-parser": "~1.10.0",
     "chart.js": "^1.0.2",
+    "d3": "^3.5.5",
     "extend": "~2.0.0",
     "flux": "~2.0.1",
     "he": "~0.5.0",
@@ -36,58 +37,49 @@
   },
   "devDependencies": {
     "browserify": "~6.2.0",
-    "gulp": "~3.8.10",
+    "browserify-shim": "~3.8.0",
     "envify": "~3.0.0",
-    "uglify-js": "~2.4.15",
-    "reactify": "~0.15.2",
-    "watchify": "~2.1.0",
     "express": "~4.8.8",
     "express3-handlebars": "~0.5.2",
-    "vinyl-source-stream": "~1.0.0",
-    "gulp-util": "~3.0.1",
-    "gulp-notify": "~2.0.1",
-    "jquery-browserify": "~1.8.1",
-    "browserify-shim": "~3.8.0",
-    "gulp-watch": "~2.0.0",
-    "morgan": "~1.3.0",
-    "gulp-inject": "~1.0.2",
-    "gulp-rename": "~1.2.0",
-    "gulp-react": "~2.0.0",
-    "node-webkit-builder": "~1.0.4",
+    "glob": "^5.0.5",
+    "gulp": "~3.8.10",
+    "gulp-clean": "~0.3.1",
+    "gulp-concat": "^2.5.2",
+    "gulp-cssmin": "^0.1.6",
     "gulp-debug": "~2.0.0",
-    "gulp-clean": "~0.3.1"
+    "gulp-if": "^1.2.5",
+    "gulp-inject": "~1.0.2",
+    "gulp-jasmine2-phantomjs": "^0.2.0",
+    "gulp-livereload": "^3.8.0",
+    "gulp-notify": "~2.0.1",
+    "gulp-react": "~2.0.0",
+    "gulp-rename": "~1.2.0",
+    "gulp-shell": "^0.4.1",
+    "gulp-streamify": "0.0.5",
+    "gulp-uglify": "^1.2.0",
+    "gulp-util": "~3.0.1",
+    "gulp-watch": "~2.0.0",
+    "jquery-browserify": "~1.8.1",
+    "morgan": "~1.3.0",
+    "node-webkit-builder": "~1.0.4",
+    "reactify": "~0.15.2",
+    "uglify-js": "~2.4.15",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "~2.1.0"
   },
   "browser": {
-    "d3": "./bower_components/d3/d3.min.js",
     "nvd3": "./bower_components/nvd3/nv.d3.min.js",
-    "highcharts": "./bower_components/highcharts/highcharts.src.js",
-    "highchartsAdapter": "./bower_components/highcharts/adapters/standalone-framework.src.js",
     "bootstrap": "./bower_components/bootstrap/dist/js/bootstrap.js",
     "noty": "./node_modules/noty/js/noty/packaged/jquery.noty.packaged.js",
     "chart": "./bower_components/chartjs/Chart.js",
-    "typeahead": "./bower_components/typeahead.js/dist/typeahead.bundle.js",
     "sweetalert": "./bower_components/sweetalert/lib/sweet-alert.js",
-    "datetimepicker": "./bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js"
+    "datetimepicker": "./bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js",
+    "select2": "./bower_components/select2/select2.js"
   },
   "browserify-shim": {
     "noty": "noty",
     "chart": "chart",
     "datetimepicker": "datetimepicker",
-    "typeahead": {
-      "depends": [
-        "jquery:$"
-      ],
-      "exports": "typeahead"
-    },
-    "highcharts": {
-      "depends": [
-        "highchartsAdapter:highchartsAdapter"
-      ],
-      "exports": "highcharts"
-    },
-    "highchartsAdapter": {
-      "exports": "highchartsAdapter"
-    },
     "d3": {
       "exports": "d3",
       "depends": [
