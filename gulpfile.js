@@ -19,6 +19,10 @@ var jasminePhantomJs = require('gulp-jasmine2-phantomjs');
 var packageJSON = require('./package.json');
 var inject = require("gulp-inject");
 var rename = require('gulp-rename');
+var NwBuilder = require('node-webkit-builder');
+var watch = require('gulp-watch');
+var buildDir = './build';
+var babelify = require("babelify");
 
 // We create an array of dependencies. These are NPM modules you have
 // installed in node_modules. Think: "require('react')" or "require('underscore')"
@@ -26,12 +30,7 @@ var rename = require('gulp-rename');
 
 var dependencies = Object.keys(packageJSON.dependencies).concat(Object.keys(packageJSON.browser));
 dependencies = dependencies.concat([
-    // './libs/bootstrap-datepicker.js',
-    // './libs/cal-heatmap.js',
-    // './libs/daterangepicker.js',
-    // './libs/d3.layout.cloud.js',
     'react/addons'
-    //'react/lib/cx'
 ]);
 
 console.log(dependencies);
@@ -55,7 +54,7 @@ var browserifyTask = function (options) {
     /* We set our dependencies as externals of our app bundler.
      For some reason it does not work to set these in the options above */
     appBundler.external(options.development ? dependencies : []);
-  
+
     /* This is the actual rebundle process of our application bundle. It produces
     a "main.js" file in our "build" folder. */
     var rebundle = function () {
@@ -168,7 +167,7 @@ var cssTask = function (options) {
 
 // Starts our development workflow
 gulp.task('default', function () {
-
+  livereload.listen();
   browserifyTask({
     development: true,
     src: './boot.js',
@@ -189,13 +188,13 @@ gulp.task('deploy', function () {
   browserifyTask({
     development: false,
     src: './boot.js',
-    dest: './dist'
+    dest: buildDir
   });
 
   cssTask({
     development: false,
     src: './css/**/*.css',
-    dest: './dist'
+    dest: buildDir
   });
 
 });
@@ -255,4 +254,58 @@ gulp.task('html', function() {
             .pipe(gulp.dest(buildDir))
             .pipe(gulp.dest('./build'));
     }
+});
+
+
+
+//sync resources file
+gulp.task('sync', function() {
+    var cssFiles = './css/**/*',
+        images = './images/**/*',
+        fonts = './fonts/**/*',
+        lttNw = './node_modules/ltt-nw/**/*',
+        js = './nw/**/*.js';
+    gulp.src(cssFiles)
+        .pipe(watch(cssFiles, function(files) {
+            return files.pipe(gulp.dest([buildDir, 'css/'].join('/')));
+        }));
+
+    gulp.src(lttNw)
+        .pipe(watch(lttNw, function (files) {
+            return files.pipe(gulp.dest([buildDir, 'node_modules/ltt-nw'].join('/')));
+        }));
+    gulp.src(images)
+        .pipe(watch(images, function(files) {
+            return files.pipe(gulp.dest([buildDir, 'images/'].join('/')));
+        }));
+    gulp.src(js)
+        .pipe(watch(js, function(files) {
+            return files.pipe(gulp.dest(buildDir + '/nw/'));
+        }));
+
+    return gulp.src(fonts)
+        .pipe(watch(fonts, function(files) {
+            return files.pipe(gulp.dest([buildDir, 'fonts/'].join('/')));
+        }));
+});
+
+
+
+gulp.task('nw', function () {
+    var nw = new NwBuilder({
+        files: [ './build/**/**'],
+        platforms: ['osx64'],
+        buildDir: './production'
+        //version: '0.12.0-rc1'
+    });
+    // Log stuff you want
+    nw.on('log', function (msg) {
+        gutil.log('node-webkit-builder', msg);
+    });
+    // Build returns a promise, return it so the task isn't called in parallel
+    return nw.build().then(function () {
+       console.log('build nw all done!');
+    }).catch(function (error) {
+        gutil.log('node-webkit-builder', error);
+    });
 });
