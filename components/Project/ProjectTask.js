@@ -472,6 +472,10 @@ var ProjectInfo = React.createClass({
                             <span className="ltt-M2" title={mProjectLastActiveTime.format(TIME_FORMAT)}>
                                 <i className="fa fa-child" title="last active"></i>{mProjectLastActiveTime.fromNow()}
                             </span>
+                            <span className="ltt-M2">
+                                <i className="fa fa-clock-o" title="Total time"></i>
+                                {Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
+                            </span>
                         </span>
                     </h1>
                     <span className="openDetail" onClick={this.toggleProjectDetail}>

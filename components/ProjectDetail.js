@@ -86,7 +86,10 @@ var ProjectDetail = React.createClass({
                     <p className="ltt_c-projectDetail-tags">{tags}</p>
                     <p className="ltt_c-projectDetail-times">
                         <span className="ltt-M2" title={mProjectCreateTime.format(TIME_FORMAT)}>Create: {mProjectCreateTime.fromNow()}</span>
-                        <span className="ltt-M2"><i className="fa fa-child" title="last active"></i> {new Moment(project.lastActiveTime).fromNow()}</span>
+                        <span className="ltt-M2"><i className="fa fa-child" title="Last active"></i> {new Moment(project.lastActiveTime).fromNow()}</span>
+                        <span className="ltt-M2"><i className="fa fa-clock-o" title="Total time"></i>
+                            {Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
+                        </span>
                     </p>
                     {versions}
                 </section>
