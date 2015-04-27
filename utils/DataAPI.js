@@ -139,6 +139,12 @@ module.exports = {
         load: function (params) {
             return get(url('/tags'), params);
         }
+    },
+
+    Version: {
+        get: function (id) {
+            return get(url('/versions/' + id));
+        }
     }
 };
 

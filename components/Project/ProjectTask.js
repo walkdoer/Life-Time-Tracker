@@ -440,25 +440,6 @@ var ProjectInfo = React.createClass({
                     return (<LogClass data={cls}/>);
                 });
             }
-            var versions, versionInfo, lastVersion;
-            if (!_.isEmpty(project.versions) && currentVersionId) {
-                var version = project.versions.filter(function (version) {
-                    return version._id === currentVersionId;
-                })[0];
-                if (version) {
-                    versionInfo = <p className="ltt_p-projectDetail-versionInfo">
-                        <span className="version-name"><i className="fa fa-sitemap">{version.name}</i></span>
-                        <span title={new Moment(version.createTime).format('YYYY-MM-DD HH:mm:ss')}>
-                            <i className="fa fa-plus" title="create time"></i>
-                            {new Moment(version.createTime).fromNow()}
-                        </span>
-                        <span title={new Moment(version.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
-                            <i className="fa fa-user" title="last active"></i>
-                            {new Moment(version.lastActiveTime).fromNow()}
-                        </span>
-                    </p>
-                }
-            }
             var mProjectCreateTime = new Moment(project.createdTime);
             var mProjectLastActiveTime = new Moment(project.lastActiveTime);
             projectBasicInfo = (
@@ -484,7 +465,7 @@ var ProjectInfo = React.createClass({
                     {this.state.showProjectDetail ? <div className="ltt_c-projectDetail-basicInfo-detail">
                         <p className="ltt_c-projectDetail-tags">{tags}</p>
                     </div> : null}
-                    {versionInfo}
+                    <VersionInfo id={this.props.versionId}/>
                 </section>
             );
         } else {
@@ -492,4 +473,65 @@ var ProjectInfo = React.createClass({
         }
         return projectBasicInfo;
     }
+});
+
+
+
+
+var VersionInfo = React.createClass({
+
+    mixins: [PureRenderMixin],
+
+    getInitialState: function () {
+        return {
+            loading: true,
+            version: null
+        };
+    },
+    render: function () {
+        var version = this.state.version;
+        return (
+            <p className="ltt_p-projectDetail-versionInfo">
+                {version ? [
+                <span className="version-name"><i className="fa fa-sitemap">{version.name}</i></span>,
+                <span>
+                    <i className="fa fa-task" title="Task count"></i>
+                    {version.taskCount}
+                </span>,
+                <span title={new Moment(version.createTime).format('YYYY-MM-DD HH:mm:ss')}>
+                    <i className="fa fa-plus" title="create time"></i>
+                    {new Moment(version.createTime).fromNow()}
+                </span>,
+                <span title={new Moment(version.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
+                    <i className="fa fa-user" title="last active"></i>
+                    {new Moment(version.lastActiveTime).fromNow()}
+                </span>,
+                <span className="ltt-M2">
+                    <i className="fa fa-clock-o" title="Total time"></i>
+                    {Moment.duration(version.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
+                </span>
+                ] : null}
+            </p>
+        );
+    },
+
+    componentDidMount: function () {
+        this.loadVersion();
+    },
+
+    componentWillReceiveProps: function (nextProps) {
+        if (this.props.id !== nextProps.id) {
+            this.loadVersion(nextProps.id);
+        }
+    },
+
+    loadVersion: function (id) {
+        var that = this;
+        DataAPI.Version.get(id || this.props.id).then(function (version) {
+            that.setState({
+                version: version
+            });
+        })
+    }
 })
+
