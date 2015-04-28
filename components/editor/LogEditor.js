@@ -4,6 +4,7 @@ var editorStore = store.namespace('LogEditor');
 var _ = require('lodash');
 var Q = require('q');
 
+
 var contentCache = {};
 //store key
 var SK_CONTENT = 'content';
@@ -13,9 +14,20 @@ var Mt = window.Mousetrap;
 var NProgress = require('nprogress');
 var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
 var Range = ace.require('ace/range').Range;
+
+/** constant */
+var EventConstant = require('../../constants/EventConstant');
+
+/**util*/
 var DataAPI = require('../../utils/DataAPI');
+var Bus = require('../../utils/Bus');
 
 var progressTpl = _.template('<%=progress%>%');
+
+var _insertLog = null;
+Bus.on(EventConstant.INSERT_LOG_FROM_TASK, function (log) {
+    _insertLog = log;
+});
 
 var LogEditor = React.createClass({
 
@@ -69,6 +81,8 @@ var LogEditor = React.createClass({
             that.gotoDoingLogLine();
             that.props.onLoad(content);
             editor.focus();
+            that.insertLog(_insertLog);
+            _insertLog = null;
             that._listenToEditor();
         }).fail(function (err) {
             console.error(err);
@@ -130,6 +144,20 @@ var LogEditor = React.createClass({
         this._initEditorCommand();
         return editor;
     },
+
+    insertLog: function (log) {
+        var session = this.editor.getSession();
+        if (log) {
+            var line = session.getLength();
+            var origin = log.origin;
+            if (origin) {
+                origin = origin.replace(/\d{1,2}\s*[:]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:]\s*\d{1,2})*/ig, '').trim();
+                console.log('插入到第' + (line + 1) + '行: ' + origin);
+                session.insert({row: line + 1, column: 0}, '\n' + origin);
+            }
+        }
+    },
+
 
     _destroyEditor: function () {
         console.log('Destroy editor start');
@@ -317,17 +345,14 @@ var LogEditor = React.createClass({
         var doingLog = Ltt.sdk.getDoingLog(title, content);
         var range, marker;
         this._doingLog = doingLog;
-        var index;
-        if (doingLog) {
-            index = getLineIndex(content, doingLog.origin);
-            if (_.isNumber(index)) {
-                if (this._doingLogIndex !== index) {
-                    removeHighlight(this._doingLogMarker);
-                    this._doingLogIndex = index;
-                    this._doingLogMarker = highlight(index);
-                } else if (!this._doingLogMarker) {
-                    this._doingLogMarker = highlight(index);
-                }
+        var index = this.getDoingLogIndex(doingLog);
+        if (_.isNumber(index)) {
+            if (this._doingLogIndex !== index) {
+                removeHighlight(this._doingLogMarker);
+                this._doingLogIndex = index;
+                this._doingLogMarker = highlight(index);
+            } else if (!this._doingLogMarker) {
+                this._doingLogMarker = highlight(index);
             }
         } else {
             removeHighlight(this._doingLogMarker);
@@ -341,6 +366,25 @@ var LogEditor = React.createClass({
             var marker = session.addMarker(range, "ace_step", "fullLine");
             return marker;
         }
+        
+        function removeHighlight(marker) {
+            if (marker) {
+                session.removeMarker(marker);
+            }
+        }
+
+    },
+
+    getDoingLogIndex: function (doingLog) {
+        var content = this.editor.getValue();
+        var title = this.props.title;
+        if (!doingLog) {
+            doingLog = Ltt.sdk.getDoingLog(title, content);
+        }
+        var index;
+        if (doingLog) {
+            index = getLineIndex(content, doingLog.origin);
+        }
         function getLineIndex (content, line){
             var lines = content.split('\n');
             for (var i = 0; i < lines.length; i++) {
@@ -348,13 +392,8 @@ var LogEditor = React.createClass({
                     return i;
                 }
             }
-        };
-        function removeHighlight(marker) {
-            if (marker) {
-                session.removeMarker(marker);
-            }
         }
-
+        return index;
     },
 
 

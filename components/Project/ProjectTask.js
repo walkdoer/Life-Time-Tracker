@@ -19,6 +19,7 @@ var initParams = require('../mixins/initParams');
 
 /** const */
 var TIME_FORMAT = 'YYYY-MM-DD HH:mm';
+var EventConstant = require('../../constants/EventConstant');
 
 /** components */
 var Tag = require('../Tag');
@@ -40,6 +41,7 @@ var TreeMap = require('../charts/TreeMap');
 /** Utils */
 var Util = require('../../utils/Util');
 var DataAPI = require('../../utils/DataAPI');
+var Bus = require('../../utils/Bus');
 
 
 module.exports = React.createClass({
@@ -161,8 +163,17 @@ module.exports = React.createClass({
     },
 
     onLogTask: function (e) {
+        var that = this;
         e.preventDefault();
-        console.log(task);
+        var currentTask = this.currentTask;
+        DataAPI.Log.load({
+            taskId: currentTask._id,
+            sort: 'start:-1',
+            limit: 1
+        }).then(function (log) {
+            Bus.emit(EventConstant.INSERT_LOG_FROM_TASK, log[0]);
+            that.transitionTo('logEditor');
+        });
     },
 
     deleteTask: function (task) {
