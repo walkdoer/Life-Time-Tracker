@@ -465,7 +465,7 @@ var ProjectInfo = React.createClass({
                     {this.state.showProjectDetail ? <div className="ltt_c-projectDetail-basicInfo-detail">
                         <p className="ltt_c-projectDetail-tags">{tags}</p>
                     </div> : null}
-                    <VersionInfo id={this.props.versionId}/>
+                    {this.props.versionId ? <VersionInfo id={this.props.versionId}/> : null}
                 </section>
             );
         } else {
@@ -490,29 +490,27 @@ var VersionInfo = React.createClass({
     },
     render: function () {
         var version = this.state.version;
-        return (
+        return version ? (
             <p className="ltt_p-projectDetail-versionInfo">
-                {version ? [
-                <span className="version-name"><i className="fa fa-sitemap">{version.name}</i></span>,
+                <span className="version-name"><i className="fa fa-sitemap">{version.name}</i></span>
                 <span>
-                    <i className="fa fa-task" title="Task count"></i>
+                    <i className="fa fa-tasks" title="Task count"></i>
                     {version.taskCount}
-                </span>,
+                </span>
                 <span title={new Moment(version.createTime).format('YYYY-MM-DD HH:mm:ss')}>
                     <i className="fa fa-plus" title="create time"></i>
                     {new Moment(version.createTime).fromNow()}
-                </span>,
+                </span>
                 <span title={new Moment(version.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
                     <i className="fa fa-user" title="last active"></i>
                     {new Moment(version.lastActiveTime).fromNow()}
-                </span>,
+                </span>
                 <span className="ltt-M2">
                     <i className="fa fa-clock-o" title="Total time"></i>
                     {Moment.duration(version.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
                 </span>
-                ] : null}
             </p>
-        );
+        ) : null;
     },
 
     componentDidMount: function () {
