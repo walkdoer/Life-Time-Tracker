@@ -264,7 +264,7 @@ var RecentActivity = React.createClass({
                <TaskList>
                     {!_.isEmpty(data) ? data.map(function (task) {
                         return <Task data={task}
-                            onTitleClick={that.gotoTaskInProject.bind(this, task)}
+                            onTitleClick={that.gotoTaskInProject.bind(that, task)}
                             key={task._id}/>
                     }) : <EmptyMsg/>}
                 </TaskList>
