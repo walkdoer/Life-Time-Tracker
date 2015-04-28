@@ -146,7 +146,10 @@ module.exports = React.createClass({
 
     componentDidMount: function () {
         this.loadProject(this.props.projectId);
-        Mt.bind(['command+d', 'ctrl+d'], this.onDeleteTask.bind(this));
+        this.onDeleteTaskToken =  this.onDeleteTask.bind(this);
+        this.onLogTaskToken = this.onLogTask.bind(this);
+        Mt.bind(['command+d', 'ctrl+d'], this.onDeleteTaskToken);
+        Mt.bind(['command+l', 'ctrl+l'], this.onLogTaskToken);
     },
 
     onDeleteTask: function (e) {
@@ -155,6 +158,11 @@ module.exports = React.createClass({
         if (this.currentTask) {
             this.deleteTask(this.currentTask);
         }
+    },
+
+    onLogTask: function (e) {
+        e.preventDefault();
+        console.log(task);
     },
 
     deleteTask: function (task) {
@@ -174,7 +182,8 @@ module.exports = React.createClass({
     },
 
     componentWillUnmount: function () {
-        Mt.unbind(['command+delete', 'ctrl+delete'], this.onDeleteTask);
+        Mt.unbind(['command+d', 'ctrl+d'], this.onDeleteTaskToken);
+        Mt.bind(['command+l', 'ctrl+l'], this.onLogTaskToken);
     },
 
     /*shouldComponentUpdate: function (nextProps, nextState) {
