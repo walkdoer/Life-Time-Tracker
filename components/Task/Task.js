@@ -92,7 +92,7 @@ var Task = React.createClass({
             <li className="ltt_c-task" data-id={task._id} onDoubleClick={this.props.onDoubleClick} onClick={this.select}>
                 <div className={"ltt_c-task-title" + (this.state.selected ? ' selected' : '')}>
                     {openButton}
-                    <span>{task.name}</span>
+                    <span className="ltt_c-task-title-text" onClick={this.props.onTitleClick}>{task.name}</span>
                     {link}
                     <span className={"ltt_c-task-mark " + (this.state.marked ? 'marked': '')} onClick={this.toggleMark}>
                         <i className={this.state.marked ? 'fa fa-flag' : 'fa fa-flag-o'}></i>

@@ -26,6 +26,11 @@
     border-left: 5px solid transparent;
     border-bottom: 1px solid #F4F4F4;
     transition: background-color .1s, border-color .1s;
+    cursor: default;
+}
+
+.ltt_c-task-title-text{
+  cursor:pointer;
 }
 
 .ltt_c-task-mark{

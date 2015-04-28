@@ -36,15 +36,15 @@ ace.define("ace/mode/ltt_highlight_rules",["require","exports","module","ace/lib
                     },
                     {   // version<>
                         token : "ltt_version",
-                        regex : "\\$.*\\$"
+                        regex : "\\$.*?\\$"
                     },
                     {   // task (task)
                         token : "ltt_task",
-                        regex : "\\(.*\\)"
+                        regex : "\\((.*?)\\)"
                     },
                     {   // subTask #subTask#
                         token : "ltt_subTask",
-                        regex : "#.*#"
+                        regex : "#(.*?)#"
                     },
                     {   // logClass {}
                         token : "ltt_logClass",
@@ -64,8 +64,12 @@ ace.define("ace/mode/ltt_highlight_rules",["require","exports","module","ace/lib
 
                     {
                         token: 'ltt_link',
-                        //regex: "(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\d\/\w \.-]*)*\/?"
-                        regex: "(http|https|ftp)\://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*"
+                        regex: "(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?"
+                    },
+
+                    {
+                        token: 'ltt_people',
+                        regex: "@\\((.*?)\\)"
                     }
                 ],
                 tags: [

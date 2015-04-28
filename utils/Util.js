@@ -64,8 +64,18 @@ function genId()
     return text;
 }
 
+function getUrlFromTask(task) {
+    if (!task) {return;}
+    if (task.versionId) {
+        url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
+    } else {
+        url = '/projects/' + task.projectId + '/tasks/' + task._id;
+    }
+    return url;
+}
 
 
 exports.walkTree = walkTree;
 exports.toDate = toDate;
-exports.genId =genId;
+exports.genId = genId;
+exports.getUrlFromTask = getUrlFromTask

@@ -10,6 +10,7 @@ var ReactBootStrap = require('react-bootstrap');
 var TabbedArea = ReactBootStrap.TabbedArea;
 var TabPane = ReactBootStrap.TabPane;
 var numeral = require('numeral');
+var Router = require('react-router');
 
 /** Components */
 var CalendarHeatMap = require('../components/charts/CalendarHeatMap');
@@ -112,6 +113,8 @@ var logClasses = [
 
 var Board = React.createClass({
 
+    mixins: [PureRenderMixin],
+
     getInitialState: function () {
         return {
             loaded: false
@@ -201,7 +204,7 @@ var Board = React.createClass({
 
 var RecentActivity = React.createClass({
 
-    mixins: [PureRenderMixin],
+    mixins: [PureRenderMixin, Router.State, Router.Navigation],
 
     getInitialState: function () {
         return {
@@ -254,17 +257,26 @@ var RecentActivity = React.createClass({
 
     renderPane: function (type) {
         var data = this.state[type + 'Task'];
+        var that = this;
         return (
             <div className="ltt_c-RecentActivity-content">
                {this.renderButtonGroup(type)}
                <TaskList>
                     {!_.isEmpty(data) ? data.map(function (task) {
                         return <Task data={task}
+                            onTitleClick={that.gotoTaskInProject.bind(this, task)}
                             key={task._id}/>
                     }) : <EmptyMsg/>}
                 </TaskList>
             </div>
         );
+    },
+
+    gotoTaskInProject: function (task) {
+        var url = Util.getUrlFromTask(task);
+        if (url) {
+            this.transitionTo(url);
+        }
     },
 
     renderButtonGroup: function (type) {
