@@ -172,7 +172,7 @@ module.exports = React.createClass({
             limit: 1
         }).then(function (log) {
             Bus.emit(EventConstant.INSERT_LOG_FROM_TASK, log[0]);
-            that.transitionTo('logEditor');
+            that.transitionTo('logEditor', {date: new Moment().format('YYYY-MM-DD')});
         });
     },
 
