@@ -44,11 +44,18 @@ var DATE_FORMAT = 'YYYY-MM-DD';
 
 var Page = React.createClass({
 
-    mixins: [PureRenderMixin],
+    mixins: [PureRenderMixin, Router.State, Router.Navigation],
 
     getInitialState: function () {
+        var params = this.getParams();
+        var date;
+        if (params && params.date) {
+            date = new Moment(params.date).format(DATE_FORMAT);
+        } else {
+            date = new Moment().format(DATE_FORMAT);
+        }
         return {
-            current: new Moment().format(DATE_FORMAT),
+            current: date,
             projects: []
         };
     },
@@ -100,6 +107,7 @@ var Page = React.createClass({
         this.setState({
             current: date
         });
+        this.transitionTo('logEditor', {date: date});
     },
 
     gotoPrevDay: function () {
@@ -107,6 +115,7 @@ var Page = React.createClass({
         this.setState({
             current: prevDay.format(DATE_FORMAT)
         });
+        this.transitionTo('logEditor', {date: prevDay.format(DATE_FORMAT)});
     },
 
     gotoNextDay: function () {
@@ -114,6 +123,7 @@ var Page = React.createClass({
         this.setState({
             current: next.format(DATE_FORMAT)
         });
+        this.transitionTo('logEditor', {date: next.format(DATE_FORMAT)});
     },
 
     gotoToday: function () {
@@ -122,6 +132,7 @@ var Page = React.createClass({
         this.setState({
             current: today
         });
+        this.transitionTo('logEditor', {date: today});
     },
 
     gotoDate: function (date) {
@@ -129,6 +140,7 @@ var Page = React.createClass({
         this.setState({
             current: date
         });
+        this.transitionTo('logEditor', {date: date});
     },
 
     openGotoDayWindow: function () {

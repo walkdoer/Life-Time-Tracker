@@ -66,7 +66,7 @@ var routes = (
         </Route>
 
         <Route name="projectManage" path="/projectManage" handler={ProjectsNew} handler={Projects}></Route>
-        <Route name="logEditor" path="/logEditor" handler={logEditor}/>
+        <Route name="logEditor" path="/logEditor/:date" handler={logEditor}/>
         <Route name="affects" path="/affects" handler={Affects}/>
         <Route name="goals" path="/goals" handler={Goals}/>
         <NotFoundRoute handler={Page404}/>

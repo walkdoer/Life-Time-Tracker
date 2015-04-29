@@ -6,6 +6,7 @@ var React = require('react');
 var Menu = require('./Menu');
 var Logo = require('./Logo');
 var _ = require('lodash');
+var Moment = require('moment');
 
 var Nav = React.createClass({
 
@@ -42,7 +43,7 @@ var Nav = React.createClass({
         }, {
             text: "Editor",
             key: "logEditor",
-            path: "logEditor",
+            path: "/logEditor/" + new Moment().format('YYYY-MM-DD'),
             icon: "fa fa-edit"
         }, {
             text: 'Affects',
