@@ -15,6 +15,7 @@ var Notify = require('./Notify');
 var Moment = require('moment');
 var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
 var history = window.history;
+var Mt = window.Mousetrap;
 
 var disabledBackButton = true,
     disabledForwardButton = true,
@@ -42,6 +43,7 @@ window.addEventListener('hashchange', function (e) {
         disabledForwardButton = true;
     }
 });
+
 
 var Header = React.createClass({
 
@@ -117,11 +119,13 @@ var Header = React.createClass({
         );
     },
 
-    back: function () {
+    back: function (e) {
+        e.preventDefault();
         history.back();
     },
 
-    forward: function () {
+    forward: function (e) {
+        e.preventDefault();
         history.forward();
     },
 
@@ -135,6 +139,16 @@ var Header = React.createClass({
 
     debugApplication: function () {
         nwGui.Window.get().showDevTools();
+    },
+
+    componentDidMount: function () {
+        Mt.bind(['shift+]'], this.forward);
+        Mt.bind(['shift+['], this.back);
+    },
+
+    componentWillUnmount: function () {
+        Mt.unbind(['shift+]'], this.forward);
+        Mt.unbind(['shift+['], this.back);
     },
 
     syncNote: function () {

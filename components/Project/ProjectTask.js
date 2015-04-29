@@ -194,7 +194,7 @@ module.exports = React.createClass({
 
     componentWillUnmount: function () {
         Mt.unbind(['command+d', 'ctrl+d'], this.onDeleteTaskToken);
-        Mt.bind(['command+l', 'ctrl+l'], this.onLogTaskToken);
+        Mt.unbind(['command+l', 'ctrl+l'], this.onLogTaskToken);
     },
 
     /*shouldComponentUpdate: function (nextProps, nextState) {
