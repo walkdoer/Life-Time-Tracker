@@ -524,7 +524,7 @@ var LogEditor = React.createClass({
             console.log('write file cost' + (new Date().getTime() - start));
             NProgress.set(0.3);
             //import into database, for stat purpose
-            hasError && Ltt.sdk.importLogContent(title, content).then(function (err) {
+            !hasError && Ltt.sdk.importLogContent(title, content).then(function (err) {
                 NProgress.done();
                 that.props.onSave(content);
                 that.__saveing = false;

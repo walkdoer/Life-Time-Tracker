@@ -8,6 +8,7 @@ var Moment = require('moment');
 var Link = Router.Link;
 var Q = require('q');
 var _ = require('lodash');
+var cx = React.addons.classSet;
 
 
 /**components*/
@@ -89,8 +90,8 @@ var Task = React.createClass({
         }
 
         return (
-            <li className="ltt_c-task" data-id={task._id} onDoubleClick={this.props.onDoubleClick} onClick={this.select}>
-                <div className={"ltt_c-task-title" + (this.state.selected ? ' selected' : '')}>
+            <li className={cx({"ltt_c-task": true, "done": task.progress === 100})} data-id={task._id} onDoubleClick={this.props.onDoubleClick} onClick={this.select}>
+                <div className={cx({"ltt_c-task-title": true, 'selected' : this.state.selected})}>
                     {openButton}
                     <span className="ltt_c-task-title-text" onClick={this.props.onTitleClick}>{task.name}</span>
                     {link}

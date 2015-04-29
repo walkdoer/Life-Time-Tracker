@@ -33,6 +33,11 @@
   cursor:pointer;
 }
 
+.ltt_c-task.done .ltt_c-task-title-text{
+  text-decoration: line-through;
+  color: #9B9B9B;
+}
+
 .ltt_c-task-mark{
   position:absolute;
   top: 10px;
