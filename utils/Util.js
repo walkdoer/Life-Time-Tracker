@@ -1,4 +1,6 @@
+'use strict';
 var Moment = require('moment');
+var TrackerHelper = require('tracker/helper');
 
 function walkTree(parentElement, func) {
     parentElement.depth = 0;
@@ -53,18 +55,19 @@ function toDate(type) {
 }
 
 
-function genId()
-{
+function genId(){
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    for( var i=0; i < 5; i++ )
+    for( var i=0; i < 5; i++ ) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
 
     return text;
 }
 
 function getUrlFromTask(task) {
+    var url;
     if (!task) {return;}
     if (task.versionId) {
         url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
@@ -75,7 +78,14 @@ function getUrlFromTask(task) {
 }
 
 
+
+
 exports.walkTree = walkTree;
 exports.toDate = toDate;
 exports.genId = genId;
-exports.getUrlFromTask = getUrlFromTask
+exports.getUrlFromTask = getUrlFromTask;
+exports.checkLogContent = function (date, content) {
+    var includeErrorInfo = true;
+    var includeLogWithoutTime = false;
+    return TrackerHelper.getLogs(content, date, includeLogWithoutTime, includeErrorInfo);
+};

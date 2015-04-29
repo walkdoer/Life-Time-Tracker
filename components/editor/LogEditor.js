@@ -25,6 +25,7 @@ var EventConstant = require('../../constants/EventConstant');
 /**util*/
 var DataAPI = require('../../utils/DataAPI');
 var Bus = require('../../utils/Bus');
+var Util = require('../../utils/Util');
 
 var progressTpl = _.template('<%=progress%>%');
 
@@ -53,7 +54,7 @@ var LogEditor = React.createClass({
         var start = new Date().getTime();
         console.log('render component logEditor');
         var syncIcon = 'fa ';
-        NProgress.configure({parent: '.ltt_c-logEditor-header', showSpinner: false});
+        NProgress.configure({parent: '.ltt_c-logEditor', showSpinner: false});
         var syncStatus = this.state.syncStatus;
         if (syncStatus === SYNCING) {
             syncIcon += 'fa-refresh fa-spin';
@@ -508,11 +509,22 @@ var LogEditor = React.createClass({
         this.__saveing = true;
         NProgress.start();
         //write to local filesystem
+        var checkResult = Util.checkLogContent(title, content);
+        var hasError = !_.isEmpty(checkResult.errors);
+        if (hasError) {
+            Notify.error('error occur when import log ' + checkResult.errors.map(function (error) {
+                return error.origin + error.message;
+            }).join('\n'));
+        }
+        if (!_.isEmpty(checkResult.warns)) {
+            Notify.warn('warn from import log');
+        }
+
         Ltt.sdk.writeLogFile(title, content).then(function () {
             console.log('write file cost' + (new Date().getTime() - start));
             NProgress.set(0.3);
             //import into database, for stat purpose
-            Ltt.sdk.importLogContent(title, content).then(function () {
+            hasError && Ltt.sdk.importLogContent(title, content).then(function (err) {
                 NProgress.done();
                 that.props.onSave(content);
                 that.__saveing = false;
