@@ -16,19 +16,20 @@
 }
 
 .ltt_c-logEditor-header{
-    padding: 10px;
     background:#FFF;
     position: absolute;
     top:0;
     right: 0;
     left: 0;
+    height: 41px;
+    line-height: 41px;
+    display: flex;
+    padding-left: 10px;
+    padding-right: 6px;
+    justify-content: space-between;
     border-bottom: 1px solid #ECECEC;
 }
 
-.ltt_c-logEditor-header .fa {
-    float: right;
-    margin-right: 10px;
-}
 .ltt_c-page-logEditor .ltt_c-logEditor #ltt-logEditor{
     height:100%;
     margin-bottom: 0px;

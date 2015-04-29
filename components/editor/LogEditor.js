@@ -3,6 +3,10 @@ var store = require('store2');
 var editorStore = store.namespace('LogEditor');
 var _ = require('lodash');
 var Q = require('q');
+var RB = require('react-bootstrap');
+var Button = RB.Button;
+var ButtonToolbar = RB.ButtonToolbar;
+var Moment = require('moment');
 
 
 var contentCache = {};
@@ -58,11 +62,16 @@ var LogEditor = React.createClass({
         } else if (syncStatus === SYNC_ERROR) {
             syncIcon += 'fa-exclamation-circle';
         }
+
         return (
             <div className="ltt_c-logEditor">
                 <div className="ltt_c-logEditor-header">
                     <span className="ltt_c-logEditor-title">{this.props.title}</span>
-                    <i className={syncIcon}></i>
+                    <ButtonToolbar>
+                        <Button onClick={this.insertYesterdayUnfinishTaskLog} title="insert yesterday's unfinish task" bsSize='small'>
+                            <i className="fa fa-copy"></i>
+                        </Button>
+                    </ButtonToolbar>
                 </div>
                 <div className="ltt_c-logEditor-projects ltt_c-logEditor-typeahead" ref="projects"></div>
                 <div className="ltt_c-logEditor-versions  ltt_c-logEditor-typeahead" ref="versions"></div>
@@ -81,8 +90,10 @@ var LogEditor = React.createClass({
             that.gotoDoingLogLine();
             that.props.onLoad(content);
             editor.focus();
-            that.insertLog(_insertLog);
-            _insertLog = null;
+            if (_insertLog) {
+                that.insertLog(_insertLog.origin);
+                _insertLog = null;
+            }
             that._listenToEditor();
         }).fail(function (err) {
             console.error(err);
@@ -145,16 +156,40 @@ var LogEditor = React.createClass({
         return editor;
     },
 
+    insertYesterdayUnfinishTaskLog: function () {
+        var that = this;
+        DataAPI.Log.load({
+            start: new Moment().subtract(1, 'day').startOf('day').toDate(),
+            end: new Moment().subtract(1, 'day').endOf('day').toDate(),
+            group: 'task',
+            sort: 'start:1'
+        }).then(function (result) {
+            var unfinishLog = [];
+            result.forEach(function (task) {
+                var logs = task.logs;
+                if (!task._id) {return;}
+                if (!_.isEmpty (logs)) {
+                    var lastLog = logs[logs.length - 1];
+                    var progress = lastLog.progress;
+                    if (progress && progress.task < 100) {
+                        unfinishLog.push(lastLog.origin);
+                    }
+                }
+            });
+            that.insertLog(unfinishLog.join('\n'));
+        }).catch(function (err) {
+            console.err(err.stack);
+            Notify.error('Insert Yesterday\'s task failed');
+        });
+    },
+
     insertLog: function (log) {
         var session = this.editor.getSession();
         if (log) {
             var line = session.getLength();
-            var origin = log.origin;
-            if (origin) {
-                origin = origin.replace(/\d{1,2}\s*[:]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:]\s*\d{1,2})*/ig, '').trim();
-                console.log('插入到第' + (line + 1) + '行: ' + origin);
-                session.insert({row: line + 1, column: 0}, '\n' + origin);
-            }
+            log = log.replace(/\d{1,2}\s*[:]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:]\s*\d{1,2})*/ig, '').trim();
+            console.log('插入到第' + (line + 1) + '行: ' + log);
+            session.insert({row: line + 1, column: 0}, '\n' + log);
         }
     },
 
