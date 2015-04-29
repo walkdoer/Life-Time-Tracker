@@ -446,7 +446,7 @@ var LogEditor = React.createClass({
 
     readLog: function (title) {
         var editor = this.editor;
-        if (!Ltt) { return Q(''); }
+        if (!Ltt.sdk) { return Q(''); }
         return Ltt.sdk.readLogContent(title)
             .then(function (content) {
                 return content;

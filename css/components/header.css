@@ -35,3 +35,20 @@
     display: flex;
     justify-content: space-between;
 }
+
+.btn-group.history-btn-group{
+    margin-right: 10px;
+}
+
+.btn-group.history-btn-group .btn{
+    border: 1px solid #ccc;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-top: 12px;
+}
+
+.btn-group.history-btn-group .btn:hover{
+    background: #EAEAEA;
+}
