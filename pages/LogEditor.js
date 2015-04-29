@@ -60,6 +60,19 @@ var Page = React.createClass({
         };
     },
 
+    componentWillReceiveProps: function (nextProps) {
+        var params = this.getParams();
+        var date;
+        if (params && params.date) {
+            date = new Moment(params.date).format(DATE_FORMAT);
+        } else {
+            date = new Moment().format(DATE_FORMAT);
+        }
+        this.setState({
+            current: date
+        });
+    },
+
     render: function () {
         var days = this.state.days;
         console.log('########render');
