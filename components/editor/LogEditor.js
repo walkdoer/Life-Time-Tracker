@@ -191,6 +191,7 @@ var LogEditor = React.createClass({
             log = log.replace(/\d{1,2}\s*[:]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:]\s*\d{1,2})*/ig, '').trim();
             console.log('插入到第' + (line + 1) + '行: ' + log);
             session.insert({row: line + 1, column: 0}, '\n' + log);
+            this.editor.gotoLine(line + 1, log.length);
         }
     },
 
@@ -260,7 +261,7 @@ var LogEditor = React.createClass({
 
         commands.addCommand({
             name: 'startNewLog',
-            bindKey: {win: 'Shift-n', mac: 'Shift-n'},
+            bindKey: {win: 'Ctrl-n', mac: 'Command-n'},
             exec: function (editor) {
                 var session = editor.getSession()
                 var allLines = session.getDocument().getAllLines();
@@ -276,12 +277,13 @@ var LogEditor = React.createClass({
                     log += '\n';
                 }
                 session.insert({row: newLine, column: 0}, log);
+                editor.gotoLine(newLine + 1, log.length);
             }
         });
 
         commands.addCommand({
             name: 'insertCurrentTime',
-            bindKey: {win: 'Shift-t', mac: 'Shift-t'},
+            bindKey: {win: 'Ctrl-t', mac: 'Command-t'},
             exec: function (editor) {
                 editor.insert(new Moment().format('HH:mm'));
             }
