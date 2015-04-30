@@ -256,7 +256,23 @@ var LogEditor = React.createClass({
             exec: function (editor) {
                 that.props.onCtrlO(editor);
             }
-        })
+        });
+
+        commands.addCommand({
+            name: 'startNewLog',
+            bindKey: {win: 'Shift-n', mac: 'Shift-n'},
+            exec: function (editor) {
+                //todo
+            }
+        });
+
+        commands.addCommand({
+            name: 'insertCurrentTime',
+            bindKey: {win: 'Shift-t', mac: 'Shift-t'},
+            exec: function (editor) {
+                editor.insert(new Moment().format('hh:mm'));
+            }
+        });
     },
 
     getTagCompletions: function (prefix, cb) {
