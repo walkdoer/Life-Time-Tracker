@@ -6,6 +6,9 @@ var React = require('react');
 var Moment = require('moment');
 var Router = require('react-router');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
+var RB = require('react-bootstrap');
+var Button = RB.Button;
+var ButtonToolbar = RB.ButtonToolbar;
 
 /** Components */
 var Task = require('../Task/Task.js');
@@ -21,7 +24,8 @@ var ProjectIndex = React.createClass({
 
     getInitialState: function () {
         return {
-            markedTask: []
+            markedTask: [],
+            showDone: false
         };
     },
 
@@ -32,6 +36,9 @@ var ProjectIndex = React.createClass({
         return (
             <div className="ltt_c-page-projectsNew-index">
                 <h3>Marked Tasks</h3>
+                <ButtonToolbar>
+                    <Button bsSize='small' active={this.state.showDone} onClick={this.showDone}>Show Done</Button>
+                </ButtonToolbar>
                 <TaskList>
                     {markedTask.map(function (task) {
                         return <Task data={task}
@@ -50,9 +57,13 @@ var ProjectIndex = React.createClass({
     loadData: function () {
         var that = this;
         //load marked task
-        DataAPI.Task.load({
+        var params = {
             marked: true
-        }).then(function (markedTask) {
+        };
+        if (!this.state.showDone) {
+            params.status = 'doing';
+        }
+        DataAPI.Task.load(params).then(function (markedTask) {
             that.setState({
                 markedTask: markedTask
             });
@@ -65,6 +76,14 @@ var ProjectIndex = React.createClass({
             this.transitionTo(url);
         }
     },
+
+    showDone: function () {
+        this.setState({
+            showDone: !this.state.showDone
+        }, function () {
+            this.loadData();
+        });
+    }
 });
 
 

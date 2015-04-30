@@ -86,9 +86,16 @@
 
 .ltt_c-page-projectsNew-index{
   padding:20px;
+  padding-top: 0px;
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
+}
+
+.ltt_c-page-projectsNew-index .btn-toolbar{
+  position:absolute;
+  top: 17px;
+  right: 20px;
 }
 
 .ltt_c-ProjectNav{
