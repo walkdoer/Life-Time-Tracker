@@ -270,7 +270,7 @@ var LogEditor = React.createClass({
                         index = i + 1;
                     }
                 }
-                var log = new Moment().format('hh:mm') + '~';
+                var log = new Moment().format('HH:mm') + '~';
                 var newLine = index;
                 if (allLines[index]) {
                     log += '\n';
@@ -283,7 +283,7 @@ var LogEditor = React.createClass({
             name: 'insertCurrentTime',
             bindKey: {win: 'Shift-t', mac: 'Shift-t'},
             exec: function (editor) {
-                editor.insert(new Moment().format('hh:mm'));
+                editor.insert(new Moment().format('HH:mm'));
             }
         });
     },
