@@ -92,7 +92,7 @@ var LogEditor = React.createClass({
             that.props.onLoad(content);
             editor.focus();
             if (_insertLog) {
-                that.insertLog(_insertLog.origin);
+                that.insertLogToLastLine(_insertLog.origin);
                 _insertLog = null;
             }
             that._listenToEditor();
@@ -177,14 +177,14 @@ var LogEditor = React.createClass({
                     }
                 }
             });
-            that.insertLog(unfinishLog.join('\n'));
+            that.insertLogToLastLine(unfinishLog.join('\n'));
         }).catch(function (err) {
             console.err(err.stack);
             Notify.error('Insert Yesterday\'s task failed');
         });
     },
 
-    insertLog: function (log) {
+    insertLogToLastLine: function (log) {
         var session = this.editor.getSession();
         if (log) {
             var line = session.getLength();
@@ -262,7 +262,20 @@ var LogEditor = React.createClass({
             name: 'startNewLog',
             bindKey: {win: 'Shift-n', mac: 'Shift-n'},
             exec: function (editor) {
-                //todo
+                var session = editor.getSession()
+                var allLines = session.getDocument().getAllLines();
+                var index = 1;
+                for (var i = 0; i < allLines.length; i++) {
+                    if (Util.isValidLog(allLines[i])) {
+                        index = i + 1;
+                    }
+                }
+                var log = new Moment().format('hh:mm') + '~';
+                var newLine = index;
+                if (allLines[index]) {
+                    log += '\n';
+                }
+                session.insert({row: newLine, column: 0}, log);
             }
         });
 

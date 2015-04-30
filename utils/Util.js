@@ -89,3 +89,8 @@ exports.checkLogContent = function (date, content) {
     var includeLogWithoutTime = false;
     return TrackerHelper.getLogs(content, date, includeLogWithoutTime, includeErrorInfo);
 };
+
+
+exports.isValidLog = function (log) {
+    return TrackerHelper.isValidLog(log);
+};
