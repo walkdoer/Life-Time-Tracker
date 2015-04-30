@@ -534,7 +534,7 @@ var LogEditor = React.createClass({
         var start = new Date().getTime();
         var that = this;
         var title = this.props.title;
-        if (this.__saveing) { console.error('syncing'); return; }
+        if (this.__saveing) { console.log('saving log is going'); return; }
         this.__saveing = true;
         NProgress.start();
         //write to local filesystem
@@ -544,6 +544,8 @@ var LogEditor = React.createClass({
             Notify.error('error occur when import log ' + checkResult.errors.map(function (error) {
                 return error.origin + error.message;
             }).join('\n'));
+            NProgress.done();
+            that.__saveing = false;
         }
         if (!_.isEmpty(checkResult.warns)) {
             Notify.warn('warn from import log');

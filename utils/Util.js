@@ -87,7 +87,10 @@ exports.getUrlFromTask = getUrlFromTask;
 exports.checkLogContent = function (date, content) {
     var includeErrorInfo = true;
     var includeLogWithoutTime = false;
-    return TrackerHelper.getLogs(content, date, includeLogWithoutTime, includeErrorInfo);
+    var result = TrackerHelper.getLogs(content, date, includeLogWithoutTime, includeErrorInfo);
+    var logSequenceError = TrackerHelper.getLogSequenceError(result.logs);
+    result.errors = result.errors.concat(logSequenceError);
+    return result;
 };
 
 
