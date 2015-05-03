@@ -88,8 +88,8 @@ var LogEditor = React.createClass({
         var editor = this._initEditor();
         this.readLog(this.props.title).then(function (content) {
             that.setValue(content);
-            that._highLightDoingLine();
-            that.gotoDoingLogLine();
+            that._highLightDoingLine(content);
+            that.gotoDoingLogLine(content);
             that.props.onLoad(content);
             editor.focus();
             if (_insertLog) {
@@ -239,7 +239,7 @@ var LogEditor = React.createClass({
             name: 'gotoDoingLog',
             bindKey: {win: 'Ctrl-/', mac: 'Command-/'},
             exec: function (editor) {
-                that.gotoDoingLogLine()
+                that.gotoDoingLogLine(editor.getValue());
             }
         });
 
@@ -307,7 +307,7 @@ var LogEditor = React.createClass({
             name: 'finishActivity',
             bindKey: {win: 'Ctrl-Shift-f', mac: 'Command-Shift-f'},
             exec: function (editor) {
-                if (that.gotoDoingLogLine()) {
+                if (that.gotoDoingLogLine(editor.getValue()) {
                     editor.insert(new Moment().format('HH:mm'));
                 }
             }
@@ -419,10 +419,9 @@ var LogEditor = React.createClass({
         var session = editor.getSession();
         session.on('change', _.debounce(function (e) {
             console.log('editor content change');
-            console.log(e.data);
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = session.getValue();
-            that._highLightDoingLine();
+            that._highLightDoingLine(content);
             that.writeLog(title, content);
             that.props.onChange(content, editor);
         }, 200));
@@ -435,13 +434,13 @@ var LogEditor = React.createClass({
         console.log('remove listeners');
     },
 
-    _highLightDoingLine: function () {
+    _highLightDoingLine: function (content) {
         if (!Ltt) {return;}
         var editor = this.editor;
         var session = this.editor.getSession();
-        var doingLog = this.getDoingLog();
+        var doingLog = this.getDoingLog(content);
         var range, marker;
-        var index = this.getDoingLogIndex(doingLog);
+        var index = this.getDoingLogIndex(doingLog, content);
         if (_.isNumber(index)) {
             if (this._doingLogIndex !== index) {
                 removeHighlight(this._doingLogMarker);
@@ -471,11 +470,9 @@ var LogEditor = React.createClass({
 
     },
 
-    getDoingLogIndex: function (doingLog) {
-        var content = this.editor.getValue();
-        var title = this.props.title;
+    getDoingLogIndex: function (doingLog, content) {
         if (!doingLog) {
-            doingLog = this.getDoingLog();
+            doingLog = this.getDoingLog(content);
         }
         var index;
         if (doingLog) {
@@ -522,16 +519,16 @@ var LogEditor = React.createClass({
                 var editor = that.editor;
                 that.setValue(content);
                 editor.focus();
-                that.gotoDoingLogLine();
-                that._highLightDoingLine();
+                that.gotoDoingLogLine(content);
+                that._highLightDoingLine(content);
                 that._listenToEditor();
             });
     },
 
-    gotoDoingLogLine: function () {
-        var doingLog = this.getDoingLog();
+    gotoDoingLogLine: function (content) {
+        var doingLog = this.getDoingLog(content);
         if (!doingLog) { return; }
-        var index = this.getDoingLogIndex(doingLog);
+        var index = this.getDoingLogIndex(doingLog, content);
         var editor = this.editor;
         var columnPosition = doingLog.origin.indexOf('~') + 1;
         if (_.isNumber(index)) {
@@ -668,9 +665,8 @@ var LogEditor = React.createClass({
         return info;
     },
 
-    getDoingLog: function () {
+    getDoingLog: function (content) {
         var title = this.props.title;
-        var content = this.editor.getValue();
         var doingLog = Util.getDoingLog(title, content);
         return doingLog;
     }
