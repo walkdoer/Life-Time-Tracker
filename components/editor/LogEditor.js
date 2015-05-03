@@ -307,8 +307,9 @@ var LogEditor = React.createClass({
             name: 'finishActivity',
             bindKey: {win: 'Ctrl-Shift-f', mac: 'Command-Shift-f'},
             exec: function (editor) {
-                that.gotoDoingLogLine();
-                editor.insert(new Moment().format('HH:mm'));
+                if (that.gotoDoingLogLine()) {
+                    editor.insert(new Moment().format('HH:mm'));
+                }
             }
         });
     },
@@ -535,6 +536,7 @@ var LogEditor = React.createClass({
         var columnPosition = doingLog.origin.indexOf('~') + 1;
         if (_.isNumber(index)) {
             editor.gotoLine(index + 1, columnPosition);
+            return true;
         }
     },
 
