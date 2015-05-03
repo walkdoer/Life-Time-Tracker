@@ -1,6 +1,7 @@
 'use strict';
 var Moment = require('moment');
 var TrackerHelper = require('tracker/helper');
+var _ = require('lodash');
 
 function walkTree(parentElement, func) {
     parentElement.depth = 0;
@@ -96,4 +97,25 @@ exports.checkLogContent = function (date, content) {
 
 exports.isValidLog = function (log) {
     return TrackerHelper.isValidLog(log);
+};
+
+
+exports.getDoingLog = function (date, logContent) {
+    var logs, target;
+    try {
+        logs = TrackerHelper.getLogs(logContent, date);
+        target = _.find(logs, function (log) {
+            var timeStr = TrackerHelper.getTimeStr(log.origin);
+            if (timeStr && timeStr.indexOf('~') >= 0) {
+                var time = TrackerHelper.getTimeSpan(log.origin, {date: date, patchEnd: false});
+                return time.start && !time.end;
+            } else {
+                return false;
+            }
+        });
+    } catch (err) {
+        console.error(err.stack);
+        return null;
+    }
+    return target;
 };

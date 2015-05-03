@@ -88,6 +88,7 @@ var LogEditor = React.createClass({
         var editor = this._initEditor();
         this.readLog(this.props.title).then(function (content) {
             that.setValue(content);
+            that._highLightDoingLine();
             that.gotoDoingLogLine();
             that.props.onLoad(content);
             editor.focus();
@@ -238,8 +239,7 @@ var LogEditor = React.createClass({
             name: 'gotoDoingLog',
             bindKey: {win: 'Ctrl-/', mac: 'Command-/'},
             exec: function (editor) {
-                var index = that._doingLogIndex;
-                editor.gotoLine(index + 1, 6);
+                that.gotoDoingLogLine()
             }
         });
 
@@ -288,6 +288,37 @@ var LogEditor = React.createClass({
                 editor.insert(new Moment().format('HH:mm'));
             }
         });
+
+
+        commands.addCommand({
+            name: 'beginActivity',
+            bindKey: {win: 'Ctrl-Shift-b', mac: 'Command-Shift-b'},
+            exec: function (editor) {
+                var session = editor.getSession();
+                var pos = editor.getCursorPosition();
+                pos.column = 0;
+                var timeStr = new Moment().format('HH:mm') + '~';
+                session.getDocument().insertInLine(pos, timeStr);
+                editor.gotoLine(pos.row + 1, timeStr.length);
+            }
+        });
+
+        commands.addCommand({
+            name: 'finishActivity',
+            bindKey: {win: 'Ctrl-Shift-f', mac: 'Command-Shift-f'},
+            exec: function (editor) {
+                that.gotoDoingLogLine();
+                editor.insert(new Moment().format('HH:mm'));
+            }
+        });
+    },
+
+    beginActivity: function () {
+
+    },
+
+    finishActivity: function () {
+
     },
 
     getTagCompletions: function (prefix, cb) {
@@ -406,12 +437,9 @@ var LogEditor = React.createClass({
     _highLightDoingLine: function () {
         if (!Ltt) {return;}
         var editor = this.editor;
-        var title = this.props.title;
         var session = this.editor.getSession();
-        var content = editor.getValue();
-        var doingLog = Ltt.sdk.getDoingLog(title, content);
+        var doingLog = this.getDoingLog();
         var range, marker;
-        this._doingLog = doingLog;
         var index = this.getDoingLogIndex(doingLog);
         if (_.isNumber(index)) {
             if (this._doingLogIndex !== index) {
@@ -446,7 +474,7 @@ var LogEditor = React.createClass({
         var content = this.editor.getValue();
         var title = this.props.title;
         if (!doingLog) {
-            doingLog = Ltt.sdk.getDoingLog(title, content);
+            doingLog = this.getDoingLog();
         }
         var index;
         if (doingLog) {
@@ -494,15 +522,19 @@ var LogEditor = React.createClass({
                 that.setValue(content);
                 editor.focus();
                 that.gotoDoingLogLine();
+                that._highLightDoingLine();
                 that._listenToEditor();
             });
     },
 
     gotoDoingLogLine: function () {
-        var highLightIndex = this._highLightDoingLine();
+        var doingLog = this.getDoingLog();
+        if (!doingLog) { return; }
+        var index = this.getDoingLogIndex(doingLog);
         var editor = this.editor;
-        if (_.isNumber(highLightIndex)) {
-            editor.gotoLine(highLightIndex + 1, 5);
+        var columnPosition = doingLog.origin.indexOf('~');
+        if (_.isNumber(index)) {
+            editor.gotoLine(index + 1, columnPosition);
         }
     },
 
@@ -635,7 +667,10 @@ var LogEditor = React.createClass({
     },
 
     getDoingLog: function () {
-        return this._doingLog;
+        var title = this.props.title;
+        var content = this.editor.getValue();
+        var doingLog = Util.getDoingLog(title, content);
+        return doingLog;
     }
 });
 
