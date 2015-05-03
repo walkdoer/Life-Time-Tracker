@@ -532,7 +532,7 @@ var LogEditor = React.createClass({
         if (!doingLog) { return; }
         var index = this.getDoingLogIndex(doingLog);
         var editor = this.editor;
-        var columnPosition = doingLog.origin.indexOf('~');
+        var columnPosition = doingLog.origin.indexOf('~') + 1;
         if (_.isNumber(index)) {
             editor.gotoLine(index + 1, columnPosition);
         }
