@@ -314,13 +314,6 @@ var LogEditor = React.createClass({
         });
     },
 
-    beginActivity: function () {
-
-    },
-
-    finishActivity: function () {
-
-    },
 
     getTagCompletions: function (prefix, cb) {
         console.log('get tag completions start');
