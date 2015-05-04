@@ -307,7 +307,7 @@ var LogEditor = React.createClass({
             name: 'finishActivity',
             bindKey: {win: 'Ctrl-Shift-f', mac: 'Command-Shift-f'},
             exec: function (editor) {
-                if (that.gotoDoingLogLine(editor.getValue()) {
+                if (that.gotoDoingLogLine(editor.getValue())) {
                     editor.insert(new Moment().format('HH:mm'));
                 }
             }
