@@ -9,7 +9,7 @@ var ButtonToolbar = RB.ButtonToolbar;
 var Moment = require('moment');
 
 
-var contentCache = {};
+
 //store key
 var SK_CONTENT = 'content';
 var Ltt = global.Ltt;
@@ -34,6 +34,9 @@ Bus.on(EventConstant.INSERT_LOG_FROM_TASK, function (log) {
     _insertLog = log;
 });
 
+/** cache */
+var contentCache = {};
+window.contentCache = contentCache;
 var LogEditor = React.createClass({
 
     getDefaultProps: function () {
@@ -86,7 +89,16 @@ var LogEditor = React.createClass({
         var start, end;
         var that = this;
         var editor = this._initEditor();
-        this.readLog(this.props.title).then(function (content) {
+        var title = this.props.title;
+        this.readLog(title).then(function (content) {
+            var cacheContent = that._recoveryFromLocalStorage();
+            if (cacheContent) {
+                console.log('recover ' + title + ' from localStorage');
+                content = cacheContent;
+                that.writeLog(title, content).then(function () {
+                    that._removeFromLocalStorage();
+                });
+            }
             that.setValue(content);
             that._highLightDoingLine(content);
             that.gotoDoingLogLine(content);
@@ -423,7 +435,9 @@ var LogEditor = React.createClass({
     },
 
     componentWillUnmount: function () {
-       this._destroyEditor();
+        this._persistCache();
+        this._removeFromLocalStorage();
+        this._destroyEditor();
     },
 
     _listenToEditor: function () {
@@ -435,8 +449,10 @@ var LogEditor = React.createClass({
             console.log('editor content change');
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = session.getValue();
+            contentCache[title] = content;
+            //persist to localstorage, if app exit accidently, can recovery from localstorage
+            that._persistToLocalStorage(title, content);
             that._highLightDoingLine(content);
-            that.writeLog(title, content);
             that.props.onChange(content, editor);
         }, 200));
         console.log('listen to editro');
@@ -475,7 +491,7 @@ var LogEditor = React.createClass({
             var marker = session.addMarker(range, "ace_step", "fullLine");
             return marker;
         }
-        
+
         function removeHighlight(marker) {
             if (marker) {
                 session.removeMarker(marker);
@@ -512,9 +528,14 @@ var LogEditor = React.createClass({
 
 
     shouldComponentUpdate: function (nextProps, nextState) {
-        var result = this.props.title !== nextProps.title ||
+        var title = this.props.title;
+        var result = title !== nextProps.title ||
             this.state.syncStatus !== nextState.syncStatus;
-        if (this.props.title !== nextProps.title) {
+        if (title !== nextProps.title) {
+            //only change the content will write to cache, it means if the content doesn't change
+            //then no need to write the file to disk
+            this._persistCache();
+            this._removeFromLocalStorage();
             this._destroyEditor();
         }
 
@@ -569,13 +590,40 @@ var LogEditor = React.createClass({
     },
 
     writeLog: function (title, content) {
-        if (!Ltt) {return;}
-        Ltt.sdk.writeLogFile(title, content).catch(function (err) {
+        if (!Ltt || !Ltt.sdk ||!Ltt.sdk.writeLogFile) {return;}
+        return Ltt.sdk.writeLogFile(title, content).catch(function (err) {
             console.error(err.stack);
             Notify.error('Write file failed ', {timeout: 3500});
         });
     },
 
+
+    _persistCache: function () {
+        var title = this.props.title;
+        var content = contentCache[title];
+        if (content) {
+            console.log('persist file ' + title);
+            this.writeLog(title, content);
+            delete contentCache[title];
+        }
+    },
+
+    _persistToLocalStorage: function (title, content) {
+        localStorage.setItem('file_' + title, content);
+    },
+
+    _recoveryFromLocalStorage: function () {
+        var title = this.props.title;
+        var cacheKey = 'file_' + title;
+        var content = localStorage.getItem(cacheKey);
+        return content;
+    },
+
+    _removeFromLocalStorage: function () {
+        var key = 'file_' + this.props.title;
+        console.log('remove from local storage ' + key);
+        localStorage.removeItem(key);
+    },
 
     save: function (content) {
         var start = new Date().getTime();
@@ -598,7 +646,7 @@ var LogEditor = React.createClass({
             Notify.warn('warn from import log');
         }
 
-        Ltt.sdk.writeLogFile(title, content).then(function () {
+        this.writeLog(title, content).then(function () {
             console.log('write file cost' + (new Date().getTime() - start));
             NProgress.set(0.3);
             //import into database, for stat purpose
