@@ -196,6 +196,36 @@ var LogEditor = React.createClass({
         }
     },
 
+    insertLogToLastValidLogLine: function (log) {
+        var editor = this.editor;
+        var session = editor.getSession()
+        var allLines = session.getDocument().getAllLines();
+        var index = 1;
+        for (var i = 0; i < allLines.length; i++) {
+            if (Util.isValidLog(allLines[i])) {
+                index = i + 1;
+            }
+        }
+        var newLine = index;
+        if (allLines[index]) {
+            log += '\n';
+        }
+        session.insert({row: newLine, column: 0}, log);
+    },
+
+    getLastValidLogPosition: function () {
+        var editor = this.editor;
+        var session = editor.getSession()
+        var allLines = session.getDocument().getAllLines();
+        var index = 1;
+        for (var i = 0; i < allLines.length; i++) {
+            if (Util.isValidLog(allLines[i])) {
+                index = i + 1;
+            }
+        }
+        return index;
+    },
+
 
     _destroyEditor: function () {
         console.log('Destroy editor start');
@@ -263,20 +293,8 @@ var LogEditor = React.createClass({
             name: 'startNewLog',
             bindKey: {win: 'Ctrl-n', mac: 'Command-n'},
             exec: function (editor) {
-                var session = editor.getSession()
-                var allLines = session.getDocument().getAllLines();
-                var index = 1;
-                for (var i = 0; i < allLines.length; i++) {
-                    if (Util.isValidLog(allLines[i])) {
-                        index = i + 1;
-                    }
-                }
                 var log = new Moment().format('HH:mm') + '~';
-                var newLine = index;
-                if (allLines[index]) {
-                    log += '\n';
-                }
-                session.insert({row: newLine, column: 0}, log);
+                that.insertLogToLastValidLogLine(log);
                 editor.gotoLine(newLine + 1, log.length);
             }
         });
@@ -296,10 +314,13 @@ var LogEditor = React.createClass({
             exec: function (editor) {
                 var session = editor.getSession();
                 var pos = editor.getCursorPosition();
+                var newIndex = that.getLastValidLogPosition();
                 pos.column = 0;
                 var timeStr = new Moment().format('HH:mm') + '~';
                 session.getDocument().insertInLine(pos, timeStr);
-                editor.gotoLine(pos.row + 1, timeStr.length);
+                var range = new Range(pos.row, 0, pos.row, Infinity);
+                session.moveText(range, {row: newIndex, column: 0})
+                editor.gotoLine(newIndex + 1, timeStr.length);
             }
         });
 

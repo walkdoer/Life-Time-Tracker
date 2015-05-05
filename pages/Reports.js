@@ -36,7 +36,7 @@ var Reports = React.createClass({
         }, {
             text: 'Project',
             key: 'project',
-            path: '/reports/project',
+            path: '/reports/projects',
             icon: 'fa fa-rocket'
         }, {
             text: 'Classes',

@@ -33,9 +33,11 @@ var ProjectDetail = require('./components/ProjectDetail'),
     LogList = require('./components/LogList'),
     ProjectTask = require('./components/Project/ProjectTask');
 
+/** Reports */
 var OverviewReport = require('./reports/Overview'),
     ClassesReport = require('./reports/ClassesReport'),
-    TagsReport = require('./reports/TagsReport');
+    TagsReport = require('./reports/TagsReport'),
+    ProjectReport = require('./reports/ProjectReport');
 
 /*
 <Route name="allProject" path="/projects" handler={Projects}>
@@ -48,9 +50,10 @@ var OverviewReport = require('./reports/Overview'),
 var routes = (
     <Route name="app" path="/" handler={App}>
         <Route name="reports" path="/reports" handler={Reports}>
-            <Route name="report" path="/reports/overview" handler={OverviewReport}/>
-            <Route name="tags" path="/reports/tags" handler={TagsReport}/>
-            <Route name="classses" path="/reports/classes" handler={ClassesReport}/>
+            <Route name="reportOverview" path="/reports/overview" handler={OverviewReport}/>
+            <Route name="tagsReport" path="/reports/tags" handler={TagsReport}/>
+            <Route name="classsesReport" path="/reports/classes" handler={ClassesReport}/>
+            <Route name="projectReport" path="/reports/projects" handler={ProjectReport}/>
             <DefaultRoute handler={OverviewReport}/>
         </Route>
         <Route name="dashboard" path="/dashboard" handler={Dashboard}/>
