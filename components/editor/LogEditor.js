@@ -225,7 +225,7 @@ var LogEditor = React.createClass({
         session.insert({row: newLine, column: 0}, log);
     },
 
-    getLastValidLogPosition: function () {
+    getLastValidLog: function () {
         var editor = this.editor;
         var session = editor.getSession()
         var allLines = session.getDocument().getAllLines();
@@ -233,9 +233,13 @@ var LogEditor = React.createClass({
         for (var i = 0; i < allLines.length; i++) {
             if (Util.isValidLog(allLines[i])) {
                 index = i + 1;
+                log = allLines[i];
             }
         }
-        return index;
+        return {
+            index: index,
+            log: log
+        };
     },
 
 
@@ -325,13 +329,19 @@ var LogEditor = React.createClass({
             bindKey: {win: 'Ctrl-Shift-b', mac: 'Command-Shift-b'},
             exec: function (editor) {
                 var session = editor.getSession();
-                var pos = editor.getCursorPosition();
-                var newIndex = that.getLastValidLogPosition();
-                pos.column = 0;
+                var doc = session.getDocument();
+                var validLog = that.getLastValidLog();
                 var timeStr = new Moment().format('HH:mm') + '~';
-                session.getDocument().insertInLine(pos, timeStr);
+                var pos = editor.getCursorPosition();
+                var line = session.getLine(pos.row);
+                var newIndex = validLog.index;
+                //move line
                 var range = new Range(pos.row, 0, pos.row, Infinity);
-                session.moveText(range, {row: newIndex, column: 0})
+                session.moveText(range, {row: newIndex, column: 0});
+                var pos = {row: newIndex, column: line.length};
+                session.insert(pos, '\n');
+                //insert time
+                session.insert({row: newIndex, column: 0}, timeStr);
                 editor.gotoLine(newIndex + 1, timeStr.length);
             }
         });
