@@ -146,7 +146,7 @@ exports.pie = function(options, highchartOptions) {
         series: [options.data]
     };
 
-    pieOptions = _.extend(pieOptions, highchartOptions);
+    pieOptions = extend(true, {}, pieOptions, highchartOptions);
 
     return options.$el.highcharts(pieOptions);
 };
@@ -164,7 +164,7 @@ exports.bar = function (options, highchartOptions) {
         series: options.data
     };
 
-    columnOptions = _.extend(columnOptions, highchartOptions);
+    columnOptions = extend(true, columnOptions, highchartOptions);
 
     return options.$el.highcharts(columnOptions);
 };
@@ -182,7 +182,7 @@ exports.column = function (options, highchartOptions) {
         series: options.data
     };
 
-    columnOptions = _.extend(columnOptions, highchartOptions);
+    columnOptions = extend(true, columnOptions, highchartOptions);
 
     return options.$el.highcharts(columnOptions);
 };
@@ -200,7 +200,7 @@ exports.line = function (options, highchartOptions) {
         series: options.data
     };
 
-    lineOptions = _.extend(lineOptions, highchartOptions);
+    lineOptions = extend(true, lineOptions, highchartOptions);
 
     return options.$el.highcharts(lineOptions);
 };
