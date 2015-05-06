@@ -162,8 +162,8 @@ var Page = React.createClass({
 
 
     onChange: function (content) {
-        console.log('chnage and fire doingLog');
-        var doingLog = this.refs.logEditor.getDoingLog(this.state.current, content);
+        console.log('change and fire doingLog');
+        var doingLog = this.refs.logEditor.getDoingLog(content);
         Bus.emit(EVENT.DOING_LOG, doingLog);
     },
 

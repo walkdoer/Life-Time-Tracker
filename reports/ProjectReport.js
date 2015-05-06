@@ -107,12 +107,6 @@ module.exports = React.createClass({
     loadSingleProjectActivity: function (projectName) {
         var id;
         var that = this;
-        /*this.state.projectSumData.some(function (project) {
-            if (project._id && project._id.name === projectName) {
-                id = project._id._id;
-                return true;
-            }
-        });*/
         DataAPI.Log.load(extend({
             projects: projectName,
             sum: true,

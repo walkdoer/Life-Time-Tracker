@@ -95,8 +95,15 @@ var LogEditor = React.createClass({
             if (cacheContent) {
                 console.log('recover ' + title + ' from localStorage');
                 content = cacheContent;
-                that.writeLog(title, content).then(function () {
-                    that._removeFromLocalStorage();
+                that.writeLog(title, content).then(function (result) {
+                    if (result === -1) {
+                        Notify.error('Recovery from cache failed');
+                    } else {
+                        Notify.success('Recovery ' + title + ' from cache');
+                        that._removeFromLocalStorage();
+                    }
+                }).catch(function(err) {
+                    Notify.error('Recovery from cache failed');
                 });
             }
             that.setValue(content);
@@ -223,6 +230,7 @@ var LogEditor = React.createClass({
             log += '\n';
         }
         session.insert({row: newLine, column: 0}, log);
+        return newLine;
     },
 
     getLastValidLog: function () {
@@ -310,8 +318,8 @@ var LogEditor = React.createClass({
             bindKey: {win: 'Ctrl-n', mac: 'Command-n'},
             exec: function (editor) {
                 var log = new Moment().format('HH:mm') + '~';
-                that.insertLogToLastValidLogLine(log);
-                editor.gotoLine(newLine + 1, log.length);
+                var line = that.insertLogToLastValidLogLine(log);
+                editor.gotoLine(line + 1, log.length);
             }
         });
 
@@ -600,7 +608,7 @@ var LogEditor = React.createClass({
     },
 
     writeLog: function (title, content) {
-        if (!Ltt || !Ltt.sdk ||!Ltt.sdk.writeLogFile) {return;}
+        if (!Ltt || !Ltt.sdk ||!Ltt.sdk.writeLogFile) {return Q(-1);}
         return Ltt.sdk.writeLogFile(title, content).catch(function (err) {
             console.error(err.stack);
             Notify.error('Write file failed ', {timeout: 3500});
