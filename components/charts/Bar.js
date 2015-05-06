@@ -58,12 +58,12 @@ var Bar = React.createClass({
                     point: {
                         events: {
                             click: function () {
-                                var data = this.series.data;
+                                /*var data = this.series.data;
                                 var color = this.series.color;
                                 for (var i = 0; i < data.length; i++) {
                                     data[i].update({ color: color }, true, false);
                                 }
-                                this.update({ color: '#f00' }, true, false);
+                                this.update({ color: '#f00' }, true, false);*/
                                 that.props.onPointClick({
                                     category: this.category,
                                     value: this.y

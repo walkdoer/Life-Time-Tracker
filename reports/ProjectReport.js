@@ -12,7 +12,7 @@ var WordsCloud = require('../components/charts/WordsCloud');
 var DateRangePicker = require('../components/DateRangePicker');
 var LoadingMask = require('../components/LoadingMask');
 var Bar = require('../components/charts/Bar');
-var Column = require('../components/charts/Column');
+var TimeColumn = require('../components/charts/TimeColumn');
 
 /** Uitls */
 var DataAPI = require('../utils/DataAPI');
@@ -101,7 +101,6 @@ module.exports = React.createClass({
     },
 
     onBarClick: function (value) {
-        alert(value);
         this.loadSingleProjectActivity(value.category);
     },
 
@@ -120,13 +119,12 @@ module.exports = React.createClass({
             group: 'date'
         }, this.getDateParams()))
         .then(function (data) {
-            data = data.map(function (item) {
-                return {
-                    label: item._id,
-                    count: item.totalTime
-                };
+            data = data.sort(function (a, b) {
+                return new Date(a._id).getTime() - new Date(b._id).getTime();
+            }).map(function (item) {
+                return [new Moment(item._id).unix() * 1000, item.totalTime];
             });
-            React.renderComponent(<Column data={data}/>, that.refs.activity.getDOMNode());
+            React.renderComponent(<TimeColumn data={data}/>, that.refs.activity.getDOMNode());
         }).catch(function (err) {
             Notify.error('load activity for project ' + projectName + 'have failed');
             console.error(err.stack);
