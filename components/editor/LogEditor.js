@@ -192,7 +192,7 @@ var LogEditor = React.createClass({
                 if (!_.isEmpty (logs)) {
                     var lastLog = logs[logs.length - 1];
                     var progress = lastLog.progress;
-                    if (progress && progress.task < 100) {
+                    if (progress && (progress.task < 100 || progress.subTask < 100)) {
                         unfinishLog.push(lastLog.origin);
                     }
                 }
