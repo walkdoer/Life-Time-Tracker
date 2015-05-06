@@ -10,7 +10,8 @@ module.exports = React.createClass({
     getDefaultProps: function () {
         return {
             xAxisLabel: true,
-            logs: []
+            logs: [],
+            name: ''
         };
     },
 
@@ -100,6 +101,19 @@ module.exports = React.createClass({
 
 
     _getTitle: function () {
-        return false;
+        var name = this.props.name;
+        var data = this.props.data;
+        var title = false;
+        if (_.isEmpty(data)) {
+            return title;
+        }
+        var isSingleDay = data.length === 1;
+        if (isSingleDay) {
+            title = name + ' lasted only one day';
+        } else {
+            var lastedDays = new Moment(data[data.length - 1][0]).diff(new Moment(data[0][0]), 'day');
+            title = name + ' lasted for ' + lastedDays + ' days';
+        }
+        return title;
     }
 });

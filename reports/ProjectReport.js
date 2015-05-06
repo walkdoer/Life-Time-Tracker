@@ -124,7 +124,7 @@ module.exports = React.createClass({
             }).map(function (item) {
                 return [new Moment(item._id).unix() * 1000, item.totalTime];
             });
-            React.renderComponent(<TimeColumn data={data}/>, that.refs.activity.getDOMNode());
+            React.renderComponent(<TimeColumn name={projectName} data={data}/>, that.refs.activity.getDOMNode());
         }).catch(function (err) {
             Notify.error('load activity for project ' + projectName + 'have failed');
             console.error(err.stack);
