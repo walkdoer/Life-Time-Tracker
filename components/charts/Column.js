@@ -28,6 +28,14 @@ var Column = React.createClass({
         )
     },
 
+    componentDidMount: function () {
+        this.setData(this.props.data);
+    },
+
+    componentWillReceiveProps: function (nextProps) {
+        this.setData(nextProps.data);
+    },
+
     setData: function(data, options) {
         this.props.data = data;
         if (data) {

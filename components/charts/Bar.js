@@ -15,7 +15,8 @@ var Bar = React.createClass({
 
     getDefaultProps: function () {
         return {
-            dataLabels: true
+            dataLabels: true,
+            onPointClick: function () {}
         };
     },
     render: function() {
@@ -41,6 +42,7 @@ var Bar = React.createClass({
             return;
         }
         this.props.data = data;
+        var that = this;
         var userHighchartOptions = this.getUserHighchartOptions('bar');
         chart.bar({
             title: this.props.title,
@@ -62,7 +64,10 @@ var Bar = React.createClass({
                                     data[i].update({ color: color }, true, false);
                                 }
                                 this.update({ color: '#f00' }, true, false);
-                                console.log('Category: ' + this.category + ', value: ' + this.y);
+                                that.props.onPointClick({
+                                    category: this.category,
+                                    value: this.y
+                                });
                             }
                         }
                     }
