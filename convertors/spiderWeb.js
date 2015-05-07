@@ -35,7 +35,7 @@ exports.dispose = function (rawData, categories, isGroup) {
         var valueKey = helper.getValueKey(rawData);
         categories.forEach(function (category) {
             var target = rawData.filter(function (d) {
-                return d.code === category;
+                return d.id === category;
             })[0];
             values.push(target ? target[valueKey] : 0);
         });
