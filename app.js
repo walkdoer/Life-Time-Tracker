@@ -302,7 +302,7 @@ var Footer = React.createClass({
                         subtitle = '要休息一下啦';
                     }
                     if (count === 2) {
-                        subtitle = '╮(╯_╰)╭累了效率不高的，休息一下吧',
+                        subtitle = '╮(╯_╰)╭累了效率不高的，休息一下吧';
                     }
                     if (count > 2) {
                         subtitle = '🐴上休息啦，喝口水，运动下再战';
