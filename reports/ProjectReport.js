@@ -173,9 +173,23 @@ var ActivityDetail = React.createClass({
         }, this.getDateParams()))
         .then(function (data) {
             data = data.sort(function (a, b) {
-                return new Moment(a._id).unix() - new Moment(b._id).unix();
+                if (granularity === 'week') {
+                    var mStart = new Moment(that.props.startDate);
+                    var mA = new Moment(mStart.year() + '-W' + a._id);
+                    var mB = new Moment(mStart.year() + '-W' + b._id);
+                    return mA.unix() - mB.unix();
+                } else {
+                    return new Moment(a._id).unix() - new Moment(b._id).unix();
+                }
             }).map(function (item) {
-                return [new Moment(item._id).unix() * 1000, item.totalTime];
+                if (granularity === 'week') {
+                    var mStart = new Moment(that.props.startDate);
+                    time = new Moment(mStart.year() + '-W' + item._id);
+                    return [time.unix() * 1000, item.totalTime];
+                } else {
+                    return [new Moment(item._id).unix() * 1000, item.totalTime];
+                }
+
             });
             that.setState({
                 data: data
