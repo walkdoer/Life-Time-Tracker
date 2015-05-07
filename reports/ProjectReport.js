@@ -6,6 +6,9 @@ var React = require('react');
 var _ = require('lodash');
 var Moment = require('moment');
 var extend = require('extend');
+var RB = require('react-bootstrap');
+var ButtonGroup = RB.ButtonGroup;
+var Button = RB.Button;
 
 /** components */
 var WordsCloud = require('../components/charts/WordsCloud');
@@ -28,6 +31,7 @@ module.exports = React.createClass({
             startDate: new Moment().subtract(1, 'month').toDate(),
             endDate: new Moment().toDate(),
             projectSumData: [],
+            selectProject: null,
             loaded: false
         };
     },
@@ -40,7 +44,11 @@ module.exports = React.createClass({
                      <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
                             onDateRangeChange={this.onDateRangeChange}/>
                 </div>
-                <div ref="activity"></div>
+                {this.state.selectProject ?
+                    <ActivityDetail 
+                        projectName={this.state.selectProject}
+                        startDate={this.state.startDate}
+                        endDate={this.state.endDate}/> : null}
                 <div style={{height: barHeight}}>
                     <Bar data={this.state.projectSumData} onPointClick={this.onBarClick}/>
                 </div>
@@ -101,29 +109,11 @@ module.exports = React.createClass({
     },
 
     onBarClick: function (value) {
-        this.loadSingleProjectActivity(value.category);
-    },
-
-    loadSingleProjectActivity: function (projectName) {
-        var id;
-        var that = this;
-        DataAPI.Log.load(extend({
-            projects: projectName,
-            sum: true,
-            group: 'date'
-        }, this.getDateParams()))
-        .then(function (data) {
-            data = data.sort(function (a, b) {
-                return new Date(a._id).getTime() - new Date(b._id).getTime();
-            }).map(function (item) {
-                return [new Moment(item._id).unix() * 1000, item.totalTime];
-            });
-            React.renderComponent(<TimeColumn name={projectName} data={data}/>, that.refs.activity.getDOMNode());
-        }).catch(function (err) {
-            Notify.error('load activity for project ' + projectName + 'have failed');
-            console.error(err.stack);
+        this.setState({
+            selectProject: value.category
         });
     },
+
 
     getDateParams: function () {
         return {
@@ -133,4 +123,76 @@ module.exports = React.createClass({
     }
 
 });
+
+
+
+var ActivityDetail = React.createClass({
+
+    getInitialState: function () {
+        return {
+            granularity: 'day',
+            data: []
+        };
+    },
+
+    render: function () {
+        var granularity = this.state.granularity;
+        return (
+            <div>
+                <ButtonGroup onClick={this.changeActivityGranularity}>
+                    {['year', 'month' ,'week', 'day'].map(function (name) {
+                        return <Button active={name === granularity}>{name}</Button>
+                    })}
+                </ButtonGroup>
+                <TimeColumn name={this.props.projectName} data={this.state.data}/>
+            </div>
+        );
+    },
+
+    changeActivityGranularity: function (e) {
+        var granularity = e.target.textContent.toLowerCase();
+        this.setState({
+            granularity: granularity
+        }, function () {
+            this.loadSingleProjectActivity(this.props.projectName, this.state.granularity);
+        });
+    },
+
+    componentDidMount: function () {
+        this.loadSingleProjectActivity(this.props.projectName, this.state.granularity);
+    },
+
+    componentWillReceiveProps: function () {
+        this.loadSingleProjectActivity(this.props.projectName, this.state.granularity);
+    },
+
+    loadSingleProjectActivity: function (projectName, granularity) {
+        var id;
+        var that = this;
+        DataAPI.Log.load(extend({
+            projects: projectName,
+            sum: true,
+            group: granularity ? 'date.' + granularity : 'date'
+        }, this.getDateParams()))
+        .then(function (data) {
+            data = data.sort(function (a, b) {
+                return new Moment(a._id).unix() - new Moment(b._id).unix();
+            }).map(function (item) {
+                return [new Moment(item._id).unix() * 1000, item.totalTime];
+            });
+            that.setState({
+                data: data
+            });
+        }).catch(function (err) {
+            Notify.error('load activity for project ' + projectName + 'have failed');
+            console.error(err.stack);
+        });
+    },
+    getDateParams: function () {
+        return {
+            start: new Moment(this.props.startDate).format(DATE_FORMAT),
+            end: new Moment(this.props.endDate).format(DATE_FORMAT)
+        };
+    }
+})
 

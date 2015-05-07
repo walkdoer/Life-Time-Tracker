@@ -33,6 +33,7 @@ var Bar = React.createClass({
         this.setData(this.props.data);
     },
 
+
     componentWillReceiveProps: function (nextProps) {
         this.setData(nextProps.data);
     },
