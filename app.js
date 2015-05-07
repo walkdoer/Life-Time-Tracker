@@ -295,22 +295,19 @@ var Footer = React.createClass({
                 if (subTask) {
                     message += ' ' + subTask.name;
                 }
+                var subtitle = '要休息一下啦';
                 if (notifyInfo) {
                     var count = notifyInfo.count;
-                    var subtitle;
                     if (count === 1) {
-                        subtitle = '要休息一下啦';
-                    }
-                    if (count === 2) {
                         subtitle = '╮(╯_╰)╭累了效率不高的，休息一下吧';
                     }
-                    if (count > 2) {
+                    if (count > 1) {
                         subtitle = '🐴上休息啦，喝口水，运动下再战';
                     }
                 }
                 Ltt.sdk.notify({
                     title: '😁' + '你在' + classesMap[doingLog.classes[0].code] +'上投入了' + start.fromNow(true),
-                    subtitle: subtitle || '要休息一下啦',
+                    subtitle: subtitle,
                     icon: path.join(__dirname, './images/me.jpg'),
                     sound: true,
                     wait: false,
