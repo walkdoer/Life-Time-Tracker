@@ -44,11 +44,7 @@ module.exports = React.createClass({
                      <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
                             onDateRangeChange={this.onDateRangeChange}/>
                 </div>
-                {this.state.selectProject ?
-                    <ActivityDetail 
-                        projectName={this.state.selectProject}
-                        startDate={this.state.startDate}
-                        endDate={this.state.endDate}/> : null}
+                <div ref='activity'></div>
                 <div style={{height: barHeight}}>
                     <Bar data={this.state.projectSumData} onPointClick={this.onBarClick}/>
                 </div>
@@ -109,9 +105,10 @@ module.exports = React.createClass({
     },
 
     onBarClick: function (value) {
-        this.setState({
-            selectProject: value.category
-        });
+        React.renderComponent(<ActivityDetail
+            projectName={value.category}
+            startDate={this.state.startDate}
+            endDate={this.state.endDate}/>, this.refs.activity.getDOMNode());
     },
 
 
