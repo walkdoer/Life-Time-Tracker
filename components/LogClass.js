@@ -1,5 +1,5 @@
 var React = require('react');
-
+var _ = require('lodash');
 var icon = {
     NT: 'fa-briefcase',
     WK: 'fa-desktop',
@@ -12,10 +12,18 @@ var icon = {
 var LogClass = React.createClass({
     render: function () {
         var data = this.props.data;
+        var iconClass, name;
+        if (_.isString(data)) {
+            iconClass = icon[data];
+            name = data;
+        } else if (_.isObject(data) && data.id) {
+            iconClass = icon[data.id];
+            name = data.name;
+        }
         return (
             <span className="ltt_c-logClass">
-                <i className={['fa', icon[data.code]].join(' ')}></i>
-                {data.name}
+                <i className={['fa', iconClass].join(' ')}></i>
+                {name}
             </span>
         );
     }

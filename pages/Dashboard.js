@@ -11,6 +11,13 @@ var TabbedArea = ReactBootStrap.TabbedArea;
 var TabPane = ReactBootStrap.TabPane;
 var numeral = require('numeral');
 var Router = require('react-router');
+var classesMap = require('../conf/config').classesMap;
+var logClasses = _.pairs(classesMap).map(function (obj) {
+    return {
+        value: obj[0],
+        text: obj[1]
+    };
+});
 
 /** Components */
 var CalendarHeatMap = require('../components/charts/CalendarHeatMap');
@@ -102,14 +109,6 @@ var Dashboard = React.createClass({
     }
 
 });
-var logClasses = [
-    { value: 'SPR', text : '体育'},
-    { value: 'WK', text : '工作'},
-    { value: 'NT', text : '一般事务'},
-    { value: 'STU', text : '学习'},
-    { value: 'BRK', text : '休息'},
-    { value: 'TK', text : '思考'}
-];
 
 var Board = React.createClass({
 
@@ -135,11 +134,11 @@ var Board = React.createClass({
             <div className="ltt_c-Board">
                 {logClasses.map(function (logClass) {
                     var time = 0, yesterdayTime;
-                    var code = logClass.value;
+                    var classId = logClass.value;
                     var data;
                     if (!_.isEmpty(logClassTime)) {
                         data = logClassTime.filter(function(item) {
-                            return item.code === code;
+                            return item.id === classId;
                         })[0];
                         if (data) {
                             time = data.count;
@@ -147,7 +146,7 @@ var Board = React.createClass({
                     }
                     if (!_.isEmpty(yesterDayLogClassTime)) {
                         data = yesterDayLogClassTime.filter(function(item) {
-                            return item.code === code;
+                            return item.id === classId;
                         })[0];
                         if (data) {
                             yesterdayTime = data.count;

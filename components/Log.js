@@ -40,7 +40,7 @@ var LogClass = React.createClass({
         classes = classes.map(function(cls) {
             return R.li({
                 className: 'ltt_c-log-class-item',
-                'data-code': cls.code
+                'data-code': cls
             }, cls.name);
         });
         return R.ul({className: 'ltt_c-log-class'}, classes);
@@ -149,7 +149,7 @@ var Log = React.createClass({
 
         function getLogClassCode(classes) {
             if (!_.isEmpty(classes)) {
-                return classes[0].code;
+                return classes[0];
             } else {
                 return '';
             }
