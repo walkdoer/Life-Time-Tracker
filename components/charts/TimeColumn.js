@@ -2,10 +2,13 @@
 var React = require('react');
 var _ = require('lodash');
 var Moment = require('moment');
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 
 var Chart = require('./chart');
 
 module.exports = React.createClass({
+
+    mixins: [PureRenderMixin],
 
     getDefaultProps: function () {
         return {

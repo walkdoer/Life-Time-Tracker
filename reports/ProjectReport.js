@@ -9,6 +9,7 @@ var extend = require('extend');
 var RB = require('react-bootstrap');
 var ButtonGroup = RB.ButtonGroup;
 var Button = RB.Button;
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 
 /** components */
 var WordsCloud = require('../components/charts/WordsCloud');
@@ -25,6 +26,8 @@ var DATE_FORMAT = 'YYYY-MM-DD';
 
 
 module.exports = React.createClass({
+
+    mixins: [PureRenderMixin],
 
     getInitialState: function () {
         return {
@@ -44,7 +47,10 @@ module.exports = React.createClass({
                      <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
                             onDateRangeChange={this.onDateRangeChange}/>
                 </div>
-                <div ref='activity'></div>
+                {this.state.selectProject ? <ActivityDetail
+                    projectName={this.state.selectProject}
+                    startDate={this.state.startDate}
+                    endDate={this.state.endDate}/> : null}
                 <div style={{height: barHeight}}>
                     <Bar data={this.state.projectSumData} onPointClick={this.onBarClick}/>
                 </div>
@@ -105,10 +111,10 @@ module.exports = React.createClass({
     },
 
     onBarClick: function (value) {
-        React.renderComponent(<ActivityDetail
-            projectName={value.category}
-            startDate={this.state.startDate}
-            endDate={this.state.endDate}/>, this.refs.activity.getDOMNode());
+        this.setState({
+            selectProject: value.category
+        });
+        //React.renderComponent(, this.refs.activity.getDOMNode());
     },
 
 
@@ -124,6 +130,8 @@ module.exports = React.createClass({
 
 
 var ActivityDetail = React.createClass({
+
+    mixins: [PureRenderMixin],
 
     getInitialState: function () {
         return {
@@ -159,8 +167,8 @@ var ActivityDetail = React.createClass({
         this.loadSingleProjectActivity(this.props.projectName, this.state.granularity);
     },
 
-    componentWillReceiveProps: function () {
-        this.loadSingleProjectActivity(this.props.projectName, this.state.granularity);
+    componentWillReceiveProps: function (nextProps) {
+        this.loadSingleProjectActivity(nextProps.projectName, this.state.granularity);
     },
 
     loadSingleProjectActivity: function (projectName, granularity) {

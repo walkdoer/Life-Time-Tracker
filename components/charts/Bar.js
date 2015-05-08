@@ -9,9 +9,10 @@ var compareConvertor = require('../../convertors/compareColumn');
 var _ = require('lodash');
 var extend = require('extend');
 var CommonFunction = require('./CommonFunction');
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var Bar = React.createClass({
     displayName: 'bar',
-    mixins: [ CommonFunction ],
+    mixins: [ CommonFunction, PureRenderMixin ],
 
     getDefaultProps: function () {
         return {
@@ -34,7 +35,7 @@ var Bar = React.createClass({
     },
 
 
-    componentWillReceiveProps: function (nextProps) {
+    componentWillUpdate: function (nextProps) {
         this.setData(nextProps.data);
     },
 
