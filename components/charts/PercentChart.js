@@ -2,7 +2,6 @@
 
 var React = require('react');
 var $ = require('jquery');
-var Highcharts = require('highcharts-browserify');
 
 
 

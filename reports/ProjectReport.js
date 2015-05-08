@@ -183,8 +183,8 @@ var ActivityDetail = React.createClass({
             data = data.sort(function (a, b) {
                 if (granularity === 'week') {
                     var mStart = new Moment(that.props.startDate);
-                    var mA = new Moment(mStart.year() + '-W' + a._id);
-                    var mB = new Moment(mStart.year() + '-W' + b._id);
+                    var mA = new Moment(mStart.year() + '-W' + (a._id - 1));
+                    var mB = new Moment(mStart.year() + '-W' + (b._id - 1));
                     return mA.unix() - mB.unix();
                 } else {
                     return new Moment(a._id).unix() - new Moment(b._id).unix();
@@ -192,7 +192,7 @@ var ActivityDetail = React.createClass({
             }).map(function (item) {
                 if (granularity === 'week') {
                     var mStart = new Moment(that.props.startDate);
-                    time = new Moment(mStart.year() + '-W' + item._id);
+                    time = new Moment(mStart.year() + '-W' + (item._id-1));
                     return [time.unix() * 1000, item.totalTime];
                 } else {
                     return [new Moment(item._id).unix() * 1000, item.totalTime];

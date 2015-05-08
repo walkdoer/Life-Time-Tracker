@@ -16,7 +16,6 @@
     "extend": "~2.0.0",
     "flux": "~2.0.1",
     "he": "~0.5.0",
-    "highcharts-browserify": "~0.1.1-4.0.3",
     "jquery": "~2.1.1",
     "jquery-ui": "^1.10.5",
     "lodash": "~2.4.1",
@@ -75,7 +74,8 @@
     "noty": "./node_modules/noty/js/noty/packaged/jquery.noty.packaged.js",
     "chart": "./bower_components/chartjs/Chart.js",
     "sweetalert": "./bower_components/sweetalert/lib/sweet-alert.js",
-    "datetimepicker": "./bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js"
+    "datetimepicker": "./bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js",
+    "highcharts": "./bower_components/Highstock-2.1.5/js/highstock-all.js"
   },
   "browserify-shim": {
     "noty": "noty",

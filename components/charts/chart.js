@@ -2,7 +2,10 @@
 var _ = require('lodash');
 var $ = require('jquery');
 window.$ = window.jQuery = $;
-var Highcharts = require('highcharts-browserify');
+//var Highcharts = require('highcharts-browserify');
+//var Highcharts = require('highstock-browserify');
+require('highcharts');
+var Highcharts = window.Highcharts;
 var extend = require('extend');
 
 //在这里添加highchart的全局设置
