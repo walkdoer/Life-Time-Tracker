@@ -228,7 +228,17 @@ var DateGoToWindow = React.createClass({
     },
 
     goto: function () {
-        var date = new Moment(this.state.date);
+        var dateStr = this.state.date;
+        var dateArr = dateStr.split('-');
+        var date;
+        //user only input a day
+        if (dateArr.length === 1) {
+            date = new Moment().date(dateArr);
+        } else if (dateArr.length === 2){
+            date = new Moment().month(parseInt(dateArr[0], 10) - 1).date(dateArr[1]);
+        } else {
+            date = new Moment(dateStr);
+        }
         if (date.isValid()) {
             this.props.onGoto(date.toDate());
             this.props.onRequestHide();
