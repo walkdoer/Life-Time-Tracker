@@ -148,8 +148,10 @@ module.exports = React.createClass({
             var name;
             if (id === null) {
                 name = '未归类'
-            } else {
-                name = id.name
+            } else if (_.isString(id)){
+                name = id;
+            } else if (_.isObject(id)) {
+                name = id.name;
             }
             return {
                 name: name,
@@ -203,6 +205,10 @@ module.exports = React.createClass({
         } else {
             return this.props.detailParams;
         }
+    },
+
+    componentWillReceiveProps: function () {
+        this.loadSumData();
     }
 
 });
