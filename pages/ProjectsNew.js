@@ -171,7 +171,7 @@ var FilterableProjects = React.createClass({
                 return tag.indexOf(text) >= 0 || tagFullPy.indexOf(text) >= 0 || tagPy.indexOf(text) >= 0;
             });
             var matchClass = (project.classes || []).some(function (cls) {
-                var upperCode = cls.code.toUpperCase();
+                var upperCode = cls.toUpperCase();
                 var upperText = text.toUpperCase();
                 return upperCode.indexOf(upperText) >= 0;
             });
