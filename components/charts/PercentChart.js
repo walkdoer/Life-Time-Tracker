@@ -8,7 +8,12 @@ var $ = require('jquery');
 module.exports = React.createClass({
 
     render: function() {
-        return <div className="ltt_c-chart ltt_c-chart-PercentArea"></div>;
+        var height = this.props.height;
+        var style = {};
+        if (height) {
+            style.height = height;
+        }
+        return <div className="ltt_c-chart ltt_c-chart-PercentArea" style={style}></div>;
     },
 
     componentDidMount: function () {

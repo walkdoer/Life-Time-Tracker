@@ -11,6 +11,7 @@ var remoteStorage = require('../components/storage.remote');
 var DateRangePicker = require('../components/DateRangePicker');
 var PercentArea = require('../components/charts/PercentChart');
 var LoadingMask = require('../components/LoadingMask');
+var ActivityBar = require('../components/charts/ActivityBar');
 
 /** constant */
 var DATE_FORMAT = 'YYYY-MM-DD';
@@ -28,12 +29,21 @@ module.exports = React.createClass({
 
     render: function () {
         return (
-            <div className="ltt_c-report ltt_c-report-tags">
+            <div className="ltt_c-report ltt_c-report-classes">
                 <div>
                      <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
                             onDateRangeChange={this.onDateRangeChange}/>
                 </div>
-                {this.state.classesTrend ? <PercentArea data={this.state.classesTrend}/> : null }
+                {this.state.classesTrend ? <PercentArea height={200} data={this.state.classesTrend}/> : null }
+                <ActivityBar
+                    params={{group: 'classes'}}
+                    detailParams={function (selectItem) {
+                        return {
+                            classes: selectItem
+                        };
+                    }}
+                    startDate={this.state.startDate}
+                    endDate={this.state.endDate}/>
                 <LoadingMask loaded={this.state.loaded}/>
             </div>
         );
