@@ -663,7 +663,7 @@ var LogEditor = React.createClass({
             that.__saveing = false;
         }
         if (!_.isEmpty(checkResult.warns)) {
-            Notify.warn('warn from import log');
+            Notify.warning('warn from import log');
         }
 
         this.writeLog(title, content).then(function () {
@@ -706,7 +706,7 @@ var LogEditor = React.createClass({
                 Notify.error('Import failed', {timeout: 3500});
             });
         }).catch(function (err) {
-            that.__saveing = true;
+            that.__saveing = false;
             NProgress.done();
             console.error(err.stack);
             Notify.error('Write file failed ', {timeout: 3500});
