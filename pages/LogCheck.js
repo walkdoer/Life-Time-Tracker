@@ -31,12 +31,12 @@ module.exports = React.createClass({
         var items = this.state.scanResult.map(function (item) {
             return (
                 <div>
-                    {item.date}
+                    <span className="scan-result-date">{item.date}</span>
                     {item.errors.map(function (item) {
-                        return <p className="scan-result-item scan-result-error">{item.message}</p>
+                        return <p className="scan-result-item scan-result-error"><i className="fa fa-times-circle"></i>{item.message}</p>
                     })}
                     {item.warns.map(function (item) {
-                        return <p className="scan-result-item scan-result-warn">{item.message}</p>
+                        return <p className="scan-result-item scan-result-warn"><i className="fa fa-exclamation-triangle"></i>{item.message}</p>
                     })}
                 </div>
             );
