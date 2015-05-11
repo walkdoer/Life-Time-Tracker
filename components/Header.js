@@ -16,6 +16,8 @@ var Moment = require('moment');
 var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
 var history = window.history;
 var Mt = window.Mousetrap;
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin
+var Router = require('react-router');
 
 var disabledBackButton = true,
     disabledForwardButton = true,
@@ -46,6 +48,8 @@ window.addEventListener('hashchange', function (e) {
 
 
 var Header = React.createClass({
+
+    mixins: [PureRenderMixin, Router.State, Router.Navigation],
 
     getInitialState: function () {
         return {
@@ -105,6 +109,9 @@ var Header = React.createClass({
                                 </Button>
                             </ButtonGroup>
                             <ButtonGroup>
+                                <Button onClick={this.openLogCheck}>
+                                    <i className="fa fa-file-text" title="check log file"></i>
+                                </Button>
                                 <Button className="ltt_c-header-debugBtn js-debugApplication" onClick={this.debugApplication}>
                                     <i className="fa fa-gear"></i>
                                 </Button>
@@ -174,6 +181,10 @@ var Header = React.createClass({
                 syncStatus: SYNC_ERROR
             });
         });
+    },
+
+    openLogCheck: function () {
+        this.transitionTo('logCheck');
     }
 
 });
