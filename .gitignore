@@ -76,3 +76,7 @@ node_modules/ltt-sdk/.DS_Store
 logs/
 bower_components/
 build/
+
+main.all.css
+main.js
+vendors.js
