@@ -23,6 +23,7 @@ var NwBuilder = require('node-webkit-builder');
 var watch = require('gulp-watch');
 var buildDir = './build';
 var babelify = require("babelify");
+var argv = require('yargs').argv;
 
 // We create an array of dependencies. These are NPM modules you have
 // installed in node_modules. Think: "require('react')" or "require('underscore')"
@@ -295,9 +296,10 @@ gulp.task('nw', function () {
     var nw = new NwBuilder({
         files: [ './build/**/**'],
         platforms: ['osx64'],
-        buildDir: './production'
-        //version: '0.12.0-rc1'
+        buildDir: './production',
+        version: argv.version
     });
+    console.log(argv);
     // Log stuff you want
     nw.on('log', function (msg) {
         gutil.log('node-webkit-builder', msg);
