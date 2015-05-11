@@ -1,6 +1,6 @@
 module.exports = {
     server: 'http://localhost:3000',
-    birthday: '1989-10-23',
+    birthday: '2014-8-1',
     classesMap: {
         SPR: '体育',
         WK: '工作',

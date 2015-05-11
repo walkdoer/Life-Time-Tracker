@@ -50,6 +50,10 @@ module.exports = {
         return get(url('/checkSyncStatus'));
     },
 
+    checkLogContent: function (params) {
+        return get(url('/checkLogContent'), params);
+    },
+
     /**
      * get calendar data
      * @param  {String} calType calendar type

@@ -1,0 +1,13 @@
+.scan-result-item{
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+.scan-result-error{
+    border-color: #DA6666;
+    background-color: #FFBABA;
+}
+
+.scan-result-warn{
+    border-color: #FFE44C;
+    background-color: #F9FAD6;
+}
