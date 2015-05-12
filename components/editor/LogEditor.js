@@ -598,10 +598,12 @@ var LogEditor = React.createClass({
     },
 
     readLog: function (title) {
+        var start = Date.now();
         var editor = this.editor;
         if (!Ltt.sdk) { return Q(''); }
         return Ltt.sdk.readLogContent(title)
             .then(function (content) {
+                console.log('read log cost:' + (Date.now() - start));
                 return content;
             })
             .catch(function (err) {
@@ -610,6 +612,7 @@ var LogEditor = React.createClass({
     },
 
     writeLog: function (title, content) {
+        var start = Date.now();
         if (!Ltt || !Ltt.sdk ||!Ltt.sdk.writeLogFile) {return Q(-1);}
         return Ltt.sdk.writeLogFile(title, content).catch(function (err) {
             console.error(err.stack);
@@ -665,51 +668,41 @@ var LogEditor = React.createClass({
         if (!_.isEmpty(checkResult.warns)) {
             Notify.warning('warn from import log');
         }
-
-        this.writeLog(title, content).then(function () {
-            console.log('write file cost' + (new Date().getTime() - start));
-            NProgress.set(0.3);
-            //import into database, for stat purpose
-            !hasError && Ltt.sdk.importLogContent(title, content).then(function (err) {
-                NProgress.done();
-                that.props.onSave(content);
-                that.__saveing = false;
-                console.log('import cost' + (new Date().getTime() - start));
-                /*
-                //don't need to sync if already syncing.
-                if (that.state.syncStatus === SYNCING) { return; }
-                var timer = setTimeout(function () {
-                    //start back up log file after log import successfully
-                    //may have change since the content may have changed
-                    //use the timer to optimize the performerce
-                    console.log('start backup' + (new Date().getTime() - start));
-                    that.setState({syncStatus: SYNCING}, function () {
-                        DataAPI.backUpLogFile(title, content).then(function (result) {
-                            console.error('done');
-                            that.setState({syncStatus: NO_SYNC}, function () {
-                                console.log('save total cost' + (new Date().getTime() - start));
-                                //init the project typeahead component again because the projects
-                                //that._initProjectTypeahead();
-                            });
-                        }).catch(function (err) {
-                            console.error(err.stack);
-                            that.setState({syncStatus: SYNC_ERROR});
-                            Notify.error('Save to evernote failed' + err.message, {timeout: 3500});
+        //import into database, for stat purpose
+        !hasError && Ltt.sdk.importLogContent(title, content).then(function (err) {
+            NProgress.done();
+            that.props.onSave(content);
+            that.__saveing = false;
+            console.log('import cost' + (new Date().getTime() - start));
+            /*
+            //don't need to sync if already syncing.
+            if (that.state.syncStatus === SYNCING) { return; }
+            var timer = setTimeout(function () {
+                //start back up log file after log import successfully
+                //may have change since the content may have changed
+                //use the timer to optimize the performerce
+                console.log('start backup' + (new Date().getTime() - start));
+                that.setState({syncStatus: SYNCING}, function () {
+                    DataAPI.backUpLogFile(title, content).then(function (result) {
+                        console.error('done');
+                        that.setState({syncStatus: NO_SYNC}, function () {
+                            console.log('save total cost' + (new Date().getTime() - start));
+                            //init the project typeahead component again because the projects
+                            //that._initProjectTypeahead();
                         });
+                    }).catch(function (err) {
+                        console.error(err.stack);
+                        that.setState({syncStatus: SYNC_ERROR});
+                        Notify.error('Save to evernote failed' + err.message, {timeout: 3500});
                     });
-                    clearTimeout(timer);
-                }, 200);*/
-            }).catch(function (err) {
-                that.__saveing = false;
-                NProgress.done();
-                console.error(err.stack);
-                Notify.error('Import failed', {timeout: 3500});
-            });
+                });
+                clearTimeout(timer);
+            }, 200);*/
         }).catch(function (err) {
             that.__saveing = false;
             NProgress.done();
             console.error(err.stack);
-            Notify.error('Write file failed ', {timeout: 3500});
+            Notify.error('Import failed', {timeout: 3500});
         });
     },
 

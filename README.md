@@ -1,6 +1,9 @@
 Life Time Tracker
 =====================
 
+Life Time Tracker是一个做个人时间统计的工具，读了《奇特的一生》之后，想实践柳比歇夫的统计方法，第一个想法就是必须得通过计算机来自动化；但是没有找到合适自己使用的工具，决定自己开发一个，顺便尝试一下`nwjs + react`的组合来开发桌面App
+
+
 ### 界面
 
 Dashboard:
@@ -19,9 +22,23 @@ Project
 
 ![Project](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/project.png)
 
-### 时间记录方式
+### 安装
 
-个人时间记录，每日记录一次。用于每周每月时间统计。
+安装前请确定你有下列依赖
+
+- gulp
+- mongodb
+
+生成App步骤
+
+```
+npm install
+bower install
+gulp deploy
+gulp nw
+```
+
+然后会在 productions目录下生成app文件，目前只支持 osx
 
 ### 时间分类
 
