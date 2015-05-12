@@ -33,7 +33,8 @@
     "react-router": "~0.11.0",
     "request": "~2.51.0",
     "select2": "^3.5.2-browserify",
-    "store2": "~2.1.6"
+    "store2": "~2.1.6",
+    "sweetalert": "^1.0.0-beta"
   },
   "devDependencies": {
     "babelify": "^6.0.2",

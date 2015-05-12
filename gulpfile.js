@@ -269,6 +269,7 @@ gulp.task('sync', function() {
         js = './nw/**/*.js';
 
     gulp.src(libs).pipe(gulp.dest([buildDir, 'libs/'].join('/')));
+    gulp.src('./node_modules/sweetalert/dist/sweetalert.css').pipe(gulp.dest('./css/lib/'));
     gulp.src(cssFiles)
         .pipe(watch(cssFiles, function(files) {
             return files.pipe(gulp.dest([buildDir, 'css/'].join('/')));

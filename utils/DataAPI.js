@@ -148,6 +148,10 @@ module.exports = {
     Version: {
         get: function (id) {
             return get(url('/versions/' + id));
+        },
+
+        delete: function (id) {
+            return deleteObj(url('/versions/' + id));
         }
     }
 };

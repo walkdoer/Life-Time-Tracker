@@ -12,8 +12,11 @@ var _ = require('lodash');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var Mt = window.Mousetrap;
 var RB = require('react-bootstrap');
+var ButtonToolbar = RB.ButtonToolbar;
+var Button = RB.Button;
 var Well = RB.Well;
 var extend = require('extend');
+var swal = require('sweetalert');
 
 /** mixins */
 var initParams = require('../mixins/initParams');
@@ -43,6 +46,7 @@ var TreeMap = require('../charts/TreeMap');
 var Util = require('../../utils/Util');
 var DataAPI = require('../../utils/DataAPI');
 var Bus = require('../../utils/Bus');
+
 
 
 module.exports = React.createClass({
@@ -86,7 +90,7 @@ module.exports = React.createClass({
             <div className="ltt_c-projectTask">
                 <main>
                     <div className="ltt_c-projectDetail">
-                        <ProjectInfo ref="projectInfo" project={project} versionId={currentVersionId}/>
+                        <ProjectInfo ref="projectInfo" project={project} versionId={currentVersionId} onDeleteVersion={this.deleteVersion}/>
                     </div>
                     <div className="ltt_c-projectTask-toolbar">
                         <div className="btn-group">
@@ -192,6 +196,27 @@ module.exports = React.createClass({
         }).catch(function (err) {
             console.error(err.stack);
             Notify.error('删除Task失败');
+        });
+    },
+
+    deleteVersion: function () {
+        console.log('delete version');
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this imaginary file!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel plx!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }, function(isConfirm){
+            if (isConfirm) {
+                swal("Deleted!", "Your imaginary file has been deleted.", "success");
+            } else {
+                swal("Cancelled", "Your imaginary file is safe :)", "error");
+            }
         });
     },
 
@@ -488,7 +513,7 @@ var ProjectInfo = React.createClass({
                     {this.state.showProjectDetail ? <div className="ltt_c-projectDetail-basicInfo-detail">
                         <p className="ltt_c-projectDetail-tags">{tags}</p>
                     </div> : null}
-                    {this.props.versionId ? <VersionInfo id={this.props.versionId}/> : null}
+                    {this.props.versionId ? <VersionInfo id={this.props.versionId} onDeleteVersion={this.props.onDeleteVersion}/> : null}
                 </section>
             );
         } else {
@@ -514,25 +539,30 @@ var VersionInfo = React.createClass({
     render: function () {
         var version = this.state.version;
         return version ? (
-            <p className="ltt_p-projectDetail-versionInfo">
-                <span className="version-name"><i className="fa fa-sitemap">{version.name}</i></span>
-                <span>
-                    <i className="fa fa-tasks" title="Task count"></i>
-                    {version.taskCount}
-                </span>
-                <span title={new Moment(version.createTime).format('YYYY-MM-DD HH:mm:ss')}>
-                    <i className="fa fa-plus" title="create time"></i>
-                    {new Moment(version.createTime).fromNow()}
-                </span>
-                <span title={new Moment(version.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
-                    <i className="fa fa-user" title="last active"></i>
-                    {new Moment(version.lastActiveTime).fromNow()}
-                </span>
-                <span className="ltt-M2">
-                    <i className="fa fa-clock-o" title="Total time"></i>
-                    {Moment.duration(version.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
-                </span>
-            </p>
+            <div className="ltt_p-projectDetail-versionInfo">
+                <div className="ltt_p-projectDetail-versionInfo-content">
+                    <span className="version-name"><i className="fa fa-sitemap">{version.name}</i></span>
+                    <span>
+                        <i className="fa fa-tasks" title="Task count"></i>
+                        {version.taskCount}
+                    </span>
+                    <span title={new Moment(version.createTime).format('YYYY-MM-DD HH:mm:ss')}>
+                        <i className="fa fa-plus" title="create time"></i>
+                        {new Moment(version.createTime).fromNow()}
+                    </span>
+                    <span title={new Moment(version.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
+                        <i className="fa fa-user" title="last active"></i>
+                        {new Moment(version.lastActiveTime).fromNow()}
+                    </span>
+                    <span className="ltt-M2">
+                        <i className="fa fa-clock-o" title="Total time"></i>
+                        {Moment.duration(version.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
+                    </span>
+                </div>
+                <div className="ltt_p-projectDetail-versionInfo-btns">
+                    <Button onClick={this.props.onDeleteVersion} bsStyle="danger" bsSize="xsmall">Delete</Button>
+                </div>
+            </div>
         ) : null;
     },
 
@@ -552,7 +582,7 @@ var VersionInfo = React.createClass({
             that.setState({
                 version: version
             });
-        })
+        });
     }
 })
 
