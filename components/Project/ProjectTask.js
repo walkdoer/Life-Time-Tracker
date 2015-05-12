@@ -200,7 +200,7 @@ module.exports = React.createClass({
     },
 
     deleteVersion: function (version) {
-        console.log('delete version');
+        var that = this;
         swal({
             title: 'Are you sure to delete ' + version.name + '?',
             text: "You will not be able to recover!",
@@ -214,7 +214,13 @@ module.exports = React.createClass({
         }, function(isConfirm){
             if (isConfirm) {
                 DataAPI.Version.delete(version._id).then(function () {
-                    swal("Deleted!", "Your version has been deleted.", "success");
+                    swal({
+                        title: "Deleted!",
+                        text: "Your version has been deleted.",
+                        type: "success",
+                        timer: 1500
+                    });
+                    that.props.onVersionDeleted(version);
                 });
             }
         });

@@ -20,7 +20,7 @@ var config = require('../conf/config');
 
 
 module.exports = React.createClass({
-    mixins: [Router.State],
+    mixins: [Router.State, Router.Navigation],
 
     getDefaultProps: function () {
         var startDate = new Moment(config.birthday).toDate(),
@@ -55,7 +55,7 @@ module.exports = React.createClass({
                         versionId={this.state.versionId}/>
                 </aside>
                 <main>
-                    <RouteHandler {... _.pick(this.state, ['projectId', 'versionId'])}/>
+                    <RouteHandler {... _.pick(this.state, ['projectId', 'versionId'])} onVersionDeleted={this.onVersionDeleted}/>
                 </main>
             </section>
         );
@@ -96,8 +96,32 @@ module.exports = React.createClass({
                     projects: projects
                 });
             });
-    }
+    },
 
+    onVersionDeleted: function (version) {
+        console.log('version deleted', version);
+        var project = this.state.projects.filter(function (project) {
+            return project._id === version.projectId;
+        })[0];
+        var index = null;
+        project.versions.some(function (ver, i) {
+            if (ver._id === version._id) {
+                index = i;
+                return true;
+            }
+        });
+        if (index !== null) {
+            project.versions.splice(index, 1);
+        }
+        this.setState({
+            projects: this.state.projects
+        });
+        if (!_.isEmpty(project.versions)) {
+            this.transitionTo('projectVersionTask', {projectId: project._id, versionId: project.versions[0]._id});
+        } else {
+            this.transitionTo('projectTask', {projectId: project._id});
+        }
+    }
 
 });
 
