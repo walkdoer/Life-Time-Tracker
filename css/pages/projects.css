@@ -23,7 +23,11 @@
     margin:-1%;
     margin-top:10px;
 }
-
+.ltt_c-page-projects-projectCards .ltt_c-projectCard .ltt_c-chart-D3SimpleColumn{
+  position: absolute;
+  bottom: 41px;
+  width: 100%;
+}
 .ltt_c-page-projects-projectCards .ltt_c-projectCard{
     display: inline-block;
     width: 23%;

@@ -76,6 +76,8 @@ var Projects = React.createClass({
                         {this.state.projects.map(function (project) {
                             return (
                                 <ProjectCard
+                                    startDate={that.state.startDate}
+                                    endDate={that.state.endDate}
                                     data={project} key={project._id}
                                     onDelete={function (project, e) {
                                         if (window.confirm("Are you sure to delete")) {

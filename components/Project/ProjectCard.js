@@ -34,7 +34,7 @@ var ProjectCard = React.createClass({
     },
 
     componentDidMount: function () {
-        this.loadActivity();
+        this.loadActivity(this.props);
     },
 
     render: function () {
@@ -124,11 +124,17 @@ var ProjectCard = React.createClass({
         return (<p className="ltt_c-projectCard-logClassIndicators">{indicators}</p>);
     },
 
-    loadActivity: function () {
+    componentWillReceiveProps: function (nextProps) {
+        this.loadActivity(nextProps);
+    },
+
+    loadActivity: function (params) {
         var that = this;
         DataAPI.Log.load({
             sum: true,
-            projects: this.props.data.name,
+            start: params.startDate,
+            end: params.endDate,
+            projects: params.data.name,
             group: 'date'
         }).then(function (data) {
             that.setState({

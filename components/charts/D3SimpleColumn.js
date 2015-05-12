@@ -41,12 +41,15 @@ module.exports = React.createClass({
 
     plot: function (data) {
         if (_.isEmpty(data)) {return;}
-        var $el = $(this.getDOMNode());
+        var $el = $(this.getDOMNode()).empty();
         var dataLen = data.length;
        //Width and height
         var w = $el.width();
         var h = $el.height();
         var barPadding = 1;
+        var y = d3.scale.linear()
+            .domain([0, d3.max(data)])
+            .range([0, h]);
         //Create SVG element
         var svg = d3.select($el[0])
                     .append("svg")
@@ -54,20 +57,20 @@ module.exports = React.createClass({
                     .attr("height", h);
 
         svg.selectAll("rect")
-           .data(data)
-           .enter()
-           .append("rect")
-           .attr("x", function(d, i) {
-                return i * (w / dataLen);
-           })
-           .attr("y", function(d) {
-                return h - (d * 4);
-           })
-           .attr("width", w / dataLen - barPadding)
-           .attr("height", function(d) {
-                return d * 4;
-           })
-           .attr("fill", "teal");
+               .data(data)
+               .enter()
+               .append("rect")
+               .attr("x", function(d, i) {
+                    return i * (w / dataLen);
+               })
+               .attr("y", function(d) {
+                    return h - y(d);
+               })
+               .attr("width", w / dataLen - barPadding)
+               .attr("height", function(d) {
+                    return y(d);
+               })
+               .attr("fill", '#f2f2f2');
     }
 
 })
