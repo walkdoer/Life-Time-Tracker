@@ -21,7 +21,8 @@
     "chartjs": "~0.2.0",
     "typeahead.js": "~0.10.5",
     "eonasdan-bootstrap-datetimepicker": "~4.7.14",
-    "select2": "~3.5.2"
+    "select2": "~3.5.2",
+    "sweetalert": "~0.5.0"
   },
   "devDependencies": {},
   "keywords": [
