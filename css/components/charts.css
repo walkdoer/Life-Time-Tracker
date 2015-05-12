@@ -25,3 +25,8 @@
     height: 100%;
     background:#FFF;
 }
+
+.ltt_c-chart-D3SimpleColumn{
+    height: 30px;
+    min-height:30px;
+}

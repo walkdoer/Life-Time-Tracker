@@ -12,6 +12,7 @@ var LogClass = require('../LogClass');
 var _ = require('lodash');
 var Router = require('react-router');
 var Link = Router.Link;
+var D3SimpleColumn = require('../charts/D3SimpleColumn.js');
 
 var LogClassColors = {
     NT: '#CCC',
@@ -22,7 +23,19 @@ var LogClassColors = {
     BRK: '#6D6C99'
 };
 
+var DataAPI = require('../../utils/DataAPI');
+
 var ProjectCard = React.createClass({
+
+    getInitialState: function () {
+        return {
+            activityData: []
+        };
+    },
+
+    componentDidMount: function () {
+        this.loadActivity();
+    },
 
     render: function () {
         var projectData = this.props.data;
@@ -91,6 +104,7 @@ var ProjectCard = React.createClass({
                         {Moment.duration(projectData.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
                     </span>
                 </p>
+                <D3SimpleColumn data={this.state.activityData}/>
                 {this.getLogClassIndicators()}
             </div>
         );
@@ -108,6 +122,19 @@ var ProjectCard = React.createClass({
             });
         }
         return (<p className="ltt_c-projectCard-logClassIndicators">{indicators}</p>);
+    },
+
+    loadActivity: function () {
+        var that = this;
+        DataAPI.Log.load({
+            sum: true,
+            projects: this.props.data.name,
+            group: 'date'
+        }).then(function (data) {
+            that.setState({
+                activityData: data.map(function (d) { return d.totalTime; })
+            });
+        });
     }
 
 });
