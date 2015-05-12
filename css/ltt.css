@@ -188,3 +188,8 @@
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
 }
+
+
+.well .fa{
+    margin-right: 5px;
+}

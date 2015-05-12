@@ -11,7 +11,8 @@ var Q = require('q');
 var _ = require('lodash');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var Mt = window.Mousetrap;
-
+var RB = require('react-bootstrap');
+var Well = RB.Well;
 var extend = require('extend');
 
 /** mixins */
@@ -129,7 +130,8 @@ module.exports = React.createClass({
                     </div>
                     {this.state.openTreeMap ? <TreeMap ref="treeMap"
                         title={"Time TreeMap of " + project.name + (version ? '-' + version.name : '')}/> : null }
-                    <TaskList>
+                    {this.state.tasks.length > 0 ? 
+                        <TaskList>
                         {this.state.tasks.map(function (task) {
                             return <Task ref={task._id}
                                 data={task}
@@ -139,7 +141,8 @@ module.exports = React.createClass({
                                 onClick={that.openTask}
                                 selected={task._id === taskId}/>
                         })}
-                    </TaskList>
+                        </TaskList> : <Well><i className="fa fa-beer"></i>No Task. Simple life.</Well>
+                    }
                 </main>
                 {this.renderTaskDetail()}
             </div>
