@@ -34,6 +34,7 @@ Project
 ```
 npm install
 bower install
+npm link ./node_modules/tracker
 gulp deploy
 gulp nw
 ```
