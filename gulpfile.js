@@ -264,8 +264,11 @@ gulp.task('sync', function() {
     var cssFiles = './css/**/*',
         images = './images/**/*',
         fonts = './fonts/**/*',
+        libs = './libs/**/*',
         lttNw = './node_modules/ltt-nw/**/*',
         js = './nw/**/*.js';
+
+    gulp.src(libs).pipe(gulp.dest([buildDir, 'libs/'].join('/')));
     gulp.src(cssFiles)
         .pipe(watch(cssFiles, function(files) {
             return files.pipe(gulp.dest([buildDir, 'css/'].join('/')));
