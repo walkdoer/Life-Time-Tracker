@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "tracker": "./node_modules/tracker",
     "body-parser": "~1.10.0",
     "chart.js": "^1.0.2",
     "d3": "^3.5.5",
