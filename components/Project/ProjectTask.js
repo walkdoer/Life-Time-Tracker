@@ -199,11 +199,11 @@ module.exports = React.createClass({
         });
     },
 
-    deleteVersion: function () {
+    deleteVersion: function (version) {
         console.log('delete version');
         swal({
-            title: "Are you sure?",
-            text: "You will not be able to recover this imaginary file!",
+            title: 'Are you sure to delete ' + version.name + '?',
+            text: "You will not be able to recover!",
             type: "warning",
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
@@ -213,9 +213,9 @@ module.exports = React.createClass({
             closeOnCancel: false
         }, function(isConfirm){
             if (isConfirm) {
-                swal("Deleted!", "Your imaginary file has been deleted.", "success");
-            } else {
-                swal("Cancelled", "Your imaginary file is safe :)", "error");
+                DataAPI.Version.delete(version._id).then(function () {
+                    swal("Deleted!", "Your version has been deleted.", "success");
+                });
             }
         });
     },
@@ -560,7 +560,7 @@ var VersionInfo = React.createClass({
                     </span>
                 </div>
                 <div className="ltt_p-projectDetail-versionInfo-btns">
-                    <Button onClick={this.props.onDeleteVersion} bsStyle="danger" bsSize="xsmall">Delete</Button>
+                    <Button onClick={this.props.onDeleteVersion.bind(this, version)} bsStyle="danger" bsSize="xsmall">Delete</Button>
                 </div>
             </div>
         ) : null;
