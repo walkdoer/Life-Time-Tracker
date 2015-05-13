@@ -44,21 +44,42 @@ module.exports = React.createClass({
         if (yesterday) {
             yesterDayLogClassTime = yesterday.classTime;
         }
-        if (this.props.backgroundColor) {
-            var highchartOptions = {
-                chart: {
-                    backgroundColor: this.props.backgroundColor
+        var highchartOptions = {
+            title: false,
+            plotOptions: {
+                pie: {
+                    innerSize: '60%',
+                    dataLabels: {
+                        enabled: true
+                    }
                 }
+            },
+            legend: {
+                enabled: false,
+                align: 'right',
+                verticalAlign: 'top',
+                layout: 'vertical',
+                x: 0,
+                y: 100
+            },
+            exporting: {
+                enabled: false
+            }
+        };
+        if (this.props.backgroundColor) {
+            highchartOptions.chart = {
+                backgroundColor: this.props.backgroundColor
             };
         }
         return (
             <div className="ltt_c-LogClassPie">
                 {logClassTime ? <Pie data={logClassTime} highchartOptions={highchartOptions}/> : null }
-                {yesterDayLogClassTime ? <Pie data={yesterDayLogClassTime} highchartOptions={highchartOptions}/> : null }
                 <LoadingMask loaded={this.state.loaded}/>
             </div>
         );
     },
+
+    //{yesterDayLogClassTime ? <Pie data={yesterDayLogClassTime} highchartOptions={highchartOptions}/> : null }
 
     componentDidMount: function (argument) {
         var that = this;
