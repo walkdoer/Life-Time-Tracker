@@ -227,3 +227,30 @@
   height: 150px;
   min-height: 150px;
 }
+
+.ltt_c-LogClassPie-changes{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ltt_c-LogClassPie-changes .changeItem{
+  flex: 50%;
+  text-align: center;
+  font-size:12px;
+}
+
+.ltt_c-LogClassPie-changes .changeItem .name{
+  margin-right:1px;
+}
+
+.ltt_c-LogClassPie-changes .changeItem .fa{
+  margin-right:1px;
+}
+
+.ltt_c-LogClassPie-changes .changeItem.down .num{
+  color: #DC1313;
+}
+
+.ltt_c-LogClassPie-changes .changeItem.rise .num{
+  color:green;
+}

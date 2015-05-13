@@ -50,7 +50,14 @@ module.exports = React.createClass({
                 pie: {
                     innerSize: '60%',
                     dataLabels: {
-                        enabled: true
+                        enabled: true,
+                        distance: 3,
+                        connectorPadding: 5,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black',
+                            fontSize: "11px"
+                        }
                     }
                 }
             },
@@ -74,6 +81,45 @@ module.exports = React.createClass({
         return (
             <div className="ltt_c-LogClassPie">
                 {logClassTime ? <Pie data={logClassTime} highchartOptions={highchartOptions}/> : null }
+                <div className="ltt_c-LogClassPie-changes">
+                {logClasses.map(function (logClass) {
+                    var time = 0, yesterdayTime;
+                    var classId = logClass.value;
+                    var data;
+                    if (!_.isEmpty(logClassTime)) {
+                        data = logClassTime.filter(function(item) {
+                            return item.id === classId;
+                        })[0];
+                        if (data) {
+                            time = data.count;
+                        }
+                    }
+                    if (!_.isEmpty(yesterDayLogClassTime)) {
+                        data = yesterDayLogClassTime.filter(function(item) {
+                            return item.id === classId;
+                        })[0];
+                        if (data) {
+                            yesterdayTime = data.count;
+                        }
+                    }
+                    var progressNumber, progressPercentage, progress;
+                    if (yesterdayTime > 0) {
+                        progressNumber = time - yesterdayTime;
+                        progressPercentage = progressNumber / yesterdayTime;
+                        progress = (
+                            <p className={'changeItem ' + (progressNumber > 0 ? 'rise' : (progressNumber < 0 ? 'down' : 'equal'))}>
+                                <span className="name">{logClass.text}</span>
+                                <span className="num">
+                                <i className={"fa fa-" + (progressNumber > 0 ? 'long-arrow-up' :
+                                    (progressNumber < 0 ? 'long-arrow-down' : 'minus'))}></i>
+                                {numeral(progressPercentage * 100).format('0.0')}%
+                                </span>
+                            </p>
+                        );
+                    }
+                    return progress;
+                })}
+                </div>
                 <LoadingMask loaded={this.state.loaded}/>
             </div>
         );
