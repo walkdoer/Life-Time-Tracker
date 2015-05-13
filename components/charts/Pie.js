@@ -16,6 +16,14 @@ var Pie = React.createClass({
         return R.div({className: className});
     },
 
+    componentDidMount: function () {
+        this.setData(this.props.data);
+    },
+
+    componentWillUpdate: function (nextProps) {
+        this.setData(nextProps.data);
+    },
+
     setData: function (data) {
         this.props.data = data;
         if (data) {

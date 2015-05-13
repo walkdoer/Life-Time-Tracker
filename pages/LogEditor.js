@@ -26,6 +26,7 @@ var Notify = require('../components/Notify');
 var Progress = require('../components/Progress');
 var DataAPI = require('../utils/DataAPI');
 var BindStore = require('../mixins/BindStore');
+var LogClassPie = require('../components/LogClassPie');
 
 /** Store */
 var ProjectStore = require('../stores/ProjectStore');
@@ -92,6 +93,7 @@ var Page = React.createClass({
                         onDateChange={this.onDateChange}
                         ref="datePicker"/>
                     <ModalTrigger modal={<DateGoToWindow onGoto={this.gotoDate}/>} ref="dateGoToWindow"><span></span></ModalTrigger>
+                    <LogClassPie/>
                     <div className="ltt_c-sidebar-splitline">Projects</div>
                     <ProjectInfo date={this.state.current}/>
                 </aside>

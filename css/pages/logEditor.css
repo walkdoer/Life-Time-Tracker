@@ -197,4 +197,24 @@
   border-bottom: 1px #ddd solid;
   margin: 10px;
 }
+/*
+.ltt_c-page-logEditor .ltt_c-Board{
+  flex-direction: column;
+}
+.ltt_c-page-logEditor .ltt_c-Board,
+.ltt_c-page-logEditor .ltt_c-Board-item-number{
+  font-size: 15px;
+}
+.ltt_c-page-logEditor .ltt_c-Board-item{
+  display: flex;
+}
 
+.ltt_c-page-logEditor .ltt_c-Board-item-number{
+  margin-top:0px;
+}
+
+.ltt_c-page-logEditor .ltt_c-Board-item-number,
+.ltt_c-page-logEditor .ltt_c-Board-item-name,
+.ltt_c-page-logEditor .ltt_c-Board-item-change{
+  padding: 10px;
+}*/
