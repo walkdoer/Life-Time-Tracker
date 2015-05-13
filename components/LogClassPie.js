@@ -44,10 +44,17 @@ module.exports = React.createClass({
         if (yesterday) {
             yesterDayLogClassTime = yesterday.classTime;
         }
+        if (this.props.backgroundColor) {
+            var highchartOptions = {
+                chart: {
+                    backgroundColor: this.props.backgroundColor
+                }
+            };
+        }
         return (
             <div className="ltt_c-LogClassPie">
-                {logClassTime ? <Pie data={logClassTime}/> : null }
-                {yesterDayLogClassTime ? <Pie data={yesterDayLogClassTime}/> : null }
+                {logClassTime ? <Pie data={logClassTime} highchartOptions={highchartOptions}/> : null }
+                {yesterDayLogClassTime ? <Pie data={yesterDayLogClassTime} highchartOptions={highchartOptions}/> : null }
                 <LoadingMask loaded={this.state.loaded}/>
             </div>
         );

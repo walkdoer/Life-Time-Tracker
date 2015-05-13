@@ -31,7 +31,7 @@ var Pie = React.createClass({
                 title: this.props.title,
                 $el: $(this.getDOMNode()),
                 data: pieConvertor.dispose(data)
-            });
+            }, this.props.highchartOptions);
         }
     }
 });

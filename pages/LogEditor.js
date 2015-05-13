@@ -93,7 +93,7 @@ var Page = React.createClass({
                         onDateChange={this.onDateChange}
                         ref="datePicker"/>
                     <ModalTrigger modal={<DateGoToWindow onGoto={this.gotoDate}/>} ref="dateGoToWindow"><span></span></ModalTrigger>
-                    <LogClassPie/>
+                    <LogClassPie backgroundColor="#f6f6f6"/>
                     <div className="ltt_c-sidebar-splitline">Projects</div>
                     <ProjectInfo date={this.state.current}/>
                 </aside>
