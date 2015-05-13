@@ -127,11 +127,11 @@ module.exports = React.createClass({
 
     //{yesterDayLogClassTime ? <Pie data={yesterDayLogClassTime} highchartOptions={highchartOptions}/> : null }
 
-    componentDidMount: function (argument) {
+    loadData: function (date) {
         var that = this;
         DataAPI.stat({
-            start: new Moment().startOf('day').format(DATE_FORMAT),
-            end: new Moment().endOf('day').format(DATE_FORMAT)
+            start: new Moment(date).startOf('day').format(DATE_FORMAT),
+            end: new Moment(date).endOf('day').format(DATE_FORMAT)
         }).then(function (statResult) {
             that.setState({
                 loaded: true,
@@ -139,13 +139,25 @@ module.exports = React.createClass({
             });
         }).then(function () {
             return DataAPI.stat({
-                start: new Moment().subtract(1, 'day').startOf('day').format(DATE_FORMAT),
-                end: new Moment().subtract(1, 'day').endOf('day').format(DATE_FORMAT)
+                start: new Moment(date).subtract(1, 'day').startOf('day').format(DATE_FORMAT),
+                end: new Moment(date).subtract(1, 'day').endOf('day').format(DATE_FORMAT)
             });
         }).then(function (statResult) {
             that.setState({
                 yesterday: statResult
             });
         });
+    },
+
+    componentDidMount: function () {
+        this.loadData(this.props.date);
+    },
+
+    componentWillReceiveProps: function (nextProps) {
+        this.loadData(nextProps.date);
+    },
+
+    update: function () {
+        this.loadData(this.props.date);
     }
 })

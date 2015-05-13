@@ -93,7 +93,7 @@ var Page = React.createClass({
                         onDateChange={this.onDateChange}
                         ref="datePicker"/>
                     <ModalTrigger modal={<DateGoToWindow onGoto={this.gotoDate}/>} ref="dateGoToWindow"><span></span></ModalTrigger>
-                    <LogClassPie backgroundColor="#f6f6f6"/>
+                    <LogClassPie date={this.state.current} backgroundColor="#f6f6f6" ref="logClassPie"/>
                     <div className="ltt_c-sidebar-splitline">Projects</div>
                     <ProjectInfo date={this.state.current}/>
                 </aside>
@@ -170,6 +170,7 @@ var Page = React.createClass({
     },
 
     onSave: function () {
+        this.refs.logClassPie.update();
         Bus.emit(EVENT.UPDATE_APP_INFO);
         //Bus.emit(EVENT.CHECK_SYNC_STATUS);
     },
