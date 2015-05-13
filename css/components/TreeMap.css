@@ -10,7 +10,7 @@
   position: absolute;
   text-indent: 2px;
 }
-
+.ltt_c-chart-D3TreeMap-content,
 .ltt_c-chart-TreeMap-content{
   width: 100%;
 }
@@ -54,4 +54,13 @@
 
 .ltt_c-chart-TreeMap .children:hover rect.child {
   fill: #bbb;
+}
+
+.ltt_c-chart-D3TreeMap .node {
+  border: solid 1px white;
+  font: 10px sans-serif;
+  line-height: 12px;
+  overflow: hidden;
+  position: absolute;
+  text-indent: 2px;
 }

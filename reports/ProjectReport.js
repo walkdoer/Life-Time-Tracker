@@ -14,7 +14,8 @@ var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 /** components */
 var DateRangePicker = require('../components/DateRangePicker');
 var ActivityBar = require('../components/charts/ActivityBar');
-
+var D3TreeMap = require('../components/charts/D3TreeMap');
+var DataAPI = require('../utils/DataAPI');
 
 /** constant */
 var DATE_FORMAT = 'YYYY-MM-DD';
@@ -27,13 +28,15 @@ module.exports = React.createClass({
     getInitialState: function () {
         return {
             startDate: new Moment().subtract(1, 'month').toDate(),
-            endDate: new Moment().toDate()
+            endDate: new Moment().toDate(),
+            root: null
         };
     },
 
     render: function () {
         return (
             <div className="ltt_c-report ltt_c-report-projects">
+                <D3TreeMap root={this.state.root}/>
                 <div>
                      <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
                             onDateRangeChange={this.onDateRangeChange}/>
@@ -57,6 +60,47 @@ module.exports = React.createClass({
             startDate: start,
             endDate: end,
         });
+    },
+
+    componentDidMount: function () {
+        this.loadProjectData();
+    },
+
+
+    loadProjectData: function () {
+        var that = this;
+        DataAPI.Log.load({
+            sum: true,
+            group: 'project'
+        })
+        .then(function (data) {
+            var adaptedData = that.adaptData(data);
+            that.setState({
+                root: adaptedData
+            });
+        })
+        .catch(function (err) {
+            console.error(err.stack);
+        });
+    },
+
+    adaptData: function (datas) {
+        return {
+            name: 'project map',
+            children: datas.map(function (data) {
+                var project = data._id;
+                if (project === null) {
+                    return {
+                        name: '未归类',
+                        size: data.totalTime
+                    };
+                }
+                return {
+                    name: project.name,
+                    size: data.totalTime
+                };
+            })
+        };
     }
 
 });

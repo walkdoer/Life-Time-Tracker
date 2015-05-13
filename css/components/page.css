@@ -29,3 +29,9 @@
     overflow: overlay;
     padding: 20px;
 }
+
+.ltt_c-report-projects .ltt_c-chart-D3TreeMap{
+    margin-top:10px;
+    margin-bottom:10px;
+    height: 300px;
+}
