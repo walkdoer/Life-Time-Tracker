@@ -223,19 +223,19 @@ var Footer = React.createClass({
         this.updateLastTimeToken = this.updateLastTime.bind(this);
         Bus.addListener(EVENT.DOING_LOG, this.updateLastTimeToken);
         Bus.addListener(EVENT.UPDATE_APP_INFO, this.loadAppInfo);
-        Bus.addListener(EVENT.CHECK_SYNC_STATUS, this.checkSyncStatus);
+        //Bus.addListener(EVENT.CHECK_SYNC_STATUS, this.checkSyncStatus);
     },
 
     componentDidMount: function () {
         var that = this;
         this.loadAppInfo();
-        this.checkSyncStatus();
+        //this.checkSyncStatus();
     },
 
     componentWillUnmount: function () {
         Bus.removeListener(EVENT.DOING_LOG, this.updateLastTimeToken);
         Bus.removeListener(EVENT.UPDATE_APP_INFO, this.loadAppInfo);
-        Bus.removeListener(EVENT.CHECK_SYNC_STATUS, this.checkSyncStatus);
+        //Bus.removeListener(EVENT.CHECK_SYNC_STATUS, this.checkSyncStatus);
     },
 
     loadAppInfo: function () {

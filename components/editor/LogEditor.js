@@ -649,7 +649,6 @@ var LogEditor = React.createClass({
     },
 
     save: function (content) {
-        var start = new Date().getTime();
         var that = this;
         var title = this.props.title;
         if (this.__saveing) { console.log('saving log is going'); return; }
@@ -668,6 +667,7 @@ var LogEditor = React.createClass({
         if (!_.isEmpty(checkResult.warns)) {
             Notify.warning('warn from import log');
         }
+        var start = new Date().getTime();
         //import into database, for stat purpose
         !hasError && Ltt.sdk.importLogContent(title, content).then(function (err) {
             NProgress.done();
