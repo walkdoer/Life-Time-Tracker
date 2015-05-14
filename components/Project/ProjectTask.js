@@ -406,29 +406,51 @@ module.exports = React.createClass({
             name: this.state.project.name,
             children: []
         };
-        var parentTask = {
-            children: this.state.tasks
-        };
+        var includeVersion = !this.props.versionId; //if user view the whole project, then show version in the tree map
+        var tasks = this.state.tasks;
+        var currentTask;
+        var versions = this.state.project.versions;
+        if (includeVersion && !_.isEmpty(versions)) {
+            currentTask = {
+                children: versions.map(function (version) {
+                    var versionId = version._id;
+                    return _.extend({
+                        name: version.name,
+                        children: tasks.filter(function(task) {
+                            return task.versionId === versionId;
+                        })
+                    });
+                })
+            };
+        } else {
+            currentTask = {
+                children: tasks
+            };
+        }
         var children = root.children;
-        var queue = [].concat(this.state.tasks);
-        var task, currentNode = root;
+        var queue = [].concat(currentTask.children);
+        var task, currentNode = root, parentTask = null;
         while (queue.length) {
             children = currentNode.children;
             task = queue.pop();
-            if (children.length === parentTask.children.length) {
-                children = parentNode.children;
-                currentNode = parentNode;
-            }
             newNode = {
                 name: task.name,
                 value: task.totalTime
             };
             children.push(newNode);
+            if (children.length === currentTask.children.length) {
+                currentNode = currentNode.parent;
+                if (currentNode) {
+                    children = currentNode.children;
+                }
+                currentTask = currentTask.parent;
+            }
             if (!_.isEmpty(task.children)) {
                 queue = queue.concat(task.children);
                 newNode.children = [];
-                parentTask = task;
-                parentNode = currentNode;
+                task.parent = currentTask;
+                currentTask = task;
+                newNode.parent = currentNode;
                 currentNode = newNode;
             }
         }
