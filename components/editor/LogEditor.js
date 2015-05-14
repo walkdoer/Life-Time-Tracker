@@ -669,7 +669,7 @@ var LogEditor = React.createClass({
         }
         var start = new Date().getTime();
         //import into database, for stat purpose
-        !hasError && Ltt.sdk.importLogContent(title, content).then(function (err) {
+        !hasError && DataAPI.importLogContent(title, content).then(function () {
             NProgress.done();
             that.props.onSave(content);
             that.__saveing = false;
