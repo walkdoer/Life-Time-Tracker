@@ -141,6 +141,9 @@ module.exports = React.createClass({
                                 data={task}
                                 key={task._id}
                                 taskId={taskId}
+                                version={!currentVersionId && project.versions.filter(function (version) {
+                                    return version._id === task.versionId;
+                                })[0]}
                                 onTaskChange={this.onTaskChange}
                                 onClick={that.openTask}
                                 selected={task._id === taskId}/>

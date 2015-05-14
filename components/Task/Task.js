@@ -55,6 +55,7 @@ var Task = React.createClass({
     render: function () {
         var task = this.props.data;
         var taskId = this.props.taskId;
+        var version = this.props.version;
         var url;
         var that = this;
         var progress;
@@ -98,19 +99,24 @@ var Task = React.createClass({
                     <span className={"ltt_c-task-mark " + (this.state.marked ? 'marked': '')} onClick={this.toggleMark}>
                         <i className={this.state.marked ? 'fa fa-flag' : 'fa fa-flag-o'}></i>
                     </span>
-                    <div className="ltt_c-task-timeInfo">
-                        <span title={new Moment(task.createTime).format('YYYY-MM-DD HH:mm:ss')}>
-                            <i className="fa fa-plus" title="create time"></i>
-                            {new Moment(task.createTime).fromNow()}
-                        </span>
-                        <span>
-                            <i className="fa fa-clock-o" title="total time"></i>
-                            {Moment.duration(task.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
-                        </span>
-                        <span title={new Moment(task.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
-                            <i className="fa fa-user" title="last active"></i>
-                            {new Moment(task.lastActiveTime).fromNow()}
-                        </span>
+                    <div className="ltt_c-task-basicInfo">
+                        <div className="ltt_c-task-basicInfo-version">
+                            {version ? <span><i className="fa fa fa-sitemap"></i>{version.name}</span> : null}
+                        </div>
+                        <div className="ltt_c-task-timeInfo">
+                            <span className="ltt_c-task-timeInfo-item" title={new Moment(task.createTime).format('YYYY-MM-DD HH:mm:ss')}>
+                                <i className="fa fa-plus" title="create time"></i>
+                                {new Moment(task.createTime).fromNow()}
+                            </span>
+                            <span  className="ltt_c-task-timeInfo-item">
+                                <i className="fa fa-clock-o" title="total time"></i>
+                                {Moment.duration(task.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
+                            </span>
+                            <span  className="ltt_c-task-timeInfo-item" title={new Moment(task.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
+                                <i className="fa fa-user" title="last active"></i>
+                                {new Moment(task.lastActiveTime).fromNow()}
+                            </span>
+                        </div>
                     </div>
                     {progress}
                 </div>

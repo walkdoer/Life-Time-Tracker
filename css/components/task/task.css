@@ -69,14 +69,25 @@
   right: 35px;
 }
 
+.ltt_c-task-basicInfo{
+   display:flex;
+   padding: 5px 0px;
+   justify-content: space-between;
+}
+
+.ltt_c-task-basicInfo-version{
+   color: #ADADAD;
+}
 .ltt_c-task-timeInfo{
     color: #ADADAD;
     text-align: right;
-    padding: 5px;
+}
+.ltt_c-task-timeInfo-item{
+  margin-right:5px;
 }
 
-.ltt_c-task-timeInfo .fa{
-    margin: 0 5px 0 8px;
+.ltt_c-task-basicInfo .fa{
+    margin: 0 5px 0 0px;
 }
 
 .ltt_c-task .ltt_c-taskList{
