@@ -75,7 +75,7 @@ var routes = (
         <Route name="affects" path="/affects" handler={Affects}/>
         <Route name="goals" path="/goals" handler={Goals}/>
         <Route name="logCheck" path="logCheck" handler={LogCheck}/>
-        <Route name="configs" path="configs" handler={Settings}/>
+        <Route name="settings" path="settings" handler={Settings}/>
         <NotFoundRoute handler={Page404}/>
         <DefaultRoute handler={Dashboard}/>
     </Route>

@@ -191,7 +191,7 @@ var Header = React.createClass({
     },
 
     openConfigs: function () {
-        this.transitionTo('configs');
+        this.transitionTo('settings');
     }
 
 });
