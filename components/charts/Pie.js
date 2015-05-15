@@ -39,6 +39,7 @@ var Pie = React.createClass({
     },
 
     updateData: function (data) {
+        if (!data) {return;}
         var index = this.chart.data('highchartsChart');
         var chart = Highcharts.charts[index];
         data = pieConvertor.dispose(data);
