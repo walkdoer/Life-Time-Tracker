@@ -7,6 +7,7 @@
 .ltt_c-searchBox input{
     outline: none;
     border: none;
+    flex: 1;
     background: #292d30;
     color: #fff;
 }
