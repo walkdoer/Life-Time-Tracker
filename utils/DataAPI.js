@@ -157,6 +157,16 @@ module.exports = {
         delete: function (id) {
             return deleteObj(url('/versions/' + id));
         }
+    },
+
+    Settings: {
+        load: function () {
+            return get(url('/settings'));
+        },
+
+        save: function (settings) {
+            return post(url('/settings'), settings);
+        }
     }
 };
 

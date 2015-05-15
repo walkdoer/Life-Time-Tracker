@@ -112,6 +112,9 @@ var Header = React.createClass({
                                 <Button onClick={this.openLogCheck}>
                                     <i className="fa fa-file-text" title="check log file"></i>
                                 </Button>
+                                <Button onClick={this.openConfigs}>
+                                    <i className="fa fa-cogs" title="applicaton configs"></i>
+                                </Button>
                                 <Button className="ltt_c-header-debugBtn js-debugApplication" onClick={this.debugApplication}>
                                     <i className="fa fa-gear"></i>
                                 </Button>
@@ -185,6 +188,10 @@ var Header = React.createClass({
 
     openLogCheck: function () {
         this.transitionTo('logCheck');
+    },
+
+    openConfigs: function () {
+        this.transitionTo('configs');
     }
 
 });

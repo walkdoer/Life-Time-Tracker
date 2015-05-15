@@ -26,7 +26,8 @@ var Dashboard = require('./pages/Dashboard'),
     Affects = require('./pages/Affects'),
     Projects = require('./pages/Projects'),
     Goals = require('./pages/Goals'),
-    LogCheck = require('./pages/LogCheck');
+    LogCheck = require('./pages/LogCheck'),
+    Settings = require('./pages/Settings');
 
 /** Components */
 var ProjectDetail = require('./components/ProjectDetail'),
@@ -74,6 +75,7 @@ var routes = (
         <Route name="affects" path="/affects" handler={Affects}/>
         <Route name="goals" path="/goals" handler={Goals}/>
         <Route name="logCheck" path="logCheck" handler={LogCheck}/>
+        <Route name="configs" path="configs" handler={Settings}/>
         <NotFoundRoute handler={Page404}/>
         <DefaultRoute handler={Dashboard}/>
     </Route>
