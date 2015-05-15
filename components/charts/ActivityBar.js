@@ -24,93 +24,6 @@ var Notify = require('../Notify');
 /** constant */
 var DATE_FORMAT = 'YYYY-MM-DD';
 
-var ActivityBar = React.createClass({
-
-    mixins: [PureRenderMixin],
-
-    getInitialState: function () {
-        return {
-            granularity: 'day',
-            data: []
-        };
-    },
-
-    render: function () {
-        var granularity = this.state.granularity;
-        return (
-            <div>
-                <ButtonGroup onClick={this.changeActivityGranularity}>
-                    {['year', 'month' ,'week', 'day'].map(function (name) {
-                        return <Button active={name === granularity}>{name}</Button>
-                    })}
-                </ButtonGroup>
-                <TimeColumn name={this.props.name} data={this.state.data}/>
-            </div>
-        );
-    },
-
-    changeActivityGranularity: function (e) {
-        var granularity = e.target.textContent.toLowerCase();
-        this.setState({
-            granularity: granularity
-        }, function () {
-            this.loadActivities(this.props.params, this.state.granularity);
-        });
-    },
-
-    componentDidMount: function () {
-        this.loadActivities(this.props.params, this.state.granularity);
-    },
-
-    componentWillReceiveProps: function (nextProps) {
-        this.loadActivities(nextProps.params, this.state.granularity);
-    },
-
-    loadActivities: function (params, granularity) {
-        var id;
-        var that = this;
-        DataAPI.Log.load(extend({
-            sum: true,
-            group: granularity ? 'date.' + granularity : 'date'
-        }, params, this.getDateParams()))
-        .then(function (data) {
-            data = data.sort(function (a, b) {
-                if (granularity === 'week') {
-                    var mStart = new Moment(that.props.startDate);
-                    var mA = new Moment(mStart.year() + '-W' + (a._id - 1));
-                    var mB = new Moment(mStart.year() + '-W' + (b._id - 1));
-                    return mA.unix() - mB.unix();
-                } else {
-                    return new Moment(a._id).unix() - new Moment(b._id).unix();
-                }
-            }).map(function (item) {
-                if (granularity === 'week') {
-                    var mStart = new Moment(that.props.startDate);
-                    time = new Moment(mStart.year() + '-W' + (item._id-1));
-                    return [time.unix() * 1000, item.totalTime];
-                } else {
-                    return [new Moment(item._id).unix() * 1000, item.totalTime];
-                }
-
-            });
-            that.setState({
-                data: data
-            });
-        }).catch(function (err) {
-            Notify.error('load activity for' + that.props.name +  ' have failed');
-            console.error(err.stack);
-        });
-    },
-
-
-    getDateParams: function () {
-        return {
-            start: new Moment(this.props.startDate).format(DATE_FORMAT),
-            end: new Moment(this.props.endDate).format(DATE_FORMAT)
-        };
-    }
-});
-
 
 
 module.exports = React.createClass({
@@ -214,3 +127,89 @@ module.exports = React.createClass({
 });
 
 
+var ActivityBar = React.createClass({
+
+    mixins: [PureRenderMixin],
+
+    getInitialState: function () {
+        return {
+            granularity: 'day',
+            data: []
+        };
+    },
+
+    render: function () {
+        var granularity = this.state.granularity;
+        return (
+            <div className="ltt_c-chart-activityBar-activities">
+                <ButtonGroup onClick={this.changeActivityGranularity}>
+                    {['year', 'month' ,'week', 'day'].map(function (name) {
+                        return <Button active={name === granularity}>{name}</Button>
+                    })}
+                </ButtonGroup>
+                <TimeColumn name={this.props.name} data={this.state.data}/>
+            </div>
+        );
+    },
+
+    changeActivityGranularity: function (e) {
+        var granularity = e.target.textContent.toLowerCase();
+        this.setState({
+            granularity: granularity
+        }, function () {
+            this.loadActivities(this.props.params, this.state.granularity);
+        });
+    },
+
+    componentDidMount: function () {
+        this.loadActivities(this.props.params, this.state.granularity);
+    },
+
+    componentWillReceiveProps: function (nextProps) {
+        this.loadActivities(nextProps.params, this.state.granularity);
+    },
+
+    loadActivities: function (params, granularity) {
+        var id;
+        var that = this;
+        DataAPI.Log.load(extend({
+            sum: true,
+            group: granularity ? 'date.' + granularity : 'date'
+        }, params, this.getDateParams()))
+        .then(function (data) {
+            data = data.sort(function (a, b) {
+                if (granularity === 'week') {
+                    var mStart = new Moment(that.props.startDate);
+                    var mA = new Moment(mStart.year() + '-W' + (a._id - 1));
+                    var mB = new Moment(mStart.year() + '-W' + (b._id - 1));
+                    return mA.unix() - mB.unix();
+                } else {
+                    return new Moment(a._id).unix() - new Moment(b._id).unix();
+                }
+            }).map(function (item) {
+                if (granularity === 'week') {
+                    var mStart = new Moment(that.props.startDate);
+                    time = new Moment(mStart.year() + '-W' + (item._id-1));
+                    return [time.unix() * 1000, item.totalTime];
+                } else {
+                    return [new Moment(item._id).unix() * 1000, item.totalTime];
+                }
+
+            });
+            that.setState({
+                data: data
+            });
+        }).catch(function (err) {
+            Notify.error('load activity for' + that.props.name +  ' have failed');
+            console.error(err.stack);
+        });
+    },
+
+
+    getDateParams: function () {
+        return {
+            start: new Moment(this.props.startDate).format(DATE_FORMAT),
+            end: new Moment(this.props.endDate).format(DATE_FORMAT)
+        };
+    }
+});
