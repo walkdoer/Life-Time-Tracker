@@ -38,7 +38,9 @@ module.exports = React.createClass({
                     </Row>
                     <Row>
                         <Col xs={6} md={4}>
-                            <Input  name="startDate" type='text' label='Start Day' placeholder='the first day start using this app'
+                            <Input  name="startDate" type='text' label='Start Day'
+                                placeholder='the first day start using this app'
+                                help="Start date is the first day when you log your activity."
                                 value={settings.startDate} onChange={this.onSettingChange}/>
                         </Col>
                     </Row>
@@ -46,7 +48,7 @@ module.exports = React.createClass({
                         <Col xs={12} md={8}>
                         <div class="form-group">
                             <label class="control-label">
-                                <span>Log file position</span>
+                                <span>Log file folder</span>
                             </label>
                             <input type="text" name="logDir"
                                 placeholder="full path"
@@ -54,6 +56,7 @@ module.exports = React.createClass({
                                 webkitdirectory
                                 onChange={this.onSettingChange}
                                 value={settings.logDir}/>
+                            <span className="help-block">where to save your log file, if you have Dropbox, you may set this option to your Dropbox folder , so you can backup your log data in Dropbox.</span>
                         </div>
                         </Col>
                     </Row>
