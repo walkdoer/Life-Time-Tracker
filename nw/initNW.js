@@ -104,26 +104,26 @@
         });
 
 
-        function initApp() {
-            Ltt.init();
-            Ltt.sdk = sdk;
-            root = global;
-            root.Ltt = Ltt;
-            window.Ltt = Ltt;
-            root.nwGui = gui;
-            //a series of init action to intialize components
-            initMenu();
-            initShortcut();
-            Ltt.getWindow().on('close', function(event) {
-                // Hide the window to give user the feeling of closing immediately
-                this.hide();
-                if (event === 'quit') {
-                    this.close(true);
-                }
-            });
-        }
     }
 
+    function initApp() {
+        Ltt.init();
+        Ltt.sdk = sdk;
+        root = global;
+        root.Ltt = Ltt;
+        window.Ltt = Ltt;
+        root.nwGui = gui;
+        //a series of init action to intialize components
+        initMenu();
+        initShortcut();
+        Ltt.getWindow().on('close', function(event) {
+            // Hide the window to give user the feeling of closing immediately
+            this.hide();
+            if (event === 'quit') {
+                this.close(true);
+            }
+        });
+    }
     function initMenu() {
         var win = Ltt.getWindow();
         var menubar = new gui.Menu({ type: "menubar" });
