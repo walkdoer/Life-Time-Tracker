@@ -23,6 +23,7 @@ var DataAPI = require('../utils/DataAPI');
 var ENERGY_STORAGE_KEY = 'energy_value';
 var SLEEP_VALUE_STORAGE_KEY = 'sleep_value';
 var ENERGY_CONFIG_STORAGE_KEY = 'energy_config';
+var NORMAL_COST_STORAGE_KEY = 'normal_cost';
 
 module.exports = React.createClass({
 
@@ -30,7 +31,8 @@ module.exports = React.createClass({
         return {
             settings: {},
             energy: store(ENERGY_STORAGE_KEY) || 100,
-            sleepValue: store(SLEEP_VALUE_STORAGE_KEY) || 10
+            sleepValue: store(SLEEP_VALUE_STORAGE_KEY) || 10,
+            normalCost: store(NORMAL_COST_STORAGE_KEY) || 3
         };
     },
 
@@ -106,7 +108,11 @@ module.exports = React.createClass({
                     <Col xs={4} md={2}>
                         <Input name="energyValue" type='number' label='Energy Value'
                             value={this.state.energy} onChange={this.onEneryChange}/>
+                        <Input name="normalCost" type='number' label='一般消耗'
+                            addonAfter="Per Hour"
+                            value={this.state.normalCost} onChange={this.onNormalChange}/>
                         <Input name="Sleep Value" type='number' label='睡眠值'
+                            addonAfter="Per Hour"
                             value={this.state.sleepValue} onChange={this.onSleepValueChange}/>
                     </Col>
                 </Row>
@@ -134,6 +140,14 @@ module.exports = React.createClass({
         store(SLEEP_VALUE_STORAGE_KEY, value);
         this.setState({
             sleepValue: value
+        });
+    },
+
+    onNormalChange: function (e) {
+        var value = numeral(e.target.value).value();
+        store(NORMAL_COST_STORAGE_KEY, value);
+        this.setState({
+            normalCost: value
         });
     },
 
