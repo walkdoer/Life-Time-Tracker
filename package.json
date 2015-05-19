@@ -3,23 +3,17 @@
   "version": "0.1.7",
   "author": "andrew",
   "license": "ISC",
-  "main": "boot.js",
   "main": "index.html",
   "window": {
-      "title": "Life Time Tracker",
-      "icon": "./images/me.jpg",
-      "toolbar": true,
-      "frame": true,
-      "width": 1200,
-      "height": 700,
-      "position": "mouse",
-      "min_width": 1180,
-      "min_height": 700
-  },
-  "scripts": {
-    "start": "watchify -o bundle.js -v -d .",
-    "build": "NODE_ENV=production browserify . | uglifyjs -cm > js/bundle.min.js",
-    "test": "jest"
+    "title": "Life Time Tracker",
+    "icon": "./images/me.jpg",
+    "toolbar": true,
+    "frame": true,
+    "width": 1200,
+    "height": 700,
+    "position": "mouse",
+    "min_width": 1180,
+    "min_height": 700
   },
   "dependencies": {
     "body-parser": "~1.10.0",
@@ -75,7 +69,7 @@
     "gulp-watch": "~2.0.0",
     "jquery-browserify": "~1.8.1",
     "morgan": "~1.3.0",
-    "node-webkit-builder": "~1.0.4",
+    "node-webkit-builder": "^1.0.11",
     "reactify": "~0.15.2",
     "uglify-js": "~2.4.15",
     "vinyl-source-stream": "^1.1.0",
@@ -86,14 +80,12 @@
     "nvd3": "./bower_components/nvd3/nv.d3.min.js",
     "bootstrap": "./bower_components/bootstrap/dist/js/bootstrap.js",
     "noty": "./node_modules/noty/js/noty/packaged/jquery.noty.packaged.js",
-    "chart": "./bower_components/chartjs/Chart.js",
     "sweetalert": "./bower_components/sweetalert/lib/sweet-alert.js",
     "datetimepicker": "./bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js",
     "highcharts": "./bower_components/Highstock-2.1.5/js/highstock-all.js"
   },
   "browserify-shim": {
     "noty": "noty",
-    "chart": "chart",
     "datetimepicker": "datetimepicker",
     "d3": {
       "exports": "d3",

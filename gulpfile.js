@@ -300,7 +300,21 @@ gulp.task('sync', function() {
 
 gulp.task('nw', function () {
     var nw = new NwBuilder({
-        files: [ './build/**/**'],
+        files: [
+          './package.json',
+          './css/**/*',
+          './fonts/**/*',
+          './images/**/*',
+          './nw/**/*',
+          './libs/**/*',
+          './node_modules/tracker/**/*',
+          '!./node_modules/tracker/node_modules/**/**',
+          './node_modules/ltt-nw/**/*',
+          './node_modules/ltt-sdk/**/*',
+          './index.html',
+          './vendors.js',
+          './main.js'
+        ],
         platforms: ['osx64'],
         buildDir: './production',
         version: argv.version
