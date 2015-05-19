@@ -1,6 +1,4 @@
 var React = require('react');
-var store = require('store2');
-var editorStore = store.namespace('LogEditor');
 var _ = require('lodash');
 var Q = require('q');
 var RB = require('react-bootstrap');
