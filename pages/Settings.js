@@ -32,14 +32,18 @@ module.exports = React.createClass({
     statics: {
         getEnergySettings: function () {
             var content = store(ENERGY_CONFIG_STORAGE_KEY);
-            var configs = content.split('\n').map(function (config) {
-                var configObj = TrackerHelper.getLogInfo({
-                    logStr: config,
-                    noTime: true
+            var configs = [];
+            if (content) {
+                 configs = content.split('\n').map(function (config) {
+                    var configObj = TrackerHelper.getLogInfo({
+                        logStr: config,
+                        noTime: true
+                    });
+                    configObj.value = numeral(configObj.content.trim().split('=')[1]).value();
+                    return configObj;
                 });
-                configObj.value = numeral(configObj.content.trim().split('=')[1]).value();
-                return configObj;
-            });
+            }
+           
             return {
                 energy: store(ENERGY_STORAGE_KEY) || 100,
                 sleepValue: store(SLEEP_VALUE_STORAGE_KEY) || 10,
