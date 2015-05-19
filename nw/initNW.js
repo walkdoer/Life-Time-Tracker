@@ -19,6 +19,7 @@
     var sdk = require('ltt-sdk');
     var path = require('path');
     var _ = require('lodash');
+    var config = require('tracker/conf/config');
 
 
 
@@ -100,7 +101,7 @@
             initApp();
         }).fail(function(err) {
             initApp();
-            alert('Start Server Error');
+            alert('Server Alreay Start in port ' + config.serverPort);
         });
 
 

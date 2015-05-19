@@ -7,8 +7,8 @@
   "window": {
     "title": "Life Time Tracker",
     "icon": "./images/me.jpg",
-    "toolbar": true,
-    "frame": true,
+    "toolbar": false,
+    "frame": false,
     "width": 1200,
     "height": 700,
     "position": "mouse",
