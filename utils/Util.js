@@ -119,3 +119,5 @@ exports.getDoingLog = function (date, logContent) {
     }
     return target;
 };
+
+

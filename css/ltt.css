@@ -25,10 +25,21 @@
     justify-content: space-between;
     z-index: 999;
 }
-.ltt-footer .btn-group{
-    padding: 4px 8px;
+.ltt-footer-left{
+    display:flex;
 }
-.ltt-footer .btn{
+
+.ltt-footer-left .ltt_c-progress{
+    width: 200px;
+    height:16px;
+    line-height:16px;
+    margin-top: 7px;
+}
+.ltt-footer-left .btn-group{
+    padding: 4px 8px;
+    display: flex;
+}
+.ltt-footer-left .btn{
     background: linear-gradient(to bottom, #636363 0%,#323232 100%);
     border: 1px solid #434141;
     color: #ccc;

@@ -5,8 +5,11 @@ var RB = require('react-bootstrap');
 var Button = RB.Button;
 var ButtonToolbar = RB.ButtonToolbar;
 var Moment = require('moment');
+var TrackerHelper = require('tracker/helper');
 
 
+/**Components*/
+var Settings = require('../../pages/Settings');
 
 //store key
 var SK_CONTENT = 'content';
@@ -479,7 +482,6 @@ var LogEditor = React.createClass({
     _detachListenToEditor: function () {
         var session = this.editor.getSession();
         session.removeAllListeners('change');
-        console.log('remove listeners');
     },
 
     _highLightDoingLine: function (content) {

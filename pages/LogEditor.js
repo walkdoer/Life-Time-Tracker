@@ -167,6 +167,7 @@ var Page = React.createClass({
         console.log('change and fire doingLog');
         var doingLog = this.refs.logEditor.getDoingLog(content);
         Bus.emit(EVENT.DOING_LOG, doingLog);
+        Bus.emit(EVENT.LOG_CHANGE, this.state.current, content);
     },
 
     onSave: function () {

@@ -12,9 +12,11 @@ var TabPane = RB.TabPane;
 var store = require('store2');
 var numeral = require('numeral');
 var _ = require('lodash');
+var TrackerHelper = require('tracker/helper');
 
 /** Components */
 var Notify = require('../components/Notify');
+var Progress = require('../components/Progress');
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
@@ -26,6 +28,26 @@ var ENERGY_CONFIG_STORAGE_KEY = 'energy_config';
 var NORMAL_COST_STORAGE_KEY = 'normal_cost';
 
 module.exports = React.createClass({
+
+    statics: {
+        getEnergySettings: function () {
+            var content = store(ENERGY_CONFIG_STORAGE_KEY);
+            var configs = content.split('\n').map(function (config) {
+                var configObj = TrackerHelper.getLogInfo({
+                    logStr: config,
+                    noTime: true
+                });
+                configObj.value = numeral(configObj.content.trim().split('=')[1]).value();
+                return configObj;
+            });
+            return {
+                energy: store(ENERGY_STORAGE_KEY) || 100,
+                sleepValue: store(SLEEP_VALUE_STORAGE_KEY) || 10,
+                normalCost: store(NORMAL_COST_STORAGE_KEY) || 3,
+                configs: configs
+            };
+        }
+    },
 
     getInitialState: function () {
         return {
@@ -105,9 +127,16 @@ module.exports = React.createClass({
         return (
             <Grid>
                 <Row>
-                    <Col xs={4} md={2}>
+                    <Col xs={4} md={2} className="vcenter">
                         <Input name="energyValue" type='number' label='Energy Value'
                             value={this.state.energy} onChange={this.onEneryChange}/>
+                    </Col>
+                    <Col xs={8} md={4} className="vcenter">
+                        <Progress max={100} value={this.state.energy}/>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col xs={4} md={2}>
                         <Input name="normalCost" type='number' label='一般消耗'
                             addonAfter="Per Hour"
                             value={this.state.normalCost} onChange={this.onNormalChange}/>
@@ -213,6 +242,12 @@ module.exports = React.createClass({
             var content = session.getValue();
             store(ENERGY_CONFIG_STORAGE_KEY, content);
         }, 200));
+    },
+
+    componentWillUnmount: function () {
+        if (this.editor) {
+            this.editor.destroy();
+        }
     }
 
 });

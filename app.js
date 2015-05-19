@@ -29,6 +29,7 @@ var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 /** Components */
 var Header = require('./components/Header');
 var Nav = require('./components/Nav');
+var EnergyBar = require('./components/EnergyBar');
 
 /* Const */
 var NAV_OPEN = 'ltt__navOpen';
@@ -130,8 +131,11 @@ var Footer = React.createClass({
     render: function () {
         return (
             <footer className="ltt-footer">
-                <div className="btn-group">
-                    <button className="btn btn-xs"><i className="fa fa-plus"></i></button>
+                <div className="ltt-footer-left">
+                    <div className="btn-group">
+                        <button className="btn btn-xs"><i className="fa fa-plus"></i></button>
+                    </div>
+                    <EnergyBar/>
                 </div>
                 <div className="lastTime" ref="lastTime"></div>
                 <div className="ltt_c-appInfo">
