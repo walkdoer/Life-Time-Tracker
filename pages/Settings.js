@@ -7,7 +7,11 @@ var Input = RB.Input;
 var Grid = RB.Grid;
 var Row = RB.Row;
 var Col = RB.Col;
-
+var TabbedArea = RB.TabbedArea;
+var TabPane = RB.TabPane;
+var store = require('store2');
+var numeral = require('numeral');
+var _ = require('lodash');
 
 /** Components */
 var Notify = require('../components/Notify');
@@ -15,21 +19,38 @@ var Notify = require('../components/Notify');
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
 
+/** constants */
+var ENERGY_STORAGE_KEY = 'energy_value';
+var SLEEP_VALUE_STORAGE_KEY = 'sleep_value';
+var ENERGY_CONFIG_STORAGE_KEY = 'energy_config';
+
 module.exports = React.createClass({
 
     getInitialState: function () {
         return {
-            settings: {}
+            settings: {},
+            energy: store(ENERGY_STORAGE_KEY) || 100,
+            sleepValue: store(SLEEP_VALUE_STORAGE_KEY) || 10
         };
     },
 
     render: function () {
-        var settings = this.state.settings;
         return (
             <div className="ltt_c-page ltt_c-page-settings">
+                <TabbedArea defaultActiveKey={1} animation={false}>
+                    <TabPane eventKey={1} tab='App Settings'>{this.renderApplicationSettings()}</TabPane>
+                    <TabPane eventKey={2} tab='Enery Settings'>{this.renderEnerySettings()}</TabPane>
+                </TabbedArea>
+            </div>
+        );
+    },
+
+    renderApplicationSettings: function () {
+        var settings = this.state.settings;
+        return (
             <form className='ltt_c-page-settings-form'>
                 <Grid>
-                    <h3>Settings</h3>
+                    <h3>Basic Settings</h3>
                     <hr/>
                     <Row>
                         <Col xs={6} md={4}>
@@ -75,12 +96,50 @@ module.exports = React.createClass({
                     </ButtonToolbar>
                 </Grid>
             </form>
-            </div>
         );
+    },
+
+    renderEnerySettings: function () {
+        return (
+            <Grid>
+                <Row>
+                    <Col xs={4} md={2}>
+                        <Input name="energyValue" type='number' label='Energy Value'
+                            value={this.state.energy} onChange={this.onEneryChange}/>
+                        <Input name="Sleep Value" type='number' label='睡眠值'
+                            value={this.state.sleepValue} onChange={this.onSleepValueChange}/>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col xs={8} md={6}>
+                        <label className="control-label"> Energy Config</label>
+                        <pre id="energy-config"/>
+                    </Col>
+                </Row>
+            </Grid>
+        );
+    },
+
+
+    onEneryChange: function (e) {
+        var value = numeral(e.target.value).value();
+        store(ENERGY_STORAGE_KEY, value);
+        this.setState({
+            energy: value
+        });
+    },
+
+    onSleepValueChange: function (e) {
+        var value = numeral(e.target.value).value();
+        store(SLEEP_VALUE_STORAGE_KEY, value);
+        this.setState({
+            sleepValue: value
+        });
     },
 
     componentDidMount: function () {
         this.loadSettings();
+        this._initEditor();
     },
 
 
@@ -114,6 +173,32 @@ module.exports = React.createClass({
         this.setState({
             settings: settings
         });
+    },
+
+    _initEditor: function () {
+        var that = this;
+        var editor = ace.edit("energy-config");
+        this.editor = editor;
+        editor.setTheme("ace/theme/github");
+        editor.renderer.setShowGutter(false); //hide the linenumbers
+        var session = editor.getSession();
+        session.setMode("ace/mode/ltt");
+        session.setUseWrapMode(true);
+        var content = store(ENERGY_CONFIG_STORAGE_KEY);
+        if (store) {
+            editor.setValue(content, -1);
+        }
+        that._listenToEditor();
+    },
+
+    _listenToEditor: function () {
+        var that = this;
+        var editor = this.editor;
+        var session = editor.getSession();
+        session.on('change', _.debounce(function (e) {
+            var content = session.getValue();
+            store(ENERGY_CONFIG_STORAGE_KEY, content);
+        }, 200));
     }
 
 });
