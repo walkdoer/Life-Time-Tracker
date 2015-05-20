@@ -62,7 +62,7 @@ module.exports = React.createClass({
 
     componentDidMount: function () {
         var that = this;
-        this.currentDay = new Moment();
+        this.currentDay = new Moment('2015-05-21');
         if (this.intervalId) {
             this.clearInterval(this.intervalId);
         }
@@ -87,7 +87,7 @@ module.exports = React.createClass({
                     that.yesterDaySleepLog = result.sleepLog;
                     that.todayWakeLog = logs.filter(function (log) {
                         return log.signs.indexOf('wake') >= 0;
-                    });
+                    })[0];
                     that.updateEnergy(result.date, logs);
                 });
             } else {
@@ -138,6 +138,10 @@ module.exports = React.createClass({
             console.log(log.origin, value);
             return sum + value;
         }, 0);
+
+        if (this.yesterDaySleepLog && this.todayWakeLog) {
+            sum += energySettings.sleepValue * (new Moment(this.todayWakeLog.end).diff(this.yesterDaySleepLog.start, 'minutes')) / 60;
+        }
 
         return sum;
 
