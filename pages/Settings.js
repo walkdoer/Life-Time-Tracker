@@ -27,12 +27,19 @@ var SLEEP_VALUE_STORAGE_KEY = 'sleep_value';
 var ENERGY_CONFIG_STORAGE_KEY = 'energy_config';
 var NORMAL_COST_STORAGE_KEY = 'normal_cost';
 
+var defaultValue = {
+    energy: 100
+};
 module.exports = React.createClass({
 
     statics: {
 
         setEnergy: function (val) {
             store(ENERGY_STORAGE_KEY, val);
+        },
+
+        getDefaultEnergy: function () {
+            return defaultValue.energy;
         },
 
         getEnergySettings: function () {
@@ -50,7 +57,7 @@ module.exports = React.createClass({
             }
 
             return {
-                energy: store(ENERGY_STORAGE_KEY) || 100,
+                energy: store(ENERGY_STORAGE_KEY) || defaultValue.energy,
                 sleepValue: store(SLEEP_VALUE_STORAGE_KEY) || 10,
                 normalCost: store(NORMAL_COST_STORAGE_KEY) || -4,
                 configs: configs
@@ -61,7 +68,7 @@ module.exports = React.createClass({
     getInitialState: function () {
         return {
             settings: {},
-            energy: store(ENERGY_STORAGE_KEY) || 100,
+            energy: store(ENERGY_STORAGE_KEY) || defaultValue.energy,
             sleepValue: store(SLEEP_VALUE_STORAGE_KEY) || 10,
             normalCost: store(NORMAL_COST_STORAGE_KEY) || -4
         };

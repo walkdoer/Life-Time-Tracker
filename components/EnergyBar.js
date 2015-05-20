@@ -4,6 +4,7 @@ var TrackerHelper = require('tracker/helper');
 var _ = require('lodash');
 var Moment = require('moment');
 var Q = require('q');
+var store = require('store2');
 
 /** Components */
 var Settings = require('../pages/Settings');
@@ -17,27 +18,46 @@ var DataAPI = require('../utils/DataAPI');
 
 /** constants */
 var EVENT = require('../constants/EventConstant');
+var SK_ORGINGAL_ENERGY = 'storage_key_original_energy';
+var SK_SLEEP_ENERGY = 'storage_key_sleep_energy';
+var TestDate = undefined;
 
 module.exports = React.createClass({
 
     mixins: [PureRenderMixin, SetIntervalMixin],
 
     getInitialState: function () {
+        var today = new Moment(TestDate);
+        var orginEnergy = store(SK_ORGINGAL_ENERGY);
+        var sleepSum = store(SK_SLEEP_ENERGY);
+        if (orginEnergy && sleepSum) {
+            var tmpArr = orginEnergy.split(',');
+            var tmpArr2 = sleepSum.split(',');
+            if (today.diff(tmpArr[0], 'day') === 0 && today.diff(tmpArr2[0], 'day') === 0) {
+                this._originalEnergy =  parseInt(tmpArr[1]) + parseInt(tmpArr2[1]);
+            } else {
+                this._originalEnergy = Settings.getDefaultEnergy();
+            }
+        } else {
+            this._originalEnergy = Settings.getDefaultEnergy();
+        }
+        if (sleepSum) {
+            tmpArr2 = orginEnergy.split(',');
+        }
         return {
-            energy: Settings.getEnergySettings().energy,
+            energy: this._originalEnergy,
             energyCost: 0
         };
     },
 
     render: function () {
         return (
-            <Progress max={100} value={this.state.energy + this.state.energyCost}/>
+            <Progress max={100} value={this.state.energy}/>
         );
     },
 
     componentWillMount: function () {
         Bus.addListener(EVENT.LOG_CHANGE, this.updateEnergy);
-
     },
 
 
@@ -52,9 +72,12 @@ module.exports = React.createClass({
                 logs = TrackerHelper.getLogs(logs, date);
             }
             var energyCost = this._calculateEnergyCost(date, logs);
+            this._originalEnergy += energyCost.sleepSum;
             this.setState({
+                energy: this._originalEnergy + energyCost.sum,
                 energyCost: energyCost
             }, function () {
+                Settings.setEnergy(this.state.energy);
                 callback && callback(energyCost);
             });
         }
@@ -62,7 +85,7 @@ module.exports = React.createClass({
 
     componentDidMount: function () {
         var that = this;
-        this.currentDay = new Moment('2015-05-19');
+        this.currentDay = new Moment(TestDate);
         if (this.intervalId) {
             this.clearInterval(this.intervalId);
         }
@@ -78,17 +101,18 @@ module.exports = React.createClass({
             var yesterday = new Moment().subtract(1, 'day').format('YYYY-MM-DD');
             var logs = TrackerHelper.getLogs(result.content, result.date);
             if (result.moveToNextDay) {
+                that.currentDay = new Moment(result.date);
                 //update yesterday's energy and move to next day
                 that.updateEnergy(result.yesterday, result.yesterdayLogs, function (cost) {
-                    that.setState({
-                        energy: that.state.energy + cost,
-                        energyCost: 0
-                    });
-                    that.yesterDaySleepLog = result.sleepLog;
-                    that.todayWakeLog = logs.filter(function (log) {
-                        return log.signs.indexOf('wake') >= 0;
-                    })[0];
-                    that.updateEnergy(result.date, logs);
+                        store(SK_ORGINGAL_ENERGY, [result.date, that._originalEnergy = that.state.energy].join(','));
+                        console.log('update enery to ' + that.state.energy);
+                        that.yesterDaySleepLog = result.sleepLog;
+                        that.todayWakeLog = logs.filter(function (log) {
+                            return log.signs.indexOf('wake') >= 0;
+                        })[0];
+                        that.updateEnergy(result.date, logs, function (cost) {
+                            store(SK_SLEEP_ENERGY, [result.date, cost.sleepSum].join(','));
+                        });
                 });
             } else {
                 that.updateEnergy(result.date, logs);
@@ -113,7 +137,6 @@ module.exports = React.createClass({
                         content: content
                     });
                 } else{
-                    that.currentDay = new Moment(nowDate);
                     DataAPI.getLogContent(nowDate).then(function (newContent) {
                         deferred.resolve({
                             content: newContent,
@@ -153,11 +176,15 @@ module.exports = React.createClass({
             sum += unTrackedTime * energySettings.normalCost / 60;
         }
 
+        var sleepSum = 0;
         if (this.yesterDaySleepLog && this.todayWakeLog) {
-            sum += energySettings.sleepValue * (new Moment(this.todayWakeLog.end).diff(this.yesterDaySleepLog.start, 'minutes')) / 60;
+            sleepSum = energySettings.sleepValue * (new Moment(this.todayWakeLog.end).diff(this.yesterDaySleepLog.start, 'minutes')) / 60;
         }
 
-        return sum;
+        return {
+            sum: sum,
+            sleepSum: sleepSum
+        };
 
         function val(log) {
             var value = 0;
@@ -193,6 +220,8 @@ module.exports = React.createClass({
             }
             if (!_.isEmpty(configs)) {
                 value = configs[0].value;
+            } else {
+                return energySettings.normalCost / 60 * log.len;
             }
             if (isDoingLog) {
                 return value / 60 * (new Moment().diff(log.start, 'minute'));
