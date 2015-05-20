@@ -46,11 +46,16 @@ module.exports = React.createClass({
         //Bus.removeListener(EVENT.CHECK_SYNC_STATUS, this.checkSyncStatus);
     },
 
-    updateEnergy: function (date, content) {
+    updateEnergy: function (date, logs, callback) {
         if (new Moment().diff(date, 'day') >= 0) {
-            var energyCost = this._calculateEnergyCost(date, content);
+            if (_.isString(logs)) {
+                logs = TrackerHelper.getLogs(logs, date);
+            }
+            var energyCost = this._calculateEnergyCost(date, logs);
             this.setState({
                 energyCost: energyCost
+            }, function () {
+                callback && callback(energyCost);
             });
         }
     },
@@ -70,7 +75,24 @@ module.exports = React.createClass({
     update: function () {
         var that = this;
         this.getLogContent().then(function (result) {
-            that.updateEnergy(result.date, result.content);
+            var yesterday = new Moment().subtract(1, 'day').format('YYYY-MM-DD');
+            var logs = TrackerHelper.getLogs(result.content, result.date);
+            if (result.moveToNextDay) {
+                //update yesterday's energy and move to next day
+                that.updateEnergy(result.yesterday, result.yesterdayLogs, function (cost) {
+                    that.setState({
+                        energy: that.state.energy + cost,
+                        energyCost: 0
+                    });
+                    that.yesterDaySleepLog = result.sleepLog;
+                    that.todayWakeLog = logs.filter(function (log) {
+                        return log.signs.indexOf('wake') >= 0;
+                    });
+                    that.updateEnergy(result.date, logs);
+                });
+            } else {
+                that.updateEnergy(result.date, logs);
+            }
         });
     },
 
@@ -85,23 +107,21 @@ module.exports = React.createClass({
                 var sleepLog = logs.filter(function (log) {
                     return log.signs.indexOf('sleep') >= 0;
                 });
-                if (_.isEmpty(sleepLog)) {
+                if (_.isEmpty(sleepLog) || _isDoingLog(currentDay, sleepLog[0])) {
                     deferred.resolve({
                         date: currentDay,
                         content: content
                     });
-                } else {
-                    if (currentDay === nowDate) {
-                        return deferred.resolve({
-                            content: content,
-                            date: currentDay
-                        });
-                    }
+                } else{
                     that.currentDay = new Moment(nowDate);
-                    DataAPI.getLogContent(nowDate).then(function (content) {
+                    DataAPI.getLogContent(nowDate).then(function (newContent) {
                         deferred.resolve({
-                            content: content,
-                            date: nowDate
+                            content: newContent,
+                            date: nowDate,
+                            yesterday: currentDay,
+                            yesterdayLogs: logs,
+                            sleepLog: sleepLog[0],
+                            moveToNextDay: true
                         });
                     });
                 }
@@ -110,11 +130,9 @@ module.exports = React.createClass({
         return deferred.promise;
     },
 
-    _calculateEnergyCost: function (date, content) {
-        if (!content) {return;}
+    _calculateEnergyCost: function (date, logs) {
+        if (_.isEmpty(logs)) {return 0;}
         var energySettings = Settings.getEnergySettings();
-        console.log(energySettings);
-        var logs = TrackerHelper.getLogs(content, date);
         var sum = logs.reduce(function (sum, log) {
             var value = val(log);
             console.log(log.origin, value);
@@ -125,7 +143,7 @@ module.exports = React.createClass({
 
         function val(log) {
             var value = 0;
-            var isDoingLog = _isDoingLog(log);
+            var isDoingLog = _isDoingLog(date, log);
             var configs = energySettings.configs;
             var tags = log.tags || [];
             var classes = log.classes || [];
@@ -164,15 +182,17 @@ module.exports = React.createClass({
                 return value / 60 * log.len;
             }
         }
-
-        function _isDoingLog(log) {
-            var timeStr = TrackerHelper.getTimeStr(log.origin);
-            if (timeStr && timeStr.indexOf('~') >= 0) {
-                var time = TrackerHelper.getTimeSpan(log.origin, {date: date, patchEnd: false});
-                return time.start && !time.end;
-            } else {
-                return false;
-            }
-        }
     }
 });
+
+
+
+function _isDoingLog(date, log) {
+    var timeStr = TrackerHelper.getTimeStr(log.origin);
+    if (timeStr && timeStr.indexOf('~') >= 0) {
+        var time = TrackerHelper.getTimeSpan(log.origin, {date: date, patchEnd: false});
+        return time.start && !time.end;
+    } else {
+        return false;
+    }
+}
