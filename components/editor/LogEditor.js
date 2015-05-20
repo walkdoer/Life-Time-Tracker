@@ -37,8 +37,9 @@ Bus.on(EventConstant.INSERT_LOG_FROM_TASK, function (log) {
 
 /** cache */
 var contentCache = {};
-window.contentCache = contentCache;
+//window.contentCache = contentCache;
 var LogEditor = React.createClass({
+
 
     getDefaultProps: function () {
         return {

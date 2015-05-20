@@ -3,18 +3,24 @@ var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var TrackerHelper = require('tracker/helper');
 var _ = require('lodash');
 var Moment = require('moment');
+var Q = require('q');
+
 /** Components */
 var Settings = require('../pages/Settings');
 var Progress = require('./Progress');
 var Bus = require('../utils/Bus');
+var SetIntervalMixin = require('./mixins/setInterval');
+var LogEditor = require('../components/editor/LogEditor');
 
+/** Utils */
+var DataAPI = require('../utils/DataAPI');
 
 /** constants */
 var EVENT = require('../constants/EventConstant');
 
 module.exports = React.createClass({
 
-    mixins: [PureRenderMixin],
+    mixins: [PureRenderMixin, SetIntervalMixin],
 
     getInitialState: function () {
         return {
@@ -31,6 +37,7 @@ module.exports = React.createClass({
 
     componentWillMount: function () {
         Bus.addListener(EVENT.LOG_CHANGE, this.updateEnergy);
+
     },
 
 
@@ -46,6 +53,61 @@ module.exports = React.createClass({
                 energyCost: energyCost
             });
         }
+    },
+
+    componentDidMount: function () {
+        var that = this;
+        this.currentDay = new Moment();
+        if (this.intervalId) {
+            this.clearInterval(this.intervalId);
+        }
+        this.update();
+        this.intervalId = this.setInterval(function () {
+            that.update();
+        }, 60000);
+    },
+
+    update: function () {
+        var that = this;
+        this.getLogContent().then(function (result) {
+            that.updateEnergy(result.date, result.content);
+        });
+    },
+
+    getLogContent: function () {
+        var deferred = Q.defer();
+        var that = this;
+        var nowDate = new Moment().format('YYYY-MM-DD');
+        var currentDay = this.currentDay.format('YYYY-MM-DD');
+        DataAPI.getLogContent(currentDay)
+            .then(function (content) {
+                var logs = TrackerHelper.getLogs(content, currentDay);
+                var sleepLog = logs.filter(function (log) {
+                    return log.signs.indexOf('sleep') >= 0;
+                });
+                if (_.isEmpty(sleepLog)) {
+                    deferred.resolve({
+                        date: currentDay,
+                        content: content
+                    });
+                } else {
+                    if (currentDay === nowDate) {
+                        return deferred.resolve({
+                            content: content,
+                            date: currentDay
+                        });
+                    }
+                    that.currentDay = new Moment(nowDate);
+                    DataAPI.getLogContent(nowDate).then(function (content) {
+                        deferred.resolve({
+                            content: content,
+                            date: nowDate
+                        });
+                    });
+                }
+            });
+
+        return deferred.promise;
     },
 
     _calculateEnergyCost: function (date, content) {

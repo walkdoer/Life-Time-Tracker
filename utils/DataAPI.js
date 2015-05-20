@@ -22,6 +22,11 @@ function url(src) {
 
 module.exports = {
 
+    getLogContent: function (date, params) {
+        return get(url('/logContents/' + date), params)
+            .then(function (result) { return result.fileContent;});
+    },
+
     stat: function (params) {
         return get(url('/stats'), params);
     },
