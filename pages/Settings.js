@@ -30,6 +30,11 @@ var NORMAL_COST_STORAGE_KEY = 'normal_cost';
 module.exports = React.createClass({
 
     statics: {
+
+        setEnergy: function (val) {
+            store(ENERGY_STORAGE_KEY, val);
+        },
+
         getEnergySettings: function () {
             var content = store(ENERGY_CONFIG_STORAGE_KEY);
             var configs = [];
@@ -43,11 +48,11 @@ module.exports = React.createClass({
                     return configObj;
                 });
             }
-           
+
             return {
                 energy: store(ENERGY_STORAGE_KEY) || 100,
                 sleepValue: store(SLEEP_VALUE_STORAGE_KEY) || 10,
-                normalCost: store(NORMAL_COST_STORAGE_KEY) || 3,
+                normalCost: store(NORMAL_COST_STORAGE_KEY) || -4,
                 configs: configs
             };
         }
@@ -58,7 +63,7 @@ module.exports = React.createClass({
             settings: {},
             energy: store(ENERGY_STORAGE_KEY) || 100,
             sleepValue: store(SLEEP_VALUE_STORAGE_KEY) || 10,
-            normalCost: store(NORMAL_COST_STORAGE_KEY) || 3
+            normalCost: store(NORMAL_COST_STORAGE_KEY) || -4
         };
     },
 
