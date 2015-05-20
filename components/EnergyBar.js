@@ -158,21 +158,22 @@ module.exports = React.createClass({
         var energySettings = Settings.getEnergySettings();
         var trackedTime = 0;
         var wakeLog = null;
-        var sleepLog = null;
-        var sum = logs.reduce(function (sum, log) {
+        var lastLog = null;
+        var lastIndex = logs.length - 1;
+        var sum = logs.reduce(function (sum, log, index) {
             var value = val(log);
             trackedTime += log.len;
             if (log.signs.indexOf('wake') >= 0) {
                 wakeLog = log;
             }
-            if (log.signs.indexOf('sleep') >= 0) {
-                sleepLog = log;
+            if (log.signs.indexOf('sleep') >= 0 || index === lastIndex) {
+                lastLog = log;
             }
             console.log(log.origin, value);
             return sum + value;
         }, 0);
-        if (wakeLog && sleepLog) {
-            unTrackedTime = new Moment(sleepLog.end).diff(wakeLog.start, 'minutes') - trackedTime;
+        if (wakeLog && lastLog) {
+            unTrackedTime = new Moment(lastLog.end).diff(wakeLog.start, 'minutes') - trackedTime;
             sum += unTrackedTime * energySettings.normalCost / 60;
         }
 
@@ -181,6 +182,7 @@ module.exports = React.createClass({
             sleepSum = energySettings.sleepValue * (new Moment(this.todayWakeLog.end).diff(this.yesterDaySleepLog.start, 'minutes')) / 60;
         }
 
+        console.log('sum:'+ sum);
         return {
             sum: sum,
             sleepSum: sleepSum
