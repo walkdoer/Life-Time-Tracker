@@ -18,35 +18,17 @@ var DataAPI = require('../utils/DataAPI');
 
 /** constants */
 var EVENT = require('../constants/EventConstant');
-var SK_ORGINGAL_ENERGY = 'storage_key_original_energy';
-var SK_SLEEP_ENERGY = 'storage_key_sleep_energy';
-var TestDate = undefined;
+var SK_REMAINDER = 'storage_key_remainder';
+var DATE_FORMAT = 'YYYY-MM-DD';
+var SPLITTER = ',';
 
 module.exports = React.createClass({
 
     mixins: [PureRenderMixin, SetIntervalMixin],
 
     getInitialState: function () {
-        var today = new Moment(TestDate);
-        var orginEnergy = store(SK_ORGINGAL_ENERGY);
-        var sleepSum = store(SK_SLEEP_ENERGY);
-        if (orginEnergy && sleepSum) {
-            var tmpArr = orginEnergy.split(',');
-            var tmpArr2 = sleepSum.split(',');
-            if (today.diff(tmpArr[0], 'day') === 0 && today.diff(tmpArr2[0], 'day') === 0) {
-                this._originalEnergy =  parseInt(tmpArr[1]) + parseInt(tmpArr2[1]);
-            } else {
-                this._originalEnergy = Settings.getDefaultEnergy();
-            }
-        } else {
-            this._originalEnergy = Settings.getDefaultEnergy();
-        }
-        if (sleepSum) {
-            tmpArr2 = orginEnergy.split(',');
-        }
         return {
-            energy: this._originalEnergy,
-            energyCost: 0
+            energy: 0
         };
     },
 
@@ -57,7 +39,7 @@ module.exports = React.createClass({
     },
 
     componentWillMount: function () {
-        Bus.addListener(EVENT.LOG_CHANGE, this.updateEnergy);
+        Bus.addListener(EVENT.LOG_CHANGE, this.onLogContentChange);
     },
 
 
@@ -66,95 +48,96 @@ module.exports = React.createClass({
         //Bus.removeListener(EVENT.CHECK_SYNC_STATUS, this.checkSyncStatus);
     },
 
-    updateEnergy: function (date, logs, callback) {
-        if (new Moment().diff(date, 'day') >= 0) {
-            if (_.isString(logs)) {
-                logs = TrackerHelper.getLogs(logs, date);
-            }
-            var energyCost = this._calculateEnergyCost(date, logs);
-            this._originalEnergy += energyCost.sleepSum;
-            this.setState({
-                energy: this._originalEnergy + energyCost.sum,
-                energyCost: energyCost
-            }, function () {
-                Settings.setEnergy(this.state.energy);
-                callback && callback(energyCost);
+    onLogContentChange: function (date, content) {
+        var that = this;
+        if (new Moment().diff(date, 'day') === 0) {
+            this.getEnergy(content).then(function (energy) {
+                that.setState({
+                    energy: energy
+                });
             });
         }
     },
 
     componentDidMount: function () {
         var that = this;
-        this.currentDay = new Moment(TestDate);
         if (this.intervalId) {
             this.clearInterval(this.intervalId);
         }
-        this.update();
+        this.updateEnergy();
         this.intervalId = this.setInterval(function () {
-            that.update();
-        }, 60000);
+            that.updateEnergy();
+        }, 15000);
     },
 
-    update: function () {
+    updateEnergy: function () {
         var that = this;
-        this.getLogContent().then(function (result) {
-            var yesterday = new Moment().subtract(1, 'day').format('YYYY-MM-DD');
-            var logs = TrackerHelper.getLogs(result.content, result.date);
-            if (result.moveToNextDay) {
-                that.currentDay = new Moment(result.date);
-                //update yesterday's energy and move to next day
-                that.updateEnergy(result.yesterday, result.yesterdayLogs, function (cost) {
-                        store(SK_ORGINGAL_ENERGY, [result.date, that._originalEnergy = that.state.energy].join(','));
-                        console.log('update enery to ' + that.state.energy);
-                        that.yesterDaySleepLog = result.sleepLog;
-                        that.todayWakeLog = logs.filter(function (log) {
-                            return log.signs.indexOf('wake') >= 0;
-                        })[0];
-                        that.updateEnergy(result.date, logs, function (cost) {
-                            store(SK_SLEEP_ENERGY, [result.date, cost.sleepSum].join(','));
-                        });
-                });
-            } else {
-                that.updateEnergy(result.date, logs);
-            }
+        this.getEnergy().then(function (energy) {
+            that.setState({
+                energy: energy
+            });
         });
     },
 
-    getLogContent: function () {
+    getEnergy: function (content) {
         var deferred = Q.defer();
         var that = this;
-        var nowDate = new Moment().format('YYYY-MM-DD');
-        var currentDay = this.currentDay.format('YYYY-MM-DD');
-        DataAPI.getLogContent(currentDay)
-            .then(function (content) {
-                var logs = TrackerHelper.getLogs(content, currentDay);
-                var sleepLog = logs.filter(function (log) {
-                    return log.signs.indexOf('sleep') >= 0;
-                });
-                if (_.isEmpty(sleepLog) || _isDoingLog(currentDay, sleepLog[0])) {
-                    deferred.resolve({
-                        date: currentDay,
-                        content: content
-                    });
-                } else{
-                    DataAPI.getLogContent(nowDate).then(function (newContent) {
-                        deferred.resolve({
-                            content: newContent,
-                            date: nowDate,
-                            yesterday: currentDay,
-                            yesterdayLogs: logs,
-                            sleepLog: sleepLog[0],
-                            moveToNextDay: true
-                        });
-                    });
+        var todayDate = new Moment().format(DATE_FORMAT);
+        var energySettings = Settings.getEnergySettings();
+        var yesterdayDate = new Moment().subtract(1, 'day').format(DATE_FORMAT);
+        var defaultEnergy = Settings.getDefaultEnergy();
+        DataAPI.getLogContent(yesterdayDate).then(function (yesterdayContent) {
+            var logs = TrackerHelper.getLogs(yesterdayContent, yesterdayDate);
+            var energyValue, sleepLog;
+            if (!_.isEmpty(logs)) { //if yesterday has logs, then calculate it's cost and getToday's initial value
+                sleepLog = getSleepLog(yesterdayDate, logs);
+                if (content !== undefined) {
+                    getTodayEnergy(content);
+                } else {
+                    DataAPI.getLogContent(todayDate).then(getTodayEnergy);
                 }
-            });
-
+            }
+            function getTodayEnergy(content) {
+                var logs = TrackerHelper.getLogs(content, todayDate);
+                var remainder = that._getYesterDayEnergyRemainder();
+                var initEnergy = defaultEnergy;
+                if (sleepLog && remainder !== null) { //if has sleep log, then get energy remainder of yesterday
+                    initEnergy = remainder;
+                }
+                var sleepSupply = 0;
+                wakeLog = getWakeLog(logs);
+                if (wakeLog && remainder !== null) {
+                    sleepSupply = energySettings.sleepValue * (new Moment(wakeLog.end).diff(sleepLog.start, 'minutes')) / 60;
+                } else if (sleepLog && !wakeLog) {
+                    sleepSupply = energySettings.sleepValue * (new Moment().diff(sleepLog.start, 'minutes')) / 60;
+                }
+                var energyCost = that._calculateEnergyCost(todayDate, logs);
+                var todaySleepLog = getSleepLog(todayDate, logs);
+                var result = initEnergy + sleepSupply + energyCost;
+                if (todaySleepLog) {
+                    store(SK_REMAINDER, [todayDate, result].join(SPLITTER));
+                }
+                deferred.resolve(result);
+            }
+        });
         return deferred.promise;
     },
 
+    _getYesterDayEnergyRemainder: function () {
+        var yesterdayDate = new Moment().subtract(1, 'day').format(DATE_FORMAT);
+        var remainder = null;
+        var remainderConfig = store(SK_REMAINDER);
+        if (remainderConfig) {
+            tmpArr = remainderConfig.split(SPLITTER);
+            if (yesterdayDate === new Moment(tmpArr[0]).format(DATE_FORMAT)) {
+                remainder = parseInt(tmpArr[1], 10);
+            }
+        }
+        return remainder;
+    },
+
+
     _calculateEnergyCost: function (date, logs) {
-        if (_.isEmpty(logs)) {return 0;}
         var energySettings = Settings.getEnergySettings();
         var trackedTime = 0;
         var wakeLog = null;
@@ -169,7 +152,7 @@ module.exports = React.createClass({
             if (log.signs.indexOf('sleep') >= 0 || index === lastIndex) {
                 lastLog = log;
             }
-            console.log(log.origin, value);
+            //console.log(log.origin, value);
             return sum + value;
         }, 0);
         if (wakeLog && lastLog) {
@@ -177,16 +160,8 @@ module.exports = React.createClass({
             sum += unTrackedTime * energySettings.normalCost / 60;
         }
 
-        var sleepSum = 0;
-        if (this.yesterDaySleepLog && this.todayWakeLog) {
-            sleepSum = energySettings.sleepValue * (new Moment(this.todayWakeLog.end).diff(this.yesterDaySleepLog.start, 'minutes')) / 60;
-        }
-
         console.log('sum:'+ sum);
-        return {
-            sum: sum,
-            sleepSum: sleepSum
-        };
+        return sum;
 
         function val(log) {
             var value = 0;
@@ -234,7 +209,20 @@ module.exports = React.createClass({
     }
 });
 
+function getSleepLog(date, logs) {
+    var log = logs.filter(function (log) {
+        return log.signs.indexOf('sleep') >= 0;
+    })[0];
+    if (log && !_isDoingLog(date, log)) {
+        return log;
+    }
+}
 
+function getWakeLog(logs) {
+    return logs.filter(function (log) {
+        return log.signs.indexOf('wake') >= 0;
+    })[0];
+}
 
 function _isDoingLog(date, log) {
     var timeStr = TrackerHelper.getTimeStr(log.origin);
