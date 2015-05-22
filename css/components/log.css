@@ -130,6 +130,10 @@
     right: 10px;
 }
 
+.ltt_c-log-gotoEditor{
+    cursor: pointer;
+}
+
 .ltt_c-log .ltt_c-progress{
     position: absolute;
     bottom: 6px;

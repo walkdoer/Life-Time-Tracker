@@ -49,6 +49,8 @@ var Page = React.createClass({
 
     getInitialState: function () {
         var params = this.getParams();
+        var query = this.getQuery();
+        this._initOrigin = query.logOrigin;
         var date;
         if (params && params.date) {
             date = new Moment(params.date).format(DATE_FORMAT);
@@ -87,6 +89,7 @@ var Page = React.createClass({
                     onChange={this.onChange}
                     onLoad={this.onEditorLoad}
                     onSave={this.onSave}
+                    locate={this._initOrigin}
                     ref="logEditor"/>
                 <aside>
                     <LogDatePicker select={this.state.current}

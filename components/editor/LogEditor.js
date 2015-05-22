@@ -111,6 +111,7 @@ var LogEditor = React.createClass({
             that.setValue(content);
             that._highLightDoingLine(content);
             that.gotoDoingLogLine(content);
+            that._gotoLocate(content, that.props.locate);
             that.props.onLoad(content);
             editor.focus();
             if (_insertLog) {
@@ -122,6 +123,19 @@ var LogEditor = React.createClass({
             console.error(err);
             console.error(err.stack);
         });
+    },
+
+    _gotoLocate: function (content, locate) {
+        if (!locate) { return; }
+        var row = null;
+        content.split('\n').some(function (log, index) {
+            if (log === locate) {
+                row = index;
+            }
+        });
+        if (row !== null) {
+            this.editor.gotoLine(row + 1, 0);
+        }
     },
 
     _initEditor: function () {
@@ -601,8 +615,7 @@ var LogEditor = React.createClass({
     readLog: function (title) {
         var start = Date.now();
         var editor = this.editor;
-        if (!Ltt.sdk) { return Q(''); }
-        return Ltt.sdk.readLogContent(title)
+        return DataAPI.getLogContent(title)
             .then(function (content) {
                 console.log('read log cost:' + (Date.now() - start));
                 return content;

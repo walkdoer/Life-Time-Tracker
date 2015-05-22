@@ -5,7 +5,7 @@ var Moment = require('moment');
 var _ = require('lodash');
 var Tag = require('./Tag');
 var Progress = require('./Progress');
-
+var Router = require('react-router');
 var Time = React.createClass({
     displayName: 'time',
 
@@ -48,7 +48,10 @@ var LogClass = React.createClass({
 });
 
 var Log = React.createClass({
+
     displayName: 'log',
+
+    mixins: [Router.Navigation],
 
     getDefaultProps: function () {
         return {
@@ -136,6 +139,7 @@ var Log = React.createClass({
                 {this.props.showDate ? <Time value={this.props.start} type='date'/> : null}
                 {this.props.showTime ? <Time value={this.props.start} type='time'/> : null }
                 {this.props.showTime ? <Time value={this.props.end} type='time'/> : null }
+                <i className="ltt_c-log-gotoEditor fa fa-external-link" onClick={this.gotoEditor}></i>
                 {this.props.showProgress ? progress : null}
                 <span className="ltt_c-log-len">{getTimeLength(this.props.len)}</span>
                 {this.state.showDetail ? detail : null}
@@ -167,6 +171,12 @@ var Log = React.createClass({
         this.setState({
             showDetail: !this.state.showDetail
         });
+    },
+
+    gotoEditor: function (e) {
+        var date = this.props.date;
+        console.log('goto editor');
+        this.transitionTo('logEditor', {date: date}, {logOrigin: this.props.origin});
     }
 
 });
