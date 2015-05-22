@@ -127,6 +127,7 @@ var LogEditor = React.createClass({
 
     _gotoLocate: function (content, locate) {
         if (!locate) { return; }
+        var session = this.editor.getSession();
         var row = null;
         content.split('\n').some(function (log, index) {
             if (log === locate) {
@@ -135,6 +136,11 @@ var LogEditor = React.createClass({
         });
         if (row !== null) {
             this.editor.gotoLine(row + 1, 0);
+            var range = new Range(row, 0, row, Infinity);
+            var marker = session.addMarker(range, "ace_step", "fullLine");
+            setTimeout(function () {
+                session.removeMarker(marker);
+            }, 10000);
         }
     },
 
@@ -500,7 +506,6 @@ var LogEditor = React.createClass({
     },
 
     _highLightDoingLine: function (content) {
-        if (!Ltt) {return;}
         var editor = this.editor;
         var session = this.editor.getSession();
         var doingLog = this.getDoingLog(content);
