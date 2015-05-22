@@ -80,17 +80,31 @@ module.exports = React.createClass({
     },
 
     getEnergy: function (content) {
-        var deferred = Q.defer();
         var that = this;
         var todayDate = new Moment().format(DATE_FORMAT);
+        return this._getEnery(todayDate, content).then(function (value) {
+            if (value === 'recalculate') {
+                return that._getEnery(new Moment(todayDate).subtract(1, 'day').format(DATE_FORMAT), content);
+            } else {
+                return value;
+            }
+        });
+    },
+
+    _getEnery: function (todayDate, content) {
+        var deferred = Q.defer();
+        var that = this;
         var energySettings = Settings.getEnergySettings();
-        var yesterdayDate = new Moment().subtract(1, 'day').format(DATE_FORMAT);
+        var yesterdayDate = new Moment(todayDate).subtract(1, 'day').format(DATE_FORMAT);
         var defaultEnergy = Settings.getDefaultEnergy();
         DataAPI.getLogContent(yesterdayDate).then(function (yesterdayContent) {
-            var logs = TrackerHelper.getLogs(yesterdayContent, yesterdayDate);
-            var energyValue, sleepLog;
-            if (!_.isEmpty(logs)) { //if yesterday has logs, then calculate it's cost and getToday's initial value
-                sleepLog = getSleepLog(yesterdayDate, logs);
+            var yesterdayLogs = TrackerHelper.getLogs(yesterdayContent, yesterdayDate);
+            var energyValue, yesterdaySleepLog;
+            if (!_.isEmpty(yesterdayLogs)) { //if yesterday has logs, then calculate it's cost and getToday's initial value
+                yesterdaySleepLog = getSleepLog(yesterdayDate, yesterdayLogs);
+                if (!yesterdaySleepLog) {
+                    return deferred.resolve('recalculate');
+                }
                 if (content !== undefined) {
                     getTodayEnergy(content);
                 } else {
@@ -99,20 +113,20 @@ module.exports = React.createClass({
             }
             function getTodayEnergy(content) {
                 var logs = TrackerHelper.getLogs(content, todayDate);
-                var remainder = that._getYesterDayEnergyRemainder();
+                var remainder = that._getYesterDayEnergyRemainder(todayDate);
+                var energyCost = that._calculateEnergyCost(todayDate, logs);
+                var todaySleepLog = getSleepLog(todayDate, logs);
                 var initEnergy = defaultEnergy;
-                if (sleepLog && remainder !== null) { //if has sleep log, then get energy remainder of yesterday
+                if (yesterdaySleepLog && remainder !== null) { //if has sleep log, then get energy remainder of yesterday
                     initEnergy = remainder;
                 }
                 var sleepSupply = 0;
                 wakeLog = getWakeLog(logs);
                 if (wakeLog && remainder !== null) {
-                    sleepSupply = energySettings.sleepValue * (new Moment(wakeLog.end).diff(sleepLog.start, 'minutes')) / 60;
-                } else if (sleepLog && !wakeLog) {
-                    sleepSupply = energySettings.sleepValue * (new Moment().diff(sleepLog.start, 'minutes')) / 60;
+                    sleepSupply = energySettings.sleepValue * (new Moment(wakeLog.end).diff(yesterdaySleepLog.start, 'minutes')) / 60;
+                } else if (yesterdaySleepLog && !wakeLog) {
+                    sleepSupply = energySettings.sleepValue * (new Moment().diff(yesterdaySleepLog.start, 'minutes')) / 60;
                 }
-                var energyCost = that._calculateEnergyCost(todayDate, logs);
-                var todaySleepLog = getSleepLog(todayDate, logs);
                 var result = initEnergy + sleepSupply + energyCost;
                 if (todaySleepLog) {
                     store(SK_REMAINDER, [todayDate, result].join(SPLITTER));
@@ -123,8 +137,8 @@ module.exports = React.createClass({
         return deferred.promise;
     },
 
-    _getYesterDayEnergyRemainder: function () {
-        var yesterdayDate = new Moment().subtract(1, 'day').format(DATE_FORMAT);
+    _getYesterDayEnergyRemainder: function (date) {
+        var yesterdayDate = new Moment(date).subtract(1, 'day').format(DATE_FORMAT);
         var remainder = null;
         var remainderConfig = store(SK_REMAINDER);
         if (remainderConfig) {
