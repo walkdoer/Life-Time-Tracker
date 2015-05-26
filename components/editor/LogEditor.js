@@ -98,7 +98,7 @@ var LogEditor = React.createClass({
                 console.log('recover ' + title + ' from localStorage');
                 content = cacheContent;
                 that.writeLog(title, content).then(function (result) {
-                    if (result === -1) {
+                    if (!result.success) {
                         Notify.error('Recovery from cache failed');
                     } else {
                         Notify.success('Recovery ' + title + ' from cache');
@@ -632,8 +632,7 @@ var LogEditor = React.createClass({
 
     writeLog: function (title, content) {
         var start = Date.now();
-        if (!Ltt || !Ltt.sdk ||!Ltt.sdk.writeLogFile) {return Q(-1);}
-        return Ltt.sdk.writeLogFile(title, content).catch(function (err) {
+        return DataAPI.writeLogContent(title, content).catch(function (err) {
             console.error(err.stack);
             Notify.error('Write file failed ', {timeout: 3500});
         });

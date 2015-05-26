@@ -27,6 +27,10 @@ module.exports = {
             .then(function (result) { return result.fileContent;});
     },
 
+    writeLogContent: function (date, content) {
+        return post(url('/logContents/' + date), {content: content});
+    },
+
     stat: function (params) {
         return get(url('/stats'), params);
     },
