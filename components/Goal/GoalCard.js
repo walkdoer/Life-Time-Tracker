@@ -12,6 +12,7 @@ var _ = require('lodash');
 var RB = require('react-bootstrap');
 var Input = RB.Input;
 var DropdownButton = RB.DropdownButton;
+var ModalTrigger = RB.ModalTrigger;
 var MenuItem = RB.MenuItem;
 
 
@@ -20,12 +21,12 @@ var Progress = require('../Progress');
 var DataAPI = require('../../utils/DataAPI');
 var LogLine = require('../charts/LogLine');
 var LoadingMask = require('../LoadingMask');
+var GoalEditWindow = require('../../components/Goal/GoadEditWindow');
+var Notify = require('../../components/Notify');
 
 /** Utils */
 var Util = require('../../utils/Util');
 
-/** Constant */
-var EMPTY_FUN = function () {};
 
 module.exports = React.createClass({
 
@@ -51,8 +52,13 @@ module.exports = React.createClass({
             <MenuItem key='day'>day</MenuItem>
         </DropdownButton>
         return (
-            <div className={cx({"ltt_c-GoalCard": true, editing: this.state.editing})}>
-                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-title">{goal.name}</div>
+            <div className={cx({"ltt_c-GoalCard": true})}>
+                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-title">
+                    {goal.name}
+                    <ModalTrigger modal={<GoalEditWindow onSave={this.props.onUpdate} goal={goal}/>} ref="modalTrigger">
+                        <span className="ltt_c-GoalCard-editBtn"><i className="fa fa-pencil-square"></i></span>
+                    </ModalTrigger>
+                </div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity">{goal.granularity}</div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-activities">
                     {this.state.activitiesLoadFailed ?
@@ -64,7 +70,6 @@ module.exports = React.createClass({
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-progress">
                     <Progress className="ltt_c-GoalCard-progress" max={goal.estimatedTime || 0} value={this.state.progress || 0}/>
                 </div>
-                <span className="ltt_c-GoalCard-editBtn" onClick={this.editing}><i className="fa fa-pencil-square"></i></span>
             </div>
         )
     },
@@ -114,5 +119,10 @@ module.exports = React.createClass({
         this.setState({
             progress: totalTime
         });
+    },
+
+
+    updated: function () {
+        this.refs.modalTrigger.hide();
     }
 });

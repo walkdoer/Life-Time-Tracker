@@ -161,7 +161,7 @@ module.exports = {
         },
 
         update: function (params) {
-            return post(url('/goals/' + params.id), params);
+            return post(url('/goals/' + params._id), params);
         }
     },
 

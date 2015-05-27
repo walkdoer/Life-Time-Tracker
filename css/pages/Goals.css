@@ -5,6 +5,8 @@
 
 .ltt_c-page-Goals .ltt_c-GoalList{
     border: 1px solid #dcdcdc;
+    
+    margin-top: 20px;
 }
 
 .ltt_c-page-Goals .ltt_c-GoalList .ltt_c-GoalCard{
@@ -72,9 +74,9 @@
 
 
 .ltt_c-GoalCard-editBtn {
-    position: absolute;
-    bottom: 2px;
-    right: 6px;
+    /* position: absolute; */
+    /* bottom: 2px; */
+    /* right: 6px; */
     color: #ccc;
 }
 

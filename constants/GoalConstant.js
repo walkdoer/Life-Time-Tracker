@@ -6,5 +6,7 @@ module.exports = {
     DESTROY: 'destroy_goal',
     LOAD: 'load_goal',
     LOAD_SUCCESS: 'load_goal_success',
-    LOAD_ERROR: 'load_goal_error'
+    LOAD_ERROR: 'load_goal_error',
+    UPDATE_SUCCESS: 'update_goal_success',
+    UPDATE_ERROR: 'update_goal_error'
 };

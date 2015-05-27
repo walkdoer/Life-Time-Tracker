@@ -4,7 +4,7 @@ var _ = require('lodash');
 var AffectConstant = require('../constants/AffectConstant');
 var CHANGE_EVENT = 'change';
 
-var Store = _.extend(EventEmitter.prototype, {
+var Store = _.extend({}, EventEmitter.prototype, {
     loaded: false,
     creating: false,
     positiveAffects: [],

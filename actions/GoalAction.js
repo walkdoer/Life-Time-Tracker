@@ -1,7 +1,8 @@
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var GoalConstant = require('../constants/GoalConstant');
 var DataAPI = require('../utils/DataAPI');
-var Util = require('../utils/Util');
+
+
 
 module.exports = {
 
@@ -41,6 +42,21 @@ module.exports = {
             AppDispatcher.handleViewAction({
                 type: GoalConstant.CREATE_SUCCESS,
                 goal: goal
+            });
+        });
+    },
+
+
+    update: function (goal) {
+        DataAPI.Goal.update(goal).then(function (goal) {
+            AppDispatcher.handleViewAction({
+                type: GoalConstant.UPDATE_SUCCESS,
+                goal: goal
+            });
+        }).catch(function (err) {
+            AppDispatcher.handleViewAction({
+                type: GoalConstant.UPDATE_ERROR,
+                error: err
             });
         });
     },

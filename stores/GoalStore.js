@@ -3,8 +3,9 @@ var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 var GoalConstant = require('../constants/GoalConstant');
 var CHANGE_EVENT = 'change';
+var extend = require('extend');
 
-var Store = _.extend(EventEmitter.prototype, {
+var Store = _.extend({}, EventEmitter.prototype, {
     loaded: false,
     creating: false,
     createSuccess: true,
@@ -22,10 +23,22 @@ var Store = _.extend(EventEmitter.prototype, {
     }
 });
 
+function destroy(id) {
+    var goalIndex = null;
+    Store.goals.some(function (goal, index) {
+        if (goal._id === id) {
+            goalIndex = index;
+        }
+    });
+    if (goalIndex !== null) {
+        return Store.goals.splice(goalIndex, 1);
+    }
+}
+
 
 AppDispatcher.register(function(payload) {
     var action = payload.action;
-    var text, goal;
+    var goal, result;
 
     switch (action.type) {
         case GoalConstant.LOAD:
@@ -57,17 +70,25 @@ AppDispatcher.register(function(payload) {
             Store.createError = action.error;
             break;
 
-        case GoalConstant.UPDATE_TEXT:
-            text = action.text.trim();
-            if (text !== '') {
-                update(action.id, text);
-            }
+        case GoalConstant.DESTROY:
+            destroy(action.goal._id);
             break;
 
-        case GoalConstant.DESTROY:
-            destroy({
-                id: action.id
+        case GoalConstant.UPDATE_SUCCESS:
+            result = action.goal;
+            Store.updateSuccess = true;
+            Store.updateGoal = result;
+            Store.goals.some(function (goal) {
+                if (goal._id === result._id) {
+                    console.log('update', goal);
+                    extend(goal, result);
+                }
             });
+            break;
+
+        case GoalConstant.UPDATE_ERROR:
+            Store.updateSuccess = false;
+            break;
         default:
             //do nothing
     }
