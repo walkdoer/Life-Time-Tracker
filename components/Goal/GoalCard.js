@@ -2,6 +2,7 @@
  * @jsx React.DOM
  */
 var React = require('react');
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var cx = React.addons.classSet;
 var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 var Router = require('react-router');
@@ -30,6 +31,7 @@ var Util = require('../../utils/Util');
 
 module.exports = React.createClass({
 
+    //mixins: [PureRenderMixin],
     getInitialState: function () {
         return {
             progress: 0,
@@ -45,6 +47,7 @@ module.exports = React.createClass({
 
     render: function () {
         var goal = this.props.goal;
+        console.log('render goal card');
         var innerDropdown = <DropdownButton title='Granularity'>
             <MenuItem key='year'>year</MenuItem>
             <MenuItem key='month'>month</MenuItem>
@@ -55,7 +58,7 @@ module.exports = React.createClass({
             <div className={cx({"ltt_c-GoalCard": true})}>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-title">
                     {goal.name}
-                    <ModalTrigger modal={<GoalEditWindow onSave={this.props.onUpdate} goal={goal}/>} ref="modalTrigger">
+                    <ModalTrigger modal={<GoalEditWindow onSave={this.props.onEdit} goal={goal}/>} ref="modalTrigger">
                         <span className="ltt_c-GoalCard-editBtn"><i className="fa fa-pencil-square"></i></span>
                     </ModalTrigger>
                 </div>
@@ -87,7 +90,12 @@ module.exports = React.createClass({
         }
     },
 
+    componentWillReceiveProps: function (nextProps) {
+        this.loadActivities(JSON.parse(nextProps.goal.filter));
+    },
+
     loadActivities: function (filter) {
+        console.log('loadActivities');
         var goal = this.props.goal;
         var dateInfo = Util.toDate(goal.granularity);
         var that = this;
@@ -95,7 +103,6 @@ module.exports = React.createClass({
             sort: 'date: -1',
             populate: false
         }, dateInfo, filter);
-        console.log(params);
         DataAPI.Log.load(params)
             .then(function (data) {
                 that.setState({

@@ -3,6 +3,7 @@
  */
 
 var React = require('react');
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var $ = require('jquery');
 var Moment = require('moment');
 var ReactBootStrap = require('react-bootstrap');
@@ -33,6 +34,8 @@ var DataAPI = require('../utils/DataAPI');
 
 module.exports = React.createClass({
 
+    //mixins: [PureRenderMixin],
+
     getInitialState: function () {
         return this.getStateFromStore();
     },
@@ -55,7 +58,7 @@ module.exports = React.createClass({
             this.refs.modalTrigger.hide();
         }
         if (GoalStore.updateSuccess) {
-            return;
+            this.refs.goalList.update(GoalStore.updateGoal);
         }
         this.setState(this.getStateFromStore());
     },
@@ -73,12 +76,16 @@ module.exports = React.createClass({
                         <Button bsSize="medium" style={{float: 'right'}}>New Goal</Button>
                     </ModalTrigger>
                 </h3>
-                <GoalList goals={this.state.goals}/>
+                <GoalList goals={this.state.goals} ref="goalList" onEdit={this.editGoal}/>
             </div>
         );
     },
 
     addGoal: function (goal) {
         GoalAction.create(goal);
+    },
+
+    editGoal: function (goal) {
+        GoalAction.update(goal);
     }
 });

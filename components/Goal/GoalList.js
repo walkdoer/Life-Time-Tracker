@@ -37,43 +37,22 @@ module.exports = React.createClass({
         };
     },
 
-    componentWillMount: function () {
-        GoalStore.addChangeListener(this._onStoreChange);
-    },
-
-    _onStoreChange: function () {
-        var goal = GoalStore.updateGoal;
-        if (GoalStore.updateSuccess) {
-            var goalCard = this.refs[goal._id];
-            if (goalCard) {
-                goalCard.updated();
-            }
-        }
-    },
-
-    getStateFromStore: function () {
-        return _.pick(GoalStore, ['updateSuccess']);
-    },
-
-    componentWillUnmount: function () {
-        GoalStore.removeChangeListener(this._onStoreChange);
-    },
-
 
     render: function () {
         var goals = this.props.goals;
         return (
             <div className="ltt_c-GoalList">
                 {goals.map(function (goal) {
-                    return <GoalCard key={goal._id} ref={goal._id} goal={goal} onUpdate={this.onUpdate}/>
+                    return <GoalCard key={goal._id} ref={goal._id} goal={goal} onEdit={this.props.onEdit}/>
                 }, this)}
             </div>
         );
     },
 
-    onUpdate: function (goal) {
-        GoalAction.update(goal);
+    update: function (goal) {
+        var goalCard = this.refs[goal._id];
+        if (goalCard) {
+            goalCard.updated();
+        }
     }
-
-
 });
