@@ -6,7 +6,6 @@ var React = require('react');
 var nwGui = global.nwGui;
 var Ltt = global.Ltt;
 var Logo = require('./Logo');
-var remoteStorage = require('./storage.remote');
 var RB = require('react-bootstrap');
 var Button = RB.Button;
 var ButtonToolbar = RB.ButtonToolbar;

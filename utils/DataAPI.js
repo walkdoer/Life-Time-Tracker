@@ -22,6 +22,9 @@ function url(src) {
 
 module.exports = {
 
+    get: get,
+    post: post,
+
     getLogContent: function (date, params) {
         return get(url('/logContents/' + date), params)
             .then(function (result) { return result.fileContent;});
@@ -185,6 +188,12 @@ module.exports = {
 
         save: function (settings) {
             return post(url('/settings'), settings);
+        }
+    },
+
+    Stat: {
+        load: function (params) {
+            return get(url('/stats'), params);
         }
     }
 };

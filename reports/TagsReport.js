@@ -16,6 +16,8 @@ var Bar = require('../components/charts/Bar');
 /** constant */
 var DATE_FORMAT = 'YYYY-MM-DD';
 
+/** Utils */
+var DataAPI = require('../utils/DataAPI');
 
 module.exports = React.createClass({
 
@@ -71,12 +73,11 @@ module.exports = React.createClass({
 
     loadTags: function () {
         var that = this;
-        remoteStorage.get('/api/stats', {
+        DataAPI.Stat.load({
                 start: new Moment(this.state.startDate).format(DATE_FORMAT),
                 end: new Moment(this.state.endDate).format(DATE_FORMAT)
             })
-            .then(function (result) {
-                var data = result.data;
+            .then(function (data) {
                 that.setState({
                     loaded: true,
                     tags: data.tagTime

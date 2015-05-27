@@ -6,7 +6,6 @@ var React = require('react');
 var Moment = require('moment');
 var Q = require('q');
 var _ = require('lodash');
-var remoteStorage = require('../components/storage.remote');
 var col4 = 'col-xs-6 col-md-4',
     col8 = 'col-xs-12 col-md-8',
     colFull = 'col-xs-12 col-md-12',

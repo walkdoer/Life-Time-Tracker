@@ -7,7 +7,6 @@ var ReportDateConfig = require('../components/ReportDateConfig');
 var Moment = require('moment');
 var Q = require('q');
 var _ = require('lodash');
-var remoteStorage = require('../components/storage.remote');
 
 /** utils */
 var DataAPI = require('../utils/DataAPI');

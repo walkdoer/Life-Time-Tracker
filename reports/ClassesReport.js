@@ -17,6 +17,9 @@ var ActivityBar = require('../components/charts/ActivityBar');
 var DATE_FORMAT = 'YYYY-MM-DD';
 
 
+/** Utils */
+var DataAPI = require('../utils/DataAPI');
+
 module.exports = React.createClass({
 
     getInitialState: function () {
@@ -66,22 +69,21 @@ module.exports = React.createClass({
 
     loadClassesTrend: function () {
         var that = this;
-        remoteStorage.get('/api/classesTrend', {
-                start: new Moment(this.state.startDate).format(DATE_FORMAT),
-                end: new Moment(this.state.endDate).format(DATE_FORMAT),
-                granularity: this.state.granularity
-            })
-            .then(function (result) {
-                var data = result.data;
-                data = that.adaptClassesTrendData(data);
-                that.setState({
-                    loaded: true,
-                    classesTrend: data
-                });
-            })
-            .catch(function (err) {
-                console.error(err.stack);
+        DataAPI.get('/classesTrend', {
+            start: new Moment(this.state.startDate).format(DATE_FORMAT),
+            end: new Moment(this.state.endDate).format(DATE_FORMAT),
+            granularity: this.state.granularity
+        })
+        .then(function (data) {
+            data = that.adaptClassesTrendData(data);
+            that.setState({
+                loaded: true,
+                classesTrend: data
             });
+        })
+        .catch(function (err) {
+            console.error(err.stack);
+        });
     },
 
     adaptClassesTrendData: function (classesData) {

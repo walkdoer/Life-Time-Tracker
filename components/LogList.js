@@ -10,7 +10,6 @@ var _ = require('lodash');
 
 /**components*/
 var Log = require('../components/Log');
-var remoteStorage = require('../components/storage.remote');
 var LoadingMask = require('../components/LoadingMask');
 module.exports = React.createClass({
 
