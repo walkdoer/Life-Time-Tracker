@@ -212,8 +212,7 @@ module.exports = React.createClass({
             confirmButtonColor: "#DD6B55",
             confirmButtonText: "Yes, delete it!",
             cancelButtonText: "No, cancel plx!",
-            closeOnConfirm: false,
-            closeOnCancel: false
+            closeOnConfirm: false
         }, function(isConfirm){
             if (isConfirm) {
                 DataAPI.Version.delete(version._id).then(function () {
@@ -591,7 +590,9 @@ var VersionInfo = React.createClass({
                     </span>
                 </div>
                 <div className="ltt_p-projectDetail-versionInfo-btns">
-                    <Button onClick={this.props.onDeleteVersion.bind(this, version)} bsStyle="danger" bsSize="xsmall">Delete</Button>
+                    <Button onClick={this.props.onDeleteVersion.bind(this, version)} bsStyle="danger" bsSize="xsmall">
+                        <i className="fa fa-trash-o"/>Delete
+                    </Button>
                 </div>
             </div>
         ) : null;

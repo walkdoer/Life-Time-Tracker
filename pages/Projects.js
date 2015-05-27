@@ -122,7 +122,7 @@ var Projects = React.createClass({
     loadProjects: function () {
         var that = this;
         this.setState({ loading: true });
-        remoteStorage.get('/api/projects', {
+        remoteStorage.get('/projects', {
             start: this.state.startDate,
             end: this.state.endDate
         }).then(function (results) {

@@ -15,7 +15,7 @@ function url(src) {
     if (isNodeWebkit) {
         return 'http://localhost:3333' + src;
     } else {
-        return server + '/api' + src;
+        return 'http://localhost:3333' + src;
     }
 }
 
