@@ -14,7 +14,6 @@ var Col = RB.Col;
 
 /**components*/
 var Log = require('../Log');
-var remoteStorage = require('../storage.remote');
 var LoadingMask = require('../LoadingMask');
 var Notify = require('../Notify');
 var LogLine = require('../charts/LogLine');
@@ -186,11 +185,11 @@ module.exports = React.createClass({
             taskId: task._id
         }, _.pick(this.props, ['versionId', 'projectId']), params);
         params.populate = false;
-        var promise = remoteStorage.get('/api/logs', params)
-            .then(function (res) {
+        var promise = DataAPI.Log.load(params)
+            .then(function (logs) {
                 that.setState({
                     loaded: true,
-                    logs: res.data
+                    logs: logs
                 });
             });
         return promise;
