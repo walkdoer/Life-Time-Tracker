@@ -92,6 +92,12 @@ module.exports = {
         return deferred.promise;
     },
 
+    Project: {
+        load: function (params) {
+            return get(url('/projects'), params);
+        }
+    },
+
     Log: {
         load: function (params) {
             return get(url('/logs'), params);

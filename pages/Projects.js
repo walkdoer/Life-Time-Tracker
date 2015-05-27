@@ -21,6 +21,7 @@ var LoadingMask = require('../components/LoadingMask');
 
 /** Utils */
 var Bus = require('../utils/Bus');
+var DataAPI = require('../utils/DataAPI');
 
 /** Constants */
 var EVENT = require('../constants/EventConstant');
@@ -122,11 +123,10 @@ var Projects = React.createClass({
     loadProjects: function () {
         var that = this;
         this.setState({ loading: true });
-        remoteStorage.get('/projects', {
+        DataAPI.Project.load({
             start: this.state.startDate,
             end: this.state.endDate
-        }).then(function (results) {
-            var projects = results.data;
+        }).then(function (projects) {
             that.allProjects = projects;
             that.setState({
                 loading: false,

@@ -10,6 +10,7 @@ var RouteHandler = Router.RouteHandler;
 var Moment = require('moment');
 var _ = require('lodash');
 var Mt = window.Mousetrap;
+
 /*components*/
 var remoteStorage = require('../components/storage.remote');
 var DateRangePicker = require('../components/DateRangePicker');
@@ -18,6 +19,8 @@ var Pinyin = require('../components/Pinyin');
 
 var config = require('../conf/config');
 
+/** Utils */
+var DataAPI = require('../utils/DataAPI');
 
 module.exports = React.createClass({
     mixins: [Router.State, Router.Navigation],
@@ -84,18 +87,17 @@ module.exports = React.createClass({
     loadProjects: function () {
         var that = this;
         this.setState({ loading: true });
-        remoteStorage.get('/api/projects', {
+        DataAPI.Project.load({
             start: this.props.startDate,
             end: this.props.endDate,
             aggregate: false
-        }).then(function (results) {
-                var projects = results.data;
-                that.allProjects = projects;
-                that.setState({
-                    loading: false,
-                    projects: projects
-                });
+        }).then(function (projects) {
+            that.allProjects = projects;
+            that.setState({
+                loading: false,
+                projects: projects
             });
+        });
     },
 
     onVersionDeleted: function (version) {
