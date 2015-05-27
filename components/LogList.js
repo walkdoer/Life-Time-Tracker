@@ -75,11 +75,11 @@ module.exports = React.createClass({
             sort: 'date: -1'
         }, _.pick(this.props, ['versionId', 'taskId', 'projectId']));
         params.populate = false;
-        var promise = remoteStorage.get('/api/logs', params)
-            .then(function (res) {
+        var promise = DataAPI.Log.load(params)
+            .then(function (logs) {
                 that.setState({
                     loaded: true,
-                    logs: res.data
+                    logs: logs
                 });
             });
         return promise;

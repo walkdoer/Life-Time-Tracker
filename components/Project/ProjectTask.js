@@ -30,7 +30,6 @@ var Tag = require('../Tag');
 var Log = require('../Log');
 var LoadIndicator = require('../LoadIndicator');
 var LogClass = require('../LogClass');
-var remoteStorage = require('../storage.remote');
 var LoadingMask = require('../LoadingMask');
 var TaskList = require('../Task/TaskList');
 var Task = require('../Task/Task');
@@ -281,9 +280,8 @@ module.exports = React.createClass({
 
     loadProject: function (projectId) {
         var that = this;
-        remoteStorage.get('/api/projects/' + projectId)
-            .then(function (res) {
-                var project = res.data;
+        DataAPI.Project.get(projectId)
+            .then(function (project) {
                 that.setState({
                     projectLoaded: true,
                     project: project
@@ -385,13 +383,13 @@ module.exports = React.createClass({
         defaultParams.parent = "null";
         params = _.extend({}, defaultParams, params);
         params.calculateTimeConsume = true;
-        remoteStorage.get('/api/tasks', params)
-            .then(function (res) {
+        DataAPI.Task.load(params)
+            .then(function (tasks) {
                 that.setState({
                     taskLoaded: true,
-                    tasks: res.data
+                    tasks: tasks
                 }, function () {
-                    deferred.resolve(res.data);
+                    deferred.resolve(tasks);
                 });
             }).catch(function (err) {
                 deferred.reject(err);

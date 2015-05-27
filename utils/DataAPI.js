@@ -95,6 +95,10 @@ module.exports = {
     Project: {
         load: function (params) {
             return get(url('/projects'), params);
+        },
+
+        get: function (id) {
+            return get(url('/projects/' + id));
         }
     },
 
