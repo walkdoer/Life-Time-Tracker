@@ -113,6 +113,15 @@ var CreateAddGoalModal = React.createClass({
                         onChange={this.onEstimatedTimeChange}/>
                     {this.renderGranularity()}
                     <pre id="ltt_c-CreateAddGoalModal-filterEditor" className="ltt_c-CreateAddGoalModal-filterEditor"/>
+                    <div className="help-block">
+                        Use filter to filter the log for the goal
+                        <pre>
+                                "classes": "SPR",
+                                "tags": 'running,jogging',
+                                "projects": "...",
+                                "tasks": "..."
+                        </pre>
+                    </div>
                 </div>
                 <div className="modal-footer">
                     <Button onClick={this.props.onRequestHide}>Close</Button>
