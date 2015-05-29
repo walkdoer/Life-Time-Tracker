@@ -35,6 +35,24 @@ module.exports = React.createClass({
             data: this._getLineData()
         }];
         var title = this._getTitle();
+        var tickInterval;
+        if (this.props.granularity) {
+            switch(this.props.granularity) {
+                case 'month':
+                case 'monthly':
+                    tickInterval = 3600 * 24 * 100;
+                    break;
+                case 'day':
+                    tickInterval = 3600 * 1000;
+                    break;
+                case 'week':
+                case 'weekly':
+                    tickInterval = 3600 * 24 * 100;
+                    break;
+                default:
+                    break;
+            }
+        }
         var options = {
             title: {
                 text: title,
@@ -52,10 +70,10 @@ module.exports = React.createClass({
                     second: '%Y-%m-%d %H:%M:%S',
                     minute: '%Y-%m-%d %H:%M',
                     hour: '%Y-%m-%d %H:%M',
-                    day: '%Y-%m-%d %H:%M',
-                    week: '%Y-%m-%d %H:%M',
-                    month: '%Y-%m-%d %H:%M',
-                    year: '%Y-%m-%d %H:%M'
+                    day: '%Y-%m-%d',
+                    week: '%Y-%m-%d',
+                    month: '%Y-%m',
+                    year: '%Y'
                 }
             },
             plotOptions: {
@@ -73,7 +91,8 @@ module.exports = React.createClass({
                     fillOpacity: 0.5
                 },
                 series: {
-                    showInLegend: false
+                    showInLegend: false,
+                    pointWidth: 10
                 }
             },
             yAxis: {
@@ -81,6 +100,7 @@ module.exports = React.createClass({
             },
             xAxis: {
                 type: 'datetime',
+                minTickInterval: tickInterval,
                 /*labels: {
                     format: '{value:%Y-%m-%d}',
                     rotation: 90,
@@ -114,11 +134,31 @@ module.exports = React.createClass({
 
     _getLineData: function () {
         var logs = this.props.logs;
-        return logs.slice(0).sort(function (a, b) {
-            return new Date(a.start).getTime() - new Date(b.start).getTime();
-        }).map(function (log) {
-            return [new Moment(log.start).unix() * 1000, log.len];
-        });
+        var granularity = this.props.granularity;
+        if (['weekly', 'week', 'month', 'monthly'].indexOf(granularity) >= 0) {
+            var data = logs.reduce(function (result, log) {
+                var date = new Moment(log.date).startOf('day').unix() * 1000;
+                if (result[date] !== undefined) {
+                    result[date] += log.len;
+                } else {
+                    result[date] = log.len;
+                }
+                return result;
+            }, {});
+            data = _.pairs(data).map(function (d) {
+                d[0] = parseInt(d[0], 10);
+                return d;
+            }).sort(function (a, b) {
+                return a[0] - b[0];
+            });
+            return data || [];
+        } else {
+            return logs.slice(0).sort(function (a, b) {
+                return new Date(a.date).getTime() - new Date(b.date).getTime();
+            }).map(function (log) {
+                return [new Moment(log.date).unix() * 1000, log.len];
+            });
+        }
     },
 
     _getTitle: function () {

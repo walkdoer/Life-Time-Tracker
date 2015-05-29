@@ -67,7 +67,11 @@ module.exports = React.createClass({
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-activities">
                     {this.state.activitiesLoadFailed ?
                         'Load Activity Failed' :
-                        (goal.filter ? <LogLine logs={this.state.activities} title={false} xAxisLabel={false} yAxisLabel={false}/> : null)
+                        (goal.filter ? <LogLine logs={this.state.activities}
+                            granularity={goal.granularity}
+                            title={false}
+                            xAxisLabel={false}
+                            yAxisLabel={false}/> : null)
                     }
                     <LoadingMask loaded={this.state.activitiesLoaded}/>
                 </div>
