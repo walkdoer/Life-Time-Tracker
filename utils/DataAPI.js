@@ -22,8 +22,12 @@ function url(src) {
 
 module.exports = {
 
-    get: get,
-    post: post,
+    get: function (_url, data) {
+        return get(url(_url), data);
+    },
+    post: function (_url, data) {
+        return post(url(_url), data);
+    },
 
     getLogContent: function (date, params) {
         return get(url('/logContents/' + date), params)

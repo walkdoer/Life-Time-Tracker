@@ -7,11 +7,6 @@
         isNodeWebkit = true;
     }
 
-    //延时1s之后再加载主要界面
-    //
-    setTimeout(function () {
-        loadjs('./main.js');
-    }, 1000);
 
     if (!isNodeWebkit) {
         console.log('init Ltt Api for browser invironment');
@@ -21,6 +16,9 @@
             }
         };
         window.Ltt = Ltt;
+        setTimeout(function () {
+            loadjs('./main.js');
+        }, 1000);
         return;
     }
     var sdk = require('ltt-sdk');
@@ -253,5 +251,11 @@
         initApp();
         //use new-instanse window to start server
         var serverWin = gui.Window.open('./server.html', {"new-instance": true, show: false});
+
+        //延时1s之后再加载主要界面
+        //
+        setTimeout(function () {
+            loadjs('./main.js');
+        }, 1000);
     }
 })();

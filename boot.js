@@ -82,7 +82,7 @@ var routes = (
 );
 
 Router.run(routes, function(Handler) {
-    React.render(<Handler />, document.getElementById('app-container'));
+    React.render(<Handler />, window.document.getElementById('app-container'));
 });
 /*
 React.render(
