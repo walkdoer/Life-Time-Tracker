@@ -72,16 +72,26 @@
     margin: 10px 0;
 }
 
-
+.ltt_c-GoalCard-deleteBtn,
 .ltt_c-GoalCard-editBtn {
     /* position: absolute; */
     /* bottom: 2px; */
     /* right: 6px; */
     color: #ccc;
+    display: none;
+}
+.ltt_c-GoalCard:hover .ltt_c-GoalCard-deleteBtn,
+.ltt_c-GoalCard:hover .ltt_c-GoalCard-editBtn{
+    display:inline-block;
 }
 
 .ltt_c-GoalCard-editBtn:hover{
     color:#32F;
+    cursor: pointer;
+}
+
+.ltt_c-GoalCard-deleteBtn:hover{
+    color:red;
     cursor: pointer;
 }
 

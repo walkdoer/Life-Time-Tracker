@@ -76,7 +76,7 @@ module.exports = React.createClass({
                         <Button bsSize="medium" style={{float: 'right'}}>New Goal</Button>
                     </ModalTrigger>
                 </h3>
-                <GoalList goals={this.state.goals} ref="goalList" onEdit={this.editGoal}/>
+                <GoalList goals={this.state.goals} ref="goalList" onEdit={this.editGoal} onDelete={this.deleteGoal}/>
             </div>
         );
     },
@@ -87,5 +87,9 @@ module.exports = React.createClass({
 
     editGoal: function (goal) {
         GoalAction.update(goal);
+    },
+
+    deleteGoal: function (goal) {
+        GoalAction.destroy(goal);
     }
 });

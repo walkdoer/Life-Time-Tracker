@@ -6,6 +6,13 @@
     if (typeof require !== 'undefined') {
         isNodeWebkit = true;
     }
+
+    //延时1s之后再加载主要界面
+    //
+    setTimeout(function () {
+        loadjs('./main.js');
+    }, 1000);
+
     if (!isNodeWebkit) {
         console.log('init Ltt Api for browser invironment');
         Ltt = {
@@ -246,9 +253,5 @@
         initApp();
         //use new-instanse window to start server
         var serverWin = gui.Window.open('./server.html', {"new-instance": true, show: false});
-        setTimeout(function () {
-            loadjs('./main.js');
-        }, 1000);
     }
-
 })();

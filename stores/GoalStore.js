@@ -70,7 +70,7 @@ AppDispatcher.register(function(payload) {
             Store.createError = action.error;
             break;
 
-        case GoalConstant.DESTROY:
+        case GoalConstant.DESTROY_SUCCESS:
             destroy(action.goal._id);
             break;
 

@@ -61,6 +61,7 @@ module.exports = React.createClass({
                     <ModalTrigger modal={<GoalEditWindow onSave={this.props.onEdit} goal={goal}/>} ref="modalTrigger">
                         <span className="ltt_c-GoalCard-editBtn"><i className="fa fa-pencil-square"></i></span>
                     </ModalTrigger>
+                    <span className="ltt_c-GoalCard-deleteBtn" onClick={this.onDelete}><i className="fa fa-trash"></i></span>
                 </div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity">{goal.granularity}</div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-activities">
@@ -131,5 +132,9 @@ module.exports = React.createClass({
 
     updated: function () {
         this.refs.modalTrigger.hide();
+    },
+
+    onDelete: function () {
+        this.props.onDelete(this.props.goal);
     }
 });

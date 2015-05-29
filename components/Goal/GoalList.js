@@ -43,7 +43,7 @@ module.exports = React.createClass({
         return (
             <div className="ltt_c-GoalList">
                 {goals.map(function (goal) {
-                    return <GoalCard key={goal._id} ref={goal._id} goal={goal} onEdit={this.props.onEdit}/>
+                    return <GoalCard key={goal._id} ref={goal._id} goal={goal} onEdit={this.props.onEdit} onDelete={this.props.onDelete}/>
                 }, this)}
             </div>
         );

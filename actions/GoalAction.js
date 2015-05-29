@@ -77,10 +77,17 @@ module.exports = {
     /**
      * @param  {string} id
      */
-    destroy: function(id) {
-        AppDispatcher.handleViewAction({
-            type: GoalConstant.DESTROY,
-            id: id
+    destroy: function(goal) {
+        DataAPI.Goal.destroy(goal).then(function (goal){
+            AppDispatcher.handleViewAction({
+                type: GoalConstant.DESTROY_SUCCESS,
+                goal: goal
+            });
+        }).catch(function (err) {
+            AppDispatcher.handleViewAction({
+                type: GoalConstant.DESTROY_ERROR,
+                error: err
+            });
         });
     }
 
