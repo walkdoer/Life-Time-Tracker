@@ -42,70 +42,6 @@
         var fileSrc = 'file:///' + path.resolve('./' + fileName);
         return fileSrc;
     }
-    if (isNodeWebkit === true) {
-        var gui = require('nw.gui');
-        console.log('init Ltt Api for node-webkit invironment');
-        Ltt = {
-
-            init: function () {
-                var win = this.getWindow();
-                gui.App.on('reopen', function () {
-                    win.show();
-                    win.focus();
-                });
-            },
-
-            getWindow: function() {
-                return gui.Window.get();
-            },
-
-            enterFullscreen: function() {
-                this.getWindow().enterFullscreen();
-            },
-
-            leaveFullscreen: function() {
-                this.getWindow().leaveFullscreen();
-            },
-
-            isFullscreen: function() {
-                return this.getWindow().isFullscreen;
-            },
-
-            /**
-             * close application window
-             */
-            close: function() {
-                var that = this;
-                if (this.isFullscreen()) {
-                    this.leaveFullscreen();
-                    setTimeout(function () {
-                        that.getWindow().hide();
-                    }, 1500);
-                } else {
-                    this.getWindow().close();
-                }
-            },
-
-            quit: function () {
-                var win = this.getWindow();
-                win.close();
-            },
-
-            openExternalLink: function (link) {
-                if (link) {
-                    gui.Shell.openExternal(link);
-                }
-            }
-        };
-        sdk.startServer().then(function () {
-            initApp();
-        }).fail(function(err) {
-            initApp();
-            alert('Server Alreay Start in port ' + config.serverPort);
-        });
-
-
-    }
 
     function initApp() {
         Ltt.init();
@@ -125,6 +61,8 @@
             }
         });
     }
+
+
     function initMenu() {
         var win = Ltt.getWindow();
         var menubar = new gui.Menu({ type: "menubar" });
@@ -240,6 +178,69 @@
             // Register global desktop shortcut, which can work without focus.
             gui.App.registerGlobalHotKey(shortcut);
         });
+    }
+
+    if (isNodeWebkit === true) {
+        var gui = require('nw.gui');
+        console.log('init Ltt Api for node-webkit invironment');
+        Ltt = {
+
+            init: function () {
+                var win = this.getWindow();
+                gui.App.on('reopen', function () {
+                    win.show();
+                    win.focus();
+                });
+            },
+
+            getWindow: function() {
+                return gui.Window.get();
+            },
+
+            enterFullscreen: function() {
+                this.getWindow().enterFullscreen();
+            },
+
+            leaveFullscreen: function() {
+                this.getWindow().leaveFullscreen();
+            },
+
+            isFullscreen: function() {
+                return this.getWindow().isFullscreen;
+            },
+
+            /**
+             * close application window
+             */
+            close: function() {
+                var that = this;
+                if (this.isFullscreen()) {
+                    this.leaveFullscreen();
+                    setTimeout(function () {
+                        that.getWindow().hide();
+                    }, 1500);
+                } else {
+                    this.getWindow().close();
+                }
+            },
+
+            quit: function () {
+                var win = this.getWindow();
+                win.close();
+            },
+
+            openExternalLink: function (link) {
+                if (link) {
+                    gui.Shell.openExternal(link);
+                }
+            },
+        };
+        global.Ltt = Ltt;
+        initApp();
+        setTimeout(function () {
+            //use new-instanse window to start server
+            var serverWin = gui.Window.open('./server.html', {"new-instance": true});
+        }, 100);
     }
 
 })();

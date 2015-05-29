@@ -317,7 +317,9 @@ gulp.task('nw', function () {
           './nw/**/*',
           './libs/**/*',
           './index.html',
+          './server.html',
           './vendors.js',
+          './nodeMain.js',
           './main.js',
         ].concat(dependencies);
 

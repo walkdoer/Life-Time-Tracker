@@ -1,0 +1,21 @@
+<html>
+<head>
+    <title>server</title>
+</head>
+<body>
+    <script type="text/javascript">
+    'use strict';
+    var sdk = require('ltt-sdk');
+    var server = process.mainModule.exports.server;
+    sdk.startServer().then(function () {
+        //process.mainModule.exports.initApp();
+        server.serverStarted(true);
+        alert('start server success');
+    }).fail(function(err) {
+        //process.mainModule.exports.initApp();
+        server.serverStarted(false);
+        alert('Server Alreay Start');
+    });
+    </script>
+</body>
+</html>
