@@ -38,6 +38,13 @@
         }
     };
 
+    function loadjs(script_filename) {
+        var script = document.createElement('script');
+        script.setAttribute('type', 'text/javascript');
+        script.setAttribute('src', script_filename);
+        document.body.appendChild(script);
+    }
+
     function getFileSrc(fileName) {
         var fileSrc = 'file:///' + path.resolve('./' + fileName);
         return fileSrc;
@@ -237,10 +244,11 @@
         };
         global.Ltt = Ltt;
         initApp();
+        //use new-instanse window to start server
+        var serverWin = gui.Window.open('./server.html', {"new-instance": true, show: false});
         setTimeout(function () {
-            //use new-instanse window to start server
-            var serverWin = gui.Window.open('./server.html', {"new-instance": true});
-        }, 100);
+            loadjs('./main.js');
+        }, 1000);
     }
 
 })();
