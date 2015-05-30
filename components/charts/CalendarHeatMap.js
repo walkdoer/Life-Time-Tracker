@@ -62,7 +62,9 @@ var CalendarHeatMap = React.createClass({
     },
 
     getDrawOptions: function () {
-        return _.omit(this.props, 'data');
+        var options = _.omit(this.props, 'data');
+        options.highlight = [new Date()];
+        return options;
     },
 
     next: function () {

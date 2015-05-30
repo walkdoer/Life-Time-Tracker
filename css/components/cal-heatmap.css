@@ -172,3 +172,8 @@ text.now
     top: -40px;
     right: 0px;
 }
+
+
+.ltt_c-calendarHeapMap rect.now {
+    stroke: #EB3819;
+}
