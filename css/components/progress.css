@@ -10,6 +10,9 @@
 .ltt_c-progress-bar {
   position: relative;
   height: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
   float: right;
   /*border-radius: 4px;*/
   -webkit-transition: 0.4s linear;
@@ -47,8 +50,5 @@
 
 .ltt_c-progress-number{
   font-size: 9px;
-  position: absolute;
-  top: 0;
-  right: 4px;
   color: #FFF;
 }

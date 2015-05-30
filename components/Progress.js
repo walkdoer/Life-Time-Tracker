@@ -20,7 +20,7 @@ var Progress = React.createClass({
             progress = 100;
         }
         var colors = ['#86e01e', '#f2d31b', '#f2b01e', '#f27011', '#f63a0f'].reverse();
-        var level = Math.ceil(value/ (max / colors.length)) - 1;
+        var level = value < max ? (Math.ceil(value/ (max / colors.length)) - 1) : (colors.length - 1);
         var reverse = this.props.reverse;
         if (reverse) {
             colors = colors.reverse();
