@@ -70,7 +70,7 @@ var Dashboard = React.createClass({
                         empty="do not meditate this day"
                         filled="{date} meditate {count}"/>
                 </div>
-                <div className="Grid">
+                <div className="Grid Grid--gutters Grid--stretch">
                     <div className="Grid-cell u-1of3">
                         <MonthCountDown width={350} height={250} padding={0}
                             itemPadding={2} lifeYear={70} birthday='1989-10-23'/>

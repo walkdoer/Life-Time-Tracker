@@ -26,6 +26,10 @@
   align-items: center;
 }
 
+.Grid--stretch {
+  align-items: stretch;
+}
+
 .Grid--justifyCenter {
   justify-content: center;
 }

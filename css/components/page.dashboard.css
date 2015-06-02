@@ -1,3 +1,8 @@
+.ltt_c-page-dashboard .ltt_c-LogClassPie{
+    min-height: 308px;
+    background-color:#fff;
+}
+
 .ltt_c-RecentActivity-content{
     position:relative;
     min-height:200px;

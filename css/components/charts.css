@@ -19,6 +19,8 @@
 .ltt_c-chart-MonthCountDown h1{
     font-size:1.34rem;
     font-weight: bold;
+    margin: 0px;
+    margin-bottom: 10px;
 }
 
 .ltt_c-chart-LogLine {
