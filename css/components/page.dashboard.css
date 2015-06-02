@@ -3,6 +3,7 @@
     max-height: 308px;
     background-color:#fff;
     padding: 10px;
+    overflow: hidden;
 }
 .ltt_c-page-dashboard .ltt_c-LogClassPie .ltt_c-chart{
     height: 274px;
