@@ -20,6 +20,7 @@ var TaskList = require('../components/Task/TaskList');
 var Task = require('../components/Task/Task');
 var LoadingMask = require('../components/LoadingMask');
 var Board = require('../components/Borad');
+var LogClassPie = require('../components/LogClassPie');
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
@@ -68,9 +69,15 @@ var Dashboard = React.createClass({
                         empty="do not meditate this day"
                         filled="{date} meditate {count}"/>
                 </div>
-                <div className="ltt_c-page-com">
-                    <MonthCountDown width={350} height={250} padding={0}
-                        itemPadding={2} lifeYear={70} birthday='1989-10-23'/>
+                <div className="Grid">
+                    <div className="Grid-cell u-1of3">
+                        <MonthCountDown width={350} height={250} padding={0}
+                            itemPadding={2} lifeYear={70} birthday='1989-10-23'/>
+                    </div>
+                    <div className="Grid-cell u-1of3">
+                        <LogClassPie start={} end={} />
+                    </div>
+
                 </div>
             </div>
         );
