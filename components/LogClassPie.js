@@ -127,11 +127,26 @@ module.exports = React.createClass({
 
     //{yesterDayLogClassTime ? <Pie data={yesterDayLogClassTime} highchartOptions={highchartOptions}/> : null }
 
-    loadData: function (date) {
+    loadData: function (nextProps) {
+        if (!nextProps) {
+            props = this.props;
+        } else {
+            props = nextProps;
+        }
+        var start = props.start,
+            end = props.end,
+            date = props.date;
         var that = this;
+        if (start && end) {
+            start = new Moment(start).startOf('day').format(DATE_FORMAT);
+            end = new Moment(end).endOf('day').format(DATE_FORMAT);
+        } else if (date) {
+            start = new Moment(date).startOf('day').format(DATE_FORMAT);
+            end = new Moment(date).endOf('day').format(DATE_FORMAT);
+        }
         DataAPI.stat({
-            start: new Moment(date).startOf('day').format(DATE_FORMAT),
-            end: new Moment(date).endOf('day').format(DATE_FORMAT)
+            start: new Moment(start).startOf('day').format(DATE_FORMAT),
+            end: new Moment(end).endOf('day').format(DATE_FORMAT)
         }).then(function (statResult) {
             that.setState({
                 loaded: true,
@@ -139,8 +154,8 @@ module.exports = React.createClass({
             });
         }).then(function () {
             return DataAPI.stat({
-                start: new Moment(date).subtract(1, 'day').startOf('day').format(DATE_FORMAT),
-                end: new Moment(date).subtract(1, 'day').endOf('day').format(DATE_FORMAT)
+                start: new Moment(start).subtract(1, 'day').startOf('day').format(DATE_FORMAT),
+                end: new Moment(end).subtract(1, 'day').endOf('day').format(DATE_FORMAT)
             });
         }).then(function (statResult) {
             that.setState({
@@ -150,14 +165,14 @@ module.exports = React.createClass({
     },
 
     componentDidMount: function () {
-        this.loadData(this.props.date);
+        this.loadData();
     },
 
     componentWillReceiveProps: function (nextProps) {
-        this.loadData(nextProps.date);
+        this.loadData(nextProps);
     },
 
     update: function () {
-        this.loadData(this.props.date);
+        this.loadData();
     }
 })

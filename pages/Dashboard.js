@@ -74,13 +74,20 @@ var Dashboard = React.createClass({
                         <MonthCountDown width={350} height={250} padding={0}
                             itemPadding={2} lifeYear={70} birthday='1989-10-23'/>
                     </div>
-                    <div className="Grid-cell u-1of3">
-                        <LogClassPie start={} end={} />
-                    </div>
-
+                    <div className="Grid-cell u-1of3" ref="logClassPieContainer"> </div>
                 </div>
             </div>
         );
+    },
+
+    loadSettings: function () {
+        DataAPI.Settings.load()
+        .then(function (settings) {
+            React.renderComponent(
+                <LogClassPie start={new Moment(settings.startDate)} end={new Moment()} />
+                ,this.refs.logClassPieContainer.getDOMNode()
+            );
+        });
     },
 
 
