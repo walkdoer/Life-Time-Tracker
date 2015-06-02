@@ -31,9 +31,21 @@ module.exports = React.createClass({
 
     componentDidMount: function () {
         this.plot(this.props);
+        this.onResizeToken = this.onResize.bind(this);
+        $(window).on('resize', this.onResizeToken);
+    },
+
+    componentWillUnmount: function () {
+        $(window).off('resize', this.onResizeToken);
+    },
+
+    onResize: function () {
+        $(this.getDOMNode()).find('svg')[0].innerHTML = '';
+        this.plot(this.props);
     },
 
     plot: function (options) {
+        if (!options) { options = this.props; }
         var $el = $(this.getDOMNode());
         options = _.extend({
             itemPadding: 3,
