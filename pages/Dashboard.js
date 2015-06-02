@@ -72,7 +72,7 @@ var Dashboard = React.createClass({
                 </div>
                 <div className="Grid Grid--gutters Grid--stretch">
                     <div className="Grid-cell u-1of3">
-                        <MonthCountDown width={350} height={250} padding={0}
+                        <MonthCountDown height={250} padding={0}
                             itemPadding={2} lifeYear={70} birthday='1989-10-23'/>
                     </div>
                     <div className="Grid-cell u-1of3" ref="logClassPieContainer">

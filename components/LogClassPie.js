@@ -30,7 +30,12 @@ module.exports = React.createClass({
 
     getInitialState: function () {
         return {
-            loaded: false,
+            loaded: false
+        };
+    },
+
+    getDefaultProps: function () {
+        return {
             compare: true
         };
     },

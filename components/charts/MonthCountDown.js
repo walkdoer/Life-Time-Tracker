@@ -34,11 +34,12 @@ module.exports = React.createClass({
     },
 
     plot: function (options) {
+        var $el = $(this.getDOMNode());
         options = _.extend({
             itemPadding: 3,
             padding: 5,
-            width: 450,
-            height: 450
+            width: $el.width(),
+            height: $el.height()
         }, options);
         var lifeYear = options.lifeYear;
         var birthday = options.birthday;
