@@ -81,6 +81,7 @@ module.exports = React.createClass({
         }
         return (
             <div className="ltt_c-LogClassPie">
+                <h1>{this.props.title}</h1>
                 {logClassTime ? <Pie data={logClassTime} highchartOptions={highchartOptions}/> : null }
                 {this.props.compare ? this.renderCompare() : null}
                 <LoadingMask loaded={this.state.loaded}/>

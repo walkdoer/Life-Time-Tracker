@@ -1,6 +1,12 @@
 .ltt_c-page-dashboard .ltt_c-LogClassPie{
-    min-height: 308px;
+    height:308px;
+    max-height: 308px;
     background-color:#fff;
+    padding: 10px;
+}
+.ltt_c-page-dashboard .ltt_c-LogClassPie .ltt_c-chart{
+    height: 274px;
+    min-height: 274px;
 }
 
 .ltt_c-RecentActivity-content{

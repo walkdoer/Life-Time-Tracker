@@ -5,3 +5,11 @@
 .ltt_c-logClass .fa{
     margin-right: 3px;
 }
+
+
+.ltt_c-LogClassPie h1{
+    font-size:14px;
+    font-weight:500;
+    margin: 0px;
+    margin-bottom: 10px;
+}
