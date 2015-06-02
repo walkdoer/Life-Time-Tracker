@@ -214,7 +214,6 @@ gulp.task('html', function() {
     var appResources = [
         './nw/initNW.js',
         './vendors.js',
-        './main.js',
         './css/lib/normalize.css',
         './css/lib/**/*.css',
         './css/ltt.css',
@@ -320,7 +319,7 @@ gulp.task('nw', function () {
           './server.html',
           './vendors.js',
           './nodeMain.js',
-          './main.js',
+          './main.js'
         ].concat(dependencies);
 
     console.log(files);

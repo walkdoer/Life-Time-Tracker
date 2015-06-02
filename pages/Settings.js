@@ -30,9 +30,21 @@ var NORMAL_COST_STORAGE_KEY = 'normal_cost';
 var defaultValue = {
     energy: 100
 };
+
+var _settings = {};
+
 module.exports = React.createClass({
 
     statics: {
+        load: function () {
+            return DataAPI.Settings.load().then(function (settings) {
+                return (_settings = settings);
+            });
+        },
+
+        get: function (key) {
+            return key ? _settings[key] : _settings;
+        },
 
         setEnergy: function (val) {
             store(ENERGY_STORAGE_KEY, val);
@@ -177,6 +189,8 @@ module.exports = React.createClass({
         store(ENERGY_STORAGE_KEY, value);
         this.setState({
             energy: value
+        }, function () {
+            _settings = this.state;
         });
     },
 
@@ -185,6 +199,8 @@ module.exports = React.createClass({
         store(SLEEP_VALUE_STORAGE_KEY, value);
         this.setState({
             sleepValue: value
+        }, function () {
+            _settings = this.state;
         });
     },
 
@@ -193,6 +209,8 @@ module.exports = React.createClass({
         store(NORMAL_COST_STORAGE_KEY, value);
         this.setState({
             normalCost: value
+        }, function () {
+            _settings = this.state;
         });
     },
 
@@ -231,6 +249,8 @@ module.exports = React.createClass({
         settings[name] = target.value;
         this.setState({
             settings: settings
+        }, function () {
+            _settings = this.state;
         });
     },
 

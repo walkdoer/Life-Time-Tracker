@@ -30,7 +30,8 @@ module.exports = React.createClass({
 
     getInitialState: function () {
         return {
-            loaded: false
+            loaded: false,
+            compare: true
         };
     },
 
@@ -81,46 +82,61 @@ module.exports = React.createClass({
         return (
             <div className="ltt_c-LogClassPie">
                 {logClassTime ? <Pie data={logClassTime} highchartOptions={highchartOptions}/> : null }
-                <div className="ltt_c-LogClassPie-changes">
-                {logClasses.map(function (logClass) {
-                    var time = 0, yesterdayTime;
-                    var classId = logClass.value;
-                    var data;
-                    if (!_.isEmpty(logClassTime)) {
-                        data = logClassTime.filter(function(item) {
-                            return item.id === classId;
-                        })[0];
-                        if (data) {
-                            time = data.count;
-                        }
-                    }
-                    if (!_.isEmpty(yesterDayLogClassTime)) {
-                        data = yesterDayLogClassTime.filter(function(item) {
-                            return item.id === classId;
-                        })[0];
-                        if (data) {
-                            yesterdayTime = data.count;
-                        }
-                    }
-                    var progressNumber, progressPercentage, progress;
-                    if (yesterdayTime > 0) {
-                        progressNumber = time - yesterdayTime;
-                        progressPercentage = progressNumber / yesterdayTime;
-                        progress = (
-                            <p className={'changeItem ' + (progressNumber > 0 ? 'rise' : (progressNumber < 0 ? 'down' : 'equal'))}>
-                                <span className="name">{logClass.text}</span>
-                                <span className="num">
-                                <i className={"fa fa-" + (progressNumber > 0 ? 'long-arrow-up' :
-                                    (progressNumber < 0 ? 'long-arrow-down' : 'minus'))}></i>
-                                {numeral(progressPercentage * 100).format('0.0')}%
-                                </span>
-                            </p>
-                        );
-                    }
-                    return progress;
-                })}
-                </div>
+                {this.props.compare ? this.renderCompare() : null}
                 <LoadingMask loaded={this.state.loaded}/>
+            </div>
+        );
+    },
+
+    renderCompare: function () {
+        var today = this.state.today;
+        var yesterday = this.state.yesterday;
+        var logClassTime, yesterDayLogClassTime;
+        if (today) {
+            logClassTime = today.classTime;
+        }
+        if (yesterday) {
+            yesterDayLogClassTime = yesterday.classTime;
+        }
+        return (
+            <div className="ltt_c-LogClassPie-changes">
+            {logClasses.map(function (logClass) {
+                var time = 0, yesterdayTime;
+                var classId = logClass.value;
+                var data;
+                if (!_.isEmpty(logClassTime)) {
+                    data = logClassTime.filter(function(item) {
+                        return item.id === classId;
+                    })[0];
+                    if (data) {
+                        time = data.count;
+                    }
+                }
+                if (!_.isEmpty(yesterDayLogClassTime)) {
+                    data = yesterDayLogClassTime.filter(function(item) {
+                        return item.id === classId;
+                    })[0];
+                    if (data) {
+                        yesterdayTime = data.count;
+                    }
+                }
+                var progressNumber, progressPercentage, progress;
+                if (yesterdayTime > 0) {
+                    progressNumber = time - yesterdayTime;
+                    progressPercentage = progressNumber / yesterdayTime;
+                    progress = (
+                        <p className={'changeItem ' + (progressNumber > 0 ? 'rise' : (progressNumber < 0 ? 'down' : 'equal'))}>
+                            <span className="name">{logClass.text}</span>
+                            <span className="num">
+                            <i className={"fa fa-" + (progressNumber > 0 ? 'long-arrow-up' :
+                                (progressNumber < 0 ? 'long-arrow-down' : 'minus'))}></i>
+                            {numeral(progressPercentage * 100).format('0.0')}%
+                            </span>
+                        </p>
+                    );
+                }
+                return progress;
+            })}
             </div>
         );
     },
@@ -144,7 +160,7 @@ module.exports = React.createClass({
             start = new Moment(date).startOf('day').format(DATE_FORMAT);
             end = new Moment(date).endOf('day').format(DATE_FORMAT);
         }
-        DataAPI.stat({
+        var promise = DataAPI.stat({
             start: new Moment(start).startOf('day').format(DATE_FORMAT),
             end: new Moment(end).endOf('day').format(DATE_FORMAT)
         }).then(function (statResult) {
@@ -152,16 +168,21 @@ module.exports = React.createClass({
                 loaded: true,
                 today: statResult
             });
-        }).then(function () {
-            return DataAPI.stat({
-                start: new Moment(start).subtract(1, 'day').startOf('day').format(DATE_FORMAT),
-                end: new Moment(end).subtract(1, 'day').endOf('day').format(DATE_FORMAT)
-            });
-        }).then(function (statResult) {
-            that.setState({
-                yesterday: statResult
-            });
         });
+        if (this.props.compare) {
+            return promise.then(function () {
+                return DataAPI.stat({
+                    start: new Moment(start).subtract(1, 'day').startOf('day').format(DATE_FORMAT),
+                    end: new Moment(end).subtract(1, 'day').endOf('day').format(DATE_FORMAT)
+                });
+            }).then(function (statResult) {
+                that.setState({
+                    yesterday: statResult
+                });
+            });
+        } else {
+            return promise;
+        }
     },
 
     componentDidMount: function () {

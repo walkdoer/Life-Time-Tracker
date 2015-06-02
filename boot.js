@@ -81,9 +81,12 @@ var routes = (
     </Route>
 );
 
-Router.run(routes, function(Handler) {
-    React.render(<Handler />, window.document.getElementById('app-container'));
-});
+//load setting and start application
+Settings.load().then(function () {
+    Router.run(routes, function(Handler) {
+        React.render(<Handler />, window.document.getElementById('app-container'));
+    });
+})
 /*
 React.render(
     <App

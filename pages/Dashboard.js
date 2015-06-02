@@ -21,6 +21,7 @@ var Task = require('../components/Task/Task');
 var LoadingMask = require('../components/LoadingMask');
 var Board = require('../components/Borad');
 var LogClassPie = require('../components/LogClassPie');
+var Settings = require('./Settings');
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
@@ -74,20 +75,12 @@ var Dashboard = React.createClass({
                         <MonthCountDown width={350} height={250} padding={0}
                             itemPadding={2} lifeYear={70} birthday='1989-10-23'/>
                     </div>
-                    <div className="Grid-cell u-1of3" ref="logClassPieContainer"> </div>
+                    <div className="Grid-cell u-1of3" ref="logClassPieContainer">
+                        <LogClassPie start={new Moment(Settings.get('startDate'))} end={new Moment()} compare={false}/>
+                    </div>
                 </div>
             </div>
         );
-    },
-
-    loadSettings: function () {
-        DataAPI.Settings.load()
-        .then(function (settings) {
-            React.renderComponent(
-                <LogClassPie start={new Moment(settings.startDate)} end={new Moment()} />
-                ,this.refs.logClassPieContainer.getDOMNode()
-            );
-        });
     },
 
 
