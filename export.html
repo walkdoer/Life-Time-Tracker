@@ -1,0 +1,13 @@
+<html>
+<head>
+</head>
+<body>
+    <textarea id="content"></textarea>>
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
+    <script type="text/javascript">
+        $.get('http://localhost:3333/exportNote?start=2015-06-03&end=2015-6-3', function (data) {
+            document.getElementById('content').value = data[0].content;
+        });
+    </script>
+</body>
+</html>
