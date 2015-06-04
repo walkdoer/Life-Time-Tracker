@@ -28,6 +28,7 @@ module.exports = React.createClass({
                 right: 'month,agendaWeek,agendaDay'
             },
             editable: false,
+            eventLimit: true,
             height: $container.height(),
             events: function(start, end, timezone, callback) {
                 DataAPI.Log.load({
