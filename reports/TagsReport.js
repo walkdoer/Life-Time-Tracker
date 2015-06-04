@@ -8,7 +8,6 @@ var Moment = require('moment');
 
 /** components */
 var WordsCloud = require('../components/charts/WordsCloud');
-var remoteStorage = require('../components/storage.remote');
 var DateRangePicker = require('../components/DateRangePicker');
 var LoadingMask = require('../components/LoadingMask');
 var Bar = require('../components/charts/Bar');

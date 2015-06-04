@@ -6,7 +6,6 @@
 var React = require('react');
 var $ = require('jquery');
 require('../libs/bootstrap-datepicker');
-var remoteStorage = require('../components/storage.remote');
 var Moment = require('moment');
 var Select2 = require('select2');
 var extend = require('extend');

@@ -11,7 +11,6 @@ var _ = require('lodash');
 var swal = require('sweetalert');
 var Mt = window.Mousetrap;
 /*components*/
-var remoteStorage = require('../components/storage.remote');
 var DateRangePicker = require('../components/DateRangePicker');
 var Pinyin = require('../components/Pinyin');
 var ProjectCard = require('../components/Project/ProjectCard');

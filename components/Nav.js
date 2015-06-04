@@ -55,6 +55,11 @@ var Nav = React.createClass({
             key: 'goals',
             path: 'goals',
             icon: "fa fa-trophy"
+        }, {
+            text: 'Calendar',
+            key: 'calendar',
+            path: 'calendar',
+            icon: 'fa fa-calendar'
         }];
         //var isActive = this.isActive(this.props.to, this.props.params, this.props.query);
         return (

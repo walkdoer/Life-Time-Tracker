@@ -22,7 +22,8 @@
     "typeahead.js": "~0.10.5",
     "eonasdan-bootstrap-datetimepicker": "~4.7.14",
     "select2": "~3.5.2",
-    "sweetalert": "~0.5.0"
+    "sweetalert": "~0.5.0",
+    "fullcalendar": "~2.3.1"
   },
   "devDependencies": {},
   "keywords": [

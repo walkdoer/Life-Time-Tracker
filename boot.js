@@ -4,9 +4,12 @@
 
 var React = require('react');
 var $ = require('jquery');window.$ = window.Jquery = window.jQuery = $;
+var moment = require('moment');
+window.moment = moment;
 // load everything for jquery ui
 require('jquery-ui');
 require('mousetrap');
+require('fullcalendar');
 var Router = require('react-router');
 var Route = Router.Route;
 var Routes = Router.Routes;
@@ -27,7 +30,8 @@ var Dashboard = require('./pages/Dashboard'),
     Projects = require('./pages/Projects'),
     Goals = require('./pages/Goals'),
     LogCheck = require('./pages/LogCheck'),
-    Settings = require('./pages/Settings');
+    Settings = require('./pages/Settings'),
+    Calendar = require('./pages/Calendar');
 
 /** Components */
 var ProjectDetail = require('./components/ProjectDetail'),
@@ -76,6 +80,7 @@ var routes = (
         <Route name="goals" path="/goals" handler={Goals}/>
         <Route name="logCheck" path="logCheck" handler={LogCheck}/>
         <Route name="settings" path="settings" handler={Settings}/>
+        <Route name="calendar" path="calendar" handler={Calendar}/>
         <NotFoundRoute handler={Page404}/>
         <DefaultRoute handler={Dashboard}/>
     </Route>

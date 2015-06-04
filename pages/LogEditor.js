@@ -17,7 +17,6 @@ var Button = ReactBootStrap.Button;
 var Link = Router.Link;
 
 /* Components */
-var remoteStorage = require('../components/storage.remote');
 var Moment = require('moment');
 var LogEditor = require('../components/editor/LogEditor');
 var SearchBox = require('../components/SearchBox');

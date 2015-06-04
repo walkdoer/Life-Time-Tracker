@@ -4,7 +4,7 @@
 
 var React = require('react');
 
-var Page404 = React.createClass({
+module.exports = React.createClass({
 
     render: function () {
         return (
@@ -16,5 +16,3 @@ var Page404 = React.createClass({
     }
 
 });
-
-module.exports = Page404;

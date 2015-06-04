@@ -7,7 +7,6 @@ var _ = require('lodash');
 var Moment = require('moment');
 
 /** components */
-var remoteStorage = require('../components/storage.remote');
 var DateRangePicker = require('../components/DateRangePicker');
 var PercentArea = require('../components/charts/PercentChart');
 var LoadingMask = require('../components/LoadingMask');

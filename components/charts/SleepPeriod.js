@@ -7,7 +7,7 @@ var extend = require('extend');
 
 var chart = require('./chart');
 var className = 'ltt_c-sleepPeriod';
-var remoteStorage = require('../storage.remote');
+var DataAPI = require('../../utils/DataAPI.js');
 var sleepPeriodConvertor = require('../../convertors/sleepPeriod');
 var LoadIndicator = require('../loadIndicator');
 
@@ -21,7 +21,7 @@ var SleepPeriod = React.createClass({
     componentDidMount: function () {
         var that = this;
         var params = extend({}, _.pick(this.props, ['start', 'end']));
-        remoteStorage.get(this.props.url, params)
+        DataAPI.get(this.props.url, params)
             .then(function(result) {
                 if (!that.isMounted()) {
                     return;
@@ -30,7 +30,7 @@ var SleepPeriod = React.createClass({
                 chart.timeline({
                     title: that.props.title,
                     $el: $(that.getDOMNode()),
-                    data: sleepPeriodConvertor.dispose(result.data)
+                    data: sleepPeriodConvertor.dispose(result)
                 });
             }).catch(function (err) {
                 console.error(err.stack);
