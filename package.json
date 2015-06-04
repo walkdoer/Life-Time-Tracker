@@ -7,7 +7,7 @@
   "node-main": "nodeMain.js",
   "window": {
     "title": "Life Time Tracker",
-    "icon": "images/me.jpg",
+    "icon": "app.ico",
     "toolbar": false,
     "frame": false,
     "width": 1200,

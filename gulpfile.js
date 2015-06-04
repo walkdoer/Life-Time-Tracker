@@ -327,6 +327,7 @@ gulp.task('nw', function () {
         files: files,
         platforms: ['osx64'],
         buildDir: './production',
+        macIcns: './app.icns',
         version: argv.version
     });
     console.log(argv);
