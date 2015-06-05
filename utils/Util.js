@@ -42,11 +42,14 @@ function toDate(type) {
     } else if ( type === 'monthly' || type === 'month') {
         params.start = new Moment().startOf('month').toDate();
         params.end = new Moment().endOf('month').toDate();
-    } else if ( type === 'last_seven_day') {
+    } else if ( type === 'last_seven_day' || type === 'last_seven_days' ||type === 'last_7_days') {
         params.start = new Moment().subtract(7, 'day').startOf('day').toDate();
         params.end = new Moment().endOf('day').toDate();
-    } else if ( type === 'last_three_day') {
+    } else if ( type === 'last_three_day' || type === 'last_three_days' || type === 'last_3_days') {
         params.start = new Moment().subtract(3, 'day').startOf('day').toDate();
+        params.end = new Moment().endOf('day').toDate();
+    } else if ( type === 'last_fifteen_day' || type === 'last_fifteen_days' || type === 'last_15_days') {
+        params.start = new Moment().subtract(15, 'day').startOf('day').toDate();
         params.end = new Moment().endOf('day').toDate();
     } else if (type === 'last_month') {
         params.start = new Moment().subtract(1, 'month').startOf('day').toDate();

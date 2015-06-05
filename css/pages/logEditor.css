@@ -30,6 +30,10 @@
     border-bottom: 1px solid #ECECEC;
 }
 
+.ltt_c-logEditor-header-right .btn-group{
+  margin-top:6px;
+}
+
 .ltt_c-page-logEditor .ltt_c-logEditor #ltt-logEditor{
     height:100%;
     margin-bottom: 0px;

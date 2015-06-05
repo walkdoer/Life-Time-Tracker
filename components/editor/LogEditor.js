@@ -4,6 +4,8 @@ var Q = require('q');
 var RB = require('react-bootstrap');
 var Button = RB.Button;
 var ButtonToolbar = RB.ButtonToolbar;
+var DropdownButton = RB.DropdownButton;
+var MenuItem = RB.MenuItem;
 var Moment = require('moment');
 var TrackerHelper = require('tracker/helper');
 
@@ -73,11 +75,21 @@ var LogEditor = React.createClass({
             <div className="ltt_c-logEditor">
                 <div className="ltt_c-logEditor-header">
                     <span className="ltt_c-logEditor-title">{this.props.title}</span>
-                    <ButtonToolbar>
-                        <Button onClick={this.insertYesterdayUnfinishTaskLog} title="insert yesterday's unfinish task" bsSize='small'>
-                            <i className="fa fa-copy"></i>
-                        </Button>
-                    </ButtonToolbar>
+                    <div className="ltt_c-logEditor-header-right">
+                        <ButtonToolbar>
+                            <DropdownButton bsSize='small' title='Copy' onSelect={this.copyTaskFromPast}>
+                                <MenuItem eventKey='today'>today</MenuItem>
+                                <MenuItem eventKey='yesterday'>yesterday</MenuItem>
+                                <MenuItem eventKey='week'>this week</MenuItem>
+                                <MenuItem eventKey='week'>this month</MenuItem>
+                                <MenuItem divider />
+                                <MenuItem eventKey='last_3_days'>last three days</MenuItem>
+                                <MenuItem eventKey='last_7_days'>last seven days</MenuItem>
+                                <MenuItem eventKey='last_15_days'>last fifeen days</MenuItem>
+                                <MenuItem eventKey='last_month'>last month</MenuItem>
+                             </DropdownButton>
+                        </ButtonToolbar>
+                    </div>
                 </div>
                 <div className="ltt_c-logEditor-projects ltt_c-logEditor-typeahead" ref="projects"></div>
                 <div className="ltt_c-logEditor-versions  ltt_c-logEditor-typeahead" ref="versions"></div>
@@ -199,11 +211,12 @@ var LogEditor = React.createClass({
         return editor;
     },
 
-    insertYesterdayUnfinishTaskLog: function () {
+    copyTaskFromPast: function (period) {
         var that = this;
+        var dateParams = Util.toDate(period);
         DataAPI.Log.load({
-            start: new Moment().subtract(1, 'day').startOf('day').toDate(),
-            end: new Moment().subtract(1, 'day').endOf('day').toDate(),
+            start: dateParams.start,
+            end: dateParams.end,
             group: 'task',
             sort: 'start:1'
         }).then(function (result) {
