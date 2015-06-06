@@ -400,6 +400,27 @@ var LogEditor = React.createClass({
                 }
             }
         });
+
+
+        commands.addCommand({
+            name: 'continueActivity',
+            bindKey: {win: 'Ctrl-Shift-c', mac: 'Command-Shift-c'},
+            exec: function (editor) {
+                var session = editor.getSession();
+                var doc = session.getDocument();
+                var validLog = that.getLastValidLog();
+                var timeStr = new Moment().format('HH:mm') + '~';
+                var pos = editor.getCursorPosition();
+                var line = session.getLine(pos.row);
+                var newIndex = validLog.index;
+                var newLine = timeStr + TrackerHelper.removeTimeString(line);
+                //insert contine log
+                session.insert({row: newIndex, column: 0},  newLine);
+                var pos = {row: newIndex, column: newLine.length};
+                session.insert(pos, '\n');
+                editor.gotoLine(newIndex + 1, timeStr.length);
+            }
+        });
     },
 
 
