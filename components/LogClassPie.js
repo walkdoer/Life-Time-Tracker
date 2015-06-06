@@ -54,15 +54,21 @@ module.exports = React.createClass({
             title: false,
             plotOptions: {
                 pie: {
-                    innerSize: '60%',
+                    innerSize: '40%',
                     dataLabels: {
                         enabled: true,
                         distance: 3,
+                        useHTML: true,
                         connectorPadding: 5,
-                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        //format: ': ',
                         style: {
                             color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black',
                             fontSize: "11px"
+                        },
+                        formatter: function () {
+                            return '<span style="color:' + this.point.color + '">' +
+                                '<b>' + this.point.name + '</b>' + numeral(this.point.y).format('0.0') + '%' +
+                                '</span>';
                         }
                     }
                 }
