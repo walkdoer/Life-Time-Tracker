@@ -60,7 +60,6 @@ module.exports = React.createClass({
                         distance: 3,
                         useHTML: true,
                         connectorPadding: 5,
-                        //format: ': ',
                         style: {
                             color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black',
                             fontSize: "11px"
