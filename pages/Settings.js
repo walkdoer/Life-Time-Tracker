@@ -358,14 +358,15 @@ var LogClassCard = React.createClass({
             showSavedColors         : true,
             saveColorsPerElement    : false,
             fadeMenuToggle          : true,
-            showHexInput            : true,
+            showHexInput            : false,
             showBasicColors         : true,
             allowBlank              : false,
             inlineDropdown          : false
         });
+        var that = this;
         $picker.on('change', function () {
             var val = $(this).val();
-            DataAPI.Class.update(extend({}, this.props.data, {color: val}));
+            DataAPI.Class.update(extend({}, that.props.data, {color: val}));
         });
     },
 
