@@ -20,6 +20,13 @@ module.exports = React.createClass({
     },
 
     componentDidMount: function () {
+        var that = this;
+        DataAPI.Class.load().then(function (classes) {
+            that.initCalendar(classes);
+        });
+    },
+
+    initCalendar: function (classes) {
         var $container = $(this.refs.calendarContainer.getDOMNode());
         $container.fullCalendar({
             header: {
@@ -36,14 +43,24 @@ module.exports = React.createClass({
                     end: end.toDate()
                 }).then(function (logs) {
                     var events = logs.map(function (log) {
+                        var logClass = log.classes[0];
                         if (log.start === log.end) {
                             return null;
                         }
-                        return {
+                        var data = {
                             title: getEventTitle(log),
                             start: new Moment(log.start),
                             end: new Moment(log.end)
                         };
+                        if (logClass) {
+                            var logClassObj = classes.filter(function (cls) {
+                                return cls._id === logClass;
+                            })[0];
+                            if (logClassObj) {
+                                data.backgroundColor = '#' + logClassObj.color;
+                            }
+                        }
+                        return data;
                     });
                     callback(events.filter(function (event) {
                         return event !== null;
