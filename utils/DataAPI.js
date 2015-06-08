@@ -208,6 +208,10 @@ module.exports = {
     Class: {
         load: function (params) {
             return get(url('/classes'), params);
+        },
+
+        update: function (logClass) {
+            return post(url('/classes/' + logClass._id), logClass);
         }
     }
 };

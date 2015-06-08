@@ -15,6 +15,7 @@ var _ = require('lodash');
 var TrackerHelper = require('tracker/helper');
 window.tinycolor = require('tinyColor');
 require('colorPicker');
+var extend = require('extend');
 
 /** Components */
 var Notify = require('../components/Notify');
@@ -328,17 +329,22 @@ var ClassesSettings = React.createClass({
 
 var LogClassCard = React.createClass({
 
+    getInitialState: function () {
+        var data = this.props.data;
+        return  _.pick(data, ['name', '_id', 'description', 'color']);
+    },
+
     render: function () {
         var logClass = this.props.data;
         return (
             <form className='form-horizontal logClassCard'>
-                <Input type='text' value={logClass._id} label='Code' disabled={true} labelClassName='col-xs-2' wrapperClassName='col-xs-10' />
-                <Input type='text' value={logClass.name} label='Name' labelClassName='col-xs-2' wrapperClassName='col-xs-10' />
-                <Input type='textarea' value={logClass.description} label='Description' labelClassName='col-xs-2' wrapperClassName='col-xs-10' placeholder="log class description."/>
+                <Input type='text' value={this.state._id} label='Code' disabled={true} labelClassName='col-xs-2' wrapperClassName='col-xs-10' />
+                <Input type='text' name="name" value={this.state.name} label='Name' onChange={this.onFieldChange} labelClassName='col-xs-2' wrapperClassName='col-xs-10' />
+                <Input type='textarea' name="description" value={this.state.description} onChange={this.onFieldChange} label='Description' labelClassName='col-xs-2' wrapperClassName='col-xs-10' placeholder="log class description."/>
                 <div className="form-group">
                     <label className="control-label col-xs-2"><span>Color</span></label>
                     <div className="col-xs-10">
-                        <input type="text" value="000" name="color" className="pick-a-color form-control"/>
+                        <input type="text" value={logClass.color} name="color" className="pick-a-color form-control"/>
                     </div>
                 </div>
             </form>
@@ -346,7 +352,8 @@ var LogClassCard = React.createClass({
     },
 
     componentDidMount: function () {
-        $(this.getDOMNode()).find(".pick-a-color").pickAColor({
+        var $picker = $(this.getDOMNode()).find(".pick-a-color");
+        $picker.pickAColor({
             showSpectrum            : true,
             showSavedColors         : true,
             saveColorsPerElement    : false,
@@ -355,6 +362,21 @@ var LogClassCard = React.createClass({
             showBasicColors         : true,
             allowBlank              : false,
             inlineDropdown          : false
+        });
+        $picker.on('change', function () {
+            var val = $(this).val();
+            DataAPI.Class.update(extend({}, this.props.data, {color: val}));
+        });
+    },
+
+    onFieldChange: function (e) {
+        var target = e.target;
+        var name = target.name;
+        var val = target.value;
+        var newState = {};
+        newState[name] = val;
+        this.setState(newState, function () {
+            DataAPI.Class.update(extend({}, this.props.data, _.pick(this.state, 'name')));
         });
     }
 });
