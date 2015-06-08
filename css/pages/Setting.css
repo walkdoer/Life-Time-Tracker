@@ -12,3 +12,18 @@
     vertical-align: middle;
     float: none;
 }
+.ltt_c-page-settings-classes{
+    flex-wrap: wrap;
+    display:flex;
+}
+
+.ltt_c-page-settings-classes .logClassCard{
+    background-color:#FFF;
+    padding: 25px;
+    box-shadow: 0 0 4px #ccc;
+    margin-bottom:25px;
+    width: 48% !important;
+    margin-right:1%;
+    margin-left: 1%;
+    flex: none!important;
+}

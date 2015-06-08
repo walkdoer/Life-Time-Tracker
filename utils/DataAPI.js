@@ -203,6 +203,12 @@ module.exports = {
         load: function (params) {
             return get(url('/stats'), params);
         }
+    },
+
+    Class: {
+        load: function (params) {
+            return get(url('/classes'), params);
+        }
     }
 };
 

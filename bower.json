@@ -23,7 +23,8 @@
     "eonasdan-bootstrap-datetimepicker": "~4.7.14",
     "select2": "~3.5.2",
     "sweetalert": "~0.5.0",
-    "fullcalendar": "~2.3.1"
+    "fullcalendar": "~2.3.1",
+    "pick-a-color": "~1.2.3"
   },
   "devDependencies": {},
   "keywords": [

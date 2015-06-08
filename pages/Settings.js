@@ -13,6 +13,8 @@ var store = require('store2');
 var numeral = require('numeral');
 var _ = require('lodash');
 var TrackerHelper = require('tracker/helper');
+window.tinycolor = require('tinyColor');
+require('colorPicker');
 
 /** Components */
 var Notify = require('../components/Notify');
@@ -32,6 +34,7 @@ var defaultValue = {
 };
 
 var _settings = {};
+
 
 module.exports = React.createClass({
 
@@ -92,6 +95,7 @@ module.exports = React.createClass({
                 <TabbedArea defaultActiveKey={1} animation={false}>
                     <TabPane eventKey={1} tab='App Settings'>{this.renderApplicationSettings()}</TabPane>
                     <TabPane eventKey={2} tab='Enery Settings'>{this.renderEnerySettings()}</TabPane>
+                    <TabPane eventKey={3} tab='Classes Settings'><ClassesSettings/></TabPane>
                 </TabbedArea>
             </div>
         );
@@ -286,6 +290,73 @@ module.exports = React.createClass({
         }
     }
 
+});
+
+
+var ClassesSettings = React.createClass({
+
+    getInitialState: function () {
+        return {
+            logClasses: []
+        };
+    },
+
+    render: function () {
+        return (
+            <div className="ltt_c-page-settings-classes">
+                {this.state.logClasses.map(function (logClass) {
+                    return <LogClassCard data={logClass} />;
+                })}
+            </div>
+        );
+    },
+
+    componentDidMount: function () {
+        this.loadClasses();
+    },
+
+    loadClasses: function () {
+        var that = this;
+        DataAPI.Class.load().then(function (classes) {
+            that.setState({
+                logClasses: classes
+            });
+        });
+    }
+});
+
+
+var LogClassCard = React.createClass({
+
+    render: function () {
+        var logClass = this.props.data;
+        return (
+            <form className='form-horizontal logClassCard'>
+                <Input type='text' value={logClass._id} label='Code' disabled={true} labelClassName='col-xs-2' wrapperClassName='col-xs-10' />
+                <Input type='text' value={logClass.name} label='Name' labelClassName='col-xs-2' wrapperClassName='col-xs-10' />
+                <Input type='textarea' value={logClass.description} label='Description' labelClassName='col-xs-2' wrapperClassName='col-xs-10' placeholder="log class description."/>
+                <div className="form-group">
+                    <label className="control-label col-xs-2"><span>Color</span></label>
+                    <div className="col-xs-10">
+                        <input type="text" value="000" name="color" className="pick-a-color form-control"/>
+                    </div>
+                </div>
+            </form>
+        )
+    },
+
+    componentDidMount: function () {
+        $(this.getDOMNode()).find(".pick-a-color").pickAColor({
+            showSpectrum            : true,
+            showSavedColors         : true,
+            saveColorsPerElement    : false,
+            fadeMenuToggle          : true,
+            showHexInput            : true,
+            showBasicColors         : true,
+            allowBlank              : false,
+            inlineDropdown          : false
+        });
+    }
 });
 
 

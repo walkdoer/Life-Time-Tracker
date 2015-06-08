@@ -91,7 +91,9 @@
     "sweetalert": "./bower_components/sweetalert/lib/sweet-alert.js",
     "datetimepicker": "./bower_components/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js",
     "highcharts": "./bower_components/Highstock-2.1.5/js/highstock-all.js",
-    "fullcalendar": "./bower_components/fullcalendar/dist/fullcalendar.js"
+    "fullcalendar": "./bower_components/fullcalendar/dist/fullcalendar.js",
+    "tinyColor": "./bower_components/tinycolor/dist/tinycolor-min.js",
+    "colorPicker": "./bower_components/pick-a-color/build/1.2.3/js/pick-a-color-1.2.3.min.js"
   },
   "browserify-shim": {
     "noty": "noty",
