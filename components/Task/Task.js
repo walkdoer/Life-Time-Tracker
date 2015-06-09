@@ -33,7 +33,9 @@ var Task = React.createClass({
         return {
             defaultIsOpen: true,
             selected: false,
+            displayChildren: true,
             onTaskChange: EMPTY_FUN,
+            dueTime: false,
             onClick: EMPTY_FUN
             //onUnMark: EMPTY_FUN
         };
@@ -70,10 +72,11 @@ var Task = React.createClass({
         var subTasks = task.children,
             subTaskList = null,
             hasSubTasks = !_.isEmpty(subTasks);
-        if (hasSubTasks && this.state.isOpen) {
+        if (hasSubTasks && this.state.isOpen && this.props.displayChildren) {
             subTaskList = (
                 <TaskList className="subtask">
                     {subTasks.map(function (task) {
+                        if (!_.isObject(task)) {return null;}
                         return (<Task {... _.pick(that.props, ['onClick', 'onDoubleClick'])}data={task} key={task.id}
                             selected={task._id === taskId}/>);
                     })}
@@ -81,7 +84,7 @@ var Task = React.createClass({
             );
         }
         var openButton;
-        if (hasSubTasks) {
+        if (hasSubTasks && this.props.displayChildren) {
             openButton = <div className="ltt_c-task-openButton" onClick={this.toggle}>
                 {<i className={'ltt_c-task-openButton-icon fa ' + (this.state.isOpen ? 'fa-chevron-down' : 'fa-chevron-right')}></i>}
             </div>
@@ -103,6 +106,9 @@ var Task = React.createClass({
                     <div className="ltt_c-task-basicInfo">
                         <div className="ltt_c-task-basicInfo-version">
                             {version ? <span><i className="fa fa fa-sitemap"></i>{version.name}</span> : null}
+                            {this.props.dueTime ? <span className="ltt_c-task-timeInfo-item" title={new Moment(task.dueTime).format('YYYY-MM-DD HH:mm:ss')}>
+                                will due at {new Moment(task.dueTime).format('YYYY-MM-DD HH:mm')}
+                            </span> : null}
                         </div>
                         <div className="ltt_c-task-timeInfo">
                             <span className="ltt_c-task-timeInfo-item" title={new Moment(task.createTime).format('YYYY-MM-DD HH:mm:ss')}>

@@ -96,10 +96,13 @@
   height: 100%;
 }
 
-.ltt_c-page-projectsNew-index .btn-toolbar{
-  position:absolute;
-  top: 17px;
-  right: 20px;
+.ltt_c-page-projectsNew-index .list-header{
+    display: flex;
+    justify-content: space-between;
+}
+
+.ltt_c-page-projectsNew-index .list-header .btn-toolbar{
+  margin-top:15px;
 }
 
 .ltt_c-ProjectNav{
