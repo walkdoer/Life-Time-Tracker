@@ -300,6 +300,7 @@ module.exports = React.createClass({
         console.log('render task detail', this.currentTask);
         if (this.state.openTaskDetail) {
             return <TaskDetail  {... _.pick(this.state, ['projectId', 'versionId'])}
+                key={this.currentTask._id}
                 onHidden={this.onLogListHidden}
                 onChange={this.onTaskChange}
                 task={this.currentTask}/>

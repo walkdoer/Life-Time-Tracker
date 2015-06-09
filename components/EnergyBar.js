@@ -67,7 +67,7 @@ module.exports = React.createClass({
         this.updateEnergy();
         this.intervalId = this.setInterval(function () {
             that.updateEnergy();
-        }, 15000);
+        }, 60000);
     },
 
     updateEnergy: function () {

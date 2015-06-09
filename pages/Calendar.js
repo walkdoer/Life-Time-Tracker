@@ -5,6 +5,7 @@
 var React = require('react');
 var _ = require('lodash');
 var Moment = require('moment');
+var Color = require('color');
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
@@ -57,7 +58,10 @@ module.exports = React.createClass({
                                 return cls._id === logClass;
                             })[0];
                             if (logClassObj) {
-                                data.backgroundColor = '#' + logClassObj.color;
+                                var backgroupColor = '#' + logClassObj.color;
+                                var borderColor = Color(backgroupColor).darken(0.2);
+                                data.backgroundColor = backgroupColor;
+                                data.borderColor = borderColor.rgbString();
                             }
                         }
                         return data;

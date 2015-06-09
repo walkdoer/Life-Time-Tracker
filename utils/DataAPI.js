@@ -145,6 +145,7 @@ module.exports = {
         },
 
         update: function (params) {
+            console.log('update task');
             return post(url('/tasks/' + params.id), params);
         },
 

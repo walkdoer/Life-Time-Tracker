@@ -20,7 +20,8 @@ var LogLine = require('../charts/LogLine');
 
 /** Utils */
 var DataAPI = require('../../utils/DataAPI');
-
+var DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+var DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
 module.exports = React.createClass({
 
@@ -79,6 +80,21 @@ module.exports = React.createClass({
                                 <DateTimePicker name="dueTime" ref="dueTime" onChange={this.updateTime} value={task.dueTime}/>
                             </Col>
                         </Row>
+                        <Row className="ltt_c-taskDetail-dateInfo-item">
+                            <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Created</Col>
+                            <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
+                                {new Moment(task.createTime).format(DATE_TIME_FORMAT)}
+                            </Col>
+                        </Row>
+                        {
+                            task.updateTime ?
+                            <Row className="ltt_c-taskDetail-dateInfo-item">
+                                <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Update</Col>
+                                <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
+                                    {new Moment(task.updateTime).format(DATE_TIME_FORMAT)}
+                                </Col>
+                            </Row> : null
+                        }
                     </div>
                     {!_.isEmpty(this.state.logs) ? <LogLine logs={this.state.logs} name={task.name}/> : null}
                     {this.renderLogs()}
@@ -293,7 +309,13 @@ var DateTimePicker = React.createClass({
     componentDidMount: function () {
         var that = this;
         var $el = $(this.getDOMNode());
-        $el.datetimepicker().on('dp.change', function (e) {
+        $el.datetimepicker()
+        if (this.props.value) {
+            $el.data('DateTimePicker').date(new Moment(this.props.value).toDate());
+        } else {
+            $el.data('DateTimePicker').date(null);
+        }
+        $el.on('dp.change', function (e) {
             var date = e.date;
             if (date && date.isSame(e.oldDate)) {console.log('same');return;}
             that.props.onChange({
@@ -301,11 +323,6 @@ var DateTimePicker = React.createClass({
                 date: date ? date.toDate() : 'null'
             });
         });
-        if (this.props.value) {
-            $el.data('DateTimePicker').date(new Moment(this.props.value).toDate());
-        } else {
-            $el.data('DateTimePicker').date(null);
-        }
     },
 
     componentWillReceiveProps: function (nextProps) {
