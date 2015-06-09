@@ -33,7 +33,8 @@ var Task = React.createClass({
         return {
             defaultIsOpen: true,
             selected: false,
-            onTaskChange: EMPTY_FUN
+            onTaskChange: EMPTY_FUN,
+            onClick: EMPTY_FUN
             //onUnMark: EMPTY_FUN
         };
     },

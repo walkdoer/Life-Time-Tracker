@@ -24,14 +24,16 @@ var ProjectIndex = React.createClass({
 
     getInitialState: function () {
         return {
-            markedTask: [],
+            markedTasks: [],
+            dueTasks: [],
             showDone: false
         };
     },
 
 
     render: function () {
-        var markedTask = this.state.markedTask;
+        var markedTasks = this.state.markedTasks;
+        var dueTasks = this.state.dueTasks;
         var that = this;
         return (
             <div className="ltt_c-page-projectsNew-index">
@@ -40,10 +42,18 @@ var ProjectIndex = React.createClass({
                     <Button bsSize='small' active={this.state.showDone} onClick={this.showDone}>Show Done</Button>
                 </ButtonToolbar>
                 <TaskList>
-                    {markedTask.map(function (task) {
+                    {markedTasks.map(function (task) {
                         return <Task data={task}
                             onTitleClick={that.gotoTaskInProject.bind(that, task)}
-                            key={task._id}/>
+                            key={'marked:' + task._id}/>
+                    })}
+                </TaskList>
+                <h3> Due Task </h3>
+                <TaskList>
+                    {dueTasks.map(function (task) {
+                        return <Task data={task}
+                            onTitleClick={that.gotoTaskInProject.bind(that, task)}
+                            key={'due:' + task._id}/>
                     })}
                 </TaskList>
             </div>
@@ -51,10 +61,11 @@ var ProjectIndex = React.createClass({
     },
 
     componentDidMount: function () {
-        this.loadData();
+        this.loadMarkedTasks();
+        this.loadDueTasks();
     },
 
-    loadData: function () {
+    loadMarkedTasks: function () {
         var that = this;
         //load marked task
         var params = {
@@ -63,9 +74,21 @@ var ProjectIndex = React.createClass({
         if (!this.state.showDone) {
             params.status = 'doing';
         }
-        DataAPI.Task.load(params).then(function (markedTask) {
+        DataAPI.Task.load(params).then(function (markedTasks) {
             that.setState({
-                markedTask: markedTask
+                markedTasks: markedTasks
+            });
+        });
+    },
+
+    loadDueTasks: function () {
+        var that = this;
+        DataAPI.Task.load({
+            dueDays: 3,
+            populdate: false
+        }).then(function (dueTasks) {
+            that.setState({
+                dueTasks: dueTasks
             });
         });
     },
@@ -81,7 +104,7 @@ var ProjectIndex = React.createClass({
         this.setState({
             showDone: !this.state.showDone
         }, function () {
-            this.loadData();
+            this.loadMarkedTasks();
         });
     }
 });
