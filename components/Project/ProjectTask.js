@@ -381,7 +381,7 @@ module.exports = React.createClass({
         var deferred = Q.defer();
         var that = this;
         var defaultParams = _.pick(that.props, ['projectId', 'versionId']);
-        defaultParams.parent = "null";
+        //defaultParams.parent = "null";
         params = _.extend({}, defaultParams, params);
         params.calculateTimeConsume = true;
         DataAPI.Task.load(params)

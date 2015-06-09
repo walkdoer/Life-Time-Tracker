@@ -77,7 +77,7 @@ var Task = React.createClass({
                 <TaskList className="subtask">
                     {subTasks.map(function (task) {
                         if (!_.isObject(task)) {return null;}
-                        return (<Task {... _.pick(that.props, ['onClick', 'onDoubleClick'])}data={task} key={task.id}
+                        return (<Task {... _.pick(that.props, ['onClick', 'onDoubleClick', 'dueTime'])}data={task} key={task.id}
                             selected={task._id === taskId}/>);
                     })}
                 </TaskList>
@@ -107,7 +107,7 @@ var Task = React.createClass({
                         <div className="ltt_c-task-basicInfo-version">
                             {version ? <span><i className="fa fa fa-sitemap"></i>{version.name}</span> : null}
                             {this.props.dueTime ? <span className="ltt_c-task-timeInfo-item" title={new Moment(task.dueTime).format('YYYY-MM-DD HH:mm:ss')}>
-                                will due at {new Moment(task.dueTime).format('YYYY-MM-DD HH:mm')}
+                                will due in {new Moment(task.dueTime).fromNow(true)} at {new Moment(task.dueTime).format('YYYY-MM-DD HH:mm')}
                             </span> : null}
                         </div>
                         <div className="ltt_c-task-timeInfo">

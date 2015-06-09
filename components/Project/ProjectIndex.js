@@ -70,7 +70,6 @@ var ProjectIndex = React.createClass({
                     <TaskList>
                         {dueTasks.map(function (task) {
                             return <Task data={task}
-                                displayChildren={false}
                                 dueTime={true}
                                 onTitleClick={that.gotoTaskInProject.bind(that, task)}
                                 key={'due:' + task._id}/>
