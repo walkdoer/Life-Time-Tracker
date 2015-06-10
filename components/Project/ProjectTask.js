@@ -72,7 +72,6 @@ module.exports = React.createClass({
     },
 
     render: function () {
-        console.log('render projectTask');
         var loadingMsg, taskList;
         var project = this.state.project;
         var version;
@@ -178,7 +177,6 @@ module.exports = React.createClass({
 
     onDeleteTask: function (e) {
         e.preventDefault();
-        console.log('delete task', this.currentTask);
         if (this.currentTask) {
             this.deleteTask(this.currentTask);
         }
@@ -310,7 +308,6 @@ module.exports = React.createClass({
     },
 
     renderTaskDetail: function () {
-        console.log('render task detail', this.currentTask);
         if (this.state.openTaskDetail) {
             return <TaskDetail  {... _.pick(this.state, ['projectId', 'versionId'])}
                 key={this.currentTask._id}
@@ -496,7 +493,6 @@ module.exports = React.createClass({
         this.setState({
             openTaskDetail: true
         });
-        console.log('open task', task);
     }
 });
 

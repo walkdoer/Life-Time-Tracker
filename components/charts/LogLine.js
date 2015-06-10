@@ -58,6 +58,7 @@ module.exports = React.createClass({
                 title: false,
                 opposite: true,
                 min: 0,
+                max: 100,
                 labels: {
                     format: '{value} %',
                 }
@@ -167,11 +168,18 @@ module.exports = React.createClass({
     },
 
     getProgressData: function () {
+        var isSubTask = this.props.isSubTask;
+        var progressField;
+        if (isSubTask) {
+            progressField = 'subTask';
+        } else {
+            progressField = 'task';
+        }
         var logs = this.props.logs;
         return logs.slice(0).sort(function (a, b) {
             return new Date(a.start).getTime() - new Date(b.start).getTime();
         }).map(function (log) {
-            return [new Moment(log.date).unix() * 1000, log.progress.task];
+            return [new Moment(log.start).unix() * 1000, log.progress[progressField]];
         });
     },
 
