@@ -5,6 +5,7 @@ var _ = require('lodash');
 var Moment = require('moment');
 var Q = require('q');
 var store = require('store2');
+require('../libs/jquery.peity.js');
 
 /** Components */
 var Settings = require('../pages/Settings');
@@ -24,7 +25,7 @@ var SPLITTER = ',';
 
 module.exports = React.createClass({
 
-    mixins: [PureRenderMixin, SetIntervalMixin],
+    mixins: [/*PureRenderMixin,*/ SetIntervalMixin],
 
     getInitialState: function () {
         return {
@@ -34,7 +35,10 @@ module.exports = React.createClass({
 
     render: function () {
         return (
-            <Progress max={100} value={this.state.energy}/>
+            <div className="ltt_c-EnergyBar">
+                <Progress max={100} value={this.state.energy}/>
+                <EnergyLine value={this.state.energy}/>
+            </div>
         );
     },
 
@@ -220,6 +224,46 @@ module.exports = React.createClass({
                 return value / 60 * log.len;
             }
         }
+    }
+});
+
+
+var EnergyLine = React.createClass({
+
+    getInitialState: function () {
+        return {
+            data: [this.props.value]
+        };
+    },
+
+
+    render: function () {
+        return <span class="ltt_c-EnergyLine">{this.state.data.join(',')}</span>
+    },
+
+    componentWillReceiveProps: function (nextProps) {
+        var data = this.state.data;
+        if (data.length === 60) {
+            values.shift();
+        }
+        data.push(nextProps.value);
+        this.setState({
+            data: data
+        }, function () {
+            this.update();
+        });
+    },
+
+    componentDidMount: function () {
+        this.plot();
+    },
+
+    update: function () {
+        this.chart.change();
+    },
+
+    plot: function () {
+        this.chart = $(this.getDOMNode()).peity("line", { width: 64 });
     }
 });
 

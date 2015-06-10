@@ -33,6 +33,7 @@
     width: 200px;
     height:16px;
     line-height:16px;
+    display: inline-block;
     margin-top: 7px;
 }
 .ltt-footer-left .btn-group{
