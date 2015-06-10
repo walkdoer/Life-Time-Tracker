@@ -152,19 +152,19 @@ module.exports = React.createClass({
 
 
     _getData: function () {
+        var series = [{
+            name: 'time consume',
+            data: this.getTimeData()
+        }];
         if (this.props.withProgress) {
-            return [{
-                name: 'time consume',
-                data: this.getTimeData()
-            }, {
+            series.push({
                 type: 'spline',
                 name: 'progress',
                 yAxis: 1,
                 data: this.getProgressData()
-            }];
-        } else {
-            return [this.getTimeData()];
+            });
         }
+        return series;
     },
 
     getProgressData: function () {
