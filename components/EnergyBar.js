@@ -37,7 +37,6 @@ module.exports = React.createClass({
         return (
             <div className="ltt_c-EnergyBar">
                 <Progress max={100} value={this.state.energy}/>
-                <EnergyLine value={this.state.energy}/>
             </div>
         );
     },

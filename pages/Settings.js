@@ -366,7 +366,7 @@ var LogClassCard = React.createClass({
         var that = this;
         $picker.on('change', function () {
             var val = $(this).val();
-            DataAPI.Class.update(extend({}, that.props.data, {color: val}));
+            DataAPI.Class.update(extend({}, that.props.data, {color: '#' + val}));
         });
     },
 

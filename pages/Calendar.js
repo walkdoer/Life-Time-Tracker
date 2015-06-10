@@ -7,6 +7,9 @@ var _ = require('lodash');
 var Moment = require('moment');
 var Color = require('color');
 
+/** Components */
+var Notify = require('../components/Notify');
+
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
 
@@ -57,8 +60,8 @@ module.exports = React.createClass({
                             var logClassObj = classes.filter(function (cls) {
                                 return cls._id === logClass;
                             })[0];
-                            if (logClassObj) {
-                                var backgroupColor = '#' + logClassObj.color;
+                            if (logClassObj && logClassObj.color) {
+                                var backgroupColor = logClassObj.color;
                                 var borderColor = Color(backgroupColor).darken(0.2);
                                 data.backgroundColor = backgroupColor;
                                 data.borderColor = borderColor.rgbString();
@@ -69,6 +72,9 @@ module.exports = React.createClass({
                     callback(events.filter(function (event) {
                         return event !== null;
                     }));
+                }).catch(function (err) {
+                    console.log(err.stack);
+                    Notify.error('Sorry, failed to show calendar events!');
                 });
             }
         });
