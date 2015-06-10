@@ -21,9 +21,10 @@ var swal = require('sweetalert');
 /** mixins */
 var initParams = require('../mixins/initParams');
 
-/** const */
+/** Constatns */
 var TIME_FORMAT = 'YYYY-MM-DD HH:mm';
 var EventConstant = require('../../constants/EventConstant');
+var MOUSEWHEEL = 'mousewheel';
 
 /** components */
 var Tag = require('../Tag');
@@ -133,8 +134,8 @@ module.exports = React.createClass({
                     </div>
                     {this.state.openTreeMap ? <TreeMap ref="treeMap"
                         title={"Time TreeMap of " + project.name + (version ? '-' + version.name : '')}/> : null }
-                    {this.state.tasks.length > 0 ? 
-                        <TaskList>
+                    {this.state.tasks.length > 0 ?
+                        <TaskList select={taskId}>
                         {this.state.tasks.map(function (task) {
                             return <Task ref={task._id}
                                 data={task}
@@ -153,6 +154,18 @@ module.exports = React.createClass({
                 {this.renderTaskDetail()}
             </div>
         );
+    },
+
+    scrollToTask: function (taskId) {
+        if (!taskId) { return; }
+        var $main = $(this.getDOMNode()).find('main');
+        var $task = $main.find('[data-id=' + taskId + ']');
+        var offsetY = $task.offset().top - 40;
+        $main.scrollTop(+offsetY).trigger(MOUSEWHEEL);
+    },
+
+    scrollToSelectTask: function () {
+        this.scrollToTask(this.state.taskId);
     },
 
     componentDidMount: function () {
@@ -390,6 +403,7 @@ module.exports = React.createClass({
                     taskLoaded: true,
                     tasks: tasks
                 }, function () {
+                    this.scrollToSelectTask();
                     deferred.resolve(tasks);
                 });
             }).catch(function (err) {
