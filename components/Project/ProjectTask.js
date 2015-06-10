@@ -160,7 +160,7 @@ module.exports = React.createClass({
         if (!taskId) { return; }
         var $main = $(this.getDOMNode()).find('main');
         var $task = $main.find('[data-id=' + taskId + ']');
-        var offsetY = $task.offset().top - 40;
+        var offsetY = $task.offset().top - 60;
         $main.scrollTop(+offsetY).trigger(MOUSEWHEEL);
     },
 

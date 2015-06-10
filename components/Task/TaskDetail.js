@@ -96,7 +96,7 @@ module.exports = React.createClass({
                             </Row> : null
                         }
                     </div>
-                    {!_.isEmpty(this.state.logs) ? <LogLine logs={this.state.logs} name={task.name}/> : null}
+                    {!_.isEmpty(this.state.logs) ? <LogLine logs={this.state.logs} withProgress={true} name={task.name}/> : null}
                     {this.renderLogs()}
                     <LoadingMask loaded={this.state.loaded}/>
                 </div>

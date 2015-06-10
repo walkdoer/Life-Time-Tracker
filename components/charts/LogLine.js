@@ -30,10 +30,7 @@ module.exports = React.createClass({
 
     _plot: function () {
         var $el = $(this.getDOMNode());
-        var data = [{
-            name: this.props.name,
-            data: this._getLineData()
-        }];
+        var data = this._getData();
         var title = this._getTitle();
         var tickInterval;
         if (this.props.granularity) {
@@ -52,6 +49,23 @@ module.exports = React.createClass({
                 default:
                     break;
             }
+        }
+        var yAxis;
+        if (this.props.withProgress) {
+            yAxis = [{
+                title: false
+            }, {
+                title: false,
+                opposite: true,
+                min: 0,
+                labels: {
+                    format: '{value} %',
+                }
+            }];
+        } else {
+            yAxis = {
+                title: false
+            };
         }
         var options = {
             title: {
@@ -95,9 +109,7 @@ module.exports = React.createClass({
                     pointWidth: 10
                 }
             },
-            yAxis: {
-                title: false
-            },
+            yAxis: yAxis,
             xAxis: {
                 type: 'datetime',
                 minTickInterval: tickInterval,
@@ -125,14 +137,45 @@ module.exports = React.createClass({
         if (this.props.yAxisLabel === false) {
             options.yAxis.gridLineWidth = 0;
         }
-        Chart.column({
+        var chartType;
+        if (this.props.type === 'progress') {
+            chartType = 'line';
+        } else {
+            chartType = 'column';
+        }
+        Chart[chartType]({
             $el: $el,
             data: data
         }, options);
     },
 
 
-    _getLineData: function () {
+    _getData: function () {
+        if (this.props.withProgress) {
+            return [{
+                name: 'time consume',
+                data: this.getTimeData()
+            }, {
+                type: 'spline',
+                name: 'progress',
+                yAxis: 1,
+                data: this.getProgressData()
+            }];
+        } else {
+            return [this.getTimeData()];
+        }
+    },
+
+    getProgressData: function () {
+        var logs = this.props.logs;
+        return logs.slice(0).sort(function (a, b) {
+            return new Date(a.start).getTime() - new Date(b.start).getTime();
+        }).map(function (log) {
+            return [new Moment(log.date).unix() * 1000, log.progress.task];
+        });
+    },
+
+    getTimeData: function () {
         var logs = this.props.logs;
         var granularity = this.props.granularity;
         if (['weekly', 'week', 'month', 'monthly'].indexOf(granularity) >= 0) {
@@ -154,11 +197,12 @@ module.exports = React.createClass({
             return data || [];
         } else {
             return logs.slice(0).sort(function (a, b) {
-                return new Date(a.date).getTime() - new Date(b.date).getTime();
+                return new Date(a.start).getTime() - new Date(b.start).getTime();
             }).map(function (log) {
-                return [new Moment(log.date).unix() * 1000, log.len];
+                return [new Moment(log.start).unix() * 1000, log.len];
             });
         }
+
     },
 
     _getTitle: function () {
