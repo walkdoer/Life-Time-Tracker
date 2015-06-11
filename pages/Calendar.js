@@ -38,6 +38,7 @@ module.exports = React.createClass({
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
             },
+            defaultView: 'agendaWeek',
             editable: false,
             eventLimit: true,
             height: $container.height(),
