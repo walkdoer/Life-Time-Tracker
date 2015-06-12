@@ -1,0 +1,34 @@
+.ltt_c-page-routine{}
+
+.ltt_c-page-routine header {
+    display: flex;
+}
+
+.ltt_c-page-routine header .ltt_c-dateRangePicker{
+    width: 260px;
+}
+
+.ltt_c-page-routine-TaskList{
+    margin: 0px;
+    padding: 0px;
+}
+.ltt_c-page-routine-Task{
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid #ccc;
+    background-color:#FFF;
+    border-radius: 5px;
+    margin-bottom:10px;
+    padding: 10px;
+}
+
+.ltt_c-page-routine-Task .title{
+    width: 100px;
+    overflow:hidden;
+    white-space: nowrap;
+    text-overflow:ellipsis;
+}
+
+.ltt_c-page-routine-Task .info{
+    color:#CCC;
+}

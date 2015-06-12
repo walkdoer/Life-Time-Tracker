@@ -60,6 +60,11 @@ var Nav = React.createClass({
             key: 'calendar',
             path: 'calendar',
             icon: 'fa fa-calendar'
+        }, {
+            text: 'Routine',
+            key: 'routine',
+            path: 'routine',
+            icon: 'fa fa-bullseye'
         }];
         //var isActive = this.isActive(this.props.to, this.props.params, this.props.query);
         return (

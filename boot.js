@@ -31,7 +31,8 @@ var Dashboard = require('./pages/Dashboard'),
     Goals = require('./pages/Goals'),
     LogCheck = require('./pages/LogCheck'),
     Settings = require('./pages/Settings'),
-    Calendar = require('./pages/Calendar');
+    Calendar = require('./pages/Calendar'),
+    Routine = require('./pages/Routine');
 
 /** Components */
 var ProjectDetail = require('./components/ProjectDetail'),
@@ -81,6 +82,7 @@ var routes = (
         <Route name="logCheck" path="logCheck" handler={LogCheck}/>
         <Route name="settings" path="settings" handler={Settings}/>
         <Route name="calendar" path="calendar" handler={Calendar}/>
+        <Route name="routine" path="routine" handler={Routine}/>
         <NotFoundRoute handler={Page404}/>
         <DefaultRoute handler={Dashboard}/>
     </Route>

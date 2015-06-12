@@ -214,6 +214,12 @@ module.exports = {
         update: function (logClass) {
             return post(url('/classes/' + logClass._id), logClass);
         }
+    },
+
+    Routine: {
+        load: function (params) {
+            return get(url('/routine'), params);
+        }
     }
 };
 
