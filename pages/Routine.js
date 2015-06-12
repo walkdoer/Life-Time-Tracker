@@ -17,6 +17,8 @@ var DataAPI = require('../utils/DataAPI');
 
 module.exports = React.createClass({
 
+    mixins: [Router.State, Router.Navigation],
+
     getInitialState: function () {
         return {
             start: new Moment().startOf('month').toDate(),
@@ -38,8 +40,9 @@ module.exports = React.createClass({
                     <DateRangePicker start={this.state.start} end={this.state.end} onDateRangeChange={this.onDateRangeChange}/>
                 </header>
                 {this.renderTagsRoutine(tagsRoutine)}
-                {this.renderTaskRoutine(taskRoutine)}
                 {this.renderProjectRoutine(projectRoutine)}
+                {this.renderVersionRoutine(versionRoutine)}
+                {this.renderTaskRoutine(taskRoutine)}
             </div>
         );
     },
@@ -61,7 +64,16 @@ module.exports = React.createClass({
         if (_.isEmpty(tasks)) { return null; }
         return [
             <h3>Task Routine</h3>,
-            <TaskList tasks={tasks}/>
+            <List items={tasks} onOpenItem={function (task) {
+                var useVersion = task.versionId;
+                var url;
+                if (useVersion && task.versionId) {
+                    url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
+                } else {
+                    url = '/projects/' + task.projectId + '/tasks/' + task._id;
+                }
+                this.transitionTo(url);
+            }.bind(this)}/>
         ];
     },
 
@@ -69,7 +81,21 @@ module.exports = React.createClass({
         if (_.isEmpty(projects)) { return null; }
         return [
             <h3>Project Routine</h3>,
-            <ProjectList projects={projects}/>
+            <List items={projects} onOpenItem={function (project) {
+                var url = '/projects/' + project._id;
+                this.transitionTo(url);
+            }.bind(this)}/>
+        ];
+    },
+
+    renderVersionRoutine: function (versions) {
+        if (_.isEmpty(versions)) { return null; }
+        return [
+            <h3>Version Routine</h3>,
+            <List items={versions} onOpenItem={function (version) {
+                var url = '/projects/' + version.projectId + '/versions/' + version._id;
+                this.transitionTo(url);
+            }.bind(this)}/>
         ];
     },
 
@@ -99,74 +125,31 @@ module.exports = React.createClass({
 });
 
 
-var TaskList = React.createClass({
+var List = React.createClass({
 
     render: function () {
-        var tasks = this.props.tasks;
-        return <ul className="ltt_c-page-routine-TaskList">
-            {tasks.map(function (task) {
-                return <Task task={task}/>
-            })}
+        var items = this.props.items;
+        return <ul className="ltt_c-page-routine-List">
+            {items.map(function (item) {
+                return <ListItem item={item} onTitleClick={this.props.onOpenItem}/>
+            }, this)}
         </ul>
     }
 });
-var Task = React.createClass({
-    mixins: [Router.State, Router.Navigation],
+var ListItem = React.createClass({
     render: function () {
-        var task = this.props.task;
-        var taskDetail = task._id;
-        return <li className="ltt_c-page-routine-Task">
-            <span className="title" onClick={this.openTask}>{taskDetail.name}</span>
+        var item = this.props.item;
+        var itemDetail = item._id;
+        return <li className="ltt_c-page-routine-ListItem">
+            <span className="title" onClick={this.onTitleClick}>{itemDetail.name}</span>
             <p className="info">
-                <span>{Moment.duration(task.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}</span>
-                <span>({task.count})</span>
+                <span>{Moment.duration(item.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}</span>
+                <span>({item.count})</span>
             </p>
         </li>
     },
 
-    openTask: function () {
-        var task = this.props.task._id;
-        var useVersion = task.versionId;
-        var url;
-        if (useVersion && task.versionId) {
-            url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
-        } else {
-            url = '/projects/' + task.projectId + '/tasks/' + task._id;
-        }
-        this.transitionTo(url);
+    onTitleClick: function () {
+        this.props.onTitleClick(this.props.item._id);
     }
 });
-
-
-
-var ProjectList = React.createClass({
-
-    render: function () {
-        var projects = this.props.projects;
-        return <ul className="ltt_c-page-routine-ProjectList">
-            {projects.map(function (project) {
-                return <Project project={project}/>
-            })}
-        </ul>
-    }
-});
-var Project = React.createClass({
-    mixins: [Router.State, Router.Navigation],
-    render: function () {
-        var project = this.props.project;
-        var projectDetail = project._id;
-        return <li className="ltt_c-page-routine-Project">
-            <span className="title" onClick={this.openProject}>{projectDetail.name}</span>
-            <p className="info">
-                <span>{Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}</span>
-                <span>({project.count})</span>
-            </p>
-        </li>
-    },
-
-    openProject: function () {
-        var project = this.props.project._id;
-        var url = '/projects/' + project._id;
-        this.transitionTo(url);
-    }
-})
