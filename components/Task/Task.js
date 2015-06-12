@@ -117,7 +117,7 @@ var Task = React.createClass({
                             </span>
                             <span  className="ltt_c-task-timeInfo-item">
                                 <i className="fa fa-clock-o" title="total time"></i>
-                                {Moment.duration(task.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
+                                {Moment.duration(task.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {new Moment(task.lastActiveTime).from(task.createTime, true)}
                             </span>
                             <span  className="ltt_c-task-timeInfo-item" title={new Moment(task.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
                                 <i className="fa fa-user" title="last active"></i>

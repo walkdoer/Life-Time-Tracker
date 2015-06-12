@@ -543,6 +543,7 @@ var ProjectInfo = React.createClass({
                             <span className="ltt-M2">
                                 <i className="fa fa-clock-o" title="Total time"></i>
                                 {Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
+                                across {mProjectLastActiveTime.from(mProjectCreateTime, true)}
                             </span>
                         </span>
                     </h1>
@@ -595,7 +596,7 @@ var VersionInfo = React.createClass({
                     </span>
                     <span className="ltt-M2">
                         <i className="fa fa-clock-o" title="Total time"></i>
-                        {Moment.duration(version.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
+                        {Moment.duration(version.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {new Moment(version.createTime).from(version.lastActiveTime, true)}
                     </span>
                 </div>
                 <div className="ltt_p-projectDetail-versionInfo-btns">
