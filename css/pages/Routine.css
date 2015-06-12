@@ -7,11 +7,12 @@
 .ltt_c-page-routine header .ltt_c-dateRangePicker{
     width: 260px;
 }
-
+.ltt_c-page-routine-ProjectList,
 .ltt_c-page-routine-TaskList{
     margin: 0px;
     padding: 0px;
 }
+.ltt_c-page-routine-Project,
 .ltt_c-page-routine-Task{
     display: flex;
     justify-content: space-between;
@@ -21,14 +22,21 @@
     margin-bottom:10px;
     padding: 10px;
 }
-
+.ltt_c-page-routine-Project .title,
 .ltt_c-page-routine-Task .title{
-    width: 100px;
+    width: 200px;
     overflow:hidden;
     white-space: nowrap;
     text-overflow:ellipsis;
+    cursor: pointer;
 }
 
+.ltt_c-page-routine-Project:hover,
+.ltt_c-page-routine-Task:hover{
+    background-color: #FCFCFC;
+}
+
+.ltt_c-page-routine-Project .info,
 .ltt_c-page-routine-Task .info{
     color:#CCC;
 }

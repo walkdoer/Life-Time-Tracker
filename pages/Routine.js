@@ -5,7 +5,7 @@
 var React = require('react');
 var _ = require('lodash');
 var Moment = require('moment');
-
+var Router = require('react-router');
 
 /** components */
 var Tag = require('../components/Tag');
@@ -39,6 +39,7 @@ module.exports = React.createClass({
                 </header>
                 {this.renderTagsRoutine(tagsRoutine)}
                 {this.renderTaskRoutine(taskRoutine)}
+                {this.renderProjectRoutine(projectRoutine)}
             </div>
         );
     },
@@ -61,6 +62,14 @@ module.exports = React.createClass({
         return [
             <h3>Task Routine</h3>,
             <TaskList tasks={tasks}/>
+        ];
+    },
+
+    renderProjectRoutine: function (projects) {
+        if (_.isEmpty(projects)) { return null; }
+        return [
+            <h3>Project Routine</h3>,
+            <ProjectList projects={projects}/>
         ];
     },
 
@@ -93,7 +102,7 @@ module.exports = React.createClass({
 var TaskList = React.createClass({
 
     render: function () {
-        tasks = this.props.tasks;
+        var tasks = this.props.tasks;
         return <ul className="ltt_c-page-routine-TaskList">
             {tasks.map(function (task) {
                 return <Task task={task}/>
@@ -102,16 +111,62 @@ var TaskList = React.createClass({
     }
 });
 var Task = React.createClass({
-
+    mixins: [Router.State, Router.Navigation],
     render: function () {
         var task = this.props.task;
         var taskDetail = task._id;
         return <li className="ltt_c-page-routine-Task">
-            <span className="title">{taskDetail.name}</span>
+            <span className="title" onClick={this.openTask}>{taskDetail.name}</span>
             <p className="info">
                 <span>{Moment.duration(task.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}</span>
                 <span>({task.count})</span>
             </p>
         </li>
+    },
+
+    openTask: function () {
+        var task = this.props.task._id;
+        var useVersion = task.versionId;
+        var url;
+        if (useVersion && task.versionId) {
+            url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
+        } else {
+            url = '/projects/' + task.projectId + '/tasks/' + task._id;
+        }
+        this.transitionTo(url);
+    }
+});
+
+
+
+var ProjectList = React.createClass({
+
+    render: function () {
+        var projects = this.props.projects;
+        return <ul className="ltt_c-page-routine-ProjectList">
+            {projects.map(function (project) {
+                return <Project project={project}/>
+            })}
+        </ul>
+    }
+});
+var Project = React.createClass({
+    mixins: [Router.State, Router.Navigation],
+    render: function () {
+        var project = this.props.project;
+        var projectDetail = project._id;
+        return <li className="ltt_c-page-routine-Project">
+            <span className="title" onClick={this.openProject}>{projectDetail.name}</span>
+            <p className="info">
+                <span>{Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}</span>
+                <span>({project.count})</span>
+            </p>
+        </li>
+    },
+
+    openProject: function () {
+        var project = this.props.project._id;
+        var url = '/projects/' + project._id;
+        this.transitionTo(url);
     }
 })
