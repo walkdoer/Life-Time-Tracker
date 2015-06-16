@@ -61,7 +61,7 @@ module.exports = React.createClass({
             openTaskDetail: false,
             markedFilter: false,
             taskStatus: 'doing',
-            period: 'all',
+            period: 'month',
             tasks: []
         }, this.getStateFromParams());
     },

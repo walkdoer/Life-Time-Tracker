@@ -46,8 +46,12 @@ module.exports = React.createClass({
                 if (content) {
                     element.qtip({
                         content: content,
+                        position: {
+                            my: 'left center',
+                            at: 'center right'
+                        },
                         hide: {
-                            delay: 400,
+                            delay: 300,
                             fixed: true
                         }
                     });
