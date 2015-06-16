@@ -278,6 +278,7 @@ module.exports = React.createClass({
                 versionId: params.versionId
             });
         } else {
+            $(this.getDOMNode()).scrollTop(0);
             this.setState(_.extend({
                 projectLoaded: false,
                 openTaskDetail: false,
