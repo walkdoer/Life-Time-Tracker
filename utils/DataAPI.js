@@ -144,6 +144,10 @@ module.exports = {
             return get(url('/tasks'), params);
         },
 
+        get: function (id) {
+            return get(url('/tasks/' + id));
+        },
+
         update: function (params) {
             console.log('update task');
             return post(url('/tasks/' + params.id), params);

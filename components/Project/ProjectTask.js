@@ -291,20 +291,50 @@ module.exports = React.createClass({
 
     loadProject: function (projectId) {
         var that = this;
+        var taskId = that.state.taskId;
         DataAPI.Project.get(projectId)
             .then(function (project) {
                 that.setState({
                     projectLoaded: true,
                     project: project
                 });
-                that.loadTasks(that.getRequestParams()).then(function () {
-                    that.plotTreeMap();
-                });
+                if (taskId) {
+                    DataAPI.Task.get(taskId).then(function (task) {
+                        var lastActiveTime = task.lastActiveTime;
+                        if (Util.isInToday(lastActiveTime)) {
+                            period = 'today';
+                        } else if (Util.isInYesterday(lastActiveTime)) {
+                            period = 'yesterday';
+                        } else if (Util.isInThisWeek(lastActiveTime)) {
+                            period = 'week';
+                        } else if (Util.isInThisMonth(lastActiveTime)) {
+                            period = 'month';
+                        } else if (Util.isInThisYear(lastActiveTime)) {
+                            period = 'year';
+                        } else {
+                            period = 'all';
+                        }
+                        that.setState({
+                            taskStatus: task.progress === 100 ? 'done' : (task.progress < 0 ? 'all' : 'doing'),
+                            period: period
+                        }, function () {
+                            loadTasks();
+                        });
+                    });
+                } else {
+                    return loadTasks();
+                }
             })
             .catch(function (err) {
                 console.error(err.stack);
                 throw err;
             });
+
+        function loadTasks() {
+            return that.loadTasks(that.getRequestParams()).then(function () {
+                that.plotTreeMap();
+            });
+        }
     },
 
     renderTaskDetail: function () {

@@ -1,7 +1,9 @@
 'use strict';
 var Moment = require('moment');
+require('moment-range');
 var TrackerHelper = require('tracker/helper');
 var _ = require('lodash');
+
 
 function walkTree(parentElement, func) {
     parentElement.depth = 0;
@@ -124,3 +126,24 @@ exports.getDoingLog = function (date, logContent) {
 };
 
 
+var isInDateRange = function (type) {
+    return function (date) {
+        date = new Moment(date);
+        var start = new Moment().startOf(type);
+        var end = new Moment().endOf(type);
+        var range = Moment.range(start, end);
+        return range.contains(date);
+    };
+};
+
+exports.isInThisYear = isInDateRange('year');
+exports.isInThisWeek = isInDateRange('week');
+exports.isInThisMonth = isInDateRange('month');
+exports.isInToday = isInDateRange('day');
+exports.isInYesterday = function (date) {
+    date = new Moment(date);
+    var start = new Moment().subtract(1, 'day').startOf('day');
+    var end = new Moment().subtract(1, 'day').endOf('day');
+    var range = Moment.range(start, end);
+    return range.contains(date);
+};
