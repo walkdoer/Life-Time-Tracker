@@ -41,11 +41,17 @@ module.exports = React.createClass({
             defaultView: 'agendaWeek',
             editable: false,
             eventLimit: true,
+            eventRender: function (event, element, view) {
+                element.qtip({
+                    content: event.content
+                });
+            },
             height: $container.height(),
             events: function(start, end, timezone, callback) {
                 DataAPI.Log.load({
                     start: start.toDate(),
-                    end: end.toDate()
+                    end: end.toDate(),
+                    populate: true
                 }).then(function (logs) {
                     var events = logs.map(function (log) {
                         var logClass = log.classes[0];
@@ -55,7 +61,8 @@ module.exports = React.createClass({
                         var data = {
                             title: getEventTitle(log),
                             start: new Moment(log.start),
-                            end: new Moment(log.end)
+                            end: new Moment(log.end),
+                            content: log.content
                         };
                         if (logClass) {
                             var logClassObj = classes.filter(function (cls) {
@@ -91,6 +98,14 @@ function getEventTitle(log) {
     if (!_.isEmpty(log.tags)) {
         title += '[' + log.tags.join(',') + ']';
     }
-    title += log.content;
+    // if (log.project) {
+    //     title += ',<span>' + log.project.name + '</span>';
+    // }
+    // if (log.version) {
+    //     title += ',' + log.version.name;
+    // }
+    // if (log.task) {
+    //     title += ',' + log.task.name + ',';
+    // }
     return title;
 }

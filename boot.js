@@ -10,6 +10,7 @@ window.moment = moment;
 require('jquery-ui');
 require('mousetrap');
 require('fullcalendar');
+require('./libs/jquery.qtip');
 var Router = require('react-router');
 var Route = Router.Route;
 var Routes = Router.Routes;
