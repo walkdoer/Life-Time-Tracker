@@ -298,22 +298,12 @@ module.exports = React.createClass({
                     projectLoaded: true,
                     project: project
                 });
+                return that.loadVersionAndAdapt();
+            }).then(function () {
                 if (taskId) {
                     DataAPI.Task.get(taskId).then(function (task) {
                         var lastActiveTime = task.lastActiveTime;
-                        if (Util.isInToday(lastActiveTime)) {
-                            period = 'today';
-                        } else if (Util.isInYesterday(lastActiveTime)) {
-                            period = 'yesterday';
-                        } else if (Util.isInThisWeek(lastActiveTime)) {
-                            period = 'week';
-                        } else if (Util.isInThisMonth(lastActiveTime)) {
-                            period = 'month';
-                        } else if (Util.isInThisYear(lastActiveTime)) {
-                            period = 'year';
-                        } else {
-                            period = 'all';
-                        }
+                        var period = getPeriod(task.createTime, lastActiveTime);
                         that.setState({
                             taskStatus: task.progress === 100 ? 'done' : (task.progress < 0 ? 'all' : 'doing'),
                             period: period
@@ -334,6 +324,21 @@ module.exports = React.createClass({
             return that.loadTasks(that.getRequestParams()).then(function () {
                 that.plotTreeMap();
             });
+        }
+    },
+
+    loadVersionAndAdapt: function () {
+        var that = this;
+        var versionId = this.state.versionId;
+        if (this.state.versionId) {
+            return DataAPI.Version.get(versionId).then(function (version) {
+                var period = getPeriod(version.createTime, version.lastActiveTime);
+                that.setState({
+                    period: period
+                });
+            });
+        } else {
+            return Q(1);
         }
     },
 
@@ -656,5 +661,24 @@ var VersionInfo = React.createClass({
             });
         });
     }
-})
+});
+
+
+function getPeriod(createTime, lastActiveTime) {
+    var period;
+    if (Util.isInToday(createTime) && Util.isInToday(lastActiveTime)) {
+        period = 'today';
+    } else if (Util.isInYesterday(createTime) && Util.isInYesterday(lastActiveTime)) {
+        period = 'yesterday';
+    } else if (Util.isInThisWeek(createTime) && Util.isInThisWeek(lastActiveTime)) {
+        period = 'week';
+    } else if (Util.isInThisMonth(createTime) && Util.isInThisMonth(lastActiveTime)) {
+        period = 'month';
+    } else if (Util.isInThisYear(createTime) && Util.isInThisYear(lastActiveTime)) {
+        period = 'year';
+    } else {
+        period = 'all';
+    }
+    return period;
+}
 
