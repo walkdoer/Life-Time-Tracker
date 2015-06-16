@@ -42,9 +42,16 @@ module.exports = React.createClass({
             editable: false,
             eventLimit: true,
             eventRender: function (event, element, view) {
-                element.qtip({
-                    content: event.content
-                });
+                var content = getEventContent(event);
+                if (content) {
+                    element.qtip({
+                        content: content,
+                        hide: {
+                            delay: 400,
+                            fixed: true
+                        }
+                    });
+                }
             },
             height: $container.height(),
             events: function(start, end, timezone, callback) {
@@ -58,12 +65,11 @@ module.exports = React.createClass({
                         if (log.start === log.end) {
                             return null;
                         }
-                        var data = {
+                        var data = _.extend({
                             title: getEventTitle(log),
                             start: new Moment(log.start),
-                            end: new Moment(log.end),
-                            content: log.content
-                        };
+                            end: new Moment(log.end)
+                        }, _.pick(log, ['project', 'version', 'task', 'content']));
                         if (logClass) {
                             var logClassObj = classes.filter(function (cls) {
                                 return cls._id === logClass;
@@ -108,4 +114,36 @@ function getEventTitle(log) {
     //     title += ',' + log.task.name + ',';
     // }
     return title;
+}
+
+
+function getEventContent(event) {
+    if (!event.content && !event.project && !event.version && !event.task) {
+        return null;
+    }
+    var content = [
+        '<div class="eventContent">',
+            '<p class="item project"><a href="#/projects/<%=project._id%>"><%=project.name%></a></p>',
+            '<p class="item version"><a href="#/projects/<%=version.projectId%>/versions/<%=version._id%>"<%=version.name%></a></p>',
+            '<p class="item task"><a href="<%=taskUrl%>"><%=task.name%></a></p>',
+            '<div class="content"><%=content%></div>',
+        '</div>'
+    ].join('');
+    var task = event.task;
+    if (task) {
+        var taskUrl;
+        if (task.versionId) {
+            taskUrl = '#/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
+        } else {
+            taskUrl = '#/projects/' + task.projectId + '/tasks/' + task._id;
+        }
+    }
+
+    return _.template(content, {
+        content: event.content,
+        project: event.project || {},
+        version: event.version || {},
+        task: task || {},
+        taskUrl: taskUrl
+    });
 }

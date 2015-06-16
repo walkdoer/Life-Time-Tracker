@@ -6,3 +6,13 @@
     height: 100%;
 }
 
+.eventContent{
+    line-height: 150%;
+}
+.eventContent .item{
+    margin: 0px;
+}
+
+.eventContent .item.project{
+    font-weight: 500;
+}
