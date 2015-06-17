@@ -567,9 +567,14 @@ var ProjectInfo = React.createClass({
             var mProjectLastActiveTime = new Moment(project.lastActiveTime);
             projectBasicInfo = (
                 <section className="ltt_c-projectDetail-basicInfo">
-                    <h1>{project.name}
+                    <h1>
+                        {project.name}
                         <span className="ltt_c-projectDetail-logClasses">{logClasses}</span>
                         <span className="ltt_c-projectDetail-times">
+                            <span className="ltt-M2">
+                                <i className="fa fa-tasks" title="Task count"></i>
+                                {project.taskCount}
+                            </span>
                             <span className="ltt-M2" title={mProjectCreateTime.format(TIME_FORMAT)}>
                                 <i className="fa fa-plus" title="create time"></i>{mProjectCreateTime.fromNow()}
                             </span>
@@ -578,8 +583,7 @@ var ProjectInfo = React.createClass({
                             </span>
                             <span className="ltt-M2">
                                 <i className="fa fa-clock-o" title="Total time"></i>
-                                {Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
-                                across {mProjectLastActiveTime.from(mProjectCreateTime, true)}
+                                {Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {mProjectLastActiveTime.from(mProjectCreateTime, true)}
                             </span>
                         </span>
                     </h1>
