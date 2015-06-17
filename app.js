@@ -12,6 +12,7 @@ var cx = addons.classSet;
 var numeral = require('numeral');
 var Ltt = global.Ltt;
 var Router = require('react-router');
+var Link = Router.Link;
 var State = Router.State;
 var RouteHandler = Router.RouteHandler;
 var Moment = require('moment');
@@ -30,12 +31,14 @@ var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var Header = require('./components/Header');
 var Nav = require('./components/Nav');
 var EnergyBar = require('./components/EnergyBar');
+var Tag = require('./components/Tag');
 
 /* Const */
 var NAV_OPEN = 'ltt__navOpen';
 var EVENT = require('./constants/EventConstant');
 
 /** Utils */
+var Util =require('./utils/Util');
 var DataAPI = require('./utils/DataAPI');
 var Bus = require('./utils/Bus');
 
@@ -119,7 +122,7 @@ var SetIntervalMixin = require('./components/mixins/setInterval');
 
 var Footer = React.createClass({
 
-    mixins: [SetIntervalMixin],
+    mixins: [SetIntervalMixin, PureRenderMixin, Router.State, Router.Navigation],
 
     getInitialState: function () {
         return {
@@ -341,26 +344,19 @@ var Footer = React.createClass({
                 var lastSeconds = new Moment().diff(new Moment(doingLog.start), 'second');
                 var task = doingLog.task,
                     project = doingLog.projects[0],
+                    version = doingLog.version,
                     subTask = doingLog.subTask,
-                    tag = (doingLog.tags || []).join(',');
-                if (tag) {
-                    name = '[' + tag + '] ';
-                }
-                if (project) {
-                    name = project.name
-                }
-                if (task) {
-                    name += ' ' + task.name;
-                }
-                if (subTask) {
-                    name += ' ' + subTask.name;
-                }
+                    tags = doingLog.tags;
                 content = (
                     <div className="ltt_c-lastTime">
-                        <i className="fa fa-clock-o"/>
                         <span className="ltt_c-lastTime-name">
-                            {name}
+                            {!_.isEmpty(tags) ? tags.map(function(tag) { return <Tag>{tag}</Tag>; }) :null}
+                            {project ? <span className="item project" onClick={that.openProject.bind(that, project)}>{project.name}</span> : null}
+                            {version ? <span className="item version" onClick={that.openVersion.bind(that, version)}>{version.name}</span> : null}
+                            {task ? <span className="item task" onClick={that.openTask.bind(that, task)}>{task.name}</span> : null}
+                            {subTask ? <span className="item task" onClick={that.openTask.bind(that, task)}>{subTask.name}</span> : null}
                         </span>
+                        <i className="fa fa-clock-o"/>
                         <span className="ltt_c-lastTime-time">{numeral(lastSeconds).format('00:00:00')}</span>
                     </div>
                 );
@@ -369,6 +365,35 @@ var Footer = React.createClass({
             }
             React.renderComponent(content, lastTime);
         }
+    },
+
+    openProject: function (project) {
+        var that = this;
+        DataAPI.Project.load({name: project.name})
+            .then(function (projects) {
+                var project = projects[0];
+                if (project) {
+                    that.transitionTo('/projects/' + project._id);
+                }
+            });
+    },
+
+    openTask: function (task) {
+        var that = this;
+        DataAPI.Task.load({name: task.name})
+            .then(function (tasks) {
+                var task = tasks[0];
+                that.transitionTo(Util.getTaskUrl(task));
+            });
+    },
+
+    openVersion: function (version) {
+        var that = this;
+        DataAPI.Version.load({name: version.name})
+            .then(function (versions) {
+                var version = versions[0];
+                that.transitionTo(Util.getVersionUrl(version));
+            });
     }
 });
 

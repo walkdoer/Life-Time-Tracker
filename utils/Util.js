@@ -147,3 +147,22 @@ exports.isInYesterday = function (date) {
     var range = Moment.range(start, end);
     return range.contains(date);
 };
+
+
+exports.getTaskUrl = function (task) {
+    var url = '';
+    if (!task) {return url;}
+    if (task.versionId) {
+        url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
+    } else {
+        url = '/projects/' + task.projectId + '/tasks/' + task._id;
+    }
+    return url;
+};
+
+
+exports.getVersionUrl = function (version) {
+    var url = '';
+    url = '/projects/' + version.projectId + '/versions/' + version._id;
+    return url;
+};

@@ -111,6 +111,32 @@
 .ltt_c-lastTime-name{
     margin-right: 4px;
 }
+
+.ltt_c-lastTime-name .ltt_c-tag{
+  padding: 0px 4px;
+  margin:0px;
+  background: #252222;
+  height: 23px;
+  line-height: 23px;
+  margin-right: 3px;
+}
+.ltt_c-lastTime-name .ltt_c-tag .fa{
+  color: #999;
+  text-shadow: 0px 1px 0px #CECECE;
+}
+
+.ltt_c-lastTime-name .item{
+  margin-right:4px;
+}
+.ltt_c-lastTime-name .item:hover{
+  cursor: pointer;
+}
+.ltt_c-lastTime-name .project{
+  font-weight:600;
+}
+.ltt_c-lastTime-time {
+  color: #FEF8D8;
+}
 .ltt_c-lastTime-name:after{
   content: ":";
   margin-left: 2px;

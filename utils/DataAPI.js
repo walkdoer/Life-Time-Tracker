@@ -185,6 +185,10 @@ module.exports = {
     },
 
     Version: {
+        load: function (params) {
+            return get(url('/versions'), params);
+        },
+
         get: function (id) {
             return get(url('/versions/' + id));
         },
