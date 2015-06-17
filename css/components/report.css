@@ -5,7 +5,6 @@
     padding: 20px;
 }
 
-
-.ltt_c-report-projects .btn-group{
-    margin:10px 10px 10px 0px;
+.ltt_c-report-projects .ltt_c-FullDateRangePicker{
+    margin-bottom:15px;
 }

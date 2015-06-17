@@ -8,7 +8,7 @@ var Q = require('q');
 var _ = require('lodash');
 
 /** Components */
-var ReportDateConfig = require('../components/ReportDateConfig');
+var FullDateRangePicker = require('../components/FullDateRangePicker');
 
 /** utils */
 var DataAPI = require('../utils/DataAPI');
@@ -52,7 +52,7 @@ var Overview = React.createClass({
         }
         return (
             <div className="ltt_c-report ltt_c-report-overview">
-                <ReportDateConfig
+                <FullDateRangePicker
                     start= {this.state.start}
                     end= {this.state.end}
                     compareStart= {this.state.compareStart}

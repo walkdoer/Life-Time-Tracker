@@ -10,7 +10,7 @@ var ButtonToolbar = RB.ButtonToolbar;
 var ButtonGroup = RB.ButtonGroup;
 var Button = RB.Button;
 
-var ReportDateConfig = React.createClass({
+module.exports = React.createClass({
     getInitialState: function () {
         return {
             period: 'today',
@@ -18,10 +18,16 @@ var ReportDateConfig = React.createClass({
         };
     },
 
+    getDefaultProps: function () {
+        return {
+            showCompare: true
+        };
+    },
+
     render: function () {
         var granularity = this.state.granularity;
         var period = this.state.period;
-        var className = 'ltt_c-reportDateConfig ' + this.props.className;
+        var className = 'ltt_c-FullDateRangePicker ' + (this.props.className || '');
         var inputClassName = 'input-daterange';
         var compareComponents;
         if (this.props.compare) {
@@ -34,13 +40,13 @@ var ReportDateConfig = React.createClass({
         }
         return (
             <div className={className}>
-                <div className="ltt_c-reportDateConfig-dateRange">
+                <div className="ltt_c-FullDateRangePicker-dateRange">
                     <DateRangePicker ref="dateRange"
                         start={this.props.start}
                         end={this.props.end}
                         granularity={this.state.granularity}
                         onDateRangeChange={this.props.onDateRangeChange}/>
-                    <input ref="isCompared" type="checkbox" onChange={this.onCompare}/>
+                    {this.props.showCompare ? <input ref="isCompared" type="checkbox" onChange={this.onCompare}/> : null }
                     {compareComponents}
                 </div>
                 <ButtonToolbar>
@@ -115,5 +121,3 @@ var ReportDateConfig = React.createClass({
         });
     }
 });
-
-module.exports = ReportDateConfig;

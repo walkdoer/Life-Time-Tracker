@@ -8,6 +8,7 @@ var Moment = require('moment');
 
 /** components */
 var DateRangePicker = require('../components/DateRangePicker');
+var FullDateRangePicker = require('../components/FullDateRangePicker');
 var PercentArea = require('../components/charts/PercentChart');
 var LoadingMask = require('../components/LoadingMask');
 var ActivityBar = require('../components/charts/ActivityBar');
@@ -33,8 +34,12 @@ module.exports = React.createClass({
         return (
             <div className="ltt_c-report ltt_c-report-classes">
                 <div>
-                     <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
-                            onDateRangeChange={this.onDateRangeChange}/>
+                    <FullDateRangePicker
+                        ref="dateRange"
+                        showCompare={false}
+                        start={this.state.startDate} end={this.state.endDate}
+                        onDateRangeChange={this.onDateRangeChange}
+                    />
                 </div>
                 {this.state.classesTrend ? <PercentArea height={200} data={this.state.classesTrend}/> : null }
                 <ActivityBar

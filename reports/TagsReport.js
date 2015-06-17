@@ -8,7 +8,7 @@ var Moment = require('moment');
 
 /** components */
 var WordsCloud = require('../components/charts/WordsCloud');
-var DateRangePicker = require('../components/DateRangePicker');
+var FullDateRangePicker = require('../components/FullDateRangePicker');
 var LoadingMask = require('../components/LoadingMask');
 var Bar = require('../components/charts/Bar');
 
@@ -34,8 +34,11 @@ module.exports = React.createClass({
         return (
             <div className="ltt_c-report ltt_c-report-tags">
                 <div>
-                     <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
-                            onDateRangeChange={this.onDateRangeChange}/>
+                     <FullDateRangePicker
+                        ref="dateRange"
+                        showCompare={false}
+                        start={this.state.startDate} end={this.state.endDate}
+                        onDateRangeChange={this.onDateRangeChange}/>
                 </div>
                 {!_.isEmpty(this.state.tags) ? <WordsCloud words={this.adaptData(this.state.tags)}/> : null }
                 <div style={{height: tagBarHeight}}>

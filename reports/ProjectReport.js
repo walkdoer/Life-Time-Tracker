@@ -12,7 +12,7 @@ var Button = RB.Button;
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 
 /** components */
-var DateRangePicker = require('../components/DateRangePicker');
+var FullDateRangePicker = require('../components/FullDateRangePicker');
 var ActivityBar = require('../components/charts/ActivityBar');
 var D3TreeMap = require('../components/charts/D3TreeMap');
 var DataAPI = require('../utils/DataAPI');
@@ -38,8 +38,11 @@ module.exports = React.createClass({
             <div className="ltt_c-report ltt_c-report-projects">
                 <D3TreeMap root={this.state.root}/>
                 <div>
-                     <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
-                            onDateRangeChange={this.onDateRangeChange}/>
+                    <FullDateRangePicker
+                        ref="dateRange"
+                        showCompare={false}
+                        start={this.state.startDate} end={this.state.endDate}
+                        onDateRangeChange={this.onDateRangeChange}/>
                 </div>
                 <ActivityBar
                     params={{group: 'project'}}

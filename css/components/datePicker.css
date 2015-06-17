@@ -4,15 +4,15 @@
     font-size: 1.14rem;
 }
 
-.ltt_c-reportDateConfig{
+.ltt_c-FullDateRangePicker{
     display: flex;
     justify-content: space-between;
 }
 
-.ltt_c-reportDateConfig-dateRange{
+.ltt_c-FullDateRangePicker-dateRange{
     display: flex;
 }
-.ltt_c-reportDateConfig input[type="checkbox"]{
+.ltt_c-FullDateRangePicker input[type="checkbox"]{
     margin:auto 10px;
 }
 
