@@ -13,6 +13,7 @@ var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var ReactBootStrap = require('react-bootstrap');
 var Modal = ReactBootStrap.Modal;
 var ModalTrigger = ReactBootStrap.ModalTrigger;
+var ButtonToolbar = ReactBootStrap.ButtonToolbar;
 var Button = ReactBootStrap.Button;
 var Link = Router.Link;
 
@@ -96,8 +97,9 @@ var Page = React.createClass({
                         ref="datePicker"/>
                     <ModalTrigger modal={<DateGoToWindow onGoto={this.gotoDate}/>} ref="dateGoToWindow"><span></span></ModalTrigger>
                     <LogClassPie date={this.state.current} backgroundColor="#f6f6f6" ref="logClassPie"/>
-                    <div className="ltt_c-sidebar-splitline">Projects</div>
-                    <ProjectInfo date={this.state.current}/>
+                    <ButtonToolbar>
+                        <Button bsSize='xsmall'><Link to="/reports/overview">More</Link></Button>
+                    </ButtonToolbar>
                 </aside>
             </div>
         );
@@ -394,6 +396,8 @@ var TaskInfo = React.createClass({
 })
 
 /*
+<div className="ltt_c-sidebar-splitline">Projects</div>
+                    <ProjectInfo date={this.state.current}/>
 var FilterableList = React.createClass({
 
     getDefaultProps: function () {

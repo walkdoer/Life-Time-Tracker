@@ -40,6 +40,17 @@
     border: none;
     border-radius: 0px;
 }
+.ltt_c-page-logEditor aside .btn-toolbar{
+    display: flex;
+    padding-right: 10px;
+    padding-left: 10px;
+    justify-content: flex-end;
+}
+
+.ltt_c-page-logEditor aside .btn-toolbar .btn a{
+  color:#393939;
+  text-decoration: none;
+}
 
 .ltt_c-page-logEditor aside{
     width: 230px;
