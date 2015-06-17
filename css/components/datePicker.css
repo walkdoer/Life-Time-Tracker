@@ -20,6 +20,16 @@
 .ltt_c-dateRangePicker{
     display: flex;
     align-items: stretch;
+    justify-content: space-between;
+}
+
+.ltt_c-dateRangePicker-picker{
+    display:flex;
+    align-items: stretch;
+}
+
+.ltt_c-dateRangePicker .btn-toolbar{
+    display:flex;
 }
 
 .ltt_c-dateRangePicker .input-daterange{

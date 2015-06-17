@@ -5,38 +5,68 @@ require('../libs/daterangepicker');
 var React = require('react');
 var Moment = require('moment');
 var DateRangePicker = require('./DateRangePicker');
+var RB = require('react-bootstrap');
+var ButtonToolbar = RB.ButtonToolbar;
+var ButtonGroup = RB.ButtonGroup;
+var Button = RB.Button;
 
 var ReportDateConfig = React.createClass({
+    getInitialState: function () {
+        return {
+            period: 'today',
+            granularity: 'day'
+        };
+    },
 
     render: function () {
+        var granularity = this.state.granularity;
+        var period = this.state.period;
         var className = 'ltt_c-reportDateConfig ' + this.props.className;
         var inputClassName = 'input-daterange';
-        var btns = [
-            {text: 'Today', value: 'today'},
-            {text: 'Yesterday', value: 'yesterday'},
-            {text: 'Weekly', value: 'weekly'},
-            {text: 'Monthly', value: 'monthly'},
-            {text: 'Annual', value: 'annual'}
-        ].map(function (btn) {
-            return (<button type="button" className="btn btn-default"
-                onClick={this.setDateRangeType.bind(this, btn.value)}>{btn.text}</button>);
-        }, this);
         var compareComponents;
         if (this.props.compare) {
             compareComponents = (
-                <DateRangePicker ref="compareDateRange" start={this.props.compareStart} end={this.props.compareEnd}
+                <DateRangePicker ref="compareDateRange"
+                    start={this.props.compareStart}
+                    end={this.props.compareEnd}
                     onDateRangeChange={this.props.onCompareDateRangeChange}/>
             );
         }
         return (
             <div className={className}>
                 <div className="ltt_c-reportDateConfig-dateRange">
-                    <DateRangePicker ref="dateRange" start={this.props.start} end={this.props.end}
+                    <DateRangePicker ref="dateRange"
+                        start={this.props.start}
+                        end={this.props.end}
+                        granularity={this.state.granularity}
                         onDateRangeChange={this.props.onDateRangeChange}/>
                     <input ref="isCompared" type="checkbox" onChange={this.onCompare}/>
                     {compareComponents}
                 </div>
-                <div className="btn-group" role="daterange">{btns}</div>
+                <ButtonToolbar>
+                    <ButtonGroup>
+                        {[
+                            {label: 'Yesterday', value: 'yesterday'},
+                            {label: 'Today', value: 'today'},
+                            {label: 'Week', value: 'week'},
+                            {label: 'Month', value: 'month'}
+                        ].map(function (btn) {
+                            return <Button active={period === btn.value}
+                                onClick={this.onPeriodChange.bind(this, btn.value)}>{btn.label}</Button>;
+                        }, this)}
+                    </ButtonGroup>
+                    <ButtonGroup>
+                        {[
+                            {label: 'day', value: 'day'},
+                            {label: 'Week', value: 'week'},
+                            {label: 'Month', value: 'month'},
+                            {label: 'Year', value: 'year'}
+                        ].map(function (btn) {
+                            return <Button active={btn.value === granularity}
+                                onClick={this.onGranularityChange.bind(this, btn.value)}>{btn.label}</Button>;
+                        }, this)}
+                    </ButtonGroup>
+                </ButtonToolbar>
             </div>
         );
     },
@@ -46,9 +76,12 @@ var ReportDateConfig = React.createClass({
         this.props.onCompare(checked);
     },
 
-    setDateRangeType: function (rangeType) {
+    onPeriodChange: function (period) {
+        this.setState({
+            period: period
+        });
         var mStart, mEnd, mNow = new Moment();
-        switch (rangeType) {
+        switch (period) {
             case 'today':
                 mStart = Moment(mNow).startOf('day');
                 mEnd = Moment(mNow).endOf('day');
@@ -58,15 +91,15 @@ var ReportDateConfig = React.createClass({
                 mStart = Moment(mNow).startOf('day');
                 mEnd = Moment(mNow).endOf('day');
                 break;
-            case 'weekly':
+            case 'week':
                 mStart = Moment(mNow).startOf('week');
                 mEnd = Moment(mNow).endOf('week');
                 break;
-            case 'monthly':
+            case 'month':
                 mStart = Moment(mNow).startOf('month');
                 mEnd = Moment(mNow).endOf('month');
                 break;
-            case 'annual':
+            case 'year':
                 mStart = Moment(mNow).startOf('year');
                 mEnd = Moment(mNow).endOf('year');
                 break;
@@ -74,8 +107,13 @@ var ReportDateConfig = React.createClass({
         if (mStart && mEnd) {
             this.props.onDateRangeChange(mStart.toDate(), mEnd.toDate());
         }
-    }
+    },
 
+    onGranularityChange: function (granularity) {
+        this.setState({
+            granularity: granularity
+        });
+    }
 });
 
 module.exports = ReportDateConfig;

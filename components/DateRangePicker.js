@@ -7,6 +7,7 @@ var Moment = require('moment');
 
 var DateRangePicker = React.createClass({
 
+
     componentDidMount: function () {
         var start, end;
         if (this.props.start && this.props.end) {
@@ -48,7 +49,6 @@ var DateRangePicker = React.createClass({
         );
     },
 
-
     setDateRange: function(start, end, trigger) {
         start = Moment(start);
         end = Moment(end);
@@ -60,24 +60,28 @@ var DateRangePicker = React.createClass({
         }
     },
 
-    prevDateRange: function () {
+    moveDateRange: function (type, value, granularity) {
+        var method;
+        if (type === 'prev') {
+            method = 'subtract';
+        } else if (type === 'next') {
+            method = 'add';
+        } else {
+            return;
+        }
         var start = new Moment(this.props.start),
-            end = new Moment(this.props.end),
-            diffDay = end.diff(start, 'day') + 1;
-
-        var newStart = Moment(start).subtract(diffDay, 'day').startOf('day');
-        var newEnd = Moment(start).subtract(1, 'day').endOf('day');
+            end = new Moment(this.props.end);
+        var newStart = Moment(start)[method](value, granularity).startOf(granularity);
+        var newEnd = Moment(newStart).endOf(granularity);
         this.setDateRange(newStart, newEnd);
     },
 
-    nextDateRange: function () {
-        var start = new Moment(this.props.start),
-            end = new Moment(this.props.end),
-            diffDay = end.diff(start, 'day') + 1;
+    prevDateRange: function () {
+        this.moveDateRange('prev', 1, this.props.granularity);
+    },
 
-        var newStart = Moment(end).add(1, 'day').startOf('day'),
-            newEnd  = Moment(end).add(diffDay, 'day');
-        this.setDateRange(newStart, newEnd);
+    nextDateRange: function () {
+        this.moveDateRange('next', 1, this.props.granularity);
     },
 });
 

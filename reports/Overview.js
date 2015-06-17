@@ -3,10 +3,12 @@
  */
 
 var React = require('react');
-var ReportDateConfig = require('../components/ReportDateConfig');
 var Moment = require('moment');
 var Q = require('q');
 var _ = require('lodash');
+
+/** Components */
+var ReportDateConfig = require('../components/ReportDateConfig');
 
 /** utils */
 var DataAPI = require('../utils/DataAPI');
