@@ -643,6 +643,9 @@ var LogEditor = React.createClass({
                 var editor = that.editor;
                 that.setValue(content);
                 editor.focus();
+                if (that.state.highlightUnFinishLog) {
+                    that.highlightUnFinishLog();
+                }
                 that.gotoDoingLogLine(content);
                 that._highLightDoingLine(content);
                 that._listenToEditor();
