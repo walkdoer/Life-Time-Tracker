@@ -53,7 +53,8 @@ var LogEditor = React.createClass({
 
     getInitialState: function () {
         return {
-            syncStatus: NO_SYNC
+            syncStatus: NO_SYNC,
+            highlightUnFinishLog: false
         };
     },
 
@@ -77,6 +78,7 @@ var LogEditor = React.createClass({
                     <span className="ltt_c-logEditor-title">{this.props.title}</span>
                     <div className="ltt_c-logEditor-header-right">
                         <ButtonToolbar>
+                            <Button onClick={this.onHighlightUnFinishLog} bsSize='small' title='show unfinish log' active={this.state.highlightUnFinishLog}><i className="fa fa-filter"></i></Button>
                             <DropdownButton bsSize='small' title='Copy' onSelect={this.copyTaskFromPast}>
                                 <MenuItem eventKey='today'>today</MenuItem>
                                 <MenuItem eventKey='yesterday'>yesterday</MenuItem>
@@ -160,6 +162,7 @@ var LogEditor = React.createClass({
         var that = this;
         var editor = ace.edit("ltt-logEditor");
         this.editor = editor;
+        this._highlightMaker = {};
         editor.setTheme("ace/theme/github");
         //editor.renderer.setShowGutter(false); //hide the linenumbers
         var session = editor.getSession();
@@ -211,12 +214,11 @@ var LogEditor = React.createClass({
         return editor;
     },
 
-    copyTaskFromPast: function (period) {
+    getUnfinishLog: function (start, end) {
         var that = this;
-        var dateParams = Util.toDate(period);
-        DataAPI.Log.load({
-            start: dateParams.start,
-            end: dateParams.end,
+        return DataAPI.Log.load({
+            start: start,
+            end: end,
             group: 'task',
             sort: 'start:1'
         }).then(function (result) {
@@ -230,11 +232,21 @@ var LogEditor = React.createClass({
                     if (progress && (
                         progress.task > 0 && progress.task < 100 ||
                         progress.subTask > 0 && progress.subTask < 100)) {
-                        unfinishLog.push(lastLog.origin);
+                        unfinishLog.push(lastLog);
                     }
                 }
             });
-            that.insertLogToLastLine(unfinishLog.join('\n'));
+            return unfinishLog;
+        });
+    },
+
+    copyTaskFromPast: function (period) {
+        var that = this;
+        var dateParams = Util.toDate(period);
+        this.getUnfinishLog(dateParams.start, dateParams.end).then(function (unfinishLogs) {
+            that.insertLogToLastLine(unfinishLogs.map(function (log) {
+                return log.origin;
+            }).join('\n'));
         }).catch(function (err) {
             console.err(err.stack);
             Notify.error('Insert Yesterday\'s task failed');
@@ -292,6 +304,8 @@ var LogEditor = React.createClass({
         console.log('Destroy editor start');
         if (this.editor) {
             this.editor.destroy();
+            this._highlightMaker = {};
+            this._highlightUnFinishLogIndex = null;
             this.refs.editor.getDOMNode().innerHTML = '';
             this.editor = null;
             console.log('Destroy editor end');
@@ -604,7 +618,8 @@ var LogEditor = React.createClass({
     shouldComponentUpdate: function (nextProps, nextState) {
         var title = this.props.title;
         var result = title !== nextProps.title ||
-            this.state.syncStatus !== nextState.syncStatus;
+            this.state.syncStatus !== nextState.syncStatus ||
+            this.state.highlightUnFinishLog !== nextState.highlightUnFinishLog;
         if (title !== nextProps.title) {
             //only change the content will write to cache, it means if the content doesn't change
             //then no need to write the file to disk
@@ -796,6 +811,67 @@ var LogEditor = React.createClass({
         var title = this.props.title;
         var doingLog = Util.getDoingLog(title, content);
         return doingLog;
+    },
+
+    onHighlightUnFinishLog: function () {
+        var highlight = !this.state.highlightUnFinishLog;
+        this.setState({
+            highlightUnFinishLog: highlight
+        });
+        this[highlight ? 'highlightUnFinishLog' : 'unhighlightUnFinishLog']();
+    },
+
+    highlightUnFinishLog: function () {
+        var allLines = this.getAllLines();
+        var that = this;
+        var _highlightUnFinishLogIndex = [];
+        var date = new Moment(this.props.title);
+        var start = Moment(date).startOf('day').toDate();
+        var end = Moment(date).endOf('day').toDate();
+        this.getUnfinishLog(start, end)
+            .then(function(unfinishLogs) {
+                unfinishLogs.forEach(function (unfinishLog) {
+                    var index = allLines.indexOf(unfinishLog.origin);
+                    if (index >= 0) {
+                        that.highlightLine(index);
+                        _highlightUnFinishLogIndex.push(index);
+                    }
+                })
+                that._highlightUnFinishLogIndex = _highlightUnFinishLogIndex;
+            });
+    },
+
+    unhighlightUnFinishLog: function () {
+        var that = this;
+        if (!_.isEmpty(that._highlightUnFinishLogIndex)) {
+            that._highlightUnFinishLogIndex.forEach(function (index) {
+                that.unhighlightLine(index);
+            });
+            that._highlightUnFinishLogIndex = null;
+        }
+    },
+
+    getAllLines: function () {
+        var editor = this.editor;
+        var session = editor.getSession();
+        return session.getDocument().getAllLines();
+    },
+
+    highlightLine: function (index) {
+        var editor = this.editor;
+        var session = editor.getSession();
+        var range = new Range(index, 0, index, Infinity);
+        var marker = session.addMarker(range, "ace_step", "fullLine");
+        this._highlightMaker[index] = marker;
+    },
+
+    unhighlightLine: function (index) {
+        var editor = this.editor;
+        var session = editor.getSession();
+        var marker =this._highlightMaker[index];
+        if (marker) {
+            session.removeMarker(marker);
+        }
     }
 });
 

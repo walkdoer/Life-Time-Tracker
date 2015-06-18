@@ -115,10 +115,12 @@
 .ltt_c-lastTime-name .ltt_c-tag{
   padding: 0px 4px;
   margin:0px;
-  background: #252222;
   height: 23px;
   line-height: 23px;
   margin-right: 3px;
+  border: 1px solid #393939;
+  background: linear-gradient(to bottom, #636363 0%,#323232 100%);     border: 1px solid #434141;     
+  color: #D9D9D9;
 }
 .ltt_c-lastTime-name .ltt_c-tag .fa{
   color: #999;
