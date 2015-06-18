@@ -140,7 +140,10 @@ var Footer = React.createClass({
                     </div>
                     <EnergyBar/>
                 </div>
-                <div className="lastTime" ref="lastTime"></div>
+                <div className="ltt-footer-log">
+                    <div className="ltt-footer-log-content" ref="logContent"></div>
+                    <div className="lastTime" ref="lastTime"></div>
+                </div>
                 <div className="ltt_c-appInfo">
                     {this.renderUnSyncInfo()}
                     <span className="ltt_c-appInfo-projectCount">
@@ -228,7 +231,9 @@ var Footer = React.createClass({
 
     componentWillMount: function () {
         this.updateLastTimeToken = this.updateLastTime.bind(this);
+        this.updateCurrentLogToken = this.updateCurrentLog.bind(this);
         Bus.addListener(EVENT.DOING_LOG, this.updateLastTimeToken);
+        Bus.addListener(EVENT.CURRENT_LOG, this.updateCurrentLogToken);
         Bus.addListener(EVENT.UPDATE_APP_INFO, this.loadAppInfo);
         //Bus.addListener(EVENT.CHECK_SYNC_STATUS, this.checkSyncStatus);
     },
@@ -242,12 +247,12 @@ var Footer = React.createClass({
     componentWillUnmount: function () {
         Bus.removeListener(EVENT.DOING_LOG, this.updateLastTimeToken);
         Bus.removeListener(EVENT.UPDATE_APP_INFO, this.loadAppInfo);
+        Bus.removeListener(EVENT.CURRENT_LOG, this.updateCurrentLogToken);
         //Bus.removeListener(EVENT.CHECK_SYNC_STATUS, this.checkSyncStatus);
     },
 
     loadAppInfo: function () {
         var that = this;
-        console.log('load app info');
         return DataAPI.getAppInfo().then(function (info) {
             that.setState(info);
         });
@@ -262,6 +267,40 @@ var Footer = React.createClass({
         });
     },
 
+    updateCurrentLog: function (log) {
+        this._currentLog = log;
+        this.renderLog(log);
+        if (!log && this._doingLog) {
+            this.renderLog(this._doingLog);
+        }
+    },
+
+    renderLog: function (log) {
+        var contaner = this.refs.logContent.getDOMNode(),
+            content;
+        if (log) {
+            var lastSeconds = new Moment().diff(new Moment(log.start), 'second');
+            var task = log.task,
+                project = log.projects[0],
+                version = log.version,
+                subTask = log.subTask,
+                tags = log.tags;
+            content = (
+                <div className="ltt_c-lastTime">
+                    <span className="ltt_c-lastTime-name">
+                        {!_.isEmpty(tags) ? tags.map(function(tag) { return <Tag>{tag}</Tag>; }) :null}
+                        {project ? <span className="item project" onClick={this.openProject.bind(this, project)}>{project.name}</span> : null}
+                        {version ? <span className="item version" onClick={this.openVersion.bind(this, version)}>{version.name}</span> : null}
+                        {task ? <span className="item task" onClick={this.openTask.bind(this, task)}>{task.name}</span> : null}
+                        {subTask ? <span className="item task" onClick={this.openTask.bind(this, task)}>{subTask.name}</span> : null}
+                    </span>
+                </div>
+            );
+        } else {
+            content = <i></i>;
+        }
+        React.renderComponent(content, contaner);
+    },
 
     updateLastTime: function (doingLog) {
         var that = this;
@@ -269,9 +308,13 @@ var Footer = React.createClass({
         if (this.updateTimeIntervalId) {
             this.clearInterval(this.updateTimeIntervalId);
         }
+        this._doingLog = doingLog;
         if (!doingLog) {return tickTime(doingLog);}
         var start = new Moment(doingLog.start);
         var notifyId = start.unix();
+        if (!this._currentLog) {
+            this.renderLog(doingLog);
+        }
         tickTime(doingLog);
         this.updateTimeIntervalId = this.setInterval(function () {
             var notifyInfo = that.notifyInfo;
@@ -342,26 +385,14 @@ var Footer = React.createClass({
             var content, name;
             if (doingLog) {
                 var lastSeconds = new Moment().diff(new Moment(doingLog.start), 'second');
-                var task = doingLog.task,
-                    project = doingLog.projects[0],
-                    version = doingLog.version,
-                    subTask = doingLog.subTask,
-                    tags = doingLog.tags;
                 content = (
                     <div className="ltt_c-lastTime">
-                        <span className="ltt_c-lastTime-name">
-                            {!_.isEmpty(tags) ? tags.map(function(tag) { return <Tag>{tag}</Tag>; }) :null}
-                            {project ? <span className="item project" onClick={that.openProject.bind(that, project)}>{project.name}</span> : null}
-                            {version ? <span className="item version" onClick={that.openVersion.bind(that, version)}>{version.name}</span> : null}
-                            {task ? <span className="item task" onClick={that.openTask.bind(that, task)}>{task.name}</span> : null}
-                            {subTask ? <span className="item task" onClick={that.openTask.bind(that, task)}>{subTask.name}</span> : null}
-                        </span>
                         <i className="fa fa-clock-o"/>
                         <span className="ltt_c-lastTime-time">{numeral(lastSeconds).format('00:00:00')}</span>
                     </div>
                 );
             } else {
-                content = <i></i>;
+                content = <i/>;
             }
             React.renderComponent(content, lastTime);
         }

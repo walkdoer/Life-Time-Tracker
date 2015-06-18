@@ -47,7 +47,8 @@ var LogEditor = React.createClass({
         return {
             onLoad: function () {},
             onChange: function () {},
-            onSave: function () {}
+            onSave: function () {},
+            onLineChange: function () {}
         };
     },
 
@@ -149,7 +150,7 @@ var LogEditor = React.createClass({
             }
         });
         if (row !== null) {
-            this.editor.gotoLine(row + 1, 0);
+            this.gotoLine(row + 1, 0);
             var range = new Range(row, 0, row, Infinity);
             var marker = session.addMarker(range, "ace_step", "fullLine");
             setTimeout(function () {
@@ -260,7 +261,7 @@ var LogEditor = React.createClass({
             log = log.replace(/\d{1,2}\s*[:]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:]\s*\d{1,2})*/ig, '').trim();
             console.log('插入到第' + (line + 1) + '行: ' + log);
             session.insert({row: line + 1, column: 0}, '\n' + log);
-            this.editor.gotoLine(line + 1, log.length);
+            this.gotoLine(line + 1, log.length);
         }
     },
 
@@ -370,7 +371,7 @@ var LogEditor = React.createClass({
             exec: function (editor) {
                 var log = new Moment().format('HH:mm') + '~';
                 var line = that.insertLogToLastValidLogLine(log);
-                editor.gotoLine(line + 1, log.length);
+                that.gotoLine(line + 1, log.length);
             }
         });
 
@@ -401,7 +402,7 @@ var LogEditor = React.createClass({
                 session.insert(pos, '\n');
                 //insert time
                 session.insert({row: newIndex, column: 0}, timeStr);
-                editor.gotoLine(newIndex + 1, timeStr.length);
+                that.gotoLine(newIndex + 1, timeStr.length);
             }
         });
 
@@ -432,7 +433,7 @@ var LogEditor = React.createClass({
                 session.insert({row: newIndex, column: 0},  newLine);
                 var pos = {row: newIndex, column: newLine.length};
                 session.insert(pos, '\n');
-                editor.gotoLine(newIndex + 1, timeStr.length);
+                that.gotoLine(newIndex + 1, timeStr.length);
             }
         });
     },
@@ -535,6 +536,7 @@ var LogEditor = React.createClass({
         var that = this;
         var editor = this.editor;
         var session = editor.getSession();
+        var selection = editor.getSelection();
         session.on('change', _.debounce(function (e) {
             console.log('editor content change');
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
@@ -544,6 +546,18 @@ var LogEditor = React.createClass({
             that._persistToLocalStorage(title, content);
             that._highLightDoingLine(content);
             that.props.onChange(content, editor);
+        }, 200));
+
+        selection.on('changeCursor', _.debounce(function (e, selection) {
+            var row = selection.getCursor().row;
+            if (row !== that._currentRow) {
+                var line = session.getLine(row), log;
+                if (line) {
+                    log = that.toLogObject(line)[0];
+                }
+                that.props.onLineChange(line, log);
+                that._currentRow = row;
+            }
         }, 200));
         console.log('listen to editro');
     },
@@ -659,7 +673,7 @@ var LogEditor = React.createClass({
         var editor = this.editor;
         var columnPosition = doingLog.origin.indexOf('~') + 1;
         if (_.isNumber(index)) {
-            editor.gotoLine(index + 1, columnPosition);
+            this.gotoLine(index + 1, columnPosition);
             return true;
         }
     },
@@ -875,6 +889,18 @@ var LogEditor = React.createClass({
         if (marker) {
             session.removeMarker(marker);
         }
+    },
+
+    gotoLine: function (row, column) {
+        if (this.editor) {
+            this.editor.gotoLine(row, column);
+            this._currentRow = row - 1;
+        }
+    },
+
+    toLogObject: function (line) {
+        var result = TrackerHelper.getLogs(line, this.props.title);
+        return result;
     }
 });
 

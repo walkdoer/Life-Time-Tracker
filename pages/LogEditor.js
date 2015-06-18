@@ -87,6 +87,7 @@ var Page = React.createClass({
                     onGotoToday={this.gotoToday}
                     onCtrlO={this.openGotoDayWindow}
                     onChange={this.onChange}
+                    onLineChange={this.onLineChange}
                     onLoad={this.onEditorLoad}
                     onSave={this.onSave}
                     locate={this._initOrigin}
@@ -172,6 +173,10 @@ var Page = React.createClass({
         var doingLog = this.refs.logEditor.getDoingLog(content);
         Bus.emit(EVENT.DOING_LOG, doingLog);
         Bus.emit(EVENT.LOG_CHANGE, this.state.current, content);
+    },
+
+    onLineChange: function (line, log) {
+        Bus.emit(EVENT.CURRENT_LOG, log);
     },
 
     onSave: function () {

@@ -139,10 +139,10 @@
 .ltt_c-lastTime-time {
   color: #FEF8D8;
 }
-.ltt_c-lastTime-name:after{
+/*.ltt_c-lastTime-name:after{
   content: ":";
   margin-left: 2px;
-}
+}*/
 
 .ltt_c-logEditor-typeahead{
     display: none;
