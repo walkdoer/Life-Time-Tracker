@@ -1,3 +1,7 @@
 .ace_ltt_people {
     color: #E550AE;
 }
+
+.ace-github .ace_marker-layer .log-unfinish{
+    background: rgb(255, 236, 201) !important;
+}

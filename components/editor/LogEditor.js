@@ -78,7 +78,7 @@ var LogEditor = React.createClass({
                     <span className="ltt_c-logEditor-title">{this.props.title}</span>
                     <div className="ltt_c-logEditor-header-right">
                         <ButtonToolbar>
-                            <Button onClick={this.onHighlightUnFinishLog} bsSize='small' title='show unfinish log' active={this.state.highlightUnFinishLog}><i className="fa fa-filter"></i></Button>
+                            <Button onClick={this.onHighlightUnFinishLog} bsSize='small' title='show unfinish log' active={this.state.highlightUnFinishLog}><i className="fa fa-magic"></i></Button>
                             <DropdownButton bsSize='small' title='Copy' onSelect={this.copyTaskFromPast}>
                                 <MenuItem eventKey='today'>today</MenuItem>
                                 <MenuItem eventKey='yesterday'>yesterday</MenuItem>
@@ -833,7 +833,7 @@ var LogEditor = React.createClass({
                 unfinishLogs.forEach(function (unfinishLog) {
                     var index = allLines.indexOf(unfinishLog.origin);
                     if (index >= 0) {
-                        that.highlightLine(index);
+                        that.highlightLine(index, 'log-unfinish');
                         _highlightUnFinishLogIndex.push(index);
                     }
                 })
@@ -857,11 +857,11 @@ var LogEditor = React.createClass({
         return session.getDocument().getAllLines();
     },
 
-    highlightLine: function (index) {
+    highlightLine: function (index, highlightClass) {
         var editor = this.editor;
         var session = editor.getSession();
         var range = new Range(index, 0, index, Infinity);
-        var marker = session.addMarker(range, "ace_step", "fullLine");
+        var marker = session.addMarker(range, "ace_step " + highlightClass || "", "fullLine");
         this._highlightMaker[index] = marker;
     },
 
