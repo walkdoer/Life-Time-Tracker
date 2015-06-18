@@ -185,9 +185,8 @@ var Page = React.createClass({
         //Bus.emit(EVENT.CHECK_SYNC_STATUS);
     },
 
-    onEditorLoad: function (content) {
+    onEditorLoad: function (content, doingLog) {
         console.log('loaded and fire doingLog');
-        var doingLog = this.refs.logEditor.getDoingLog(this.state.current, content);
         Bus.emit(EVENT.DOING_LOG, doingLog);
     }
 });

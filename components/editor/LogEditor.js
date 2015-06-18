@@ -127,13 +127,14 @@ var LogEditor = React.createClass({
             that._highLightDoingLine(content);
             that.gotoDoingLogLine(content);
             that._gotoLocate(content, that.props.locate);
-            that.props.onLoad(content);
+            that.props.onLoad(content, that.getDoingLog(content));
             editor.focus();
             if (_insertLog) {
                 that.insertLogToLastLine(_insertLog.origin);
                 _insertLog = null;
             }
             that._listenToEditor();
+            that._activeCurrentLine();
         }).fail(function (err) {
             console.error(err);
             console.error(err.stack);
@@ -307,6 +308,7 @@ var LogEditor = React.createClass({
             this.editor.destroy();
             this._highlightMaker = {};
             this._highlightUnFinishLogIndex = null;
+            this._currentRow = null;
             this.refs.editor.getDOMNode().innerHTML = '';
             this.editor = null;
             console.log('Destroy editor end');
@@ -663,7 +665,16 @@ var LogEditor = React.createClass({
                 that.gotoDoingLogLine(content);
                 that._highLightDoingLine(content);
                 that._listenToEditor();
+                that._activeCurrentLine();
             });
+    },
+
+    _activeCurrentLine: function () {
+        var line = this.editor.getSession().getLine(this._currentRow), log;
+        if (line) {
+            log = this.toLogObject(line)[0];
+        }
+        this.props.onLineChange(line, log);
     },
 
     gotoDoingLogLine: function (content) {

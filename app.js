@@ -288,6 +288,7 @@ var Footer = React.createClass({
             content = (
                 <div className="ltt_c-lastTime">
                     <span className="ltt_c-lastTime-name">
+                        {this.renderSigns(log.signs)}
                         {!_.isEmpty(tags) ? tags.map(function(tag) { return <Tag>{tag}</Tag>; }) :null}
                         {project ? <span className="item project" onClick={this.openProject.bind(this, project)}>{project.name}</span> : null}
                         {version ? <span className="item version" onClick={this.openVersion.bind(this, version)}>{version.name}</span> : null}
@@ -300,6 +301,17 @@ var Footer = React.createClass({
             content = <i></i>;
         }
         React.renderComponent(content, contaner);
+    },
+
+    renderSigns: function (signs) {
+        if (!_.isEmpty(signs)) {
+            return signs.map(function (sign) {
+                if (sign === 'wake') {
+                    return <span className="item"><i className="fa fa-sun-o"></i></span>;
+                }
+                return null;
+            });
+        }
     },
 
     updateLastTime: function (doingLog) {
