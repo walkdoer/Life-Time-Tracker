@@ -231,13 +231,21 @@ var LogEditor = React.createClass({
                 if (!_.isEmpty (logs)) {
                     var lastLog = logs[logs.length - 1];
                     var progress = lastLog.progress;
-                    if (progress && (
-                        progress.task > 0 && progress.task < 100 ||
-                        progress.subTask > 0 && progress.subTask < 100)) {
+                    if (
+                        progress && isDoing(progress)
+                    ) {
                         unfinishLog.push(lastLog);
                     }
                 }
             });
+
+            function isDoing(progress) {
+                var sequence = ['project', 'version', 'task', 'subTask'].map(function (type) {
+                    return progress[type];
+                }).filter(function (num) { return _.isNumber(num);})
+                var lastProgress = _.last(sequence);
+                return lastProgress >= 0 && lastProgress < 100;
+            }
             return unfinishLog;
         });
     },
