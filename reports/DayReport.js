@@ -20,6 +20,9 @@ var Bar = require('../components/charts/Bar');
 var setAndCompareData = require('../components/charts/setAndCompareData');
 var SpiderWeb = require('../components/charts/SpiderWeb');
 
+/** configs */
+var config = require('../conf/config');
+
 var Report = React.createClass({
 
     mixins: [setAndCompareData],
@@ -50,10 +53,11 @@ var Report = React.createClass({
     }],
 
     render: function () {
+        var logClasses = config.classes;
         return (
             <div className="ltt_c-report-day">
                 <div className="row ltt-row">
-                    <SpiderWeb className={col4} ref="chart_logClassTime" categories={['NT', 'WK', 'STU', 'TK', 'BRK', 'SPR']}/>
+                    <SpiderWeb className={col4} ref="chart_logClassTime" categories={logClasses.map(function (cls) { return { id: cls._id, text: cls.name};})}/>
                     <Column title="Tag Time" className={col8} ref="chart_tagTime" legend={false}/>
                 </div>
                 <div className="row ltt-row">

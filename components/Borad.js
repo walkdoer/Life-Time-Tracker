@@ -6,13 +6,7 @@ var ReactBootStrap = require('react-bootstrap');
 var numeral = require('numeral');
 
 /** configs */
-var classesMap = require('../conf/config').classesMap;
-var logClasses = _.pairs(classesMap).map(function (obj) {
-    return {
-        value: obj[0],
-        text: obj[1]
-    };
-});
+var config = require('../conf/config');
 
 /** components */
 var LoadingMask = require('../components/LoadingMask');
@@ -36,6 +30,7 @@ module.exports = React.createClass({
     render: function () {
         var today = this.state.today;
         var yesterday = this.state.yesterday;
+        var logClasses = config.classes;
         var logClassTime, yesterDayLogClassTime;
         if (today) {
             logClassTime = today.classTime;
@@ -47,7 +42,7 @@ module.exports = React.createClass({
             <div className="ltt_c-Board">
                 {logClasses.map(function (logClass) {
                     var time = 0, yesterdayTime;
-                    var classId = logClass.value;
+                    var classId = logClass._id;
                     var data;
                     if (!_.isEmpty(logClassTime)) {
                         data = logClassTime.filter(function(item) {
@@ -80,7 +75,7 @@ module.exports = React.createClass({
                     return (
                         <div className="ltt_c-Board-item">
                             <p className="ltt_c-Board-item-number">{time}</p>
-                            <p className="ltt_c-Board-item-name">{logClass.text}</p>
+                            <p className="ltt_c-Board-item-name">{logClass.name}</p>
                             <p className="ltt_c-Board-item-change">{progress}</p>
                         </div>
                     );

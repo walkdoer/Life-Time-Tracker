@@ -35,7 +35,7 @@ exports.dispose = function (rawData, categories, isGroup) {
         var valueKey = helper.getValueKey(rawData);
         categories.forEach(function (category) {
             var target = rawData.filter(function (d) {
-                return d.id === category;
+                return d.id === category.id;
             })[0];
             values.push(target ? target[valueKey] : 0);
         });
@@ -60,7 +60,7 @@ exports.dispose = function (rawData, categories, isGroup) {
         }];
 
         return {
-            labels: categories,
+            labels: categories.map(function (category) { return category.text; }),
             datasets: getDatasets(data, isGroup, names)
         };
 
