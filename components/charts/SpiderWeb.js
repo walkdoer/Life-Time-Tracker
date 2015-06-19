@@ -37,10 +37,9 @@ var SpiderWeb = React.createClass({
         };
         if (this.myRadarChart){
             this.myRadarChart.destroy();
-            this.myRadarChart = this.chart.Radar(data, plotOptions);
+            this.myRadarChart = new Chart(ctx).Radar(data, plotOptions);
         } else {
-            this.chart = new Chart(ctx)
-            this.myRadarChart = this.chart.Radar(data, plotOptions);
+            this.myRadarChart = new Chart(ctx).Radar(data, plotOptions);
         }
     },
 
