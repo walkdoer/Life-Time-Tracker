@@ -66,11 +66,14 @@ module.exports = React.createClass({
             } else if (_.isObject(id)) {
                 name = id.name;
             }
+            if (_.isFunction(this.props.getName)) {
+                name = this.props.getName(item, name);
+            }
             return {
                 name: name,
                 count: item.totalTime
             };
-        }).sort(function (a, b) {
+        }, this).sort(function (a, b) {
             return b.count - a.count;
         });
     },
@@ -98,8 +101,12 @@ module.exports = React.createClass({
     },
 
     onBarClick: function (value) {
+        var item = value.category;
+        if (_.isFunction(this.props.mapCategory)) {
+            item = this.props.mapCategory(value.category);
+        }
         this.setState({
-            selectItem: value.category
+            selectItem: item
         });
         //React.renderComponent(, this.refs.activity.getDOMNode());
     },

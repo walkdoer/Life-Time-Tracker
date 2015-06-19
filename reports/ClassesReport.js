@@ -16,6 +16,8 @@ var ActivityBar = require('../components/charts/ActivityBar');
 /** constant */
 var DATE_FORMAT = 'YYYY-MM-DD';
 
+/** configs */
+var config = require('../conf/config');
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
@@ -31,6 +33,7 @@ module.exports = React.createClass({
     },
 
     render: function () {
+        var logClasses = config.classes;
         return (
             <div className="ltt_c-report ltt_c-report-classes">
                 <div>
@@ -48,6 +51,15 @@ module.exports = React.createClass({
                         return {
                             classes: selectItem
                         };
+                    }}
+                    getName={function (item) {
+                        var classId = item._id;
+                        var cls = _.find(logClasses, function (cls) { return cls._id === classId});
+                        return (cls && cls.name) || "unknow";
+                    }}
+                    mapCategory={function (category) {
+                        var cls = _.find(logClasses, function (cls) { return cls.name === category});
+                        return (cls && cls._id) || categrory;
                     }}
                     startDate={this.state.startDate}
                     endDate={this.state.endDate}/>
@@ -95,6 +107,7 @@ module.exports = React.createClass({
         var granularity = this.state.granularity;
         var startDate = this.state.startDate;
         var endDate = this.state.endDate;
+        var logClasses = config.classes;
         return _.map(classesData, function (classData) {
             var data = classData.data;
             var mStart = new Moment(startDate);
@@ -115,8 +128,10 @@ module.exports = React.createClass({
                 }
                 mStart.add(1, granularity);
             }
+            var classId = classData.class;
+            var cls = _.find(logClasses, function (cls) { return cls._id === classId});
             return {
-                name: classData.class,
+                name: (cls && cls.name) || "unknow",
                 data: seriesData
             };
         })
