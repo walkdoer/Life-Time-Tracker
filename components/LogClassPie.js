@@ -36,6 +36,7 @@ module.exports = React.createClass({
         var today = this.state.today;
         var yesterday = this.state.yesterday;
         var logClassTime, yesterDayLogClassTime;
+        var logClasses = config.classes;
         if (today) {
             logClassTime = today.classTime;
         }
@@ -81,6 +82,12 @@ module.exports = React.createClass({
                 backgroundColor: this.props.backgroundColor
             };
         }
+        logClassTime && logClassTime.forEach(function (item) {
+            var cls = _.find(logClasses, {'_id': item.id});
+            if (cls) {
+                item.label = cls.name;
+            }
+        });
         return (
             <div className="ltt_c-LogClassPie">
                 <h1>{this.props.title}</h1>
