@@ -17,6 +17,8 @@ window.tinycolor = require('tinyColor');
 require('colorPicker');
 var extend = require('extend');
 
+var config = require('../conf/config');
+
 /** Components */
 var Notify = require('../components/Notify');
 var Progress = require('../components/Progress');
@@ -377,7 +379,15 @@ var LogClassCard = React.createClass({
         var newState = {};
         newState[name] = val;
         this.setState(newState, function () {
-            DataAPI.Class.update(extend({}, this.props.data, _.pick(this.state, 'name')));
+            DataAPI.Class.update(extend({}, this.props.data, _.pick(this.state, 'name')))
+            .then(function (cls) {
+                var index = _.findIndex(config.classes, function(clsItem) {
+                    return clsItem._id === cls._id;
+                });
+                if (index >= 0) {
+                    config.classes.splice(index, 1, cls);
+                }
+            });
         });
     }
 });

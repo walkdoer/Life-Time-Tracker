@@ -6,15 +6,7 @@ var ReactBootStrap = require('react-bootstrap');
 var numeral = require('numeral');
 var Pie = require('./charts/Pie');
 
-/** configs */
-var classesMap = require('../conf/config').classesMap;
-var logClasses = _.pairs(classesMap).map(function (obj) {
-    return {
-        value: obj[0],
-        text: obj[1]
-    };
-});
-
+var config = require('../conf/config');
 /** components */
 var LoadingMask = require('../components/LoadingMask');
 
@@ -102,6 +94,7 @@ module.exports = React.createClass({
     renderCompare: function () {
         var today = this.state.today;
         var yesterday = this.state.yesterday;
+        var logClasses = config.classes;
         var logClassTime, yesterDayLogClassTime;
         if (today) {
             logClassTime = today.classTime;
@@ -113,7 +106,7 @@ module.exports = React.createClass({
             <div className="ltt_c-LogClassPie-changes">
             {logClasses.map(function (logClass) {
                 var time = 0, yesterdayTime;
-                var classId = logClass.value;
+                var classId = logClass._id;
                 var data;
                 if (!_.isEmpty(logClassTime)) {
                     data = logClassTime.filter(function(item) {
@@ -137,7 +130,7 @@ module.exports = React.createClass({
                     progressPercentage = progressNumber / yesterdayTime;
                     progress = (
                         <p className={'changeItem ' + (progressNumber > 0 ? 'rise' : (progressNumber < 0 ? 'down' : 'equal'))}>
-                            <span className="name">{logClass.text}</span>
+                            <span className="name">{logClass.name}</span>
                             <span className="num">
                             <i className={"fa fa-" + (progressNumber > 0 ? 'long-arrow-up' :
                                 (progressNumber < 0 ? 'long-arrow-down' : 'minus'))}></i>

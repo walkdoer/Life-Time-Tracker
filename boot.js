@@ -11,6 +11,7 @@ require('jquery-ui');
 require('mousetrap');
 require('fullcalendar');
 require('./libs/jquery.qtip');
+
 var Router = require('react-router');
 var Route = Router.Route;
 var Routes = Router.Routes;
@@ -19,7 +20,7 @@ var DefaultRoute = Router.DefaultRoute;
 var Link = Router.Link;
 var OverviewReport = require('./reports/Overview');
 var App = require('./app');
-
+var config = require('./conf/config.js');
 /** Pages */
 var Dashboard = require('./pages/Dashboard'),
     Logs = require('./pages/Logs'),
@@ -47,6 +48,8 @@ var OverviewReport = require('./reports/Overview'),
     TagsReport = require('./reports/TagsReport'),
     ProjectReport = require('./reports/ProjectReport');
 
+/** Utils */
+var DataAPI = require('./utils/DataAPI');
 /*
 <Route name="allProject" path="/projects" handler={Projects}>
             <DefaultRoute name="projectIndex"  handler={ProjectIndex}/>
@@ -91,6 +94,11 @@ var routes = (
 
 //load setting and start application
 Settings.load().then(function () {
+    //load logClasses
+    return DataAPI.Class.load();
+}).then(function (classes) {
+    config.classes = classes;
+}).then(function () {
     Router.run(routes, function(Handler) {
         React.render(<Handler />, window.document.getElementById('app-container'));
     });
