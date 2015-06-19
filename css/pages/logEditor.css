@@ -130,6 +130,11 @@
 .ltt_c-lastTime-name .item{
   margin-right:4px;
 }
+
+.ltt_c-lastTime-name .item .extenal-link {
+  margin-left: 2px;
+  margin-right: 2px;
+}
 .ltt_c-lastTime-name .item:hover{
   cursor: pointer;
 }

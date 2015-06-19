@@ -290,10 +290,10 @@ var Footer = React.createClass({
                     <span className="ltt_c-lastTime-name">
                         {this.renderSigns(log.signs)}
                         {!_.isEmpty(tags) ? tags.map(function(tag) { return <Tag>{tag}</Tag>; }) :null}
-                        {project ? <span className="item project" onClick={this.openProject.bind(this, project)}>{project.name}</span> : null}
-                        {version ? <span className="item version" onClick={this.openVersion.bind(this, version)}>{version.name}</span> : null}
-                        {task ? <span className="item task" onClick={this.openTask.bind(this, task)}>{task.name}</span> : null}
-                        {subTask ? <span className="item task" onClick={this.openTask.bind(this, task)}>{subTask.name}</span> : null}
+                        {project ? <span className="item project" onClick={this.openProject.bind(this, project)}>{project.name}{this.renderLink(project)}</span> : null}
+                        {version ? <span className="item version" onClick={this.openVersion.bind(this, version)}>{version.name}{this.renderLink(version)}</span> : null}
+                        {task ? <span className="item task" onClick={this.openTask.bind(this, task)}>{task.name}{this.renderLink(task)}</span> : null}
+                        {subTask ? <span className="item task" onClick={this.openTask.bind(this, task)}>{subTask.name}{this.renderLink(subTask)}</span> : null}
                     </span>
                 </div>
             );
@@ -301,6 +301,19 @@ var Footer = React.createClass({
             content = <i></i>;
         }
         React.renderComponent(content, contaner);
+    },
+
+    renderLink: function (obj) {
+        var link;
+        if (obj && obj.attributes && (link = obj.attributes.link)) {
+            return <span className="extenal-link" onClick={this.openExternalLink.bind(this, link)} title={link}><i className="fa fa-external-link"></i></span>
+        }
+        return null;
+    },
+
+    openExternalLink: function (link, e) {
+        e.stopPropagation();
+        Ltt.openExternalLink(link);
     },
 
     renderSigns: function (signs) {
