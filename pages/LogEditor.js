@@ -16,6 +16,7 @@ var ModalTrigger = ReactBootStrap.ModalTrigger;
 var ButtonToolbar = ReactBootStrap.ButtonToolbar;
 var Button = ReactBootStrap.Button;
 var Link = Router.Link;
+var Color = require('color');
 
 /* Components */
 var Moment = require('moment');
@@ -28,6 +29,9 @@ var DataAPI = require('../utils/DataAPI');
 var BindStore = require('../mixins/BindStore');
 var LogClassPie = require('../components/LogClassPie');
 
+/** config */
+var config = require('../conf/config');
+
 /** Store */
 var ProjectStore = require('../stores/ProjectStore');
 
@@ -36,6 +40,7 @@ var EVENT = require('../constants/EventConstant');
 
 /** Utils */
 var Bus = require('../utils/Bus');
+var DataAPI = require('../utils/DataAPI');
 
 
 var Ltt = global.Ltt;
@@ -92,6 +97,7 @@ var Page = React.createClass({
                     onSave={this.onSave}
                     locate={this._initOrigin}
                     ref="logEditor"/>
+                <Calendar date={this.state.current}/>
                 <aside>
                     <LogDatePicker select={this.state.current}
                         onDateChange={this.onDateChange}
@@ -398,6 +404,75 @@ var TaskInfo = React.createClass({
         )
     }
 })
+
+var Calendar = React.createClass({
+
+    render: function () {
+        return <div className="ltt_c-page-logEditor-Calendar"></div>
+    },
+
+    componentDidMount: function () {
+        var classes = config.classes;
+        var $container = $(this.getDOMNode());
+        $container.fullCalendar({
+            header: false,
+            defaultView: 'agendaDay',
+            editable: false,
+            eventLimit: false,
+            height: $container.height(),
+            defaultDate: this.props.date,
+            events: function(start, end, timezone, callback) {
+                DataAPI.Log.load({
+                    start: start.toDate(),
+                    end: end.toDate(),
+                    populate: true
+                }).then(function (logs) {
+                    var events = logs.map(function (log) {
+                        var logClass = log.classes[0];
+                        if (log.start === log.end) {
+                            return null;
+                        }
+                        var data = _.extend({
+                            title: getEventTitle(log),
+                            start: new Moment(log.start),
+                            end: new Moment(log.end)
+                        }, _.pick(log, ['project', 'version', 'task', 'content']));
+                        if (logClass) {
+                            var logClassObj = classes.filter(function (cls) {
+                                return cls._id === logClass;
+                            })[0];
+                            if (logClassObj && logClassObj.color) {
+                                var backgroupColor = logClassObj.color;
+                                var borderColor = Color(backgroupColor).darken(0.2);
+                                data.backgroundColor = backgroupColor;
+                                data.borderColor = borderColor.rgbString();
+                            }
+                        }
+                        return data;
+                    });
+                    callback(events.filter(function (event) {
+                        return event !== null;
+                    }));
+                }).catch(function (err) {
+                    console.log(err.stack);
+                    Notify.error('Sorry, failed to show calendar events!');
+                });
+            }
+        });
+    }
+})
+
+
+function getEventTitle(log) {
+    var title = '';
+    if (!_.isEmpty(log.classes)) {
+        title += log.classes.join(',');
+    }
+    if (!_.isEmpty(log.tags)) {
+        title += '[' + log.tags.join(',') + ']';
+    }
+    return title;
+}
 
 /*
 <div className="ltt_c-sidebar-splitline">Projects</div>

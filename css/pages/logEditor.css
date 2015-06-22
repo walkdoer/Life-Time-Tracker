@@ -302,3 +302,7 @@
 .ltt_c-LogClassPie-changes .changeItem.rise .num{
   color:green;
 }
+
+.ltt_c-page-logEditor-Calendar {
+  width: 200px;
+}
