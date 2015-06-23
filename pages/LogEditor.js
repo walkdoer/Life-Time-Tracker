@@ -86,6 +86,7 @@ var Page = React.createClass({
         console.log('########render');
         return (
             <div className="ltt_c-page ltt_c-page-logEditor">
+                <Calendar date={this.state.current}/>
                 <LogEditor title={this.state.current}
                     onNextDay={this.gotoNextDay}
                     onPrevDay={this.gotoPrevDay}
@@ -97,7 +98,6 @@ var Page = React.createClass({
                     onSave={this.onSave}
                     locate={this._initOrigin}
                     ref="logEditor"/>
-                <Calendar date={this.state.current}/>
                 <aside>
                     <LogDatePicker select={this.state.current}
                         onDateChange={this.onDateChange}
