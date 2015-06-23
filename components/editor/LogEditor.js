@@ -7,6 +7,7 @@ var ButtonToolbar = RB.ButtonToolbar;
 var DropdownButton = RB.DropdownButton;
 var MenuItem = RB.MenuItem;
 var Moment = require('moment');
+var Color = require('color');
 var TrackerHelper = require('tracker/helper');
 
 
@@ -29,6 +30,9 @@ var EventConstant = require('../../constants/EventConstant');
 var DataAPI = require('../../utils/DataAPI');
 var Bus = require('../../utils/Bus');
 var Util = require('../../utils/Util');
+
+/** config */
+var config = require('../../conf/config');
 
 var progressTpl = _.template('<%=progress%>%');
 
@@ -55,7 +59,8 @@ var LogEditor = React.createClass({
     getInitialState: function () {
         return {
             syncStatus: NO_SYNC,
-            highlightUnFinishLog: false
+            highlightUnFinishLog: false,
+            showCalendar: false
         };
     },
 
@@ -76,7 +81,13 @@ var LogEditor = React.createClass({
         return (
             <div className="ltt_c-logEditor">
                 <div className="ltt_c-logEditor-header">
-                    <span className="ltt_c-logEditor-title">{this.props.title}</span>
+                    <div className="ltt_c-logEditor-header-left">
+                        <span className="ltt_c-logEditor-header-toggleCalendar"
+                            onClick={this.toggleCalendar}>
+                            <i className="fa fa-calendar"></i>
+                        </span>
+                        <span className="ltt_c-logEditor-title">{this.props.title}</span>
+                    </div>
                     <div className="ltt_c-logEditor-header-right">
                         <ButtonToolbar>
                             <Button onClick={this.onHighlightUnFinishLog} bsSize='small' title='show unfinish log' active={this.state.highlightUnFinishLog}><i className="fa fa-magic"></i></Button>
@@ -94,10 +105,10 @@ var LogEditor = React.createClass({
                         </ButtonToolbar>
                     </div>
                 </div>
-                <div className="ltt_c-logEditor-projects ltt_c-logEditor-typeahead" ref="projects"></div>
-                <div className="ltt_c-logEditor-versions  ltt_c-logEditor-typeahead" ref="versions"></div>
-                <div className="ltt_c-logEditor-tasks  ltt_c-logEditor-typeahead" ref="tasks"></div>
-                <Editor ref="editor"/>
+                <div className="ltt_c-logEditor-content">
+                    {this.state.showCalendar ? <Calendar date={this.props.title}/> : null }
+                    <Editor ref="editor"/>
+                </div>
             </div>
         );
     },
@@ -643,7 +654,8 @@ var LogEditor = React.createClass({
         var title = this.props.title;
         var result = title !== nextProps.title ||
             this.state.syncStatus !== nextState.syncStatus ||
-            this.state.highlightUnFinishLog !== nextState.highlightUnFinishLog;
+            this.state.highlightUnFinishLog !== nextState.highlightUnFinishLog ||
+            this.state.showCalendar !== nextState.showCalendar;
         if (title !== nextProps.title) {
             //only change the content will write to cache, it means if the content doesn't change
             //then no need to write the file to disk
@@ -920,6 +932,12 @@ var LogEditor = React.createClass({
     toLogObject: function (line) {
         var result = TrackerHelper.getLogs(line, this.props.title);
         return result;
+    },
+
+    toggleCalendar: function () {
+        this.setState({
+            showCalendar: !this.state.showCalendar
+        });
     }
 });
 
@@ -932,5 +950,80 @@ var Editor = React.createClass({
         return false;
     }
 });
+var Calendar = React.createClass({
+
+    render: function () {
+        return <div className="ltt_c-logEditor-Calendar"></div>
+    },
+
+    componentDidMount: function () {
+        var classes = config.classes;
+        var $calendar = $(this.getDOMNode());
+        this.$calendar = $calendar;
+        $calendar.fullCalendar({
+            header: false,
+            defaultView: 'agendaDay',
+            editable: false,
+            eventLimit: false,
+            height: $calendar.height(),
+            defaultDate: this.props.date,
+            events: function(start, end, timezone, callback) {
+                DataAPI.Log.load({
+                    start: start.toDate(),
+                    end: end.toDate(),
+                    populate: true
+                }).then(function (logs) {
+                    var events = logs.map(function (log) {
+                        var logClass = log.classes[0];
+                        if (log.start === log.end) {
+                            return null;
+                        }
+                        var data = _.extend({
+                            title: getEventTitle(log),
+                            start: new Moment(log.start),
+                            end: new Moment(log.end)
+                        }, _.pick(log, ['project', 'version', 'task', 'content']));
+                        if (logClass) {
+                            var logClassObj = classes.filter(function (cls) {
+                                return cls._id === logClass;
+                            })[0];
+                            if (logClassObj && logClassObj.color) {
+                                var backgroupColor = logClassObj.color;
+                                var borderColor = Color(backgroupColor).darken(0.2);
+                                data.backgroundColor = backgroupColor;
+                                data.borderColor = borderColor.rgbString();
+                            }
+                        }
+                        return data;
+                    });
+                    callback(events.filter(function (event) {
+                        return event !== null;
+                    }));
+                }).catch(function (err) {
+                    console.log(err.stack);
+                    Notify.error('Sorry, failed to show calendar events!');
+                });
+            }
+        });
+    },
+
+    componentWillReceiveProps: function (nextProps) {
+        if (nextProps.date !== this.props.date) {
+            this.$calendar.fullCalendar('gotoDate', nextProps.date);
+        }
+    }
+})
+
+
+function getEventTitle(log) {
+    var title = '';
+    if (!_.isEmpty(log.classes)) {
+        title += log.classes.join(',');
+    }
+    if (!_.isEmpty(log.tags)) {
+        title += '[' + log.tags.join(',') + ']';
+    }
+    return title;
+}
 
 module.exports = LogEditor;

@@ -1,7 +1,32 @@
+.ltt_c-logEditor{
+    height: 100%;
+}
+.ltt_c-logEditor-content{
+    height: 100%;
+    display: flex;
+}
+.ltt_c-logEditor-Calendar{
+    width: 150px;
+}
+
+
+.ltt_c-logEditor-content .ace_editor{
+    flex: 1;
+}
+
 .ace_ltt_people {
     color: #E550AE;
 }
 
 .ace-github .ace_marker-layer .log-unfinish{
     background: rgb(255, 236, 201) !important;
+}
+
+.ltt_c-logEditor-header-toggleCalendar {
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.ltt_c-logEditor-header-toggleCalendar:hover{
+    color: blue;
 }
