@@ -41,28 +41,25 @@ var ProjectIndex = React.createClass({
         var that = this;
         return (
             <div className="ltt_c-page-projectsNew-index">
-                <div className="marked-list">
-                    <div className="list-header">
-                        <h3>Marked Tasks</h3>
-                        <ButtonToolbar>
-                            <Button bsSize='small' active={this.state.showDone} onClick={this.showDone}>Show Done</Button>
-                        </ButtonToolbar>
-                    </div>
-                    <TaskList>
-                        {markedTasks.map(function (task) {
-                            return <Task data={task}
-                                displayChildren={false}
-                                onTitleClick={that.gotoTaskInProject.bind(that, task)}
-                                key={'marked:' + task._id}/>
-                        })}
-                    </TaskList>
-                </div>
                 <div className="due-list">
+                    <div>
+                        <div className="list-header">
+                            <h3>Over Due</h3>
+                        </div>
+                        <TaskList>
+                            {overDueTasks.map(function (task) {
+                                return <Task data={task}
+                                    dueTime={true}
+                                    onTitleClick={that.gotoTaskInProject.bind(that, task)}
+                                    key={'due:' + task._id}/>
+                            })}
+                        </TaskList>
+                    </div>
                     <div>
                         <div className="list-header">
                             <h3> Due Soon</h3>
                             <ButtonToolbar>
-                                <DropdownButton bsSize='small' title='Due in' onSelect={this.loadDueTasks}>
+                                <DropdownButton bsSize='small' title='Due in' onSelect={this.loadDueSoonTasks}>
                                     <MenuItem eventKey='1'>1 days</MenuItem>
                                     <MenuItem eventKey='3'>3 days</MenuItem>
                                     <MenuItem eventKey='7'>7 days</MenuItem>
@@ -79,19 +76,22 @@ var ProjectIndex = React.createClass({
                             })}
                         </TaskList>
                     </div>
-                    <div>
-                        <div className="list-header">
-                            <h3>Over Due</h3>
-                        </div>
-                        <TaskList>
-                            {overDueTasks.map(function (task) {
-                                return <Task data={task}
-                                    dueTime={true}
-                                    onTitleClick={that.gotoTaskInProject.bind(that, task)}
-                                    key={'due:' + task._id}/>
-                            })}
-                        </TaskList>
+                </div>
+                <div className="marked-list">
+                    <div className="list-header">
+                        <h3>Marked Tasks</h3>
+                        <ButtonToolbar>
+                            <Button bsSize='small' active={this.state.showDone} onClick={this.showDone}>Show Done</Button>
+                        </ButtonToolbar>
                     </div>
+                    <TaskList>
+                        {markedTasks.map(function (task) {
+                            return <Task data={task}
+                                displayChildren={false}
+                                onTitleClick={that.gotoTaskInProject.bind(that, task)}
+                                key={'marked:' + task._id}/>
+                        })}
+                    </TaskList>
                 </div>
             </div>
         );
@@ -99,7 +99,7 @@ var ProjectIndex = React.createClass({
 
     componentDidMount: function () {
         this.loadMarkedTasks();
-        this.loadDueTasks();
+        this.loadDueSoonTasks();
         this.loadOverDueTasks();
     },
 
@@ -119,12 +119,13 @@ var ProjectIndex = React.createClass({
         });
     },
 
-    loadDueTasks: function (days) {
+    loadDueSoonTasks: function (days) {
         var that = this;
         if (days) {
             days = parseInt(days, 10);
         }
         DataAPI.Task.load({
+            status: 'doing',
             dueDays: days || 3,
             populate: false
         }).then(function (dueTasks) {

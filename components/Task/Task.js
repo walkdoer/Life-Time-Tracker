@@ -113,7 +113,7 @@ var Task = React.createClass({
                             {version ? <span><i className="fa fa fa-sitemap"></i>{version.name}</span> : null}
                             {dueTime ? <span className="ltt_c-task-timeInfo-item" title={dueTime.format('YYYY-MM-DD HH:mm:ss')}>
                                 {dueTime.diff(Date.now()) > 0 ?
-                                    <span className="willDue">will due in {dueTime.fromNow()} at {dueTime.format('YYYY-MM-DD HH:mm')}</span>
+                                    <span className="willDue">will due {dueTime.fromNow()} at {dueTime.format('YYYY-MM-DD HH:mm')}</span>
                                     :
                                     <span className="overDue">due {dueTime.fromNow()} at {dueTime.format('YYYY-MM-DD HH:mm')}</span>
                                 }
