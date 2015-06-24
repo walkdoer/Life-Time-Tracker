@@ -957,6 +957,7 @@ var Calendar = React.createClass({
     },
 
     componentDidMount: function () {
+        var that = this;
         var classes = config.classes;
         var $calendar = $(this.getDOMNode());
         this.$calendar = $calendar;
@@ -965,6 +966,8 @@ var Calendar = React.createClass({
             defaultView: 'agendaDay',
             editable: false,
             eventLimit: false,
+            //scrollTime: new Moment(),
+            allDaySlot: false,
             height: $calendar.height(),
             defaultDate: this.props.date,
             events: function(start, end, timezone, callback) {
@@ -999,6 +1002,8 @@ var Calendar = React.createClass({
                     callback(events.filter(function (event) {
                         return event !== null;
                     }));
+                    that.setTimelineInterval();
+                    that.scrollToAdaptiveEvent();
                 }).catch(function (err) {
                     console.log(err.stack);
                     Notify.error('Sorry, failed to show calendar events!');
@@ -1008,9 +1013,94 @@ var Calendar = React.createClass({
     },
 
     componentWillReceiveProps: function (nextProps) {
+        var that = this;
         if (nextProps.date !== this.props.date) {
             this.$calendar.fullCalendar('gotoDate', nextProps.date);
+            var timer = setTimeout(function () {
+                that.scrollToAdaptiveEvent();
+                clearTimeout(timer);
+            }, 100);
         }
+    },
+
+    setTimeline: function() {
+        var $calendar = this.$calendar;
+        var parentDiv = $calendar.find(".fc-slats:visible").parent();;
+        var timeline = parentDiv.children(".timeline");
+        if (timeline.length == 0) { //if timeline isn't there, add it
+            timeline = $("<hr>").addClass("timeline");
+            parentDiv.prepend(timeline);
+        }
+
+        var curTime = new Date();
+
+        var curCalView = $calendar.fullCalendar('getView');
+        if (curCalView.intervalStart < curTime && curCalView.intervalEnd > curTime) {
+            timeline.show();
+        } else {
+            timeline.hide();
+            return;
+        }
+        timeline.show();
+        var curSeconds = (curTime.getHours() * 60 * 60) + (curTime.getMinutes() * 60) + curTime.getSeconds();
+        var percentOfDay = curSeconds / 86400; //24 * 60 * 60 = 86400, # of seconds in a day
+        var topLoc = Math.floor(parentDiv.height() * percentOfDay);
+
+        timeline.css("top", topLoc + "px");
+
+        if (curCalView.name == "agendaWeek") { //week view, don't want the timeline to go the whole way across
+            var dayCol = $(".fc-today:visible");
+            var left = dayCol.position().left + 1;
+            var width = dayCol.width() - 2;
+            timeline.css({
+                left: left + "px",
+                width: width + "px"
+            });
+        }
+    },
+
+    setTimelineInterval: function () {
+        var that = this;
+        if (this._intervalTimer) {
+            clearInterval(this._intervalTimer);
+        }
+        this.setTimeline();
+        this._intervalTimer = setInterval(function () {
+            that.setTimeline();
+        }, 60000);
+    },
+
+    componentWillUnmount: function () {
+        if (this._intervalTimer) {
+            clearInterval(this._intervalTimer);
+        }
+    },
+
+    scrollToEvent: function (event) {
+        if (!event) {return;}
+        var $calendar = this.$calendar;
+        var view = $calendar.fullCalendar('getView');
+        view.scrollerEl.scrollTop(event.top)
+    },
+
+    scrollToAdaptiveEvent: function () {
+        if (new Moment().diff(this.props.date, 'day') === 0) {
+            this.scrollToLastEvent();
+        } else {
+            this.scrollToFirstEvent();
+        }
+    },
+
+    scrollToFirstEvent: function () {
+        var view = this.$calendar.fullCalendar('getView');
+        var event = _.first(view.getEventSegs());
+        this.scrollToEvent(event);
+    },
+
+    scrollToLastEvent: function () {
+        var view = this.$calendar.fullCalendar('getView');
+        var event = _.last(view.getEventSegs());
+        this.scrollToEvent(event);
     }
 })
 

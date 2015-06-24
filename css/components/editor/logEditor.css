@@ -30,3 +30,13 @@
 .ltt_c-logEditor-header-toggleCalendar:hover{
     color: blue;
 }
+
+
+.ltt_c-logEditor-Calendar .timeline {
+    position: absolute;
+    border-top: 2px dashed #4085AD;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 999;
+}
