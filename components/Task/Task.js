@@ -36,6 +36,7 @@ var Task = React.createClass({
             displayChildren: true,
             onTaskChange: EMPTY_FUN,
             dueTime: false,
+            totalTime: true,
             onClick: EMPTY_FUN
             //onUnMark: EMPTY_FUN
         };
@@ -125,10 +126,12 @@ var Task = React.createClass({
                                 <i className="fa fa-plus" title="create time"></i>
                                 {new Moment(task.createTime).fromNow()}
                             </span>
+                            {this.props.totalTime ?
                             <span  className="ltt_c-task-timeInfo-item">
                                 <i className="fa fa-clock-o" title="total time"></i>
                                 {Moment.duration(task.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {new Moment(task.lastActiveTime).from(task.createTime, true)}
-                            </span>
+                            </span> : null
+                            }
                             <span  className="ltt_c-task-timeInfo-item" title={new Moment(task.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
                                 <i className="fa fa-user" title="last active"></i>
                                 {new Moment(task.lastActiveTime).fromNow()}

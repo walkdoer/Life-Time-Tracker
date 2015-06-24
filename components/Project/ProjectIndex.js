@@ -11,6 +11,7 @@ var Button = RB.Button;
 var ButtonToolbar = RB.ButtonToolbar;
 var DropdownButton = RB.DropdownButton;
 var MenuItem = RB.MenuItem;
+var _ = require('lodash');
 
 /** Components */
 var Task = require('../Task/Task.js');
@@ -42,6 +43,7 @@ var ProjectIndex = React.createClass({
         return (
             <div className="ltt_c-page-projectsNew-index">
                 <div className="due-list">
+                    {!_.isEmpty(overDueTasks) ?
                     <div>
                         <div className="list-header">
                             <h3>Over Due</h3>
@@ -50,20 +52,23 @@ var ProjectIndex = React.createClass({
                             {overDueTasks.map(function (task) {
                                 return <Task data={task}
                                     dueTime={true}
+                                    totalTime={false}
                                     onTitleClick={that.gotoTaskInProject.bind(that, task)}
                                     key={'due:' + task._id}/>
                             })}
                         </TaskList>
-                    </div>
+                    </div> : null }
+                    {!_.isEmpty(dueTasks) ?
                     <div>
                         <div className="list-header">
                             <h3> Due Soon</h3>
                             <ButtonToolbar>
-                                <DropdownButton bsSize='small' title='Due in' onSelect={this.loadDueSoonTasks}>
-                                    <MenuItem eventKey='1'>1 days</MenuItem>
+                                <DropdownButton bsSize='small' title='Due soon in' onSelect={this.loadDueSoonTasks}>
+                                    <MenuItem eventKey='1'>tomorrow</MenuItem>
                                     <MenuItem eventKey='3'>3 days</MenuItem>
                                     <MenuItem eventKey='7'>7 days</MenuItem>
                                     <MenuItem eventKey='30'>30 days</MenuItem>
+                                    <MenuItem eventKey='30'>60 days</MenuItem>
                                  </DropdownButton>
                             </ButtonToolbar>
                         </div>
@@ -71,12 +76,15 @@ var ProjectIndex = React.createClass({
                             {dueTasks.map(function (task) {
                                 return <Task data={task}
                                     dueTime={true}
+                                    totalTime={false}
                                     onTitleClick={that.gotoTaskInProject.bind(that, task)}
                                     key={'due:' + task._id}/>
                             })}
                         </TaskList>
                     </div>
+                    : null}
                 </div>
+                {!_.isEmpty(markedTasks) ?
                 <div className="marked-list">
                     <div className="list-header">
                         <h3>Marked Tasks</h3>
@@ -88,11 +96,13 @@ var ProjectIndex = React.createClass({
                         {markedTasks.map(function (task) {
                             return <Task data={task}
                                 displayChildren={false}
+                                totalTime={false}
                                 onTitleClick={that.gotoTaskInProject.bind(that, task)}
                                 key={'marked:' + task._id}/>
                         })}
                     </TaskList>
                 </div>
+                : null}
             </div>
         );
     },
@@ -126,7 +136,7 @@ var ProjectIndex = React.createClass({
         }
         DataAPI.Task.load({
             status: 'doing',
-            dueDays: days || 3,
+            dueDays: days || 15, //default load task that will due in 15 days
             populate: false
         }).then(function (dueTasks) {
             that.setState({
