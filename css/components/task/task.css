@@ -85,14 +85,23 @@
 .ltt_c-task-timeInfo-item{
   margin-right:5px;
 }
-
+.ltt_c-task-timeInfo-item .willDue,
 .ltt_c-task-timeInfo-item .overDue{
-  background: #FFC8C8;
-  border: 1px solid #C41717;
+  border: 1px solid;
   border-radius: 4px;
-  color: #A31717;
   padding-right: 3px;
   padding-left: 3px;
+}
+
+.ltt_c-task-timeInfo-item .willDue.warning{
+  background: #FBEAC8;
+  border-color: #DC8121;
+  color: #AF661A;
+}
+.ltt_c-task-timeInfo-item .overDue{
+  background: #FFC8C8;
+  border-color: #C41717;
+  color: #A31717;
 }
 
 .ltt_c-task-basicInfo .fa{

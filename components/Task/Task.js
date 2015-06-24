@@ -97,6 +97,7 @@ var Task = React.createClass({
         var dueTime;
         if (this.props.dueTime && task.dueTime) {
             dueTime = new Moment(task.dueTime);
+            dueDiffDays = dueTime.diff(Date.now(), 'day');
         }
 
         return (
@@ -113,7 +114,7 @@ var Task = React.createClass({
                             {version ? <span><i className="fa fa fa-sitemap"></i>{version.name}</span> : null}
                             {dueTime ? <span className="ltt_c-task-timeInfo-item" title={dueTime.format('YYYY-MM-DD HH:mm:ss')}>
                                 {dueTime.diff(Date.now()) > 0 ?
-                                    <span className="willDue">will due {dueTime.fromNow()} at {dueTime.format('YYYY-MM-DD HH:mm')}</span>
+                                    <span className={cx({"willDue": true,  "warning": dueDiffDays > 0 && dueDiffDays <= 3})}>will due {dueTime.fromNow()} at {dueTime.format('YYYY-MM-DD HH:mm')}</span>
                                     :
                                     <span className="overDue">due {dueTime.fromNow()} at {dueTime.format('YYYY-MM-DD HH:mm')}</span>
                                 }
