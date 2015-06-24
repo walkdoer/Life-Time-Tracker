@@ -28,6 +28,7 @@ var ProjectIndex = React.createClass({
         return {
             markedTasks: [],
             dueTasks: [],
+            overDueTasks: [],
             showDone: false
         };
     },
@@ -36,6 +37,7 @@ var ProjectIndex = React.createClass({
     render: function () {
         var markedTasks = this.state.markedTasks;
         var dueTasks = this.state.dueTasks;
+        var overDueTasks = this.state.overDueTasks;
         var that = this;
         return (
             <div className="ltt_c-page-projectsNew-index">
@@ -56,25 +58,40 @@ var ProjectIndex = React.createClass({
                     </TaskList>
                 </div>
                 <div className="due-list">
-                    <div className="list-header">
-                        <h3> Due Task </h3>
-                        <ButtonToolbar>
-                            <DropdownButton bsSize='small' title='Due in' onSelect={this.loadDueTasks}>
-                                <MenuItem eventKey='1'>1 days</MenuItem>
-                                <MenuItem eventKey='3'>3 days</MenuItem>
-                                <MenuItem eventKey='7'>7 days</MenuItem>
-                                <MenuItem eventKey='30'>30 days</MenuItem>
-                             </DropdownButton>
-                        </ButtonToolbar>
+                    <div>
+                        <div className="list-header">
+                            <h3> Due Soon</h3>
+                            <ButtonToolbar>
+                                <DropdownButton bsSize='small' title='Due in' onSelect={this.loadDueTasks}>
+                                    <MenuItem eventKey='1'>1 days</MenuItem>
+                                    <MenuItem eventKey='3'>3 days</MenuItem>
+                                    <MenuItem eventKey='7'>7 days</MenuItem>
+                                    <MenuItem eventKey='30'>30 days</MenuItem>
+                                 </DropdownButton>
+                            </ButtonToolbar>
+                        </div>
+                        <TaskList>
+                            {dueTasks.map(function (task) {
+                                return <Task data={task}
+                                    dueTime={true}
+                                    onTitleClick={that.gotoTaskInProject.bind(that, task)}
+                                    key={'due:' + task._id}/>
+                            })}
+                        </TaskList>
                     </div>
-                    <TaskList>
-                        {dueTasks.map(function (task) {
-                            return <Task data={task}
-                                dueTime={true}
-                                onTitleClick={that.gotoTaskInProject.bind(that, task)}
-                                key={'due:' + task._id}/>
-                        })}
-                    </TaskList>
+                    <div>
+                        <div className="list-header">
+                            <h3>Over Due</h3>
+                        </div>
+                        <TaskList>
+                            {overDueTasks.map(function (task) {
+                                return <Task data={task}
+                                    dueTime={true}
+                                    onTitleClick={that.gotoTaskInProject.bind(that, task)}
+                                    key={'due:' + task._id}/>
+                            })}
+                        </TaskList>
+                    </div>
                 </div>
             </div>
         );
@@ -83,6 +100,7 @@ var ProjectIndex = React.createClass({
     componentDidMount: function () {
         this.loadMarkedTasks();
         this.loadDueTasks();
+        this.loadOverDueTasks();
     },
 
     loadMarkedTasks: function () {
@@ -114,6 +132,18 @@ var ProjectIndex = React.createClass({
                 dueTasks: dueTasks
             });
         });
+    },
+
+    loadOverDueTasks: function () {
+        DataAPI.Task.load({
+            status: 'doing',
+            populate: false,
+            overDue: true
+        }).then(function (tasks) {
+            this.setState({
+                overDueTasks: tasks
+            });
+        }.bind(this))
     },
 
     gotoTaskInProject: function (task) {

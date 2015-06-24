@@ -86,6 +86,15 @@
   margin-right:5px;
 }
 
+.ltt_c-task-timeInfo-item .overDue{
+  background: #FFC8C8;
+  border: 1px solid #C41717;
+  border-radius: 4px;
+  color: #A31717;
+  padding-right: 3px;
+  padding-left: 3px;
+}
+
 .ltt_c-task-basicInfo .fa{
     margin: 0 5px 0 0px;
 }

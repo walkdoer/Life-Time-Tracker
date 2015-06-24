@@ -94,6 +94,11 @@ var Task = React.createClass({
             link = <span onClick={this.openTaskExternalLink.bind(this, link)} title={link}><i className="fa fa-external-link"></i></span>
         }
 
+        var dueTime;
+        if (this.props.dueTime && task.dueTime) {
+            dueTime = new Moment(task.dueTime);
+        }
+
         return (
             <li className={cx({"ltt_c-task": true, "done": task.progress === 100})} data-id={task._id} onDoubleClick={this.props.onDoubleClick} onClick={this.select}>
                 <div className={cx({"ltt_c-task-title": true, 'selected' : this.state.selected})}>
@@ -106,8 +111,12 @@ var Task = React.createClass({
                     <div className="ltt_c-task-basicInfo">
                         <div className="ltt_c-task-basicInfo-version">
                             {version ? <span><i className="fa fa fa-sitemap"></i>{version.name}</span> : null}
-                            {this.props.dueTime ? <span className="ltt_c-task-timeInfo-item" title={new Moment(task.dueTime).format('YYYY-MM-DD HH:mm:ss')}>
-                                will due in {new Moment(task.dueTime).fromNow(true)} at {new Moment(task.dueTime).format('YYYY-MM-DD HH:mm')}
+                            {dueTime ? <span className="ltt_c-task-timeInfo-item" title={dueTime.format('YYYY-MM-DD HH:mm:ss')}>
+                                {dueTime.diff(Date.now()) > 0 ?
+                                    <span className="willDue">will due in {dueTime.fromNow()} at {dueTime.format('YYYY-MM-DD HH:mm')}</span>
+                                    :
+                                    <span className="overDue">due {dueTime.fromNow()} at {dueTime.format('YYYY-MM-DD HH:mm')}</span>
+                                }
                             </span> : null}
                         </div>
                         <div className="ltt_c-task-timeInfo">
