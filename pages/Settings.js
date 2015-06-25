@@ -368,7 +368,8 @@ var LogClassCard = React.createClass({
         var that = this;
         $picker.on('change', function () {
             var val = $(this).val();
-            DataAPI.Class.update(extend({}, that.props.data, {color: '#' + val}));
+            DataAPI.Class.update(extend({}, that.props.data, {color: '#' + val}))
+                .then(updateClassesConfig);
         });
     },
 
@@ -380,16 +381,18 @@ var LogClassCard = React.createClass({
         newState[name] = val;
         this.setState(newState, function () {
             DataAPI.Class.update(extend({}, this.props.data, _.pick(this.state, 'name')))
-            .then(function (cls) {
-                var index = _.findIndex(config.classes, function(clsItem) {
-                    return clsItem._id === cls._id;
-                });
-                if (index >= 0) {
-                    config.classes.splice(index, 1, cls);
-                }
-            });
+                .then(updateClassesConfig);
         });
     }
 });
+
+function updateClassesConfig(cls) {
+    var index = _.findIndex(config.classes, function(clsItem) {
+        return clsItem._id === cls._id;
+    });
+    if (index >= 0) {
+        config.classes.splice(index, 1, cls);
+    }
+}
 
 
