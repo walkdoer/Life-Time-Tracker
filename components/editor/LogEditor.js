@@ -951,6 +951,8 @@ var LogEditor = React.createClass({
     toggleCalendar: function () {
         this.setState({
             showCalendar: !this.state.showCalendar
+        }, function () {
+            this.editor.resize();
         });
     },
 
