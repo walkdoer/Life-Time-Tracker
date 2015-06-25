@@ -1120,7 +1120,9 @@ var Calendar = React.createClass({
         var $calendar = this.$calendar;
         var view = $calendar.fullCalendar('getView');
         var span = this._calendarHeight * 0.1;
-        view.scrollerEl.scrollTop((event.top - span) || 0);
+        view.scrollerEl.animate({
+            scrollTop: (event.top - span) || 0
+        }, 500);
     },
 
     scrollToAdaptiveEvent: function () {
