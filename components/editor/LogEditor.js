@@ -106,7 +106,7 @@ var LogEditor = React.createClass({
                     </div>
                 </div>
                 <div className="ltt_c-logEditor-content">
-                    {this.state.showCalendar ? <Calendar date={this.props.title}/> : null }
+                    {this.state.showCalendar ? <Calendar date={this.props.title} ref="calendar"/> : null }
                     <Editor ref="editor"/>
                 </div>
             </div>
@@ -342,7 +342,12 @@ var LogEditor = React.createClass({
             name: "import",
             bindKey: {win: "Ctrl-S", mac: "Command-S"},
             exec: function(editor) {
-                that.save(editor.getValue());
+                that.save(editor.getValue()).then(function () {
+                    var calendar = that.refs.calendar;
+                    if (calendar) {
+                        calendar.refetch();
+                    }
+                });
             }
         });
 
@@ -784,7 +789,7 @@ var LogEditor = React.createClass({
         }
         var start = new Date().getTime();
         //import into database, for stat purpose
-        !hasError && DataAPI.importLogContent(title, content).then(function () {
+        return !hasError && DataAPI.importLogContent(title, content).then(function () {
             NProgress.done();
             that.props.onSave(content);
             that.__saveing = false;
@@ -958,7 +963,6 @@ var Calendar = React.createClass({
 
     componentDidMount: function () {
         var that = this;
-        var classes = config.classes;
         var $calendar = $(this.getDOMNode());
         this.$calendar = $calendar;
         $calendar.fullCalendar({
@@ -971,6 +975,7 @@ var Calendar = React.createClass({
             height: $calendar.height(),
             defaultDate: this.props.date,
             events: function(start, end, timezone, callback) {
+                var classes = config.classes;
                 DataAPI.Log.load({
                     start: start.toDate(),
                     end: end.toDate(),
@@ -1101,6 +1106,10 @@ var Calendar = React.createClass({
         var view = this.$calendar.fullCalendar('getView');
         var event = _.last(view.getEventSegs());
         this.scrollToEvent(event);
+    },
+
+    refetch: function () {
+        this.$calendar.fullCalendar('refetchEvents');
     }
 })
 
