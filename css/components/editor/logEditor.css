@@ -40,3 +40,9 @@
     padding: 0;
     z-index: 999;
 }
+
+.ltt_c-logEditor-Calendar .event-highlight {
+    border-color: #FF9715 !important;
+    border-width: 1px;
+    box-shadow: 0 0 5px #FFC151;
+}

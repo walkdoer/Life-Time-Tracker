@@ -25,7 +25,7 @@ var Range = ace.require('ace/range').Range;
 
 /** constant */
 var EventConstant = require('../../constants/EventConstant');
-
+var EVENT_HIGHLIGHT_CLASS = 'event-highlight';
 /**util*/
 var DataAPI = require('../../utils/DataAPI');
 var Bus = require('../../utils/Bus');
@@ -970,7 +970,9 @@ var LogEditor = React.createClass({
             }
         }*/
         if (calendar) {
-            calendar.scrollToEventByStartTime(log.start);
+            calendar.unHighlightEvent();
+            var event = calendar.scrollToEventByStartTime(log.start);
+            calendar.highlightEvent(event);
             //calendar.scrollToEventByIndex(index - 1);
         }
     }
@@ -992,8 +994,10 @@ var Calendar = React.createClass({
     },
 
     componentDidMount: function () {
-        var that = this;
         var $calendar = $(this.getDOMNode());
+        var calendarHeight = $calendar.height();
+        this._calendarHeight = calendarHeight;
+        var that = this;
         this.$calendar = $calendar;
         $calendar.fullCalendar({
             header: false,
@@ -1002,7 +1006,7 @@ var Calendar = React.createClass({
             eventLimit: false,
             //scrollTime: new Moment(),
             allDaySlot: false,
-            height: $calendar.height(),
+            height: calendarHeight,
             defaultDate: this.props.date,
             events: function(start, end, timezone, callback) {
                 var classes = config.classes;
@@ -1115,7 +1119,8 @@ var Calendar = React.createClass({
         if (!event) {return;}
         var $calendar = this.$calendar;
         var view = $calendar.fullCalendar('getView');
-        view.scrollerEl.scrollTop(event.top)
+        var span = this._calendarHeight * 0.1;
+        view.scrollerEl.scrollTop((event.top - span) || 0);
     },
 
     scrollToAdaptiveEvent: function () {
@@ -1153,12 +1158,33 @@ var Calendar = React.createClass({
     scrollToEventByStartTime: function (startTime) {
         var view = this.$calendar.fullCalendar('getView');
         var events = view.getEventSegs();
-
+        var target;
         events.some(function (event) {
             if (Moment(event.start.toISOString()).isSame(startTime)) {
+                target = event;
                 this.scrollToEvent(event);
             }
         }, this);
+        return target;
+    },
+
+    highlightEvent: function (event) {
+        event.el.addClass(EVENT_HIGHLIGHT_CLASS);
+    },
+
+    unHighlightEvent: function (event) {
+        if (!event) {
+            this.getAllEvents().forEach(function (event) {
+                event.el.removeClass(EVENT_HIGHLIGHT_CLASS);
+            });
+        } else {
+            event.el.removeClass(EVENT_HIGHLIGHT_CLASS);
+        }
+    },
+
+    getAllEvents: function () {
+        var view = this.$calendar.fullCalendar('getView');
+        return view.getEventSegs();
     }
 })
 
