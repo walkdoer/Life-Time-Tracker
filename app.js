@@ -294,6 +294,7 @@ var Footer = React.createClass({
                         {version ? <span className="item version" onClick={this.openVersion.bind(this, version)}>{version.name}{this.renderLink(version)}</span> : null}
                         {task ? <span className="item task" onClick={this.openTask.bind(this, task)}>{task.name}{this.renderLink(task)}</span> : null}
                         {subTask ? <span className="item task" onClick={this.openTask.bind(this, task)}>{subTask.name}{this.renderLink(subTask)}</span> : null}
+                        {log.len ? Moment.duration(log.len, "minutes").format("M[m],d[d],h[h],mm[min]") : null}
                     </span>
                 </div>
             );

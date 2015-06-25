@@ -581,6 +581,7 @@ var LogEditor = React.createClass({
                 if (line) {
                     log = that.toLogObject(line)[0];
                 }
+                that.allocateLogInCalendar(log);
                 that.props.onLineChange(line, log);
                 that._currentRow = row;
             }
@@ -776,6 +777,14 @@ var LogEditor = React.createClass({
         NProgress.start();
         //write to local filesystem
         var checkResult = Util.checkLogContent(title, content);
+        /* use sessioon.setAnnotations(annotations) to display error message
+            [{
+                row: error.line-1, // must be 0 based
+                column: error.character,  // must be 0 based
+                text: error.message,  // text to show in tooltip
+                type: "error"|"warning"|"info"
+            }]
+        */
         var hasError = !_.isEmpty(checkResult.errors);
         if (hasError) {
             Notify.error('error occur when import log ' + checkResult.errors.map(function (error) {
@@ -943,6 +952,27 @@ var LogEditor = React.createClass({
         this.setState({
             showCalendar: !this.state.showCalendar
         });
+    },
+
+    allocateLogInCalendar: function (log) {
+        if (!log) { return; }
+        var calendar = this.refs.calendar;
+        /*var allLines = this.getAllLines(), line;
+        var targetIndex = null;
+        for (var i = 0; i < allLines.length; i++) {
+            line = allLines[i];
+            if (Util.isValidLog(line)) {
+                index = i + 1;
+                if (line === log.origin) {
+                    targetIndex = index;
+                    break;
+                }
+            }
+        }*/
+        if (calendar) {
+            calendar.scrollToEventByStartTime(log.start);
+            //calendar.scrollToEventByIndex(index - 1);
+        }
     }
 });
 
@@ -1110,6 +1140,25 @@ var Calendar = React.createClass({
 
     refetch: function () {
         this.$calendar.fullCalendar('refetchEvents');
+    },
+
+    scrollToEventByIndex: function (index) {
+        var view = this.$calendar.fullCalendar('getView');
+        var event = view.getEventSegs()[index];
+        if (event) {
+            this.scrollToEvent(event);
+        }
+    },
+
+    scrollToEventByStartTime: function (startTime) {
+        var view = this.$calendar.fullCalendar('getView');
+        var events = view.getEventSegs();
+
+        events.some(function (event) {
+            if (Moment(event.start.toISOString()).isSame(startTime)) {
+                this.scrollToEvent(event);
+            }
+        }, this);
     }
 })
 
