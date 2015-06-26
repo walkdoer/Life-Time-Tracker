@@ -7,19 +7,32 @@
     height: 260px;
 }
 .ltt_c-PieDetail-compare{
-    border-left: 1px solid #F2F2F2;
+    border-left: 1px solid #CCC;
 }
 
 .ltt_c-PieDetail-compare{
     height: 260px;
-    overflow-y:hidden;
+    overflow-y:auto;
 }
 
-.ltt_c-PieDetail-compare .item{
-    height: 50px;
-    border-bottom: 1px solid #f2f2f2;
+.ltt_c-PieDetail-compare .table tbody>tr {
 }
 
-.ltt_c-PieDetail-compare .item:last-child{
-    border-bottom: none;
+.ltt_c-PieDetail-compare .table tbody>tr>td.vert-align
+{
+    vertical-align: middle;
+}
+
+.ltt_c-PieDetail-compare .table .text-center{
+    text-align: center;
+}
+
+.ltt_c-PieDetail-compare .change.rise .fa,
+.ltt_c-PieDetail-compare .change.rise .num{
+    color: green;
+}
+
+.ltt_c-PieDetail-compare .change.down .fa,
+.ltt_c-PieDetail-compare .change.down .num{
+    color: red;
 }

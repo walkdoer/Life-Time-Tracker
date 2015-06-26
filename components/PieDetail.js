@@ -7,8 +7,10 @@ var Moment = require('moment');
 var _ = require('lodash');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var ReactBootStrap = require('react-bootstrap');
+var Table = ReactBootStrap.Table;
 var numeral = require('numeral');
 var Pie = require('./charts/Pie');
+var Q = require('q');
 
 var config = require('../conf/config');
 
@@ -79,7 +81,19 @@ module.exports = React.createClass({
                     {todayData ? <Pie data={todayData} highchartOptions={highchartOptions}/> : null }
                 </div>
                 <div className="Grid-cell u-2of3 ltt_c-PieDetail-compare">
-                    {this.renderCompare()}
+                    <Table striped condensed hover>
+                        <thead>
+                          <tr>
+                            <th className="col-sm-2">Name</th>
+                            <th className="col-sm-3">Percent</th>
+                            <th className="col-sm-4">Compare</th>
+                            <th className="col-sm-4">Activity</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {this.renderCompare()}
+                        </tbody>
+                      </Table>
                 </div>
                 <LoadingMask loaded={this.state.loaded}/>
             </div>
@@ -87,50 +101,67 @@ module.exports = React.createClass({
     },
 
     renderCompare: function () {
+        var date = this.props.date;
         var todayData = this.state.todayData;
         var yesterdayData = this.state.yesterdayData;
         var logClasses = config.classes;
+        var weekData = this.state.weekData;
+        var todayTotal = todayData ? todayData.reduce(function (total, itm) { return total + itm.totalTime}, 0) : 0;
+        var weekTotal = weekData ? weekData.reduce(function (total, itm) { return total + itm.totalTime}, 0) : 0;
         return logClasses.map(function (logClass) {
                 var time, yesterdayTime;
                 var classId = logClass._id;
-                var data;
-                if (!_.isEmpty(todayData)) {
-                    data = todayData.filter(function(item) {
-                        return item._id === classId;
-                    })[0];
-                    if (data) {
-                        time = data.totalTime;
-                    }
+                var todayTime = getTimeConsumeBy(classId, todayData);
+                var yesterdayTime = getTimeConsumeBy(classId, yesterdayData);
+                var weekTime = getTimeConsumeBy(classId, weekData), meanWeekTime;
+                if (weekTime) {
+                    meanWeekTime  = weekTime / (new Moment(date).day() + 1);
                 }
-                if (!_.isEmpty(yesterdayData)) {
-                    data = yesterdayData.filter(function(item) {
-                        return item._id === classId;
-                    })[0];
-                    if (data) {
-                        yesterdayTime = data.totalTime;
-                    }
-                }
-                if (!time) {return;}
-                var progressNumber, progressPercentage, item;
-                progressNumber = time - yesterdayTime;
-                if (yesterdayTime !== 0) {
-                    progressPercentage = progressNumber / yesterdayTime;
-                } else {
-                    progressPercentage = 1;
-                }
+                if (!todayTime) {return;}
+                var cpToYesterday, cpToMeanWeek, item;
+                cpToYesterday = compare(todayTime, yesterdayTime)
+                cpToMeanWeek = compare(todayTime, meanWeekTime);
 
                 item = (
-                    <div className='item'>
-                        <div className="name">{logClass.name}</div>
-                        <div className="change">
-                            <div className={"yesterday" + (progressNumber > 0 ? 'rise' : (progressNumber < 0 ? 'down' : 'equal'))}>
-                                {this._toNumItem(progressPercentage)}
+                    <tr>
+                        <td className="vert-align text-center">{logClass.name}</td>
+                        <td className="vert-align">
+                            <p>今日占比: {todayTotal ? numeral(todayTime / todayTotal * 100).format('0.0') + '%' : '--'}</p>
+                            <p>一周占比: {weekTotal ? numeral(todayTime / weekTotal * 100).format('0.0') + '%' : '--'}</p>
+                        </td>
+                        <td className="vert-align">
+                            <div className={"change " + (cpToYesterday > 0 ? 'rise' : (cpToYesterday < 0 ? 'down' : 'equal'))}>
+                                较昨日:{this._toNumItem(cpToYesterday)}
                             </div>
-                        </div>
-                    </div>
+                            <div className={"change " + (cpToMeanWeek> 0 ? 'rise' : (cpToMeanWeek < 0 ? 'down' : 'equal'))}>
+                                较本周平均: {this._toNumItem(cpToMeanWeek)}
+                            </div>
+                        </td>
+                        <td className="vert-align">--</td>
+                    </tr>
                 );
                 return item;
             }, this);
+
+        function compare(a, b) {
+            if (b !== undefined && b !== 0) {
+                return (a - b) / b;
+            } else {
+                return 1;
+            }
+        }
+        function getTimeConsumeBy(classId, data) {
+            var time, target;
+            if (!_.isEmpty(data)) {
+                target = data.filter(function(item) {
+                    return item._id === classId;
+                })[0];
+                if (target) {
+                    time = target.totalTime;
+                }
+            }
+            return time;
+        }
     },
 
     _toNumItem: function (progressPercentage){
@@ -149,43 +180,50 @@ module.exports = React.createClass({
         } else {
             props = nextProps;
         }
-        var type = props.type;
-        var start = props.start,
-            end = props.end,
+        var type = props.type,
             date = props.date;
         var that = this;
-        if (start && end) {
-            start = new Moment(start).startOf('day').format(DATE_FORMAT);
-            end = new Moment(end).endOf('day').format(DATE_FORMAT);
-        } else if (date) {
-            start = new Moment(date).startOf('day').format(DATE_FORMAT);
-            end = new Moment(date).endOf('day').format(DATE_FORMAT);
-        }
-        var promise = DataAPI.Log.load({
-            start: new Moment(start).startOf('day').format(DATE_FORMAT),
-            end: new Moment(end).endOf('day').format(DATE_FORMAT),
-            group: type,
-            sum: true
-        }).then(function (statResult) {
+        return Q.all([
+            loadToday(),
+            loadYesterDay(),
+            loadWeek()
+        ]).spread(function (today, yesterday, week) {
             that.setState({
                 loaded: true,
-                todayData: statResult
-            });
-        });
-        return promise.then(function () {
-            return DataAPI.Log.load({
-                start: new Moment(start).subtract(1, 'day').startOf('day').format(DATE_FORMAT),
-                end: new Moment(end).subtract(1, 'day').endOf('day').format(DATE_FORMAT),
-                sum: true,
-                group: type
-            });
-        }).then(function (statResult) {
-            that.setState({
-                yesterdayData: statResult
+                todayData: today,
+                yesterdayData: yesterday,
+                weekData: week
             });
         }).catch(function (err) {
             console.error(err.stack);
         });
+
+        function loadYesterDay() {
+            return DataAPI.Log.load({
+                start: new Moment(date).subtract(1, 'day').startOf('day').format(DATE_FORMAT),
+                end: new Moment(date).subtract(1, 'day').endOf('day').format(DATE_FORMAT),
+                sum: true,
+                group: type
+            });
+        }
+
+        function loadToday() {
+            return DataAPI.Log.load({
+                start: new Moment(date).startOf('day').format(DATE_FORMAT),
+                end: new Moment(date).endOf('day').format(DATE_FORMAT),
+                group: type,
+                sum: true
+            })
+        }
+
+        function loadWeek() {
+            return DataAPI.Log.load({
+                start: new Moment(date).startOf('week').format(DATE_FORMAT),
+                end: new Moment(date).endOf('week').format(DATE_FORMAT),
+                sum: true,
+                group: type
+            });
+        }
     },
 
     componentDidMount: function () {

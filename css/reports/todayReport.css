@@ -10,3 +10,7 @@
 .ltt_c-report-TodayReport .chart{
     background: #FFF;
 }
+
+.ltt_c-report-TodayReport .ltt_c-PieDetail{
+    box-shadow: 0 0 2px #8D8D8D;
+}

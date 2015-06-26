@@ -25,10 +25,8 @@ module.exports = React.createClass({
         return (
             <div className="ltt_c-page ltt_c-report-TodayReport">
                 <div className="Grid Grid--gutters Grid--stretch ltt_c-report-TodayReport-header">
-                    <div className="Grid-cell u-2of3">
+                    <div className="Grid-cell">
                         <PieDetail className="chart" date={new Moment()} type="classes"/>
-                    </div>
-                    <div className="Grid-cell u-1of3">
                     </div>
                 </div>
             </div>
