@@ -11,6 +11,8 @@ module.exports = React.createClass({
         return {
             backgroundColor: 'rgba(0,0,0,0)',
             xAxisLabel: true,
+            highlightToday: false,
+            highlightColor: 'red',
             logs: []
         };
     },
@@ -206,12 +208,15 @@ module.exports = React.createClass({
         if (_.isEmpty(data)) {
             return 0;
         }
-        return _.sum(data, function (item) { return item[1]}) / data.length;
+        return _.sum(data, function (item) { return item.y}) / data.length;
     },
 
     getTimeData: function () {
         var logs = this.props.logs;
+        var todayUnix = new Moment(this.props.date).unix() * 1000;
         var granularity = this.props.granularity;
+        var highlightToday = this.props.highlightToday;
+        var highlightColor = this.props.highlightColor;
         if (['weekly', 'week', 'month', 'monthly'].indexOf(granularity) >= 0) {
             var data = logs.reduce(function (result, log) {
                 var date = new Moment(log.date).startOf('day').unix() * 1000;
@@ -223,17 +228,25 @@ module.exports = React.createClass({
                 return result;
             }, {});
             data = _.pairs(data).map(function (d) {
-                d[0] = parseInt(d[0], 10);
-                return d;
+                var unix = parseInt(d[0], 10);
+                var data = {x: unix, y: d[1]};
+                if (highlightToday && todayUnix === unix) {
+                    data.color = highlightColor;
+                }
+                return data;
             }).sort(function (a, b) {
-                return a[0] - b[0];
+                return a.x - b.x;
             });
             return data || [];
         } else {
             return logs.slice(0).sort(function (a, b) {
                 return new Date(a.start).getTime() - new Date(b.start).getTime();
             }).map(function (log) {
-                return [new Moment(log.start).unix() * 1000, log.len];
+                var unix = new Moment(log.date).unix() * 1000;
+                var data = {x: new Moment(log.start).unix() * 1000, y: log.len};
+                if (highlightToday && todayUnix === unix) {
+                    data.color = highlightColor;
+                }
             });
         }
 
