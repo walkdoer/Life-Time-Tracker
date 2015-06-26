@@ -9,6 +9,7 @@ module.exports = React.createClass({
 
     getDefaultProps: function () {
         return {
+            backgroundColor: 'rgba(0,0,0,0)',
             xAxisLabel: true,
             logs: []
         };
@@ -69,6 +70,10 @@ module.exports = React.createClass({
             };
         }
         var options = {
+            exporting: { enabled: false },
+            chart: {
+                backgroundColor: this.props.backgroundColor
+            },
             title: {
                 text: title,
                 style: {

@@ -16,6 +16,7 @@ var config = require('../conf/config');
 
 /** components */
 var LoadingMask = require('./LoadingMask');
+var LogLine = require('./charts/LogLine');
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
@@ -52,7 +53,7 @@ module.exports = React.createClass({
                 }
             },
             legend: {
-                enabled: false,
+                enabled: true,
                 align: 'right',
                 verticalAlign: 'top',
                 layout: 'vertical',
@@ -106,70 +107,17 @@ module.exports = React.createClass({
         var yesterdayData = this.state.yesterdayData;
         var logClasses = config.classes;
         var weekData = this.state.weekData;
-        var todayTotal = todayData ? todayData.reduce(function (total, itm) { return total + itm.totalTime}, 0) : 0;
-        var weekTotal = weekData ? weekData.reduce(function (total, itm) { return total + itm.totalTime}, 0) : 0;
         return logClasses.map(function (logClass) {
-                var time, yesterdayTime;
-                var classId = logClass._id;
-                var todayTime = getTimeConsumeBy(classId, todayData);
-                var yesterdayTime = getTimeConsumeBy(classId, yesterdayData);
-                var weekTime = getTimeConsumeBy(classId, weekData), meanWeekTime;
-                if (weekTime) {
-                    meanWeekTime  = weekTime / (new Moment(date).day() + 1);
-                }
-                if (!todayTime) {return;}
-                var cpToYesterday, cpToMeanWeek, item;
-                cpToYesterday = compare(todayTime, yesterdayTime)
-                cpToMeanWeek = compare(todayTime, meanWeekTime);
-
-                item = (
-                    <tr>
-                        <td className="vert-align text-center">{logClass.name}</td>
-                        <td className="vert-align">
-                            <p>今日占比: {todayTotal ? numeral(todayTime / todayTotal * 100).format('0.0') + '%' : '--'}</p>
-                            <p>一周占比: {weekTotal ? numeral(todayTime / weekTotal * 100).format('0.0') + '%' : '--'}</p>
-                        </td>
-                        <td className="vert-align">
-                            <div className={"change " + (cpToYesterday > 0 ? 'rise' : (cpToYesterday < 0 ? 'down' : 'equal'))}>
-                                较昨日:{this._toNumItem(cpToYesterday)}
-                            </div>
-                            <div className={"change " + (cpToMeanWeek> 0 ? 'rise' : (cpToMeanWeek < 0 ? 'down' : 'equal'))}>
-                                较本周平均: {this._toNumItem(cpToMeanWeek)}
-                            </div>
-                        </td>
-                        <td className="vert-align">--</td>
-                    </tr>
-                );
-                return item;
+                return <Detail date={date}
+                    item={logClass}
+                    todayData={todayData}
+                    yesterdayData={yesterdayData}
+                    weekData={weekData}
+                    params={{
+                        classes: logClass._id
+                    }}/>
             }, this);
 
-        function compare(a, b) {
-            if (b !== undefined && b !== 0) {
-                return (a - b) / b;
-            } else {
-                return 1;
-            }
-        }
-        function getTimeConsumeBy(classId, data) {
-            var time, target;
-            if (!_.isEmpty(data)) {
-                target = data.filter(function(item) {
-                    return item._id === classId;
-                })[0];
-                if (target) {
-                    time = target.totalTime;
-                }
-            }
-            return time;
-        }
-    },
-
-    _toNumItem: function (progressPercentage){
-        if (isNaN(progressPercentage)) {return;}
-        return [
-            <i className={"fa fa-" + (progressPercentage > 0 ? 'long-arrow-up' :(progressPercentage < 0 ? 'long-arrow-down' : 'minus'))}></i>,
-            <span className="num">{numeral(progressPercentage * 100).format('0.0')}%</span>
-        ]
     },
 
     //{yesterDayLogClassTime ? <Pie data={yesterDayLogClassTime} highchartOptions={highchartOptions}/> : null }
@@ -237,4 +185,119 @@ module.exports = React.createClass({
     update: function () {
         this.loadData();
     }
+});
+
+Detail = React.createClass({
+
+    getInitialState: function () {
+        return {
+            activitiesLoaded: false,
+            activities: []
+        };
+    },
+
+    render: function () {
+        var item = this.props.item;
+        var date = this.props.date;
+        var weekData = this.props.weekData;
+        var yesterdayData = this.props.yesterdayData;
+        var todayData = this.props.todayData;
+        var time, yesterdayTime;
+        var id = item._id;
+        var todayTime = getTimeConsumeBy(id, todayData);
+        var yesterdayTime = getTimeConsumeBy(id, yesterdayData);
+        var weekTime = getTimeConsumeBy(id, weekData), meanWeekTime;
+        var todayTotal = todayData ? todayData.reduce(function (total, itm) { return total + itm.totalTime}, 0) : 0;
+        var weekTotal = weekData ? weekData.reduce(function (total, itm) { return total + itm.totalTime}, 0) : 0;
+        if (weekTime) {
+            meanWeekTime  = weekTime / (new Moment(date).day() + 1);
+        }
+        var cpToYesterday, cpToMeanWeek, item;
+        cpToYesterday = compare(todayTime, yesterdayTime)
+        cpToMeanWeek = compare(todayTime, meanWeekTime);
+
+        return (
+            <tr>
+                <td className="vert-align text-center">{item.name}</td>
+                <td className="vert-align">
+                    <p>今日占比: {todayTotal && todayTime ? numeral(todayTime / todayTotal * 100).format('0.0') : '0'}%</p>
+                    <p>一周占比: {weekTotal && todayTime ? numeral(todayTime / weekTotal * 100).format('0.0') : '0'}%</p>
+                </td>
+                <td className="vert-align">
+                    <div className={"change " + (cpToYesterday > 0 ? 'rise' : (cpToYesterday < 0 ? 'down' : 'equal'))}>
+                        较昨日:{this._toNumItem(cpToYesterday)}
+                    </div>
+                    <div className={"change " + (cpToMeanWeek> 0 ? 'rise' : (cpToMeanWeek < 0 ? 'down' : 'equal'))}>
+                        较本周平均: {this._toNumItem(cpToMeanWeek)}
+                    </div>
+                </td>
+                <td className="vert-align">
+                    <LogLine logs={this.state.activities}
+                        granularity='week'
+                        title={false}
+                        xAxisLabel={false}
+                        yAxisLabel={false}/>
+                    <LoadingMask loaded={this.state.activitiesLoaded}/>
+                </td>
+            </tr>
+        );
+    },
+
+    componentDidMount: function () {
+        var date = this.props.date;
+        this.loadActivity(new Moment(date).startOf('week').toDate(), new Moment(date).endOf('week').toDate());
+    },
+
+    _toNumItem: function (progressPercentage){
+        if (isNaN(progressPercentage)) {return;}
+        return [
+            <i className={"fa fa-" + (progressPercentage > 0 ? 'long-arrow-up' :(progressPercentage < 0 ? 'long-arrow-down' : 'minus'))}></i>,
+            <span className="num">{numeral(progressPercentage * 100).format('0.0')}%</span>
+        ]
+    },
+
+    loadActivity: function (start, end) {
+        var that = this;
+        var params = _.extend({
+            sort: 'date: -1',
+            start: start,
+            end: end,
+            populate: false
+        }, this.props.params);
+        DataAPI.Log.load(params).then(function (data) {
+            that.setState({
+                activitiesLoaded: true,
+                activities: data
+            });
+        }).fail(function (err) {
+            that.setState({
+                activitiesLoaded: true,
+                activitiesLoadFailed: true
+            })
+        });
+    }
 })
+
+
+function compare(a, b) {
+    if (a === b) {
+        return 0;
+    }
+    if (b !== undefined && b !== 0) {
+        return (a - b) / b;
+    } else {
+        return 1;
+    }
+}
+function getTimeConsumeBy(id, data) {
+    var time = 0, target;
+    if (!_.isEmpty(data)) {
+        target = data.filter(function(item) {
+            return item._id === id;
+        })[0];
+        if (target) {
+            time = target.totalTime;
+        }
+    }
+    return time;
+}

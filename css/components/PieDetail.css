@@ -36,3 +36,11 @@
 .ltt_c-PieDetail-compare .change.down .num{
     color: red;
 }
+
+
+.ltt_c-PieDetail-compare .ltt_c-chart-LogLine{
+    height: 80px;
+    max-height: 80px;
+    min-height: 80px;
+    background: none;
+}
