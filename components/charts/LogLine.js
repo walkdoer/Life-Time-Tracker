@@ -32,6 +32,7 @@ module.exports = React.createClass({
     _plot: function () {
         var $el = $(this.getDOMNode());
         var data = this._getData();
+        var average = this._getAverage();
         var title = this._getTitle();
         var tickInterval;
         if (this.props.granularity) {
@@ -54,7 +55,13 @@ module.exports = React.createClass({
         var yAxis;
         if (this.props.withProgress) {
             yAxis = [{
-                title: false
+                title: false,
+                plotLines: [{
+                    color: 'red',
+                    value: average,
+                    dashStyle: 'longdashdot',
+                    width: '1'
+                }]
             }, {
                 title: false,
                 opposite: true,
@@ -66,7 +73,13 @@ module.exports = React.createClass({
             }];
         } else {
             yAxis = {
-                title: false
+                title: false,
+                plotLines: [{
+                    color: 'red',
+                    value: average,
+                    dashStyle: 'longdashdot',
+                    width: '1'
+                }]
             };
         }
         var options = {
@@ -186,6 +199,14 @@ module.exports = React.createClass({
         }).map(function (log) {
             return [new Moment(log.start).unix() * 1000, log.progress[progressField]];
         });
+    },
+
+    _getAverage: function () {
+        var data = this.getTimeData();
+        if (_.isEmpty(data)) {
+            return 0;
+        }
+        return _.sum(data, function (item) { return item[1]}) / data.length;
     },
 
     getTimeData: function () {
