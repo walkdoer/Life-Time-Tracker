@@ -32,13 +32,16 @@ module.exports = React.createClass({
     },
 
     _plot: function () {
+        var date = this.props.date;
         var $el = $(this.getDOMNode());
         var data = this._getData();
         var average = this._getAverage();
         var title = this._getTitle();
         var tickInterval;
-        if (this.props.granularity) {
-            switch(this.props.granularity) {
+        var mStart, mEnd;
+        var granularity = this.props.granularity;
+        if (granularity) {
+            switch(granularity) {
                 case 'month':
                 case 'monthly':
                     tickInterval = 3600 * 24 * 100;
@@ -53,6 +56,8 @@ module.exports = React.createClass({
                 default:
                     break;
             }
+            mStart = new Moment(date).startOf(granularity);
+            mEnd = new Moment(date).endOf(granularity);
         }
         var yAxis;
         if (this.props.withProgress) {
@@ -127,7 +132,8 @@ module.exports = React.createClass({
                 },
                 series: {
                     showInLegend: false,
-                    pointWidth: 10
+                    pointWidth: 10,
+                    pointInterval: tickInterval
                 }
             },
             yAxis: yAxis,
@@ -157,6 +163,10 @@ module.exports = React.createClass({
         }
         if (this.props.yAxisLabel === false) {
             options.yAxis.gridLineWidth = 0;
+        }
+        if (granularity) {
+            options.xAxis.min = mStart.unix() * 1000;
+            options.xAxis.max = mEnd.unix() * 1000;
         }
         var chartType;
         if (this.props.type === 'progress') {
