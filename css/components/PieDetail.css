@@ -9,3 +9,17 @@
 .ltt_c-PieDetail-compare{
     border-left: 1px solid #F2F2F2;
 }
+
+.ltt_c-PieDetail-compare{
+    height: 260px;
+    overflow-y:hidden;
+}
+
+.ltt_c-PieDetail-compare .item{
+    height: 50px;
+    border-bottom: 1px solid #f2f2f2;
+}
+
+.ltt_c-PieDetail-compare .item:last-child{
+    border-bottom: none;
+}

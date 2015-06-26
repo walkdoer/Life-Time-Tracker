@@ -79,6 +79,7 @@ module.exports = React.createClass({
                     {todayData ? <Pie data={todayData} highchartOptions={highchartOptions}/> : null }
                 </div>
                 <div className="Grid-cell u-2of3 ltt_c-PieDetail-compare">
+                    {this.renderCompare()}
                 </div>
                 <LoadingMask loaded={this.state.loaded}/>
             </div>
@@ -89,47 +90,55 @@ module.exports = React.createClass({
         var todayData = this.state.todayData;
         var yesterdayData = this.state.yesterdayData;
         var logClasses = config.classes;
-        return (
-            <div className="ltt_c-LogClassPie-changes">
-            {logClasses.map(function (logClass) {
-                var time = 0, yesterdayTime;
+        return logClasses.map(function (logClass) {
+                var time, yesterdayTime;
                 var classId = logClass._id;
                 var data;
-                if (!_.isEmpty(logClassTime)) {
-                    data = logClassTime.filter(function(item) {
-                        return item.id === classId;
+                if (!_.isEmpty(todayData)) {
+                    data = todayData.filter(function(item) {
+                        return item._id === classId;
                     })[0];
                     if (data) {
-                        time = data.count;
+                        time = data.totalTime;
                     }
                 }
-                if (!_.isEmpty(yesterDayLogClassTime)) {
-                    data = yesterDayLogClassTime.filter(function(item) {
-                        return item.id === classId;
+                if (!_.isEmpty(yesterdayData)) {
+                    data = yesterdayData.filter(function(item) {
+                        return item._id === classId;
                     })[0];
                     if (data) {
-                        yesterdayTime = data.count;
+                        yesterdayTime = data.totalTime;
                     }
                 }
-                var progressNumber, progressPercentage, progress;
-                if (yesterdayTime > 0) {
-                    progressNumber = time - yesterdayTime;
+                if (!time) {return;}
+                var progressNumber, progressPercentage, item;
+                progressNumber = time - yesterdayTime;
+                if (yesterdayTime !== 0) {
                     progressPercentage = progressNumber / yesterdayTime;
-                    progress = (
-                        <p className={'changeItem ' + (progressNumber > 0 ? 'rise' : (progressNumber < 0 ? 'down' : 'equal'))}>
-                            <span className="name">{logClass.name}</span>
-                            <span className="num">
-                            <i className={"fa fa-" + (progressNumber > 0 ? 'long-arrow-up' :
-                                (progressNumber < 0 ? 'long-arrow-down' : 'minus'))}></i>
-                            {numeral(progressPercentage * 100).format('0.0')}%
-                            </span>
-                        </p>
-                    );
+                } else {
+                    progressPercentage = 1;
                 }
-                return progress;
-            })}
-            </div>
-        );
+
+                item = (
+                    <div className='item'>
+                        <div className="name">{logClass.name}</div>
+                        <div className="change">
+                            <div className={"yesterday" + (progressNumber > 0 ? 'rise' : (progressNumber < 0 ? 'down' : 'equal'))}>
+                                {this._toNumItem(progressPercentage)}
+                            </div>
+                        </div>
+                    </div>
+                );
+                return item;
+            }, this);
+    },
+
+    _toNumItem: function (progressPercentage){
+        if (isNaN(progressPercentage)) {return;}
+        return [
+            <i className={"fa fa-" + (progressPercentage > 0 ? 'long-arrow-up' :(progressPercentage < 0 ? 'long-arrow-down' : 'minus'))}></i>,
+            <span className="num">{numeral(progressPercentage * 100).format('0.0')}%</span>
+        ]
     },
 
     //{yesterDayLogClassTime ? <Pie data={yesterDayLogClassTime} highchartOptions={highchartOptions}/> : null }
@@ -163,22 +172,20 @@ module.exports = React.createClass({
                 todayData: statResult
             });
         });
-        if (this.props.compare) {
-            return promise.then(function () {
-                return DataAPI.Log.load({
-                    start: new Moment(start).subtract(1, 'day').startOf('day').format(DATE_FORMAT),
-                    end: new Moment(end).subtract(1, 'day').endOf('day').format(DATE_FORMAT),
-                    sum: true,
-                    group: type
-                });
-            }).then(function (statResult) {
-                that.setState({
-                    yesterdayData: statResult
-                });
+        return promise.then(function () {
+            return DataAPI.Log.load({
+                start: new Moment(start).subtract(1, 'day').startOf('day').format(DATE_FORMAT),
+                end: new Moment(end).subtract(1, 'day').endOf('day').format(DATE_FORMAT),
+                sum: true,
+                group: type
             });
-        } else {
-            return promise;
-        }
+        }).then(function (statResult) {
+            that.setState({
+                yesterdayData: statResult
+            });
+        }).catch(function (err) {
+            console.error(err.stack);
+        });
     },
 
     componentDidMount: function () {
