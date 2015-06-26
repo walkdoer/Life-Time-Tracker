@@ -215,10 +215,13 @@ module.exports = React.createClass({
 
     _getAverage: function () {
         var data = this.getTimeData();
+        if (this.props.granularity) {
+            var diff = Math.abs(new Moment(this.props.date).startOf(this.props.granularity).diff(this.props.date, 'day')) + 1;
+        }
         if (_.isEmpty(data)) {
             return 0;
         }
-        return _.sum(data, function (item) { return item.y}) / data.length;
+        return _.sum(data, function (item) { return item.y}) / diff;
     },
 
     getTimeData: function () {
