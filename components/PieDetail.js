@@ -85,7 +85,8 @@ module.exports = React.createClass({
                     <Table striped condensed hover>
                         <thead>
                           <tr>
-                            <th className="col-sm-2">Name</th>
+                            <th className="col-sm-1">Name</th>
+                            <th className="col-sm-1">Time</th>
                             <th className="col-sm-3">Percent</th>
                             <th className="col-sm-4">Compare</th>
                             <th className="col-sm-4">Activity</th>
@@ -219,6 +220,7 @@ Detail = React.createClass({
         return (
             <tr>
                 <td className="vert-align text-center">{item.name}</td>
+                <td className="vert-align text-center">{Moment.duration(todayTime, "minutes").format("M[m],d[d],h[h],mm[min]")}</td>
                 <td className="vert-align">
                     <p>今日占比: {todayTotal && todayTime ? numeral(todayTime / todayTotal * 100).format('0.0') : '0'}%</p>
                     <p>一周占比: {weekTotal && todayTime ? numeral(todayTime / weekTotal * 100).format('0.0') : '0'}%</p>
