@@ -21,7 +21,7 @@ var inject = require("gulp-inject");
 var rename = require('gulp-rename');
 var NwBuilder = require('node-webkit-builder');
 var watch = require('gulp-watch');
-var buildDir = './build';
+var buildDir = './';
 var babelify = require("babelify");
 var argv = require('yargs').argv;
 
@@ -63,7 +63,7 @@ var browserifyTask = function (options) {
         console.log('Building APP bundle');
         appBundler.bundle()
           .on('error', gutil.log)
-          .pipe(source('main.js'))
+          .pipe(source(options.destFile))
           .pipe(gulpif(!options.development, streamify(uglify())))
           .pipe(gulp.dest(options.dest))
           .pipe(gulpif(options.development, livereload())) // It notifies livereload about a change if you use it
@@ -172,6 +172,7 @@ gulp.task('default', function () {
   browserifyTask({
     development: true,
     src: './boot.js',
+    destFile: 'main.js',
     dest: './'
   });
 
@@ -189,6 +190,7 @@ gulp.task('deploy', function () {
   browserifyTask({
     development: false,
     src: './boot.js',
+    destFile: 'main.js',
     dest: buildDir
   });
 

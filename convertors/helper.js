@@ -12,6 +12,8 @@ exports.getValueKey = function (rawData) {
         valueKey = 'time';
     } else if (firstRecord.count !== undefined) {
         valueKey = 'count';
+    } else if (firstRecord.value !== undefined) {
+        valueKey = 'value';
     }
     return valueKey;
 };

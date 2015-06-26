@@ -1,0 +1,11 @@
+.ltt_c-PieDetail {
+    height: 260px;
+}
+
+.ltt_c-PieDetail .ltt_c-chart{
+    min-height: 260px;
+    height: 260px;
+}
+.ltt_c-PieDetail-compare{
+    border-left: 1px solid #F2F2F2;
+}

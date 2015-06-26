@@ -46,6 +46,7 @@ var ProjectDetail = require('./components/ProjectDetail'),
 var OverviewReport = require('./reports/Overview'),
     ClassesReport = require('./reports/ClassesReport'),
     TagsReport = require('./reports/TagsReport'),
+    TodayReport = require('./reports/todayReport'),
     ProjectReport = require('./reports/ProjectReport');
 
 /** Utils */
@@ -64,6 +65,7 @@ var routes = (
             <Route name="reportOverview" path="/reports/overview" handler={OverviewReport}/>
             <Route name="tagsReport" path="/reports/tags" handler={TagsReport}/>
             <Route name="classsesReport" path="/reports/classes" handler={ClassesReport}/>
+            <Route name="todayReport" path="/reports/today" handler={TodayReport}/>
             <Route name="projectReport" path="/reports/projects" handler={ProjectReport}/>
             <DefaultRoute handler={OverviewReport}/>
         </Route>

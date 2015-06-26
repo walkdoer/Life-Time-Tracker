@@ -1,0 +1,12 @@
+.ltt_c-report-TodayReport{
+    flex: 1;
+}
+
+.ltt_c-report-TodayReport-header{
+    max-height: 260px;
+    height: 260px;
+}
+
+.ltt_c-report-TodayReport .chart{
+    background: #FFF;
+}
