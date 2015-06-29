@@ -76,7 +76,7 @@ var Dashboard = React.createClass({
                             itemPadding={2} lifeYear={70} birthday='1989-10-23'/>
                     </div>
                     <div className="Grid-cell u-1of3" ref="logClassPieContainer">
-                        <LogClassPie title="All Time's Class distribution" start={new Moment(Settings.get('startDate'))} end={new Moment()} compare={false}/>
+                        <LogClassPie title="All Time's Class distribution" start={new Moment(Settings.get('startDate'))} end={new Moment()} compare={false} legend={true}/>
                     </div>
                 </div>
             </div>

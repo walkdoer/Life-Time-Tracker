@@ -29,7 +29,8 @@ module.exports = React.createClass({
 
     getDefaultProps: function () {
         return {
-            compare: true
+            compare: true,
+            legend: false
         };
     },
 
@@ -60,7 +61,7 @@ module.exports = React.createClass({
                 }
             },
             legend: {
-                enabled: false,
+                enabled: this.props.legend
             },
             exporting: {
                 enabled: false
