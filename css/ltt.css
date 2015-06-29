@@ -209,3 +209,8 @@
 .well .fa{
     margin-right: 5px;
 }
+
+
+.nav-tabs > li > a{
+    border-radius: 0px;
+}

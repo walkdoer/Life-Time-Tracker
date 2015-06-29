@@ -46,11 +46,7 @@ var Bar = React.createClass({
         this.props.data = data;
         var that = this;
         var userHighchartOptions = this.getUserHighchartOptions('bar');
-        chart.bar({
-            title: this.props.title,
-            $el: $(this.getDOMNode()),
-            data: convertor.dispose(data)
-        }, extend(true, {
+        var options = extend(true, {
             xAxis: {
                 categories: helper.getCategories(data)
             },
@@ -75,7 +71,29 @@ var Bar = React.createClass({
                     }
                 }
             },
-        }, userHighchartOptions));
+        }, userHighchartOptions);
+
+        if (this.props.labelWidth) {
+            _.extend(options.xAxis, {
+                labels: {
+                    style: {
+                        'max-width': this.props.labelWidth + 'px',
+                        'overflow': 'hidden',
+                        'white-space': 'nowrap',
+                        'text-overflow': 'ellipsis'
+                    },
+                    formatter: function () {
+                        return '<span title="' + this.value + '">' + this.value + '</span>';
+                    },
+                    useHTML: true
+                }
+            });
+        }
+        chart.bar({
+            title: this.props.title,
+            $el: $(this.getDOMNode()),
+            data: convertor.dispose(data)
+        }, options);
     },
 
     compareData: function (datas){

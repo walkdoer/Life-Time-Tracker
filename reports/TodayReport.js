@@ -14,6 +14,7 @@ var config = require('../conf/config');
 /** components */
 var LoadingMask = require('../components/LoadingMask');
 var PieDetail = require('../components/PieDetail');
+var TimeConsumeRanking = require('../components/TimeConsumeRanking');
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
@@ -27,6 +28,14 @@ module.exports = React.createClass({
                 <div className="Grid Grid--gutters Grid--stretch ltt_c-report-TodayReport-header">
                     <div className="Grid-cell">
                         <PieDetail className="chart" date={new Moment().startOf('day')} type="classes"/>
+                    </div>
+                </div>
+                <div className="Grid Grid--gutters Grid--stretch">
+                    <div className="Grid-cell u-1of3">
+                        <TimeConsumeRanking className="chart"/>
+                    </div>
+                    <div className="Grid-cell u-1of3">
+                        <div className="chart"></div>
                     </div>
                 </div>
             </div>

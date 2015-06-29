@@ -1,5 +1,6 @@
 .ltt_c-report-TodayReport{
     flex: 1;
+    overflow: auto;
 }
 
 .ltt_c-report-TodayReport-header{
@@ -9,8 +10,18 @@
 
 .ltt_c-report-TodayReport .chart{
     background: #FFF;
-}
-
-.ltt_c-report-TodayReport .ltt_c-PieDetail{
     box-shadow: 0 0 2px #8D8D8D;
 }
+
+
+.ltt_c-TimeConsumeRanking .tab-pane{
+    padding: 10px;
+}
+
+.ltt_c-TimeConsumeRanking .nav-tabs > li.active > a,
+.ltt_c-TimeConsumeRanking .nav-tabs > li.active > a:hover,
+.ltt_c-TimeConsumeRanking .nav-tabs > li.active > a:focus {
+    border-top:0px;
+    border-radius: 0px;
+}
+
