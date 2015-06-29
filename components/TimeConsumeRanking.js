@@ -51,6 +51,12 @@ module.exports = React.createClass({
                     activeKey={this.state.currentTab}
                     animation={false}
                     onSelect={this.handleTabSelect}>
+                    <TabPane eventKey="tags" tab="Tags">
+                        {this.renderPane('tags')}
+                    </TabPane>
+                    <TabPane eventKey="classes" tab="Classes">
+                        {this.renderPane('classes')}
+                    </TabPane>
                     <TabPane eventKey="project" tab="Project">
                         {this.renderPane('project')}
                     </TabPane>
@@ -76,7 +82,7 @@ module.exports = React.createClass({
     },
 
     renderRankingData: function (data) {
-        return <Bar data={this.convertData(data)} labelWidth={this._width * 0.3} legend={false}/>
+        return <Bar data={this.convertData(data)} exporting={false} labelWidth={this._width * 0.3} legend={false}/>
     },
 
     componentDidMount: function () {
@@ -103,7 +109,9 @@ module.exports = React.createClass({
             sum: true,
             group: rankType
         }).then(function (list) {
-            return list.sort(function (a, b){
+            return list.filter(function (item) {
+                return item._id !== null;
+            }).sort(function (a, b){
                 return b.totalTime - a.totalTime;
             });
         }).then(function (data) {

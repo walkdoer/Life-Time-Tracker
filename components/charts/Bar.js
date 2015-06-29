@@ -73,6 +73,12 @@ var Bar = React.createClass({
             },
         }, userHighchartOptions);
 
+        if (this.props.exporting === false) {
+            options.exporting = {
+                enabled: false
+            };
+        }
+
         if (this.props.labelWidth) {
             _.extend(options.xAxis, {
                 labels: {

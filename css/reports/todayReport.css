@@ -4,8 +4,7 @@
 }
 
 .ltt_c-report-TodayReport-header{
-    max-height: 260px;
-    height: 260px;
+
 }
 
 .ltt_c-report-TodayReport .chart{
@@ -13,6 +12,9 @@
     box-shadow: 0 0 2px #8D8D8D;
 }
 
+.ltt_c-report-TodayReport .table{
+    margin-bottom:0px;
+}
 
 .ltt_c-TimeConsumeRanking .tab-pane{
     padding: 10px;
@@ -24,8 +26,11 @@
     border-top:0px;
     border-radius: 0px;
 }
-
+.ltt_c-TimeConsumeRanking .nav-tabs > li:first-child.active > a{
+    border-left:0px;
+}
 
 .ltt_c-TimeConsumeRanking .tab-pane{
     height: 320px;
 }
+

@@ -31,10 +31,10 @@ module.exports = React.createClass({
                     </div>
                 </div>
                 <div className="Grid Grid--gutters Grid--stretch">
-                    <div className="Grid-cell u-1of3">
+                    <div className="Grid-cell u-1of2">
                         <TimeConsumeRanking className="chart"/>
                     </div>
-                    <div className="Grid-cell u-1of3">
+                    <div className="Grid-cell u-1of2">
                         <div className="chart"></div>
                     </div>
                 </div>

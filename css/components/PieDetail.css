@@ -1,17 +1,17 @@
 .ltt_c-PieDetail {
-    height: 240px;
+    height: 300px;
 }
 
 .ltt_c-PieDetail .ltt_c-chart{
-    min-height: 240px;
-    height: 240px;
+    min-height: 300px;
+    height: 300px;
 }
 .ltt_c-PieDetail-compare{
     border-left: 1px solid #CCC;
 }
 
 .ltt_c-PieDetail-compare{
-    height: 240px;
+    height: 300px;
     overflow-y:auto;
 }
 
