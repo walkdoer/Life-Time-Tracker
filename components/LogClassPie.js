@@ -5,6 +5,7 @@ var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var ReactBootStrap = require('react-bootstrap');
 var numeral = require('numeral');
 var Pie = require('./charts/Pie');
+var Q = require('q');
 
 var config = require('../conf/config');
 /** components */
@@ -33,23 +34,16 @@ module.exports = React.createClass({
     },
 
     render: function () {
-        var today = this.state.today;
-        var yesterday = this.state.yesterday;
-        var logClassTime, yesterDayLogClassTime;
+        var todayData = this.state.todayData;
+        var yesterdayData = this.state.yesterdayData;
         var logClasses = config.classes;
-        if (today) {
-            logClassTime = today.classTime;
-        }
-        if (yesterday) {
-            yesterDayLogClassTime = yesterday.classTime;
-        }
         var highchartOptions = {
             title: false,
             plotOptions: {
                 pie: {
                     innerSize: '40%',
                     dataLabels: {
-                        enabled: true,
+                        enabled: false,
                         distance: 3,
                         useHTML: true,
                         connectorPadding: 5,
@@ -67,11 +61,6 @@ module.exports = React.createClass({
             },
             legend: {
                 enabled: false,
-                align: 'right',
-                verticalAlign: 'top',
-                layout: 'vertical',
-                x: 0,
-                y: 100
             },
             exporting: {
                 enabled: false
@@ -82,16 +71,17 @@ module.exports = React.createClass({
                 backgroundColor: this.props.backgroundColor
             };
         }
-        logClassTime && logClassTime.forEach(function (item) {
-            var cls = _.find(logClasses, {'_id': item.id});
-            if (cls) {
-                item.label = cls.name;
-            }
+        todayData = todayData && todayData.map(function (item) {
+            var cls = _.find(logClasses, {'_id': item._id});
+            return {
+                value: item.totalTime,
+                label: (cls && cls.name) || item._id
+            };
         });
         return (
             <div className="ltt_c-LogClassPie">
                 <h1>{this.props.title}</h1>
-                {logClassTime ? <Pie data={logClassTime} highchartOptions={highchartOptions}/> : null }
+                {todayData ? <Pie data={todayData} highchartOptions={highchartOptions}/> : null }
                 {this.props.compare ? this.renderCompare() : null}
                 <LoadingMask loaded={this.state.loaded}/>
             </div>
@@ -99,100 +89,70 @@ module.exports = React.createClass({
     },
 
     renderCompare: function () {
-        var today = this.state.today;
-        var yesterday = this.state.yesterday;
+        var todayData = this.state.todayData;
+        var yesterdayData = this.state.yesterdayData;
         var logClasses = config.classes;
-        var logClassTime, yesterDayLogClassTime;
-        if (today) {
-            logClassTime = today.classTime;
-        }
-        if (yesterday) {
-            yesterDayLogClassTime = yesterday.classTime;
-        }
         return (
             <div className="ltt_c-LogClassPie-changes">
             {logClasses.map(function (logClass) {
                 var time = 0, yesterdayTime;
                 var classId = logClass._id;
-                var data;
-                if (!_.isEmpty(logClassTime)) {
-                    data = logClassTime.filter(function(item) {
-                        return item.id === classId;
-                    })[0];
-                    if (data) {
-                        time = data.count;
-                    }
-                }
-                if (!_.isEmpty(yesterDayLogClassTime)) {
-                    data = yesterDayLogClassTime.filter(function(item) {
-                        return item.id === classId;
-                    })[0];
-                    if (data) {
-                        yesterdayTime = data.count;
-                    }
-                }
-                var progressNumber, progressPercentage, progress;
-                if (yesterdayTime > 0) {
-                    progressNumber = time - yesterdayTime;
-                    progressPercentage = progressNumber / yesterdayTime;
-                    progress = (
-                        <p className={'changeItem ' + (progressNumber > 0 ? 'rise' : (progressNumber < 0 ? 'down' : 'equal'))}>
-                            <span className="name">{logClass.name}</span>
-                            <span className="num">
-                            <i className={"fa fa-" + (progressNumber > 0 ? 'long-arrow-up' :
-                                (progressNumber < 0 ? 'long-arrow-down' : 'minus'))}></i>
-                            {numeral(progressPercentage * 100).format('0.0')}%
-                            </span>
-                        </p>
-                    );
-                }
-                return progress;
+                time = getTimeConsumeBy(classId, todayData);
+                yesterdayTime = getTimeConsumeBy(classId, yesterdayData);
+                var cpToYesterday = compare(time, yesterdayTime);
+                return (
+                    <p className={'changeItem ' + (cpToYesterday > 0 ? 'rise' : (cpToYesterday < 0 ? 'down' : 'equal'))}>
+                        <span className="name">{logClass.name}</span>
+                        <span className="num">
+                        <i className={"fa fa-" + (cpToYesterday > 0 ? 'long-arrow-up' :
+                            (cpToYesterday < 0 ? 'long-arrow-down' : 'minus'))}></i>
+                        {numeral(cpToYesterday * 100).format('0.0')}%
+                        </span>
+                    </p>
+                );
             })}
             </div>
         );
     },
 
-    //{yesterDayLogClassTime ? <Pie data={yesterDayLogClassTime} highchartOptions={highchartOptions}/> : null }
-
-    loadData: function (nextProps) {
+    loadData:function (nextProps) {
         if (!nextProps) {
             props = this.props;
         } else {
             props = nextProps;
         }
-        var start = props.start,
-            end = props.end,
+        var type = 'classes',
             date = props.date;
         var that = this;
-        if (start && end) {
-            start = new Moment(start).startOf('day').format(DATE_FORMAT);
-            end = new Moment(end).endOf('day').format(DATE_FORMAT);
-        } else if (date) {
-            start = new Moment(date).startOf('day').format(DATE_FORMAT);
-            end = new Moment(date).endOf('day').format(DATE_FORMAT);
-        }
-        var promise = DataAPI.stat({
-            start: new Moment(start).startOf('day').format(DATE_FORMAT),
-            end: new Moment(end).endOf('day').format(DATE_FORMAT)
-        }).then(function (statResult) {
+        return Q.all([
+            loadToday(),
+            loadYesterDay()
+        ]).spread(function (today, yesterday) {
             that.setState({
                 loaded: true,
-                today: statResult
+                todayData: today,
+                yesterdayData: yesterday
             });
+        }).catch(function (err) {
+            console.error(err.stack);
         });
-        if (this.props.compare) {
-            return promise.then(function () {
-                return DataAPI.stat({
-                    start: new Moment(start).subtract(1, 'day').startOf('day').format(DATE_FORMAT),
-                    end: new Moment(end).subtract(1, 'day').endOf('day').format(DATE_FORMAT)
-                });
-            }).then(function (statResult) {
-                that.setState({
-                    yesterday: statResult
-                });
+
+        function loadYesterDay() {
+            return DataAPI.Log.load({
+                start: new Moment(date).subtract(1, 'day').startOf('day').format(DATE_FORMAT),
+                end: new Moment(date).subtract(1, 'day').endOf('day').format(DATE_FORMAT),
+                sum: true,
+                group: type
             });
-        } else {
-            return promise;
+        }
+
+        function loadToday() {
+            return DataAPI.Log.load({
+                start: new Moment(date).startOf('day').format(DATE_FORMAT),
+                end: new Moment(date).endOf('day').format(DATE_FORMAT),
+                group: type,
+                sum: true
+            })
         }
     },
 
@@ -207,4 +167,28 @@ module.exports = React.createClass({
     update: function () {
         this.loadData();
     }
-})
+});
+
+
+function compare(a, b) {
+    if (a === b) {
+        return 0;
+    }
+    if (b !== undefined && b !== 0) {
+        return (a - b) / b;
+    } else {
+        return 1;
+    }
+}
+function getTimeConsumeBy(id, data) {
+    var time = 0, target;
+    if (!_.isEmpty(data)) {
+        target = data.filter(function(item) {
+            return item._id === id;
+        })[0];
+        if (target) {
+            time = target.totalTime;
+        }
+    }
+    return time;
+}
