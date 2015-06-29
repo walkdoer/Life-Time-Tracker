@@ -18,13 +18,34 @@ var Line = require('../components/charts/Line');
 var Bar = require('../components/charts/Bar');
 var BubbleCloud = require('../components/charts/BubbleCloud');
 var setAndCompareData = require('../components/charts/setAndCompareData');
+var config = require('../conf/config');
 
+function getClassName(clsId) {
+    var classes = config.classes;
+    var cls = classes.filter(function (cls) {
+        return cls._id === clsId;
+    })[0];
+    if (cls) {
+        return cls.name;
+    } else {
+        return null;
+    }
+}
 var Report = React.createClass({
 
     mixins: [setAndCompareData],
 
     chartDatas: {
-        chart_logClassTime: 'classTime',
+        chart_logClassTime: function (result) {
+            var data = result.classTime;
+            return data.map(function (item) {
+                var name = getClassName(item.id);
+                if (name) {
+                    item.label = name;
+                }
+                return item;
+            });
+        },
         chart_logClassTimeTrend: function (data) { return this.getLogClassTimeTrend(data); },
         chart_tagTimeTrend: function (data) { return this.getTagTimeTrend(data); },
         chart_projectTimeTrend: function (data) { return this.getProjectTimeTrend(data); },
@@ -32,7 +53,15 @@ var Report = React.createClass({
         chart_sitStandTime: function (data) { return data.sitPerspective;},
         chart_categoryTime: function (data) { return data.categoryPerspective.categoryTime; },
         chart_projectTime: function (data) { return  data.projectTime.slice(0,10);},
-        chart_meanLogClassTime: function (data) { return data.meanPerspective.classes},
+        chart_meanLogClassTime: function (data) {
+            return _.map(data.meanPerspective.classes, function (value, classId) {
+                var label = getClassName(classId) || classId;
+                return {
+                    label: label,
+                    value: value
+                };
+            });
+        },
         chart_activeTime: function (data) {
             var trackedTime = [], unTrackedTime = [], sleepTime = [];
             var days = data.days;
@@ -181,7 +210,7 @@ var Report = React.createClass({
         });
         return _.map(result, function (data, key) {
             return {
-                name: key,
+                name: getClassName(key) || key,
                 data: data
             };
         });
