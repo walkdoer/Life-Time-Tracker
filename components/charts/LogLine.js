@@ -62,13 +62,7 @@ module.exports = React.createClass({
         var yAxis;
         if (this.props.withProgress) {
             yAxis = [{
-                title: false,
-                plotLines: [{
-                    color: 'red',
-                    value: average,
-                    dashStyle: 'longdashdot',
-                    width: '1'
-                }]
+                title: false
             }, {
                 title: false,
                 opposite: true,
@@ -80,14 +74,22 @@ module.exports = React.createClass({
             }];
         } else {
             yAxis = {
-                title: false,
-                plotLines: [{
-                    color: 'red',
-                    value: average,
-                    dashStyle: 'longdashdot',
-                    width: '1'
-                }]
+                title: false
             };
+        }
+
+        if (average !== null) {
+            var plotLines = [{
+                color: 'red',
+                value: average,
+                dashStyle: 'longdashdot',
+                width: '1'
+            }];
+            if (this.props.withProgress) {
+                yAxis[0].plotLines = plotLines;
+            } else {
+                yAxis.plotLines = plotLines;
+            }
         }
         var options = {
             exporting: { enabled: false },
@@ -217,6 +219,8 @@ module.exports = React.createClass({
         var data = this.getTimeData();
         if (this.props.granularity) {
             var diff = Math.abs(new Moment(this.props.date).startOf(this.props.granularity).diff(this.props.date, 'day')) + 1;
+        } else {
+            return null;
         }
         if (_.isEmpty(data)) {
             return 0;
@@ -260,6 +264,7 @@ module.exports = React.createClass({
                 if (highlightToday && todayUnix === unix) {
                     data.color = highlightColor;
                 }
+                return data;
             });
         }
 

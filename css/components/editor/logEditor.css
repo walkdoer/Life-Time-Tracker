@@ -16,6 +16,11 @@
 
 .ace_ltt_place {
     color: #1F746C !important;
+    /* background-color: #B3F5C1; */
+    border: 1px solid #4B9B93;
+    padding-right: 2px;
+    border-radius: 3px;
+    padding-left: 2px;
 }
 
 .ace_ltt_people {
