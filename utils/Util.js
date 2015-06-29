@@ -3,6 +3,7 @@ var Moment = require('moment');
 require('moment-range');
 var TrackerHelper = require('tracker/helper');
 var _ = require('lodash');
+var config = require('../conf/config');
 
 
 function walkTree(parentElement, func) {
@@ -166,3 +167,16 @@ exports.getVersionUrl = function (version) {
     url = '/projects/' + version.projectId + '/versions/' + version._id;
     return url;
 };
+
+
+exports.getClassName = function (clsId) {
+    var classes = config.classes;
+    var cls = classes.filter(function (cls) {
+        return cls._id === clsId;
+    })[0];
+    if (cls) {
+        return cls.name;
+    } else {
+        return null;
+    }
+}
