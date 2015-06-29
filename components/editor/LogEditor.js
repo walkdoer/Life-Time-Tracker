@@ -1196,7 +1196,9 @@ var Calendar = React.createClass({
 function getEventTitle(log) {
     var title = '';
     if (!_.isEmpty(log.classes)) {
-        title += log.classes.join(',');
+        title += log.classes.map(function (cls) {
+            return Util.getClassName(cls);
+        }).join(',');
     }
     if (!_.isEmpty(log.tags)) {
         title += '[' + log.tags.join(',') + ']';
