@@ -14,8 +14,16 @@
     flex: 1;
 }
 
+.ace_ltt_place {
+    color: #1F746C !important;
+}
+
 .ace_ltt_people {
-    color: #E550AE;
+    color: #E550AE !important;
+}
+
+.ace_ltt_subTask {
+    color: #8B4C92 !important;
 }
 
 .ace-github .ace_marker-layer .log-unfinish{

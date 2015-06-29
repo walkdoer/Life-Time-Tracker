@@ -48,7 +48,12 @@ ace.define("ace/mode/ltt_highlight_rules",["require","exports","module","ace/lib
                     },
                     {   // logClass {}
                         token : "ltt_logClass",
-                        regex : "\\{.*\\}"
+                        regex : "\\{(.*?)\\}"
+                    },
+
+                    {   // logClass {}
+                        token : "ltt_place",
+                        regex : "\\*(.*?)\\*"
                     },
 
                     {   //time 00:00~12:00
@@ -60,11 +65,6 @@ ace.define("ace/mode/ltt_highlight_rules",["require","exports","module","ace/lib
                         token: "ltt_tag_start",
                         regex: "\\[",
                         push: "tags"
-                    },
-
-                    {
-                        token: 'ltt_link',
-                        regex: "(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?"
                     },
 
                     {
