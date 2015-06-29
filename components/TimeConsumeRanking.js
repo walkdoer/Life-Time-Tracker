@@ -60,14 +60,18 @@ module.exports = React.createClass({
                     <TabPane eventKey="task" tab="Task">
                         {this.renderPane('task')}
                     </TabPane>
+                <LoadingMask loaded={this.state.loaded}/>
                 </TabbedArea>
             </div>
         );
     },
 
     renderPane: function (rankType) {
+        if (rankType !== this.state.currentTab) {
+            return null;
+        }
         return (
-            !_.isEmpty(this.state.rankingData) ? this.renderRankingData(this.state.rankingData) : 'No data to display'
+            !_.isEmpty(this.state.rankingData) ? this.renderRankingData(this.state.rankingData) : null
         );
     },
 
@@ -83,6 +87,7 @@ module.exports = React.createClass({
     handleTabSelect: function (key) {
         this.setState({
             currentTab: key,
+            rankingData: [],
             loaded: false
         }, function () {
             var that = this;
