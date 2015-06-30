@@ -20,6 +20,7 @@ var config = require('../conf/config');
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
+var Util = require('../utils/Util');
 
 module.exports = React.createClass({
     mixins: [Router.State, Router.Navigation],
@@ -136,7 +137,8 @@ var FilterableProjects = React.createClass({
 
     getInitialState: function () {
         return {
-            projects: this.props.projects
+            projects: this.props.projects,
+            projectTime: []
         };
     },
 
@@ -147,11 +149,17 @@ var FilterableProjects = React.createClass({
     },
 
     componentDidMount: function () {
+        var that = this;
         var input = this.refs.nameInput;
         Mt.bind('command+f', function (e) {
             e.preventDefault();
             var $input = $(input.getDOMNode());
             $input.focus();
+        });
+        this.loadTodayProjectTime().then(function (data) {
+            that.setState({
+                projectTime: data
+            });
         });
     },
 
@@ -172,11 +180,33 @@ var FilterableProjects = React.createClass({
         );
     },
 
+    loadTodayProjectTime: function () {
+        return DataAPI.Log.load({
+            start: new Moment().startOf('day').toDate(),
+            end: new Moment().endOf('day').toDate(),
+            group: 'project+version',
+            sum: true
+        }).then(function (data) {
+            return data.filter(function (item) {
+                return item._id !== null && item.project !== null;
+            }).map(function (item) {
+                var _id = item._id;
+                return {
+                    project: _id.project,
+                    version: _id.version,
+                    totalTime: item.totalTime
+                };
+            });
+        });
+    },
+
     renderProject: function (project) {
         var projectId = this.props.projectId;
         var isMatch = projectId === project._id;
         var className = isMatch ? 'active' : null;
+        var timeData = this.state.projectTime.filter(function (item) {return item.project === project._id;})
         return <ProjectNav project={project} className={className}
+            timeData={timeData}
             defaultIsOpen={isMatch} versionId={this.props.versionId}/>
     },
 
@@ -226,27 +256,43 @@ var ProjectNav = React.createClass({
     this.setState({ isOpen: !this.state.isOpen });
   },
 
-  renderItems: function () {
+  renderVersions: function () {
     var project = this.props.project;
     var versionId = this.props.versionId;
+    var timeData = this.props.timeData;
     return this.state.isOpen ? (project.versions || []).map(function (version) {
         var params = {projectId: project._id, versionId: version._id};
         var className = "ltt_c-ProjectNav-Item";
         if (versionId === version._id) {
             className += ' active';
         }
-      return (
-        <li className={className} key={version._id}>
-          <i className="fa fa-sitemap" title="version"></i>
-          <Link to="projectVersionTask" params={params}>{version.name}</Link>
-        </li>
-      );
+        var versionTimeData = timeData.filter(function (item) {
+            return item.version === version._id;
+        })[0];
+        var totalVersionTime;
+        if (versionTimeData) {
+            totalVersionTime = versionTimeData.totalTime;
+        }
+        return (
+            <li className={className} key={version._id}>
+                <i className="fa fa-sitemap" title="version"></i>
+                <Link to="projectVersionTask" params={params}>
+                    {version.name}
+                    {totalVersionTime ? <span className="timeAmount">{Util.displayTime(totalVersionTime)}</span> : null}
+                </Link>
+            </li>
+        );
     }) : null;
   },
 
   render: function () {
     var project = this.props.project;
     var className ="ltt_c-ProjectNav";
+    var timeData = this.props.timeData;
+    var totalProjectTime;
+    if (!_.isEmpty(timeData)) {
+        totalProjectTime = timeData.reduce(function (total, item) {return total + item.totalTime}, 0);
+    }
     if (this.props.className) {
         className += ' ' + this.props.className;
     }
@@ -256,9 +302,12 @@ var ProjectNav = React.createClass({
       <div className={className}>
         <h3 onClick={this.toggle}>
             <i className={iconClassName}/>
-            <Link to="projectTask" params={params}>{project.name}</Link>
+            <Link to="projectTask" params={params}>
+                {project.name}
+                {totalProjectTime ? <span className="timeAmount">{Util.displayTime(totalProjectTime)}</span> : null}
+            </Link>
         </h3>
-        <ul>{this.renderItems()}</ul>
+        <ul>{this.renderVersions()}</ul>
       </div>
     );
   }
