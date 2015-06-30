@@ -23,7 +23,8 @@ module.exports = React.createClass({
     docked: React.PropTypes.bool,
     header: React.PropTypes.element,
     onChange: React.PropTypes.func,
-    onNavOpen: React.PropTypes.func,
+    onOpen: React.PropTypes.func,
+    onTransitionEnd: React.PropTypes.func,
     onNavClose: React.PropTypes.func,
     openRight: React.PropTypes.bool,
   },
@@ -36,7 +37,8 @@ module.exports = React.createClass({
   getDefaultProps: function() {
     return {
       docked: true,
-      width: 200
+      width: 200,
+      duration: 450
     };
   },
 
@@ -64,7 +66,15 @@ module.exports = React.createClass({
     if (options) {
       this._width = options.width;
     }
-    this.setState({ open: !this.state.open });
+    this.setState({ open: !this.state.open }, function() {
+      var that = this;
+      if (this.state.open) {
+        var timer = setTimeout(function () {
+          clearTimeout(timer);
+          that.props.onTransitionEnd();
+        }, this.props.duration);
+      }
+    });
     return this;
   },
 
@@ -83,7 +93,7 @@ module.exports = React.createClass({
       this._width = options.width;
     }
     this.setState({ open: true });
-    if (this.props.onNavOpen) this.props.onNavOpen();
+    if (this.props.onOpen) this.props.onOpen();
     return this;
   },
 
@@ -99,7 +109,7 @@ module.exports = React.createClass({
         left: 0,
         top: 0,
         transform: 'translate3d(' + x + ', 0, 0)',
-        transition: !this.state.swiping && Transitions.easeOut(),
+        transition: !this.state.swiping && Transitions.easeOut(this.props.duration + 'ms'),
         overflow: 'hidden'
       },
       rootWhenOpenRight: {

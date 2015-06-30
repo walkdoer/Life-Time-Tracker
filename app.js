@@ -301,7 +301,7 @@ var Footer = React.createClass({
         } else {
             content = <i></i>;
         }
-        React.renderComponent(content, contaner);
+        React.render(content, contaner);
     },
 
     renderLink: function (obj) {

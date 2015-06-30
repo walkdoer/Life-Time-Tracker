@@ -17,6 +17,7 @@ var mui = require('material-ui');
 
 /**Components*/
 var Settings = require('../../pages/Settings');
+var TodayReport = require('../../reports/TodayReport');
 
 //store key
 var SK_CONTENT = 'content';
@@ -126,7 +127,9 @@ var LogEditor = React.createClass({
                 <div className="ltt_c-logEditor-content">
                     {this.state.showCalendar ? <Calendar date={this.props.title} ref="calendar"/> : null }
                     <Editor ref="editor"/>
-                    <SlidePanel className="todayReport" ref="todayReport" open={false}>MEssage</SlidePanel>
+                    <SlidePanel className="todayReport" ref="todayReport" open={false} onTransitionEnd={this.renderTodayReport}>
+                        <div ref="reportContainer"></div>
+                    </SlidePanel>
                 </div>
             </div>
         );
@@ -1036,6 +1039,10 @@ var LogEditor = React.createClass({
         this.refs.todayReport.toggle({
             width: $(this.getDOMNode()).width()
         });
+    },
+
+    renderTodayReport: function () {
+        React.render(<TodayReport/>, this.refs.reportContainer.getDOMNode());
     }
 });
 
