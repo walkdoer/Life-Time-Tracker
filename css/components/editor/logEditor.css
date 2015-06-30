@@ -31,6 +31,13 @@
     color: #8B4C92 !important;
 }
 
+.ace_ltt_estimatedTime{
+    color: #EA5DC5 !important;
+    background-color: rgba(255, 151, 233, 0.38);
+    font-weight: bold;
+    border-bottom: 2px solid #F04BB6;
+}
+
 .ace-github .ace_marker-layer .log-unfinish{
     background: rgb(255, 236, 201) !important;
 }

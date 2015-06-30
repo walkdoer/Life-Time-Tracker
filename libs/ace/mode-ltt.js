@@ -70,6 +70,11 @@ ace.define("ace/mode/ltt_highlight_rules",["require","exports","module","ace/lib
                     {
                         token: 'ltt_people',
                         regex: "@\\((.*?)\\)"
+                    },
+
+                    {
+                        token: 'ltt_estimatedTime',
+                        regex: "!\\((.*?)\\)"
                     }
                 ],
                 tags: [
