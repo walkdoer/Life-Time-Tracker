@@ -9,6 +9,9 @@ var MenuItem = RB.MenuItem;
 var Moment = require('moment');
 var Color = require('color');
 var TrackerHelper = require('tracker/helper');
+var SlidePanel = require('../SlidePanel');
+var mui = require('material-ui');
+
 
 
 
@@ -23,7 +26,7 @@ var Mt = window.Mousetrap;
 var NProgress = require('nprogress');
 var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
 var Range = ace.require('ace/range').Range;
-
+var ThemeManager = new mui.Styles.ThemeManager();
 /** constant */
 var EventConstant = require('../../constants/EventConstant');
 var EVENT_HIGHLIGHT_CLASS = 'event-highlight';
@@ -47,6 +50,15 @@ var contentCache = {};
 //window.contentCache = contentCache;
 var LogEditor = React.createClass({
 
+    childContextTypes: {
+        muiTheme: React.PropTypes.object
+    },
+
+    getChildContext: function() {
+        return {
+            muiTheme: ThemeManager.getCurrentTheme()
+        };
+    },
 
     getDefaultProps: function () {
         return {
@@ -78,7 +90,11 @@ var LogEditor = React.createClass({
         } else if (syncStatus === SYNC_ERROR) {
             syncIcon += 'fa-exclamation-circle';
         }
-
+        var menuItems = [
+          { route: 'get-started', text: 'Get Started' },
+          { route: 'customization', text: 'Customization' },
+          { route: 'components', text: 'Components' }
+        ];
         return (
             <div className="ltt_c-logEditor">
                 <div className="ltt_c-logEditor-header">
@@ -92,6 +108,7 @@ var LogEditor = React.createClass({
                     <div className="ltt_c-logEditor-header-right">
                         <ButtonToolbar>
                             <Button onClick={this.onHighlightUnFinishLog} bsSize='small' title='show unfinish log' active={this.state.highlightUnFinishLog}><i className="fa fa-magic"></i></Button>
+                            <Button onClick={this.openReport}>Report</Button>
                             <DropdownButton bsSize='small' title='Copy' onSelect={this.copyTaskFromPast}>
                                 <MenuItem eventKey='today'>today</MenuItem>
                                 <MenuItem eventKey='yesterday'>yesterday</MenuItem>
@@ -109,6 +126,7 @@ var LogEditor = React.createClass({
                 <div className="ltt_c-logEditor-content">
                     {this.state.showCalendar ? <Calendar date={this.props.title} ref="calendar"/> : null }
                     <Editor ref="editor"/>
+                    <SlidePanel className="todayReport" ref="todayReport" open={false}>MEssage</SlidePanel>
                 </div>
             </div>
         );
@@ -119,6 +137,7 @@ var LogEditor = React.createClass({
         var that = this;
         var editor = this._initEditor();
         var title = this.props.title;
+
         this.readLog(title).then(function (content) {
             var cacheContent = that._recoveryFromLocalStorage();
             if (cacheContent) {
@@ -1011,6 +1030,12 @@ var LogEditor = React.createClass({
             calendar.highlightEvent(event);
             //calendar.scrollToEventByIndex(index - 1);
         }
+    },
+
+    openReport: function () {
+        this.refs.todayReport.toggle({
+            width: $(this.getDOMNode()).width()
+        });
     }
 });
 
@@ -1224,6 +1249,7 @@ var Calendar = React.createClass({
         var view = this.$calendar.fullCalendar('getView');
         return view.getEventSegs();
     }
+
 })
 
 

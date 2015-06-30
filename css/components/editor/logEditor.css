@@ -4,6 +4,11 @@
 .ltt_c-logEditor-content{
     height: 100%;
     display: flex;
+    position: relative;
+}
+
+.ltt_c-logEditor-content .todayReport{
+    
 }
 .ltt_c-logEditor-Calendar{
     width: 150px;

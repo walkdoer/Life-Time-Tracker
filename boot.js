@@ -11,6 +11,8 @@ require('jquery-ui');
 require('mousetrap');
 require('fullcalendar');
 require('./libs/jquery.qtip');
+var injectTapEventPlugin = require("react-tap-event-plugin");
+injectTapEventPlugin();
 
 var Router = require('react-router');
 var Route = Router.Route;

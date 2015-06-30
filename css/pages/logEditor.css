@@ -15,6 +15,11 @@
     padding-top: 41px;
 }
 
+.ltt_c-logEditor-content .ltt_c-SlidePanel .paper{
+    box-shadow: none !important;
+    padding: 1em;
+}
+
 .ltt_c-logEditor-header{
     background:#FFF;
     position: absolute;
