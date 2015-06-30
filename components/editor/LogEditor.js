@@ -128,7 +128,8 @@ var LogEditor = React.createClass({
                     {this.state.showCalendar ? <Calendar date={this.props.title} ref="calendar"/> : null }
                     <Editor ref="editor"/>
                     <SlidePanel className="todayReport" ref="todayReport" open={false} onTransitionEnd={this.renderTodayReport}>
-                        <div ref="reportContainer"></div>
+                        <div ref="reportContainer" style={{height: "100%"}}>
+                        </div>
                     </SlidePanel>
                 </div>
             </div>

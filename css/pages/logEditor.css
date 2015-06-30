@@ -17,7 +17,7 @@
 
 .ltt_c-logEditor-content .ltt_c-SlidePanel .paper{
     box-shadow: none !important;
-    padding: 1em;
+    overflow-y: auto !important;
 }
 
 .ltt_c-logEditor-header{

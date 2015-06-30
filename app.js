@@ -420,7 +420,7 @@ var Footer = React.createClass({
             } else {
                 content = <i/>;
             }
-            React.renderComponent(content, lastTime);
+            React.render(content, lastTime);
         }
     },
 
