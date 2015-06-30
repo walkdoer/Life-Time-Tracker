@@ -101,12 +101,32 @@ var Page = React.createClass({
                     <ModalTrigger modal={<DateGoToWindow onGoto={this.gotoDate}/>} ref="dateGoToWindow"><span></span></ModalTrigger>
                     <LogClassPie date={this.state.current} backgroundColor="#f6f6f6" ref="logClassPie"/>
                     <ButtonToolbar>
-                        <Button bsSize='xsmall'><Link to="/reports/overview">More</Link></Button>
+                        <Button bsSize='xsmall'><Link to="/reports/today">More Detail</Link></Button>
                     </ButtonToolbar>
+                    <div className="overtimeLog" ref="overtimeLog"></div>
                 </aside>
             </div>
         );
     },
+
+    /*renderOverTimeLog: function (allLogs) {
+        var overtimeLogs = this.getOverTimeLog(allLogs);
+        if (_.isEmpty(overtimeLogs)) {
+            return;
+        }
+        React.renderComponent(
+            <div>
+                {logs.map(function () {return <OvertimeLog log={log}/>})}
+            </div>,
+            this.refs.overtimeLog.getDOMNode());
+    },
+
+    getOverTimeLog: function (logs) {
+        if (!logs) {return [];}
+        return logs.filter(function (log) {
+            return log.len > log.estimatedTime;
+        });
+    },*/
 
     componentWillMount: function () {
         var that = this;
@@ -445,7 +465,28 @@ var ListItem = React.createClass({
     onClick: function (e) {
         this.props.onClick(e, this.props);
     }
+
+var OvertimeLog = React.createClass({
+
+    render: function () {
+        var log = this.props.log;
+        var estimatedTime = log.estimatedTime;
+        var realTime = log.len
+        var isOvertime = realTime > estimatedTime;
+        return <div className={cx({
+            "ltt_c-OvertimeLog": true,
+            "real": }>
+            {displayTime(realTime)}/{displayTime(estimatedTime)}
+        </div>
+    }
+});
+
+function displayTime(timeAmount) {
+    return Moment.duration(timeAmount, "minutes").format("M[m],d[d],h[h],mm[min]")
+}
 })*/
+
+
 
 
 module.exports = Page;

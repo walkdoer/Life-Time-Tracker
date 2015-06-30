@@ -11,6 +11,7 @@ var Color = require('color');
 var TrackerHelper = require('tracker/helper');
 
 
+
 /**Components*/
 var Settings = require('../../pages/Settings');
 
@@ -568,9 +569,11 @@ var LogEditor = React.createClass({
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = session.getValue();
             contentCache[title] = content;
+            var logs = TrackerHelper.getLogs(content, title);
             //persist to localstorage, if app exit accidently, can recovery from localstorage
             that._persistToLocalStorage(title, content);
             that._highLightDoingLine(content);
+            that._annotationOverTimeLog(logs, content);
             that.props.onChange(content, editor);
         }, 200));
 
@@ -629,20 +632,51 @@ var LogEditor = React.createClass({
 
     },
 
+    _annotationOverTimeLog: function (logs, content) {
+        var overtimeLogs = this._getOverTimeLog(logs);
+        var annotations = overtimeLogs.map(function (log) {
+            var realTime = log.len;
+            var estimatedTime = log.estimatedTime;
+            var overRate = ((realTime - estimatedTime) / estimatedTime) * 100;
+            return {
+                row: this.getLineIndex(log.origin, content), // must be 0 based
+                column: 0,  // must be 0 based
+                text: 'overtime ' + overRate.toFixed(1) + '% (' + displayTime(realTime) + '/' + displayTime(estimatedTime) + ')',
+                type: "warning"
+            }
+        }, this);
+        this.editor.getSession().setAnnotations(annotations)
+    },
+
+
+    _getOverTimeLog: function (logs) {
+        if (!logs) {return [];}
+        return logs.filter(function (log) {
+            return  log.estimatedTime && log.len > log.estimatedTime;
+        });
+    },
+
     getDoingLogIndex: function (doingLog, content) {
         if (!doingLog) {
             doingLog = this.getDoingLog(content);
         }
         var index;
         if (doingLog) {
-            index = getLineIndex(content, doingLog.origin);
+            index = this.getLineIndex(doingLog.origin, content);
         }
-        function getLineIndex (content, line){
-            var lines = content.split('\n');
-            for (var i = 0; i < lines.length; i++) {
-                if (lines[i] === line) {
-                    return i;
-                }
+        return index;
+    },
+
+    getLineIndex: function (line, content) {
+        var index;
+        var lines = content.split('\n');
+        if (!content) {
+            content = this.editor.getSession().getValue();
+        }
+        for (var i = 0; i < lines.length; i++) {
+            if (lines[i] === line) {
+                index = i;
+                break;
             }
         }
         return index;
@@ -1204,6 +1238,10 @@ function getEventTitle(log) {
         title += '[' + log.tags.join(',') + ']';
     }
     return title;
+}
+
+function displayTime(timeAmount) {
+    return Moment.duration(timeAmount, "minutes").format("M[m],d[d],h[h],mm[min]")
 }
 
 module.exports = LogEditor;
