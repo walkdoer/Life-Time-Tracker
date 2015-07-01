@@ -96,13 +96,17 @@ var routes = (
     </Route>
 );
 
+
 //load setting and start application
 Settings.load().then(function () {
+    //increase app init progress bar to 100 percent
+    Ltt.setProgress(90);
     //load logClasses
     return DataAPI.Class.load();
 }).then(function (classes) {
     config.classes = classes;
 }).then(function () {
+    Ltt.setProgress(100);
     Router.run(routes, function(Handler) {
         React.render(<Handler />, window.document.getElementById('app-container'));
     });

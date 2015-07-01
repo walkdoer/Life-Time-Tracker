@@ -83,20 +83,45 @@
         <script src="libs/ace/ace.js"></script>
         <script src="libs/ace/ext-language_tools.js"></script>
         <script type="text/javascript">
-            var progressBar = document.querySelector('.progress .bar');
-            loadJS([
-                "nw/initNw.js",
-                "vendors.js",
-                "main.js"
-            ], {
-                onProgress: function (progress) {
-                    progressBar.style.width = (progress * 100) + '%';
-                },
+            (function (window) {
+                'use strict';
+                var requestAnimationFrame = window.requestAnimationFrame;
+                var progressBar = document.querySelector('.progress .bar');
+                var _progress = 0;
 
-                onComplete: function () {
-                    console.log('done!');
+                window.Ltt = {
+                    setProgress: function (progress) {
+                        _progress = progress;
+                    }
+                };
+
+                loadJS([
+                    "nw/initNw.js",
+                    "vendors.js",
+                    "main.js"
+                ], {
+                    onProgress: function (progress) {
+                        _progress = progress * 100;
+                    },
+
+                    onComplete: function () {
+                        console.log('done!');
+                    }
+                });
+
+                function updateProgress() {
+                    console.log('update progress' +  _progress);
+                    progressBar.style.width = (_progress - 20) + '%';
+                    if (_progress < 100) {
+                        requestAnimationFrame(updateProgress);
+                    } else {
+                        console.log('update progress finish' +  _progress);
+                    }
                 }
-            });
+
+                requestAnimationFrame(updateProgress);
+
+            })(window);
         </script>
     </body>
 </html>
