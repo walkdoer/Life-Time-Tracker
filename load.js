@@ -35,15 +35,7 @@
         }
 
         function transferComplete(e) {
-            var element = e.target;
-            var scriptDOM = document.createElement("script");
-            scriptDOM.innerHTML = element.responseText;
-            document.documentElement.appendChild(scriptDOM);
-            onComplete();
-
-            scriptDOM.addEventListener("load", function() {
-                onExcuted();
-            });
+            onComplete(e);
         }
 
         function transferFailed(e) {
@@ -78,6 +70,7 @@
         var scriptLength = urls.length;
         var queue = urls.slice(0);
         var scriptProgresses = Object.create(null);
+        var responseCache = {};
         urls.forEach(function (url) {
             loadScript(url, {
                 onProgress: function (progress) {
@@ -88,10 +81,27 @@
                     }
                 },
 
-                onComplete: function () {
+                onComplete: function (e) {
                     var index = queue.indexOf(url);
-                    if (index >= 0) {
+                    var element = e.target;
+                    var insertResponse = function (response) {
+                        var scriptDOM = document.createElement("script");
+                        scriptDOM.innerHTML = response;
+                        document.documentElement.appendChild(scriptDOM);
+                    };
+
+                    if (index === 0) {
                         queue.splice(index, 1);
+                        insertResponse(element.responseText);
+                        queue.forEach(function (url) {
+                            var response = responseCache[url];
+                            if (response) {
+                                insertResponse(response);
+                            }
+                        });
+                    } else if (index > 0) {
+                        //cache
+                        responseCache[url] = element.responseText;
                     }
                     if (queue.length === 0) {
                         onComplete();

@@ -321,6 +321,7 @@ gulp.task('nw', function () {
           './server.html',
           './vendors.js',
           './nodeMain.js',
+          './load.js',
           './main.js'
         ].concat(dependencies);
 

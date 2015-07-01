@@ -16,9 +16,6 @@
             }
         };
         window.Ltt = Ltt;
-        setTimeout(function () {
-            loadjs('./main.js');
-        }, 1000);
         return;
     }
     var sdk = require('ltt-sdk');
@@ -42,12 +39,6 @@
         }
     };
 
-    function loadjs(script_filename) {
-        var script = document.createElement('script');
-        script.setAttribute('type', 'text/javascript');
-        script.setAttribute('src', script_filename);
-        document.body.appendChild(script);
-    }
 
     function getFileSrc(fileName) {
         var fileSrc = 'file:///' + path.resolve('./' + fileName);
