@@ -15,6 +15,7 @@ var config = require('../conf/config');
 var LoadingMask = require('../components/LoadingMask');
 var PieDetail = require('../components/PieDetail');
 var TimeConsumeRanking = require('../components/TimeConsumeRanking');
+var DatePicker = require('../components/DatePicker');
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
@@ -22,17 +23,31 @@ var DataAPI = require('../utils/DataAPI');
 
 module.exports = React.createClass({
 
+    getInitialState: function () {
+        return {
+            date: new Moment()
+        };
+    },
+
     render: function () {
+        var date = this.state.date;
         return (
             <div className="ltt_c-page ltt_c-report-TodayReport">
+                <div className="Grid Grid--gutters">
+                    <div className="Grid-cell u-1of4">
+                        <DatePicker date={date} onChange={this.onDateChange}/>
+                    </div>
+                </div>
                 <div className="Grid Grid--gutters Grid--stretch ltt_c-report-TodayReport-header">
                     <div className="Grid-cell">
-                        <PieDetail className="chart" date={new Moment().startOf('day')} type="classes"/>
+                        <PieDetail className="chart" date={date} type="classes"/>
                     </div>
                 </div>
                 <div className="Grid Grid--gutters Grid--stretch">
                     <div className="Grid-cell u-1of2">
-                        <TimeConsumeRanking className="chart"/>
+                        <TimeConsumeRanking className="chart"
+                            start={Moment(date).startOf('day')}
+                            end={Moment(date).endOf('day')} />
                     </div>
                     <div className="Grid-cell u-1of2">
                         <div className="chart"></div>
@@ -40,5 +55,12 @@ module.exports = React.createClass({
                 </div>
             </div>
         );
+    },
+
+
+    onDateChange: function (date) {
+        this.setState({
+            date: date
+        });
     }
 });

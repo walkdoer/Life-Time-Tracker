@@ -1,7 +1,6 @@
 .ltt_c-datePicker{
+    display: flex;
     height: 34px;
-    text-indent: 10px;
-    font-size: 1.14rem;
 }
 
 .ltt_c-FullDateRangePicker{
@@ -31,7 +30,7 @@
 .ltt_c-dateRangePicker .btn-toolbar{
     display:flex;
 }
-
+.ltt_c-datePicker .input-date,
 .ltt_c-dateRangePicker .input-daterange{
     width: 185px;
     border: 1px solid #ccc;
@@ -43,7 +42,7 @@
     flex: 1;
 }
 
-
+.ltt_c-datePicker  button[type="button"],
 .ltt_c-dateRangePicker button[type="button"]{
     border: 1px solid #ccc;
     text-indent:3px;
@@ -52,9 +51,11 @@
     display:inline-block;
     height: 34px;
 }
+.ltt_c-datePicker button[type="button"].prev,
 .ltt_c-dateRangePicker button[type="button"].prev{
     border-right: none;
 }
+.ltt_c-datePicker button[type="button"].next,
 .ltt_c-dateRangePicker button[type="button"].next{
     border-left: none;
 }

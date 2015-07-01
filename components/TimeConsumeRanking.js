@@ -90,6 +90,11 @@ module.exports = React.createClass({
         this._width = $(this.getDOMNode()).width();
     },
 
+
+    componentWillReceiveProps: function (nextProps) {
+        this.loadRankingData(this.state.currentTab, nextProps);
+    },
+
     handleTabSelect: function (key) {
         this.setState({
             currentTab: key,
@@ -101,11 +106,17 @@ module.exports = React.createClass({
         });
     },
 
-    loadRankingData: function (rankType) {
+    loadRankingData: function (rankType, params) {
         var that = this;
+        var start = this.props.start;
+        var end = this.props.end;
+        if (params) {
+            start = params.start;
+            end = params.end;
+        }
         DataAPI.Log.load({
-            start: this.props.start.toDate(),
-            end: this.props.start.toDate(),
+            start: start.toDate(),
+            end: end.toDate(),
             sum: true,
             group: rankType
         }).then(function (list) {
