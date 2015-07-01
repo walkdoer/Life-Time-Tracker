@@ -5,6 +5,7 @@
         <title>LTT</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script type="text/javascript" src="./load.js"></script>
         <!-- inject:css -->
         <link rel="stylesheet" href="css/lib/normalize.css">
         <link rel="stylesheet" href="css/lib/animate.css">
@@ -29,6 +30,7 @@
         <link rel="stylesheet" href="css/components/Grid.css">
         <link rel="stylesheet" href="css/components/LoadingMask.css">
         <link rel="stylesheet" href="css/components/PieDetail.css">
+        <link rel="stylesheet" href="css/components/SlidePanel.css">
         <link rel="stylesheet" href="css/components/TreeMap.css">
         <link rel="stylesheet" href="css/components/appInfo.css">
         <link rel="stylesheet" href="css/components/bubbleCloud.css">
@@ -67,11 +69,22 @@
     </head>
     <body>
         <section id="app-container"></section>
-        <script src="libs/ace/ace.js" type="text/javascript" charset="utf-8"></script>
-        <script src="libs/ace/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
-        <!-- inject:js -->
-        <script src="nw/initNW.js"></script>
-        <script src="vendors.js"></script>
-        <!-- endinject -->
+        <script type="text/javascript">
+            loadJS([
+                "libs/ace/ace.js",
+                "libs/ace/ext-language_tools.js",
+                "nw/initNW.js",
+                "vendors.js",
+                "main.js"
+            ], {
+                onProgress: function (progress) {
+                    console.log('total:' + progress * 100);
+                },
+
+                onComplete: function () {
+                    console.log('done!');
+                }
+            });
+        </script>
     </body>
 </html>

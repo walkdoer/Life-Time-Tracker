@@ -5,14 +5,28 @@
         <title>LTT</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script type="text/javascript" src="./load.js"></script>
         <!-- inject:css -->
         <!-- endinject -->
     </head>
     <body>
         <section id="app-container"></section>
-        <script src="libs/ace/ace.js" type="text/javascript" charset="utf-8"></script>
-        <script src="libs/ace/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
-        <!-- inject:js -->
-        <!-- endinject -->
+        <script type="text/javascript">
+            loadJS([
+                "libs/ace/ace.js",
+                "libs/ace/ext-language_tools.js",
+                "nw/initNW.js",
+                "vendors.js",
+                "main.js"
+            ], {
+                onProgress: function (progress) {
+                    console.log('total:' + progress * 100);
+                },
+
+                onComplete: function () {
+                    console.log('done!');
+                }
+            });
+        </script>
     </body>
 </html>
