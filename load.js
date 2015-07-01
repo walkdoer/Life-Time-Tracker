@@ -30,7 +30,6 @@
         function updateProgress(e) {
             var progress = calculateProgress(e);
             if (progress !== null) {
-                console.log(url, progress);
                 onProgress(progress);
             }
         }
@@ -105,6 +104,7 @@
 
                 onExcuted: function () {
                     onExcuted(url);
+                    console.log('excuted:' + url);
                 },
 
                 onAbort: function () {

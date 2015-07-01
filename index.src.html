@@ -10,17 +10,26 @@
         <!-- endinject -->
     </head>
     <body>
-        <section id="app-container"></section>
+        <section id="app-container">
+            <div class="Aligner appStartingMsg">
+                <div class="Aligner-item">
+                    <div class="progress">
+                        <div class="bar"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <script src="libs/ace/ace.js"></script>
+        <script src="libs/ace/ext-language_tools.js"></script>
         <script type="text/javascript">
+            var progressBar = document.querySelector('.progress .bar');
             loadJS([
-                "libs/ace/ace.js",
-                "libs/ace/ext-language_tools.js",
                 "nw/initNW.js",
                 "vendors.js",
                 "main.js"
             ], {
                 onProgress: function (progress) {
-                    console.log('total:' + progress * 100);
+                    progressBar.style.width = (progress * 100) + '%';
                 },
 
                 onComplete: function () {

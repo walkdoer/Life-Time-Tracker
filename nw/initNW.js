@@ -250,11 +250,5 @@
         initApp();
         //use new-instanse window to start server
         var serverWin = gui.Window.open('./server.html', {"new-instance": true, show: false});
-
-        //延时1s之后再加载主要界面
-        //
-        setTimeout(function () {
-            loadjs('./main.js');
-        }, 1000);
     }
 })();
