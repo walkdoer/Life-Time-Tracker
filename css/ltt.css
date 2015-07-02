@@ -214,31 +214,3 @@
 .nav-tabs > li > a{
     border-radius: 0px;
 }
-
-
-.appStartingMsg{
-    height: 100%;
-}
-
-.appStartingMsg .progress {
-    width: 200px;
-    border: solid 4px #85DFBE;
-    border-radius: 10px;
-    position: relative;
-    padding: 3px 4px;
-}
-
-.appStartingMsg .progress .bar{
-  height: 100%;
-  background: #7FDFBC;
-  border-radius: 3px;
-  width:0%;
-  -webkit-transition: 0.4s linear;
-  -moz-transition: 0.4s linear;
-  -o-transition: 0.4s linear;
-  transition: 0.4s linear;
-  -webkit-transition-property: width, background-color;
-  -moz-transition-property: width, background-color;
-  -o-transition-property: width, background-color;
-  transition-property: width, background-color;
-}

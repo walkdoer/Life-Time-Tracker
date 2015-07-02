@@ -7,33 +7,90 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style type="text/css">
             html,body{ background: #f6f6f6; }
+            .appStartingMsg{
+                position: fixed;
+                top:0;
+                left:0;
+                bottom: 0;
+                right: 0;
+                z-index: 9999;
+                background-color: #f6f6f6;
+            }
+
+            .appStartingMsg .progress {
+                width: 200px;
+                height: 26px;
+                border: solid 4px #85DFBE;
+                border-radius: 10px;
+                position: relative;
+                padding: 3px 4px;
+            }
+
+            .appStartingMsg .progress .bar{
+              height: 100%;
+              background: #7FDFBC;
+              border-radius: 3px;
+              width:0%;
+              -webkit-transition: 0.4s linear;
+              -moz-transition: 0.4s linear;
+              -o-transition: 0.4s linear;
+              transition: 0.4s linear;
+              -webkit-transition-property: width, background-color;
+              -moz-transition-property: width, background-color;
+              -o-transition-property: width, background-color;
+              transition-property: width, background-color;
+            }
+            .appStartingMsg-fade {
+              transition: all 300ms linear 700ms;
+              -webkit-transform: translate3d(0,0,0);
+              -moz-transform: translate3d(0,0,0);
+              -ms-transform: translate3d(0,0,0);
+              -o-transform: translate3d(0,0,0);
+              transform: translate3d(0,0,0);
+              opacity: 1;
+            }
+
+            .appStartingMsg-fade.out {
+              opacity: 0;
+            }
         </style>
         <script type="text/javascript" src="./load.js"></script>
         <!-- inject:css -->
         <!-- endinject -->
     </head>
     <body>
-        <section id="app-container">
-            <div class="Aligner appStartingMsg">
-                <div class="Aligner-item">
-                    <div class="progress">
-                        <div class="bar"></div>
-                    </div>
+        <div class="Aligner appStartingMsg appStartingMsg-fade out">
+            <div class="Aligner-item">
+                <div class="progress">
+                    <div class="bar"></div>
                 </div>
             </div>
-        </section>
+        </div>
+        <section id="app-container"></section>
         <script src="libs/ace/ace.js"></script>
         <script src="libs/ace/ext-language_tools.js"></script>
         <script type="text/javascript">
             (function (window) {
                 'use strict';
-                var requestAnimationFrame = window.requestAnimationFrame;
+                var appStartingMsgDOM = document.querySelector('.appStartingMsg');
+                appStartingMsgDOM.classList.remove('out');
                 var progressBar = document.querySelector('.progress .bar');
                 var _progress = 0;
 
                 window.Ltt = {
                     setProgress: function (progress) {
                         _progress = progress;
+                        progressBar.style.width = _progress + '%';
+                        if (_progress === 100) {
+                            var timer = setTimeout(function () {
+                                appStartingMsgDOM.classList.add('out');
+                                clearTimeout(timer);
+                                timer = setTimeout(function () {
+                                    $('.appStartingMsg').hide();
+                                    clearTimeout(timer);
+                                }, 1000);
+                            }, 2500);
+                        }
                     }
                 };
 
@@ -43,7 +100,7 @@
                     "main.js"
                 ], {
                     onProgress: function (progress) {
-                        _progress = progress * 100;
+                        Ltt.setProgress(progress * 100 -20);
                     },
 
                     onComplete: function () {
@@ -51,9 +108,8 @@
                     }
                 });
 
-                function updateProgress() {
+                /*function updateProgress() {
                     console.log('update progress' +  _progress);
-                    progressBar.style.width = (_progress - 20) + '%';
                     if (_progress < 100) {
                         requestAnimationFrame(updateProgress);
                     } else {
@@ -61,7 +117,7 @@
                     }
                 }
 
-                requestAnimationFrame(updateProgress);
+                requestAnimationFrame(updateProgress);*/
 
             })(window);
         </script>
