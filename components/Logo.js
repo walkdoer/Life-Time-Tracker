@@ -40,7 +40,7 @@ var Logo = React.createClass({
         var that = this;
         this.setInterval(function () {
             that.setState(that.getColorSettings());
-        }, 3600000);
+        }, 600000);
     },
 
     getColorDependOnTime: function () {

@@ -166,6 +166,7 @@
     height: 50px;
     line-height: 50px;
     text-align: center;
+    transition: background-color 2s ease-out;
 }
 .ltt_c-logo-title{
     font-size: 20px;

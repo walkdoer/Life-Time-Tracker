@@ -30,6 +30,7 @@ var ProjectIndex = React.createClass({
             markedTasks: [],
             dueTasks: [],
             overDueTasks: [],
+            notActiveDoingTasks: [],
             showDone: false
         };
     },
@@ -39,6 +40,7 @@ var ProjectIndex = React.createClass({
         var markedTasks = this.state.markedTasks;
         var dueTasks = this.state.dueTasks;
         var overDueTasks = this.state.overDueTasks;
+        var notActiveDoingTasks = this.state.notActiveDoingTasks;
         var that = this;
         return (
             <div className="ltt_c-page-projectsNew-index">
@@ -54,7 +56,7 @@ var ProjectIndex = React.createClass({
                                     dueTime={true}
                                     totalTime={false}
                                     onTitleClick={that.gotoTaskInProject.bind(that, task)}
-                                    key={'due:' + task._id}/>
+                                    key={'overDue:' + task._id}/>
                             })}
                         </TaskList>
                     </div> : null }
@@ -68,7 +70,7 @@ var ProjectIndex = React.createClass({
                                     <MenuItem eventKey='3'>3 days</MenuItem>
                                     <MenuItem eventKey='7'>7 days</MenuItem>
                                     <MenuItem eventKey='30'>30 days</MenuItem>
-                                    <MenuItem eventKey='30'>60 days</MenuItem>
+                                    <MenuItem eventKey='60'>60 days</MenuItem>
                                  </DropdownButton>
                             </ButtonToolbar>
                         </div>
@@ -79,6 +81,33 @@ var ProjectIndex = React.createClass({
                                     totalTime={false}
                                     onTitleClick={that.gotoTaskInProject.bind(that, task)}
                                     key={'due:' + task._id}/>
+                            })}
+                        </TaskList>
+                    </div>
+                    : null}
+
+                    {!_.isEmpty(notActiveDoingTasks) ?
+                    <div>
+                        <div className="list-header">
+                            <h3> Not Active Doing Tasks</h3>
+                            <ButtonToolbar>
+                                <DropdownButton bsSize='small' title='Period' onSelect={this.loadDoingTaskNotActivieInAPeriod}>
+                                    <MenuItem eventKey='3'>3 days</MenuItem>
+                                    <MenuItem eventKey='7'>7 days</MenuItem>
+                                    <MenuItem eventKey='30'>1 month</MenuItem>
+                                    <MenuItem eventKey='60'>2 month</MenuItem>
+                                    <MenuItem eventKey='180'>half year</MenuItem>
+                                    <MenuItem eventKey='365'>1 year</MenuItem>
+                                 </DropdownButton>
+                            </ButtonToolbar>
+                        </div>
+                        <TaskList>
+                            {notActiveDoingTasks.map(function (task) {
+                                return <Task data={task}
+                                    dueTime={true}
+                                    totalTime={false}
+                                    onTitleClick={that.gotoTaskInProject.bind(that, task)}
+                                    key={'notActive:' + task._id}/>
                             })}
                         </TaskList>
                     </div>
@@ -111,6 +140,7 @@ var ProjectIndex = React.createClass({
         this.loadMarkedTasks();
         this.loadDueSoonTasks();
         this.loadOverDueTasks();
+        this.loadDoingTaskNotActivieInAPeriod();
     },
 
     loadMarkedTasks: function () {
@@ -169,6 +199,19 @@ var ProjectIndex = React.createClass({
             showDone: !this.state.showDone
         }, function () {
             this.loadMarkedTasks();
+        });
+    },
+
+    loadDoingTaskNotActivieInAPeriod: function (days) {
+        var that = this;
+        DataAPI.Task.load({
+            status: 'doing',
+            notActiveDay: days || 7,
+            populate: true
+        }).then(function (tasks) {
+            that.setState({
+                notActiveDoingTasks: tasks
+            });
         });
     }
 });
