@@ -83,11 +83,11 @@ module.exports = React.createClass({
     },
 
 
-    loadSumData: function () {
+    loadSumData: function (nextProps) {
         var that = this;
         DataAPI.Log.load(extend({
             sum: true
-        }, this.getDateParams(), this.props.params))
+        }, this.getDateParams(nextProps), this.props.params))
         .then(function (data) {
             var adaptedData = that.adaptData(data);
             that.setState({
@@ -112,10 +112,14 @@ module.exports = React.createClass({
     },
 
 
-    getDateParams: function () {
+    getDateParams: function (nextProps) {
+        var props = this.props;
+        if (nextProps) {
+            props = nextProps;
+        }
         return {
-            start: new Moment(this.props.startDate).format(DATE_FORMAT),
-            end: new Moment(this.props.endDate).format(DATE_FORMAT)
+            start: new Moment(props.startDate).format(DATE_FORMAT),
+            end: new Moment(props.endDate).format(DATE_FORMAT)
         };
     },
 
@@ -127,8 +131,8 @@ module.exports = React.createClass({
         }
     },
 
-    componentWillReceiveProps: function () {
-        this.loadSumData();
+    componentWillReceiveProps: function (nextProps) {
+        this.loadSumData(nextProps);
     }
 
 });

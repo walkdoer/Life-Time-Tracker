@@ -27,8 +27,8 @@ module.exports = React.createClass({
 
     getInitialState: function () {
         return {
-            startDate: new Moment().subtract(1, 'month').toDate(),
-            endDate: new Moment().toDate(),
+            startDate: new Moment().startOf('month').toDate(),
+            endDate: new Moment().endOf('month').toDate(),
             root: null
         };
     },
@@ -41,6 +41,8 @@ module.exports = React.createClass({
                     <FullDateRangePicker
                         ref="dateRange"
                         showCompare={false}
+                        period="month"
+                        granularity="month"
                         start={this.state.startDate} end={this.state.endDate}
                         onDateRangeChange={this.onDateRangeChange}/>
                 </div>

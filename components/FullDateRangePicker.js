@@ -13,14 +13,15 @@ var Button = RB.Button;
 module.exports = React.createClass({
     getInitialState: function () {
         return {
-            period: 'today',
-            granularity: 'day'
+            period: this.props.period,
+            granularity: this.props.granularity
         };
     },
 
     getDefaultProps: function () {
         return {
-            showCompare: true
+            showCompare: true,
+            period: 'today'
         };
     },
 
