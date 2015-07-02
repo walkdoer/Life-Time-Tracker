@@ -12,6 +12,7 @@ var ButtonToolbar = RB.ButtonToolbar;
 var DropdownButton = RB.DropdownButton;
 var MenuItem = RB.MenuItem;
 var _ = require('lodash');
+var Select = require('react-select');
 
 /** Components */
 var Task = require('../Task/Task.js');
@@ -31,7 +32,8 @@ var ProjectIndex = React.createClass({
             dueTasks: [],
             overDueTasks: [],
             notActiveDoingTasks: [],
-            showDone: false
+            showDone: false,
+            notActiveDay: 7
         };
     },
 
@@ -89,17 +91,19 @@ var ProjectIndex = React.createClass({
                     {!_.isEmpty(notActiveDoingTasks) ?
                     <div>
                         <div className="list-header">
-                            <h3> Not Active Doing Tasks</h3>
-                            <ButtonToolbar>
-                                <DropdownButton bsSize='small' title='Period' onSelect={this.loadDoingTaskNotActivieInAPeriod}>
-                                    <MenuItem eventKey='3'>3 days</MenuItem>
-                                    <MenuItem eventKey='7'>7 days</MenuItem>
-                                    <MenuItem eventKey='30'>1 month</MenuItem>
-                                    <MenuItem eventKey='60'>2 month</MenuItem>
-                                    <MenuItem eventKey='180'>half year</MenuItem>
-                                    <MenuItem eventKey='365'>1 year</MenuItem>
-                                 </DropdownButton>
-                            </ButtonToolbar>
+                            <h3>Doing tasks not active <select className="select" onChange={function (e) {
+                                var val = e.target.value;
+                                this.setState({notActiveDay: val});
+                                this.loadDoingTaskNotActivieInAPeriod(val);
+                            }.bind(this)} value={this.state.notActiveDay}>
+                                {[
+                                    {value: 3, label: '3 days'},
+                                    {value: 7, label: '1 week'},
+                                    {value: 15, label: '15 days'}
+                                ].map(function (option) {
+                                    return <option value={option.value}>{option.label}</option>
+                                })}
+                            </select> of Last 30 days</h3>
                         </div>
                         <TaskList>
                             {notActiveDoingTasks.map(function (task) {
@@ -206,6 +210,8 @@ var ProjectIndex = React.createClass({
         var that = this;
         DataAPI.Task.load({
             status: 'doing',
+            start: new Moment().subtract(30, 'day').startOf('day').toDate(),
+            end: new Moment().endOf('day').toDate(),
             notActiveDay: days || 7,
             populate: true
         }).then(function (tasks) {
