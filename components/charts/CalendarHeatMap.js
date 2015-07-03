@@ -14,25 +14,34 @@ var CalendarHeatMap = React.createClass({
 
     getInitialState: function () {
         return {
-            loaded: false,
-            data: []
+            loaded: true,
+            data: this.props.data || []
         };
     },
     componentDidMount: function () {
         var that = this;
-        if (_.isFunction(this.props.data)) {
-            this.props.data()
+        if (_.isFunction(this.props.getData)) {
+            this.props.getData()
                 .then(function (data) {
-                    that.setState({loaded: true, data: data}, function () {
-                        this.renderCalendar(data);
-                    });
+                    that.setState({loaded: true, data: data});
                 });
+        } else {
+            this.renderCalendar(this.state.data);
         }
     },
 
+    componentWillReceiveProps: function (nextProps) {
+        this.setState({
+            data: nextProps.data
+        });
+    },
+
+    componentDidUpdate: function () {
+        this.redraw();
+    },
+
     renderCalendar: function (data) {
-        this.data = data;
-        this.calendar = createCalHealMap.call(this, data, this.getDrawOptions());
+        this.calendar = createCalHealMap.call(this, this.state.data, this.getDrawOptions());
         this.redrawHandler = _.debounce(this.redraw, 300);
         $(window).on('resize', this.redrawHandler);
     },
@@ -45,10 +54,10 @@ var CalendarHeatMap = React.createClass({
         return (
             <div className="ltt_c-calendarHeapMap">
                 {this.getStreakInfo(this.state.data)}
-                <div className="btn-group">
+                {this.props.noButton === true ? null : <div className="btn-group">
                     <button className="btn btn-xs" onClick={this.prev}><i className="fa fa-angle-left" title="previous"></i></button>
                     <button className="btn btn-xs" onClick={this.next}><i className="fa fa-angle-right" title="next"></i></button>
-                </div>
+                </div>}
                 <div className="calendar"></div>
                 <LoadingMask loaded={this.state.loaded}/>
             </div>
@@ -56,9 +65,8 @@ var CalendarHeatMap = React.createClass({
     },
 
     redraw: function () {
-        var data = this.data
         $(this.getDOMNode()).find('.calendar').empty();
-        this.calendar = createCalHealMap.call(this, data, this.getDrawOptions());
+        this.calendar = createCalHealMap.call(this, this.state.data, this.getDrawOptions());
     },
 
     getDrawOptions: function () {
@@ -76,6 +84,7 @@ var CalendarHeatMap = React.createClass({
     },
 
     getStreakInfo: function (data) {
+        if (this.props.noStreak === true) {return null; }
         var currentStreak = 0, longestStreak = 0, currentStreakSpan, longestStreakSpan;
         var streaks = [], prevDate;
         data.forEach(function (item, index) {
@@ -129,14 +138,15 @@ var CalendarHeatMap = React.createClass({
         colOfMonth = 5,
         cellPadding = 1;
     var width = $el.width();
-    var range = Math.round(((width + cellPadding) / (cellSize + cellPadding)) / colOfMonth) - 1;
-    var startDate = now.subtract(range / 2, 'month').startOf('month').toDate();
+    var range = this.props.range || Math.round(((width + cellPadding) / (cellSize + cellPadding)) / colOfMonth) - 1;
+    var startDate = this.props.start || now.subtract(range / 2, 'month').startOf('month').toDate();
     var defaulOptions = {
         itemSelector: $el[0],
         data: renderData,
         start: startDate,
-        domain: "month",
-        subDomain: "day",
+        displayLegend: this.props.displayLegend === undefined ? true : this.props.displayLegend,
+        domain: this.props.domain || "month",
+        subDomain: this.props.subDomain || "day",
         range: range,
         //subDomainTextFormat: "%d",
         cellSize: cellSize,

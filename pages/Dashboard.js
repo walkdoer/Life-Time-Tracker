@@ -52,21 +52,21 @@ var Dashboard = React.createClass({
                 <div className="ltt_c-page-com">
                     <p className="ltt_c-page-title">Sport Cal-Heatmap</p>
                     <CalendarHeatMap
-                        data={this.loadSportCalendar}
+                        getData={this.loadSportCalendar}
                         empty="no sport data"
                         filled="{date} 运动时间 {count}分钟"/>
                 </div>
                 <div className="ltt_c-page-com">
                     <p className="ltt_c-page-title">Meditation</p>
                     <CalendarHeatMap
-                        data={this.loadMeditationCalendar}
+                        getData={this.loadMeditationCalendar}
                         empty="do not meditate this day"
                         filled="{date} meditate {count}"/>
                 </div>
                 <div className="ltt_c-page-com">
                     <p className="ltt_c-page-title">Thinking</p>
                     <CalendarHeatMap
-                        data={this.loadThinkingCalendar}
+                        getData={this.loadThinkingCalendar}
                         empty="do not meditate this day"
                         filled="{date} meditate {count}"/>
                 </div>

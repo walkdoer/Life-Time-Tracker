@@ -65,7 +65,7 @@ module.exports = React.createClass({
                     <span className="ltt_c-GoalCard-deleteBtn" onClick={this.onDelete}><i className="fa fa-trash"></i></span>
                 </div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity">{goal.granularity}</div>
-                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity">{this.renderCalendar()}</div>
+                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity" style={{width: 400}}>{this.renderCalendar()}</div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-activities">
                     {this.state.activitiesLoadFailed ?
                         'Load Activity Failed' :
@@ -77,9 +77,8 @@ module.exports = React.createClass({
                             xAxisLabel={false}
                             yAxisLabel={false}/> : null)
                     }
-                    <LoadingMask loaded={this.state.activitiesLoaded}/>
                 </div>
-                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-progress">
+                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-progress" style={{width: 200}}>
                     <Progress className="ltt_c-GoalCard-progress" max={goal.estimatedTime || 0} value={this.state.progress || 0}/>
                 </div>
             </div>
@@ -164,9 +163,32 @@ module.exports = React.createClass({
     },
 
     renderCalendar: function () {
-        return null;
-        if (this.props.goal.granularity === 'day' ) { return null;}
-        return <CalendarHeatMap data={this.state.activities.map(getDateData)}/>
+        var granularity = this.props.goal.granularity;
+        var estimatedTime = this.props.goal.estimatedTime;
+        if (granularity === 'day' ) { return null;}
+        var dateInfo = Util.toDate(granularity);
+        var max;
+        if (granularity === 'week') {
+            max = estimatedTime / 7;
+        } else if(granularity === 'month') {
+            max = estimatedTime / 30;
+        } else if (granularity === 'year') {
+            max = estimatedTime / 365;
+        } else {
+            max = estimatedTime;
+        }
+        return <CalendarHeatMap 
+            data={this.state.activities.map(getDateData)}
+            empty="no sport data"
+            noStreak={true}
+            noButton={true}
+            start={dateInfo.start}
+            displayLegend={false}
+            legend={[0, max]}
+            domain={granularity}
+            subDomain="x_day"
+            range={1}
+            filled="{date} 运动时间 {count}分钟"/>
     }
 });
 
