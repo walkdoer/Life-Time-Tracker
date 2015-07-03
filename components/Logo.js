@@ -17,10 +17,9 @@ var Logo = React.createClass({
 
     getColorSettings: function () {
         var backgroundColor = this.getColorDependOnTime();
-        if (['#E9D4B0'].indexOf(backgroundColor) >=0) {
+        var fontColor = "#FFF";
+        if (['#E9D4B0'].indexOf(backgroundColor) >= 0) {
             fontColor = "#494849";
-        } else {
-            fontColor = "#FFF";
         }
         return {
             backgroundColor: backgroundColor,
@@ -30,7 +29,7 @@ var Logo = React.createClass({
 
     render: function () {
         return (
-            <div className="ltt_c-logo" style={{backgroundColor: this.state.backgroundColor, color: fontColor}}>
+            <div className="ltt_c-logo" style={{backgroundColor: this.state.backgroundColor, color: this.state.fontColor}}>
                 <span className="ltt_c-logo-title">{this.props.title}</span>
             </div>
         );

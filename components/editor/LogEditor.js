@@ -31,6 +31,7 @@ var ThemeManager = new mui.Styles.ThemeManager();
 /** constant */
 var EventConstant = require('../../constants/EventConstant');
 var EVENT_HIGHLIGHT_CLASS = 'event-highlight';
+var NotEmpty = function(a) {return !!a};
 /**util*/
 var DataAPI = require('../../utils/DataAPI');
 var Bus = require('../../utils/Bus');
@@ -109,7 +110,8 @@ var LogEditor = React.createClass({
                     <div className="ltt_c-logEditor-header-right">
                         <ButtonToolbar>
                             <Button onClick={this.onHighlightUnFinishLog} bsSize='small' title='show unfinish log' active={this.state.highlightUnFinishLog}><i className="fa fa-magic"></i></Button>
-                            <Button onClick={this.openReport}>Report</Button>
+                            <Button onClick={this.openReport} bsSize='small' title="open report"><i className="fa fa-line-chart"/></Button>
+                            <Button onClick={this.sortLogs} bsSize='small' title="sort logs"><i className="fa fa-sort-alpha-asc"></i></Button>
                             <DropdownButton bsSize='small' title='Copy' onSelect={this.copyTaskFromPast}>
                                 <MenuItem eventKey='today'>today</MenuItem>
                                 <MenuItem eventKey='yesterday'>yesterday</MenuItem>
@@ -436,7 +438,7 @@ var LogEditor = React.createClass({
 
         commands.addCommand({
             name: 'beginActivity',
-            bindKey: {win: 'Ctrl-Shift-b', mac: 'Command-Shift-b'},
+            bindKey: {win: 'Ctrl-b', mac: 'Command-b'},
             exec: function (editor) {
                 var session = editor.getSession();
                 var doc = session.getDocument();
@@ -1044,6 +1046,22 @@ var LogEditor = React.createClass({
 
     renderTodayReport: function () {
         React.render(<TodayReport/>, this.refs.reportContainer.getDOMNode());
+    },
+
+    sortLogs: function () {
+        var lines = this.getAllLines();
+        var validLogs = [];
+        var planLogs = []
+        lines.forEach(function (line) {
+            if (!line) { return false; }
+            if (Util.isValidLog(line)) {
+                validLogs.push(line);
+            } else {
+                planLogs.push(line);
+            }
+        });
+        planLogs.sort(function (a,b) {return a.localeCompare(b)});
+        this.setValue(validLogs.concat(planLogs).join('\n'));
     }
 });
 
