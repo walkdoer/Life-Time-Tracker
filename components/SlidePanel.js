@@ -36,6 +36,7 @@ module.exports = React.createClass({
 
   getDefaultProps: function() {
     return {
+      onTransitionEnd: function() {},
       docked: true,
       width: 200,
       duration: 450

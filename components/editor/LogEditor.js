@@ -18,6 +18,7 @@ var mui = require('material-ui');
 /**Components*/
 var Settings = require('../../pages/Settings');
 var TodayReport = require('../../reports/TodayReport');
+var HelpDocument= require('../HelpDocument');
 
 //store key
 var SK_CONTENT = 'content';
@@ -112,6 +113,7 @@ var LogEditor = React.createClass({
                             <Button onClick={this.onHighlightUnFinishLog} bsSize='small' title='show unfinish log' active={this.state.highlightUnFinishLog}><i className="fa fa-magic"></i></Button>
                             <Button onClick={this.openReport} bsSize='small' title="open report"><i className="fa fa-line-chart"/></Button>
                             <Button onClick={this.sortLogs} bsSize='small' title="sort logs"><i className="fa fa-sort-alpha-asc"></i></Button>
+                            <Button onClick={this.openHelpDoc} bsSize='small' title="open help document"><i className="fa fa-book"></i></Button>
                             <DropdownButton bsSize='small' title='Copy' onSelect={this.copyTaskFromPast}>
                                 <MenuItem eventKey='today'>today</MenuItem>
                                 <MenuItem eventKey='yesterday'>yesterday</MenuItem>
@@ -132,6 +134,9 @@ var LogEditor = React.createClass({
                     <SlidePanel className="todayReport" ref="todayReport" open={false} onTransitionEnd={this.renderTodayReport}>
                         <div ref="reportContainer" style={{height: "100%"}}>
                         </div>
+                    </SlidePanel>
+                    <SlidePanel className="helpDoc" ref="helpDoc" open={false}>
+                        <HelpDocument src="./help/editor.md"/>
                     </SlidePanel>
                 </div>
             </div>
@@ -1087,6 +1092,12 @@ var LogEditor = React.createClass({
             return false;
         });
         return result;
+    },
+
+    openHelpDoc: function () {
+        this.refs.helpDoc.toggle({
+            width: $(this.getDOMNode()).width()
+        });
     }
 });
 
