@@ -316,6 +316,7 @@ gulp.task('nw', function () {
           './fonts/**/*',
           './images/**/*',
           './nw/**/*',
+          './help/**/*',
           './libs/**/*',
           './index.html',
           './server.html',

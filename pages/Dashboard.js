@@ -85,27 +85,54 @@ var Dashboard = React.createClass({
 
 
     loadSportCalendar: function () {
-        return DataAPI.calendar({
+        return DataAPI.Log.load({
+            sum: true,
+            group: 'date.day',
             start: new Moment().startOf('month').subtract(1, 'year').toDate(),
             end: new Moment().endOf('month').toDate(),
             classes: 'SPR'
+        }).then(function (data) {
+            return data.map(function (item) {
+                return {
+                    date: item._id,
+                    count: item.totalTime
+                }
+            });
         });
     },
 
 
     loadMeditationCalendar: function () {
-        return DataAPI.calendar({
+        return DataAPI.Log.load({
+            sum: true,
+            group: 'date.day',
             start: new Moment().startOf('month').subtract(1, 'year').toDate(),
             end: new Moment().endOf('month').toDate(),
             tags: 'meditation'
+        }).then(function (data) {
+            return data.map(function (item) {
+                return {
+                    date: item._id,
+                    count: item.totalTime
+                }
+            });
         });
     },
 
     loadThinkingCalendar: function () {
-        return DataAPI.calendar({
+        return DataAPI.Log.load({
+            sum: true,
+            group: 'date.day',
             start: new Moment().startOf('month').subtract(1, 'year').toDate(),
             end: new Moment().endOf('month').toDate(),
             classes: 'TK'
+        }).then(function (data) {
+            return data.map(function (item) {
+                return {
+                    date: item._id,
+                    count: item.totalTime
+                }
+            });
         });
     }
 

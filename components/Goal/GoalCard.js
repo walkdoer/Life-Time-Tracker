@@ -140,5 +140,9 @@ module.exports = React.createClass({
 
     onDelete: function () {
         this.props.onDelete(this.props.goal);
+    },
+
+    renderCalendar: function () {
+        return null;
     }
 });

@@ -120,7 +120,7 @@ var CalendarHeatMap = React.createClass({
     if (!data) {return;}
     data.forEach(function(val) {
         var seconds = new Date(val.date).getTime() / 1000;
-        if (val.count > 0) {
+        if ((val.count) > 0) {
             renderData[seconds] = val.count;
         }
     });
