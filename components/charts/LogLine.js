@@ -230,11 +230,35 @@ module.exports = React.createClass({
 
     getTimeData: function () {
         var logs = this.props.logs;
+        var groupedData;
+        if (this.props.grouped) {
+            groupedData = logs;
+            groupedData = groupedData.map(function (item) {
+                var unix = new Moment(item.date).startOf('day').unix() * 1000;
+                var data = {x: unix, y: item.count};
+                return data;
+            }).sort(function (a, b) {
+                return a.x - b.x;
+            });
+        } else {
+            groupedData = this.groupData(logs);
+        }
         var todayUnix = new Moment(this.props.date).unix() * 1000;
-        var granularity = this.props.granularity;
         var highlightToday = this.props.highlightToday;
         var highlightColor = this.props.highlightColor;
-        if (['weekly', 'week', 'month', 'monthly'].indexOf(granularity) >= 0) {
+        groupedData.forEach(function (d) {
+            if (highlightToday && todayUnix === d.x) {
+                d.color = highlightColor;
+            }
+            return d;
+        });
+        return groupedData;
+    },
+
+    groupData: function (logs) {
+        var todayUnix = new Moment(this.props.date).unix() * 1000;
+        var granularity = this.props.granularity;
+        if (['weekly', 'week', 'month', 'monthly', 'year', 'annual'].indexOf(granularity) >= 0) {
             var data = logs.reduce(function (result, log) {
                 var date = new Moment(log.date).startOf('day').unix() * 1000;
                 if (result[date] !== undefined) {
@@ -247,9 +271,6 @@ module.exports = React.createClass({
             data = _.pairs(data).map(function (d) {
                 var unix = parseInt(d[0], 10);
                 var data = {x: unix, y: d[1]};
-                if (highlightToday && todayUnix === unix) {
-                    data.color = highlightColor;
-                }
                 return data;
             }).sort(function (a, b) {
                 return a.x - b.x;
@@ -261,13 +282,9 @@ module.exports = React.createClass({
             }).map(function (log) {
                 var unix = new Moment(log.date).unix() * 1000;
                 var data = {x: new Moment(log.start).unix() * 1000, y: log.len};
-                if (highlightToday && todayUnix === unix) {
-                    data.color = highlightColor;
-                }
                 return data;
             });
         }
-
     },
 
     _getTitle: function () {

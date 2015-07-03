@@ -24,6 +24,7 @@ var LogLine = require('../charts/LogLine');
 var LoadingMask = require('../LoadingMask');
 var GoalEditWindow = require('../../components/Goal/GoadEditWindow');
 var Notify = require('../../components/Notify');
+var CalendarHeatMap = require('../../components/charts/CalendarHeatMap');
 
 /** Utils */
 var Util = require('../../utils/Util');
@@ -64,10 +65,13 @@ module.exports = React.createClass({
                     <span className="ltt_c-GoalCard-deleteBtn" onClick={this.onDelete}><i className="fa fa-trash"></i></span>
                 </div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity">{goal.granularity}</div>
+                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity">{this.renderCalendar()}</div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-activities">
                     {this.state.activitiesLoadFailed ?
                         'Load Activity Failed' :
-                        (goal.filter ? <LogLine logs={this.state.activities}
+                        (goal.filter ? <LogLine
+                            logs={goal.granularity !== 'day' ? this.state.activities.map(getDateData) : this.state.activities}
+                            grouped={goal.granularity !== 'day'}
                             granularity={goal.granularity}
                             title={false}
                             xAxisLabel={false}
@@ -103,10 +107,12 @@ module.exports = React.createClass({
         console.log('loadActivities');
         var goal = this.props.goal;
         var dateInfo = Util.toDate(goal.granularity);
+        var groupOption = this.getGroupOption(goal.granularity);
         var that = this;
         var params = _.extend({
             sort: 'date: -1',
-            populate: false
+            group: groupOption,
+            sum: true
         }, dateInfo, filter);
         DataAPI.Log.load(params)
             .then(function (data) {
@@ -125,12 +131,27 @@ module.exports = React.createClass({
     },
 
     calculateProgress: function () {
-        var totalTime = this.state.activities.reduce(function (total, log) {
-            return total + (log.len || 0);
-        }, 0);
+        var totalTime;
+        if (this.props.goal.granularity === 'day') {
+            totalTime = this.state.activities.reduce(function (total, item) {
+                return total + (item.len || 0);
+            }, 0);
+        } else {
+            totalTime = this.state.activities.reduce(function (total, item) {
+                return total + (item.totalTime || 0);
+            }, 0);
+        }
         this.setState({
             progress: totalTime
         });
+    },
+
+    getGroupOption: function (granularity) {
+        return {
+            week: 'date.day',
+            month: 'date.day',
+            year: 'date.month'
+        }[granularity];
     },
 
 
@@ -144,5 +165,14 @@ module.exports = React.createClass({
 
     renderCalendar: function () {
         return null;
+        if (this.props.goal.granularity === 'day' ) { return null;}
+        return <CalendarHeatMap data={this.state.activities.map(getDateData)}/>
     }
 });
+
+function getDateData (item) {
+    return {
+        date: item._id,
+        count: item.totalTime
+    };
+}
