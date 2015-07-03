@@ -446,12 +446,19 @@ var LogEditor = React.createClass({
                 var timeStr = new Moment().format('HH:mm') + '~';
                 var pos = editor.getCursorPosition();
                 var line = session.getLine(pos.row);
+                if (!line || Util.isValidLog(line)) {
+                    line = that.getFirstPlanLog();
+                    row = that.getLineIndex(line);
+                } else {
+                    row = pos.row;
+                }
                 var newIndex = validLog.index;
+                that.finishCurrentActivity();
                 //move line
-                var range = new Range(pos.row, 0, pos.row, Infinity);
+                var range = new Range(row, 0, row, Infinity);
                 session.moveText(range, {row: newIndex, column: 0});
                 var pos = {row: newIndex, column: line.length};
-                session.insert(pos, '\n');
+                //session.insert(pos, '\n');
                 //insert time
                 session.insert({row: newIndex, column: 0}, timeStr);
                 that.gotoLine(newIndex + 1, timeStr.length);
@@ -462,9 +469,7 @@ var LogEditor = React.createClass({
             name: 'finishActivity',
             bindKey: {win: 'Ctrl-Shift-f', mac: 'Command-Shift-f'},
             exec: function (editor) {
-                if (that.gotoDoingLogLine(editor.getValue())) {
-                    editor.insert(new Moment().format('HH:mm'));
-                }
+                that.finishCurrentActivity();
             }
         });
 
@@ -488,6 +493,13 @@ var LogEditor = React.createClass({
                 that.gotoLine(newIndex + 1, timeStr.length);
             }
         });
+    },
+
+    finishCurrentActivity: function () {
+        var editor = this.editor;
+        if (this.gotoDoingLogLine(editor.getValue())) {
+            editor.insert(new Moment().format('HH:mm'));
+        }
     },
 
 
@@ -694,10 +706,10 @@ var LogEditor = React.createClass({
 
     getLineIndex: function (line, content) {
         var index;
-        var lines = content.split('\n');
         if (!content) {
             content = this.editor.getSession().getValue();
         }
+        var lines = content.split('\n');
         for (var i = 0; i < lines.length; i++) {
             if (lines[i] === line) {
                 index = i;
@@ -1062,6 +1074,19 @@ var LogEditor = React.createClass({
         });
         planLogs.sort(function (a,b) {return a.localeCompare(b)});
         this.setValue(validLogs.concat(planLogs).join('\n'));
+    },
+
+    getFirstPlanLog: function () {
+        var result = null;
+        (this.getAllLines() || []).some(function (line) {
+            if (!line) {return false;}
+            if (!Util.isValidLog(line)) {
+                result = line;
+                return true;
+            }
+            return false;
+        });
+        return result;
     }
 });
 
