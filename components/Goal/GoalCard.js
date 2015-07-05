@@ -25,6 +25,7 @@ var LoadingMask = require('../LoadingMask');
 var GoalEditWindow = require('../../components/Goal/GoadEditWindow');
 var Notify = require('../../components/Notify');
 var CalendarHeatMap = require('../../components/charts/CalendarHeatMap');
+var GoalChart = require('../../components/charts/GoalChart');
 
 /** Utils */
 var Util = require('../../utils/Util');
@@ -65,7 +66,7 @@ module.exports = React.createClass({
                     <span className="ltt_c-GoalCard-deleteBtn" onClick={this.onDelete}><i className="fa fa-trash"></i></span>
                 </div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity">{goal.granularity}</div>
-                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity" style={{width: 400}}>{this.renderCalendar()}</div>
+                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity" style={{width: 200}}>{this.renderCalendar()}</div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-activities">
                     {this.state.activitiesLoadFailed ?
                         'Load Activity Failed' :
@@ -115,6 +116,9 @@ module.exports = React.createClass({
         }, dateInfo, filter);
         DataAPI.Log.load(params)
             .then(function (data) {
+                data.sort(function (a, b) {
+                    return new Date(a._id).getTime() - new Date(b._id).getTime();
+                });
                 that.setState({
                     activitiesLoaded: true,
                     activities: data
@@ -122,6 +126,7 @@ module.exports = React.createClass({
                     this.calculateProgress();
                 });
             }).fail(function (err) {
+                console.error(err.stack);
                 that.setState({
                     activitiesLoaded: true,
                     activitiesLoadFailed: true
@@ -177,18 +182,19 @@ module.exports = React.createClass({
         } else {
             max = estimatedTime;
         }
-        return <CalendarHeatMap 
-            data={this.state.activities.map(getDateData)}
-            empty="no sport data"
-            noStreak={true}
-            noButton={true}
-            start={dateInfo.start}
-            displayLegend={false}
-            legend={[0, max]}
-            domain={granularity}
-            subDomain="x_day"
-            range={1}
-            filled="{date} 运动时间 {count}分钟"/>
+        return <GoalChart data={this.state.activities.map(function (item, index) {
+            return {
+                date: item._id,
+                count: item.totalTime
+            };
+        })}
+        start={dateInfo.start}
+        end={dateInfo.end}
+        threshold={max}
+        rowItemCount={12}
+        itemPadding={1}
+        width={180}
+        height={80}/>
     }
 });
 

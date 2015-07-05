@@ -155,6 +155,7 @@ var CalendarHeatMap = React.createClass({
         subDomainTitleFormat: {
             empty: 'No data'
         },
+        legendColor: this.props.legendColor,
         subDomainDateFormat: function(date) {
             return moment(date).format('D号 dddd');
         }
