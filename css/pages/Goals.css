@@ -100,3 +100,26 @@
     min-height: 79px;
     max-height: 79px;
 }
+.ltt_c-chart-GoalChart .circle{
+    fill: rgb(238,238, 238)
+}
+.ltt_c-chart-GoalChart .circle.over {
+    fill: rgb(183, 232, 193);
+    stroke: #20B655;
+}
+.ltt_c-chart-GoalChart .circle.under{
+    fill: rgb(255, 190, 190);
+    stroke: #DF2323;
+}
+
+.ltt_c-chart-GoalChart .circle.current{
+    fill: rgb(218,218, 218)
+}
+
+.ltt_c-chart-GoalChart .circle.under.current{
+    fill: rgb(240, 101, 101);
+}
+
+.ltt_c-chart-GoalChart .circle.over.current{
+    fill: rgb(64, 203, 93);
+}

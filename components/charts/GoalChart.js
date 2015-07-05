@@ -2,6 +2,7 @@ var React = require('react');
 var Moment = require('moment');
 var _ = require('lodash');
 var numeral = require('numeral');
+var DATE_FORMAT = 'YYYY-MM-DD';
 module.exports = React.createClass({
     displayName: 'MonthCountDown',
     getDefaultProps: function () {
@@ -33,10 +34,20 @@ module.exports = React.createClass({
         var hasData = !_.isEmpty(data);
         //if (!hasData) return;
         var start = this.props.start;
+        var type = this.props.type;
+        var dateMethod = function () { return false};
+        if (type === 'month') {
+            dateMethod = function (date, i) {
+                return (new Moment(date).date() - 1)  === i;
+            };
+        } else if (type === 'week') {
+            dateMethod = function (date, i) {
+                return new Moment(date).day() === i;
+            };
+        }
         data = _.range(0, new Moment(this.props.end).diff(start, 'day')).map(function (i) {
             var target = data.filter(function (d) {
-                var date = new Moment(d.date).date() - 1;
-                return date === i;
+                return dateMethod(d.date, i);
             })[0];
             if (target) {
                 return target;
@@ -53,6 +64,7 @@ module.exports = React.createClass({
         var threshold = this.props.threshold;
         var itemPadding = this.props.itemPadding;
         var rowItemCount = this.props.rowItemCount;
+        var circleBorder = 1;
         var row;
         if (rowItemCount) {
             row = Math.ceil(dataLen / rowItemCount);
@@ -60,40 +72,45 @@ module.exports = React.createClass({
             rowItemCount = dataLen;
             row = 1;
         }
-        var itemWidth = (width - (rowItemCount - 1) * itemPadding)/ rowItemCount;
+        var leftPadding = itemPadding;
+        var itemWidth = (width - (rowItemCount - 1) * itemPadding - leftPadding)/ rowItemCount;
         var itemHeight = (height - (row - 1) * itemPadding) / row;
         var radius = Math.min(itemWidth, itemHeight) / 2;
         var svg = d3.select(this.getDOMNode()).select('svg');
         var topPadding = (height - 2 * radius * row - (row - 1) * itemPadding) / 2;
         svg.style('height', height);
         svg.style('width', width);
+        var today = new Moment().format(DATE_FORMAT);
         var circle = svg.selectAll('circle')
-            //.style('fill', 'rgb(238,238, 238)')
             .data(data, function (d) {
                 return d.date;
             });
         circle.enter()
             .append("circle")
+            .attr("class", function (d) {
+                 var cls;
+                 if (d.count === -1 ) {
+                    cls = 'circle';
+                 } else if (d.count > threshold) {
+                    cls = 'circle over';
+                 } else{
+                    cls = 'circle under';
+                 }
+                 if (new Moment(d.date).format(DATE_FORMAT) === today) {
+                    cls += ' current';
+                 }
+                 return cls;
+            })
             .attr("cy", function (d, i) {
                 var currentRow = Math.floor(i / rowItemCount) + 1;
                 return topPadding + (2 * currentRow - 1) * radius + (currentRow - 1) * itemPadding;
             })
             .attr("cx", function(d, i) {
                 i = i % rowItemCount;
-                return (2 * i + 1) * radius + i * itemPadding;
+                return leftPadding + (2 * i + 1) * radius + i * itemPadding;
             })
             .attr("r", function(d) {
                 return radius;
-            })
-            .style("fill", function (d) {
-                if (d.count === -1) {
-                    return 'rgb(238,238, 238)';
-                }
-                if (d.count < threshold) {
-                    return 'red';
-                } else {
-                    return 'rgb(48, 201, 79)';
-                }
             });
         circle.exit().remove();
     }

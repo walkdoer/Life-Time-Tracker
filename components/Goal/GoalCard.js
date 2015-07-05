@@ -190,9 +190,10 @@ module.exports = React.createClass({
         })}
         start={dateInfo.start}
         end={dateInfo.end}
+        type={granularity}
         threshold={max}
         rowItemCount={12}
-        itemPadding={1}
+        itemPadding={2}
         width={180}
         height={80}/>
     }
