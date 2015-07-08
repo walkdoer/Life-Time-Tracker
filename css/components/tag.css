@@ -9,6 +9,10 @@
     border-radius: 5px;
 }
 
+.ltt_c-tag.selectable{
+    cursor: pointer;
+}
+
 .ltt_c-tag.select{
     background-color: orange;
 }

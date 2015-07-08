@@ -22,13 +22,14 @@ var Tag = React.createClass({
 
     getDefaultProps: function () {
         return {
-            select: false
+            select: false,
+            selectable: false
         };
     },
 
     render: function () {
         return (
-            <span className={cx({"ltt_c-tag": true, "select": this.state.select})}
+            <span className={cx({"ltt_c-tag": true, "select": this.state.select, "selectable": this.props.selectable})}
                 onClick={this.onClick}>
                 <i className="fa fa-tag"></i>
                 {this.props.children}

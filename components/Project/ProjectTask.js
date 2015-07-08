@@ -572,7 +572,7 @@ var ProjectInfo = React.createClass({
                 logClasses = project.classes;
             if (!_.isEmpty(tags)) {
                 tags = tags.map(function (tag) {
-                    return (<Tag onClick={this.onTagClick} value={tag}>{tag}</Tag>);
+                    return (<Tag selectable={true} onClick={this.onTagClick} value={tag}>{tag}</Tag>);
                 }, this);
             }
             if (!_.isEmpty(logClasses)) {
