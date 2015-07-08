@@ -89,7 +89,11 @@ module.exports = React.createClass({
             <div className="ltt_c-projectTask">
                 <main>
                     <div className="ltt_c-projectDetail">
-                        <ProjectInfo ref="projectInfo" project={project} versionId={currentVersionId} onDeleteVersion={this.deleteVersion}/>
+                        <ProjectInfo ref="projectInfo" 
+                            project={project}
+                            versionId={currentVersionId}
+                            onDeleteVersion={this.deleteVersion}
+                            onFilterTags={this.filterTaskWithTags}/>
                     </div>
                     <div className="ltt_c-projectTask-toolbar">
                         <div className="btn-group">
@@ -529,14 +533,27 @@ module.exports = React.createClass({
         this.setState({
             openTaskDetail: true
         });
+    },
+
+    filterTaskWithTags: function (tags) {
+        var params = this.getRequestParams();
+        this._filterTags = tags;
+        params.tags = tags.join(',');
+        this.loadTasks(params);
     }
 });
 
 
 var ProjectInfo = React.createClass({
+
+    propTypes: {
+        onFilterTags: React.PropTypes.func
+    },
+
     getInitialState: function () {
         return {
-            showProjectDetail: false
+            showProjectDetail: false,
+            selectTags: []
         };
     },
 
@@ -555,8 +572,8 @@ var ProjectInfo = React.createClass({
                 logClasses = project.classes;
             if (!_.isEmpty(tags)) {
                 tags = tags.map(function (tag) {
-                    return (<Tag>{tag}</Tag>);
-                });
+                    return (<Tag onClick={this.onTagClick} value={tag}>{tag}</Tag>);
+                }, this);
             }
             if (!_.isEmpty(logClasses)) {
                 logClasses = logClasses.map(function(cls) {
@@ -600,6 +617,21 @@ var ProjectInfo = React.createClass({
             projectBasicInfo = <div></div>
         }
         return projectBasicInfo;
+    },
+
+    onTagClick: function (tag, select) {
+        var selectTags = this.state.selectTags;
+        var index = selectTags.indexOf(tag);
+        if (index >= 0 && select === false) {
+            selectTags.splice(index, 1);
+        } else {
+            selectTags.push(tag);
+        }
+        this.setState({
+            selectTags: selectTags
+        }, function () {
+            this.props.onFilterTags && this.props.onFilterTags(this.state.selectTags);
+        });
     }
 });
 

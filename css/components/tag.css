@@ -9,10 +9,19 @@
     border-radius: 5px;
 }
 
+.ltt_c-tag.select{
+    background-color: orange;
+}
+
 .ltt_c-tag .fa-tag{
     color: #CFEAFF;
     margin-right: 4px;
     text-shadow: 0px 1px 0px #326994;
+}
+
+.ltt_c-tag.select .fa-tag{
+    color: #FFF;
+    text-shadow: 0px 1px 0px #F5F5F5;
 }
 
 p.ltt_c-projectCard-tags{
