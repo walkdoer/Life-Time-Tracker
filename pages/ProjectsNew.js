@@ -239,6 +239,7 @@ var FilterableProjects = React.createClass({
 })
 
 var ProjectNav = React.createClass({
+
   getInitialState: function () {
     return { isOpen: this.props.defaultIsOpen};
   },

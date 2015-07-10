@@ -33,6 +33,19 @@
   cursor:pointer;
 }
 
+.ltt_c-task-todayTime{
+    font-weight: 400;
+    margin-left: 5px;
+    color: #D17211;
+    border: 1px solid #DBA46B;
+    padding-right: 3px;
+    font-size: 11px;
+    padding-left: 3px;
+    background-color: #F8E3C4;
+    border-radius: 4px;
+}
+}
+
 .ltt_c-task.done .ltt_c-task-title-text{
   text-decoration: line-through;
   color: #9B9B9B;

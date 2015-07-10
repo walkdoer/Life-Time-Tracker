@@ -16,6 +16,9 @@ var Progress = require('../Progress');
 var TaskList = require('../Task/TaskList');
 var DataAPI = require('../../utils/DataAPI');
 
+/** utils */
+var Util = require('../../utils/Util.js');
+
 /** Constant */
 var EMPTY_FUN = function () {};
 
@@ -37,6 +40,7 @@ var Task = React.createClass({
             onTaskChange: EMPTY_FUN,
             dueTime: false,
             totalTime: true,
+            todayTime: null,
             onClick: EMPTY_FUN
             //onUnMark: EMPTY_FUN
         };
@@ -78,7 +82,7 @@ var Task = React.createClass({
                 <TaskList className="subtask">
                     {subTasks.map(function (task) {
                         if (!_.isObject(task)) {return null;}
-                        return (<Task {... _.pick(that.props, ['onClick', 'onDoubleClick', 'dueTime'])}data={task} key={task.id}
+                        return (<Task {... _.pick(that.props, ['onClick', 'onDoubleClick', 'dueTime'])} data={task} key={task.id}
                             selected={task._id === taskId}/>);
                     })}
                 </TaskList>
@@ -100,12 +104,14 @@ var Task = React.createClass({
             dueTime = new Moment(task.dueTime);
             dueDiffDays = dueTime.diff(Date.now(), 'day');
         }
+        var todayTime = this.props.todayTime;
 
         return (
             <li className={cx({"ltt_c-task": true, "done": task.progress === 100})} data-id={task._id} onDoubleClick={this.props.onDoubleClick} onClick={this.select}>
                 <div className={cx({"ltt_c-task-title": true, 'selected' : this.state.selected})}>
                     {openButton}
                     <span className="ltt_c-task-title-text" onClick={this.props.onTitleClick}>{task.name}</span>
+                    {todayTime ? <span className="ltt_c-task-todayTime">{Util.displayTime(todayTime)}</span> : null}
                     {link}
                     <span className={"ltt_c-task-mark " + (this.state.marked ? 'marked': '')} onClick={this.toggleMark}>
                         <i className={this.state.marked ? 'fa fa-flag' : 'fa fa-flag-o'}></i>

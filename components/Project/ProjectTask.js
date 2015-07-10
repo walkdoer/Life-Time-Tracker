@@ -62,6 +62,7 @@ module.exports = React.createClass({
             markedFilter: false,
             taskStatus: 'doing',
             period: 'month',
+            todayTaskTime: [],
             tasks: []
         }, this.getStateFromParams());
     },
@@ -78,6 +79,7 @@ module.exports = React.createClass({
         var that = this;
         var taskId = this.state.taskId;
         var taskStatus = this.state.taskStatus;
+        var todayTaskTime = this.state.todayTaskTime;
         var period = this.state.period;
         var currentVersionId = this.props.versionId;
         if (project) {
@@ -89,7 +91,7 @@ module.exports = React.createClass({
             <div className="ltt_c-projectTask">
                 <main>
                     <div className="ltt_c-projectDetail">
-                        <ProjectInfo ref="projectInfo" 
+                        <ProjectInfo ref="projectInfo"
                             project={project}
                             versionId={currentVersionId}
                             onDeleteVersion={this.deleteVersion}
@@ -140,16 +142,19 @@ module.exports = React.createClass({
                     {this.state.tasks.length > 0 ?
                         <TaskList select={taskId}>
                         {this.state.tasks.map(function (task) {
-                            return <Task ref={task._id}
+                            var taskId = task._id;
+                            var todayTask = todayTaskTime.filter(function (t) { return t._id === taskId;})[0];
+                            return <Task ref={taskId}
                                 data={task}
-                                key={task._id}
+                                key={taskId}
                                 taskId={taskId}
+                                todayTime={todayTask ? todayTask.totalTime : null}
                                 version={!currentVersionId && project.versions.filter(function (version) {
                                     return version._id === task.versionId;
                                 })[0]}
                                 onTaskChange={this.onTaskChange}
                                 onClick={that.openTask}
-                                selected={task._id === taskId}/>
+                                selected={taskId === taskId}/>
                         })}
                         </TaskList> : <Well><i className="fa fa-beer"></i>No Task. Simple life.</Well>
                     }
@@ -173,6 +178,7 @@ module.exports = React.createClass({
 
     componentDidMount: function () {
         this.loadProject(this.props.projectId);
+        this.loadTodayTaskTime();
         this.onDeleteTaskToken =  this.onDeleteTask.bind(this);
         this.onLogTaskToken = this.onLogTask.bind(this);
         Mt.bind(['command+d', 'ctrl+d'], this.onDeleteTaskToken);
@@ -540,6 +546,25 @@ module.exports = React.createClass({
         this._filterTags = tags;
         params.tags = tags.join(',');
         this.loadTasks(params);
+    },
+
+    loadTodayTaskTime: function () {
+        var that = this;
+        return DataAPI.Log.load({
+            start: new Moment().startOf('day').toDate(),
+            end: new Moment().endOf('day').toDate(),
+            group: 'task',
+            populate:false,
+            sum: true
+        }).then(function (data) {
+            return data.filter(function (item) {
+                return item._id !== null;
+            });
+        }).then(function (data) {
+            that.setState({
+                todayTaskTime: data
+            });
+        });
     }
 });
 
