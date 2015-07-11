@@ -142,19 +142,19 @@ module.exports = React.createClass({
                     {this.state.tasks.length > 0 ?
                         <TaskList select={taskId}>
                         {this.state.tasks.map(function (task) {
-                            var taskId = task._id;
-                            var todayTask = todayTaskTime.filter(function (t) { return t._id === taskId;})[0];
-                            return <Task ref={taskId}
+                            var childTaskId = task._id;
+                            var todayTask = todayTaskTime.filter(function (t) { return t._id === childTaskId;})[0];
+                            return <Task ref={childTaskId}
                                 data={task}
-                                key={taskId}
-                                taskId={taskId}
+                                key={childTaskId}
+                                taskId={childTaskId}
                                 todayTime={todayTask}
                                 version={!currentVersionId && project.versions.filter(function (version) {
                                     return version._id === task.versionId;
                                 })[0]}
                                 onTaskChange={this.onTaskChange}
                                 onClick={that.openTask}
-                                selected={taskId === taskId}/>
+                                selected={taskId === childTaskId}/>
                         })}
                         </TaskList> : <Well><i className="fa fa-beer"></i>No Task. Simple life.</Well>
                     }
