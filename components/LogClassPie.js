@@ -35,8 +35,8 @@ module.exports = React.createClass({
     },
 
     render: function () {
-        var todayData = this.state.todayData;
-        var yesterdayData = this.state.yesterdayData;
+        var currentData = this.state.currentData;
+        var compareData = this.state.compareData;
         var logClasses = config.classes;
         var highchartOptions = {
             title: false,
@@ -72,7 +72,7 @@ module.exports = React.createClass({
                 backgroundColor: this.props.backgroundColor
             };
         }
-        todayData = todayData && todayData.map(function (item) {
+        currentData = currentData && currentData.map(function (item) {
             var cls = _.find(logClasses, {'_id': item._id});
             return {
                 value: item.totalTime,
@@ -82,7 +82,7 @@ module.exports = React.createClass({
         return (
             <div className="ltt_c-LogClassPie">
                 <h1>{this.props.title}</h1>
-                {todayData ? <Pie data={todayData} highchartOptions={highchartOptions}/> : null }
+                {currentData ? <Pie data={currentData} highchartOptions={highchartOptions}/> : null }
                 {this.props.compare ? this.renderCompare() : null}
                 <LoadingMask loaded={this.state.loaded}/>
             </div>
@@ -90,16 +90,16 @@ module.exports = React.createClass({
     },
 
     renderCompare: function () {
-        var todayData = this.state.todayData;
-        var yesterdayData = this.state.yesterdayData;
+        var currentData = this.state.currentData;
+        var compareData = this.state.compareData;
         var logClasses = config.classes;
         return (
             <div className="ltt_c-LogClassPie-changes">
             {logClasses.map(function (logClass) {
                 var time = 0, yesterdayTime;
                 var classId = logClass._id;
-                time = getTimeConsumeBy(classId, todayData);
-                yesterdayTime = getTimeConsumeBy(classId, yesterdayData);
+                time = getTimeConsumeBy(classId, currentData);
+                yesterdayTime = getTimeConsumeBy(classId, compareData);
                 var cpToYesterday = compare(time, yesterdayTime);
                 return (
                     <p className={'changeItem ' + (cpToYesterday > 0 ? 'rise' : (cpToYesterday < 0 ? 'down' : 'equal'))}>
@@ -123,34 +123,43 @@ module.exports = React.createClass({
             props = nextProps;
         }
         var type = 'classes',
-            date = props.date;
+            date = props.date,
+            start = props.start,
+            end = props.end;
+        if (!start && !end) {
+            start = Moment(date).startOf('day');
+            end = Moment(date).endOf('day');
+        }
         var that = this;
         return Q.all([
-            loadToday(),
-            loadYesterDay()
-        ]).spread(function (today, yesterday) {
+            loadCurrent(),
+            props.compare ? loadCompare() : Q(null)
+        ]).spread(function (current, compare) {
             that.setState({
                 loaded: true,
-                todayData: today,
-                yesterdayData: yesterday
+                currentData: current,
+                compareData: compare
             });
         }).catch(function (err) {
             console.error(err.stack);
         });
 
-        function loadYesterDay() {
+        function loadCompare() {
+            var diff = end.diff(start, 'day');
+            var cEnd = Moment(start).subtract(1, 'day').endOf('day');// compare end
+            var cStart = Moment(cEnd).subtract(diff, 'day').startOf('day');
             return DataAPI.Log.load({
-                start: new Moment(date).subtract(1, 'day').startOf('day').format(DATE_FORMAT),
-                end: new Moment(date).subtract(1, 'day').endOf('day').format(DATE_FORMAT),
+                start: cStart.format(DATE_FORMAT),
+                end: cEnd.format(DATE_FORMAT),
                 sum: true,
                 group: type
             });
         }
 
-        function loadToday() {
+        function loadCurrent() {
             return DataAPI.Log.load({
-                start: new Moment(date).startOf('day').format(DATE_FORMAT),
-                end: new Moment(date).endOf('day').format(DATE_FORMAT),
+                start: Moment(start).startOf('day').format(DATE_FORMAT),
+                end: Moment(end).endOf('day').format(DATE_FORMAT),
                 group: type,
                 sum: true
             })
