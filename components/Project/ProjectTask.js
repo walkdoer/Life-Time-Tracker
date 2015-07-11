@@ -148,7 +148,7 @@ module.exports = React.createClass({
                                 data={task}
                                 key={taskId}
                                 taskId={taskId}
-                                todayTime={todayTask ? todayTask.totalTime : null}
+                                todayTime={todayTask}
                                 version={!currentVersionId && project.versions.filter(function (version) {
                                     return version._id === task.versionId;
                                 })[0]}
@@ -554,12 +554,50 @@ module.exports = React.createClass({
             start: new Moment().startOf('day').toDate(),
             end: new Moment().endOf('day').toDate(),
             group: 'task',
-            populate:false,
             sum: true
         }).then(function (data) {
-            return data.filter(function (item) {
-                return item._id !== null;
+            var result = [];
+            data.forEach(function (item) {
+                var task = item._id;
+                if  (task === null) { return; }
+                var taskParent = task.parent;
+                if (taskParent === null) {
+                    result.push({
+                        _id: task._id,
+                        totalTime: item.totalTime
+                    });
+                } else {
+                    var foundTask = result.some(function (item) {return item._id._id === taskParent});
+                    if (!foundTask) {
+                        result.push({
+                            _id: taskParent,
+                            _needCalulate: true,
+                            totalTime: 0
+                        });
+                    }
+                }
             });
+            result.forEach(function (task) {
+                var taskId = task._id;
+                var totalTime = 0;
+                var _needCalulate = task._needCalulate;
+                task.children = data.filter(function (d) {
+                    var task = d._id;
+                    if (task && task.parent === taskId) {
+                        if (_needCalulate) {
+                            totalTime += d.totalTime;
+                        }
+                        return true;
+                    }
+                }).map(function (d) {
+                    return {
+                        _id: d._id._id,
+                        totalTime: d.totalTime
+                    };
+                });
+                _needCalulate && (task.totalTime = totalTime);
+            });
+            return result;
         }).then(function (data) {
             that.setState({
                 todayTaskTime: data

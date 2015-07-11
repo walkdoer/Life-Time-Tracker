@@ -64,9 +64,14 @@ var Task = React.createClass({
         var task = this.props.data;
         var taskId = this.props.taskId;
         var version = this.props.version;
+        var todayTime = this.props.todayTime;
+        var todayTimeChildren;
         var url;
         var that = this;
         var progress;
+        if (todayTime) {
+            todayTimeChildren = todayTime.children || [];
+        }
         if (task.progress >= 0 ) {
             if (task.progress < 100) {
                 progress = (<Progress max={100} value={task.progress}/>);
@@ -82,7 +87,13 @@ var Task = React.createClass({
                 <TaskList className="subtask">
                     {subTasks.map(function (task) {
                         if (!_.isObject(task)) {return null;}
-                        return (<Task {... _.pick(that.props, ['onClick', 'onDoubleClick', 'dueTime'])} data={task} key={task.id}
+                        var subTaskTodayTime = todayTimeChildren && todayTimeChildren.filter(function (item) {
+                            return item._id === task._id;
+                        })[0];
+                        return (<Task {... _.pick(that.props, ['onClick', 'onDoubleClick', 'dueTime'])}
+                            data={task}
+                            key={task.id}
+                            todayTime={subTaskTodayTime}
                             selected={task._id === taskId}/>);
                     })}
                 </TaskList>
@@ -104,14 +115,13 @@ var Task = React.createClass({
             dueTime = new Moment(task.dueTime);
             dueDiffDays = dueTime.diff(Date.now(), 'day');
         }
-        var todayTime = this.props.todayTime;
 
         return (
             <li className={cx({"ltt_c-task": true, "done": task.progress === 100})} data-id={task._id} onDoubleClick={this.props.onDoubleClick} onClick={this.select}>
                 <div className={cx({"ltt_c-task-title": true, 'selected' : this.state.selected})}>
                     {openButton}
                     <span className="ltt_c-task-title-text" onClick={this.props.onTitleClick}>{task.name}</span>
-                    {todayTime ? <span className="ltt_c-task-todayTime">{Util.displayTime(todayTime)}</span> : null}
+                    {todayTime ? <span className="ltt_c-task-todayTime">{Util.displayTime(todayTime.totalTime)}</span> : null}
                     {link}
                     <span className={"ltt_c-task-mark " + (this.state.marked ? 'marked': '')} onClick={this.toggleMark}>
                         <i className={this.state.marked ? 'fa fa-flag' : 'fa fa-flag-o'}></i>
