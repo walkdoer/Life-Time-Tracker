@@ -143,7 +143,7 @@ function getEventContent(event) {
         }
     }
 
-    return _.template(content, {
+    return _.template(content)({
         content: event.content,
         project: event.project || {},
         version: event.version || {},

@@ -58,6 +58,7 @@ function toDate(type) {
         params.start = new Moment().subtract(1, 'month').startOf('day').toDate();
         params.end = new Moment().endOf('day').toDate();
     }
+    params.diff = Moment(params.end).diff(params.start, 'day') + 1;
     return params;
 }
 

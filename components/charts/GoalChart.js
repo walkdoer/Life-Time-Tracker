@@ -45,7 +45,7 @@ module.exports = React.createClass({
                 return new Moment(date).day() === i;
             };
         }
-        data = _.range(0, new Moment(this.props.end).diff(start, 'day')).map(function (i) {
+        data = _.range(0, new Moment(this.props.end).diff(start, 'day') + 1).map(function (i) {
             var target = data.filter(function (d) {
                 return dateMethod(d.date, i);
             })[0];

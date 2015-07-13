@@ -172,16 +172,7 @@ module.exports = React.createClass({
         var estimatedTime = this.props.goal.estimatedTime;
         if (granularity === 'day' ) { return null;}
         var dateInfo = Util.toDate(granularity);
-        var max;
-        if (granularity === 'week') {
-            max = estimatedTime / 7;
-        } else if(granularity === 'month') {
-            max = estimatedTime / 30;
-        } else if (granularity === 'year') {
-            max = estimatedTime / 365;
-        } else {
-            max = estimatedTime;
-        }
+        var max = estimatedTime / dateInfo.diff;
         return <GoalChart data={this.state.activities.map(function (item, index) {
             return {
                 date: item._id,

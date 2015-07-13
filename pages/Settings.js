@@ -118,6 +118,14 @@ module.exports = React.createClass({
                     </Row>
                     <Row>
                         <Col xs={6} md={4}>
+                            <Input name="birthday" type='text' label='Birthday'
+                                placeholder='your birthday'
+                                help="Birthday is required for time statistical"
+                                value={settings.birthday} onChange={this.onSettingChange}/>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={6} md={4}>
                             <Input  name="startDate" type='text' label='Start Day'
                                 placeholder='the first day start using this app'
                                 help="Start date is the first day when you log your activity."

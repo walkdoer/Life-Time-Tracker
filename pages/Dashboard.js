@@ -73,7 +73,7 @@ var Dashboard = React.createClass({
                 <div className="Grid Grid--gutters Grid--stretch">
                     <div className="Grid-cell u-1of3">
                         <MonthCountDown height={250} padding={0}
-                            itemPadding={2} lifeYear={70} birthday='1989-10-23'/>
+                            itemPadding={2} lifeYear={70} birthday={Settings.get('birthday')}/>
                     </div>
                     <div className="Grid-cell u-1of3" ref="logClassPieContainer">
                         <LogClassPie title="All Time's Class distribution" start={new Moment(Settings.get('startDate'))} end={new Moment()} compare={false} legend={true}/>
