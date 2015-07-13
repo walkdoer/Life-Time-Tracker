@@ -221,6 +221,10 @@ module.exports = {
 
         update: function (logClass) {
             return post(url('/classes/' + logClass._id), logClass);
+        },
+
+        delete: function (logClassId) {
+            return deleteObj(url('/classes/' + logClassId));
         }
     },
 

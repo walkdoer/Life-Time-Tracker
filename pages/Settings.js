@@ -316,8 +316,8 @@ var ClassesSettings = React.createClass({
         return (
             <div className="ltt_c-page-settings-classes">
                 {this.state.logClasses.map(function (logClass) {
-                    return <LogClassCard data={logClass} />;
-                })}
+                    return <LogClassCard key={logClass._id} data={logClass} onDelete={this.deleteLogClass.bind(this, logClass)}/>;
+                }, this)}
             </div>
         );
     },
@@ -333,6 +333,23 @@ var ClassesSettings = React.createClass({
                 logClasses: classes
             });
         });
+    },
+
+    deleteLogClass: function (logClass) {
+        var that = this;
+        DataAPI.Class.delete(logClass._id)
+        .then(function (logClass) {
+            var removeClassId = logClass._id;
+            var logClasses = that.state.logClasses;
+            var index = _.findIndex(logClasses, function (logClass) {return logClass._id === removeClassId;} )
+            logClasses.splice(index, 1);
+            that.setState({
+                logClasses: logClasses
+            });
+        }).catch(function(err) {
+            console.error(err.stack);
+            Notify.error('delete log class failed! ' + err.message);
+        })
     }
 });
 
@@ -357,6 +374,7 @@ var LogClassCard = React.createClass({
                         <input type="text" value={logClass.color} name="color" className="pick-a-color form-control"/>
                     </div>
                 </div>
+                <span className="logClassCard-delete" onClick={this.props.onDelete}><i className="fa fa-trash"/></span>
             </form>
         )
     },
