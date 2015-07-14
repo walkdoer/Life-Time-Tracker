@@ -13,14 +13,19 @@ var _ = require('lodash');
 var RB = require('react-bootstrap');
 var Button = RB.Button;
 var Well = RB.Well;
+var FixedDataTable = require('fixed-data-table');
+var Table = FixedDataTable.Table;
+var Column = FixedDataTable.Column;
 
 /* components */
 var Log = require('../components/Log');
 var DatePicker = require('../components/DatePicker');
 var LoadingMask = require('../components/LoadingMask');
+var Notify = require('../components/Notify');
 
 /* utils */
 var DataAPI = require('../utils/DataAPI');
+
 /*    <DatePicker
 onChange={this.onDateChange}
 className="ltt_c-page-logs-date"/>*/
@@ -39,10 +44,10 @@ var Logs = React.createClass({
 
     render: function () {
         return (
-            <div className="ltt_c-page ltt_c-page-logs">
+            <div className="ltt_c-page ltt_c-page-logs ">
                 {this.renderFilters()}
                 <div className="ltt_c-page-logs-list">
-                    <div id="ltt_c-page-logs-timeline"></div>
+                    {this.renderLogs()}
                     <LoadingMask loaded={this.state.logLoaded}/>
                 </div>
             </div>
@@ -51,10 +56,25 @@ var Logs = React.createClass({
 
     renderLogs: function () {
         var logs = this.state.logs;
+
+        function rowGetter(index) {
+            return logs[index];
+            //return [log.date, log.start, log.end, log.len, log.tags.join(","), log.content];
+        }
         if (logs && logs.length > 0) {
-            return logs.map(function (log, index) {
-                return Log(log);
-            });
+            return <Table
+                rowHeight={50}
+                rowGetter={rowGetter}
+                rowsCount={logs.length}
+                width={1000}
+                height={800}
+                headerHeight={50}>
+                <Column label="Date" width={100} dataKey="date"/>
+                <Column label="Start" width={100} dataKey="start" />
+                <Column label="End" width={100}  dataKey="end" />
+                <Column label="Length" width={100} dataKey="len" />
+                <Column label="Content" width={500} dataKey="content" />
+            </Table>
         } else if (!logs){
             return <Well className="align-center MT-20">通过条件查找日志</Well>
         } else {
@@ -63,6 +83,7 @@ var Logs = React.createClass({
     },
 
     renderTimeline: function () {
+        this.refs.timeline.getDOMNode().innerHTML = '';
         createStoryJS({
             type:       'timeline',
             width:      '800',
@@ -73,45 +94,42 @@ var Logs = React.createClass({
     },
 
     toTimelineData: function (logs) {
-        return {
-            "timeline":
-            {
-                "headline":"The Main Timeline Headline Goes here",
+        var timeLineObj = {
+            timeline: {
+                "headline": "Timeline",
                 "type":"default",
-                "text":"<p>Intro body text goes here, some HTML is ok</p>",
+                "text":"<p>" + this._selectTags.join(', ') + "</p>",
                 "asset": {
                     "media":"http://yourdomain_or_socialmedialink_goes_here.jpg",
-                    "credit":"Credit Name Goes Here",
-                    "caption":"Caption text goes here"
+                    "credit":"Show your activity timeline",
+                    "caption":""
                 },
-                "date": [
+                /*"era": [ //era 表示一个时间段
                     {
-                        "startDate":"2011,12,10,07,02,10",
-                        "endDate":"2011,12,11,08,11",
-                        "headline":"Headline Goes Here",
-                        "text":"<p>Body text goes here, some HTML is OK</p>",
-                        "tag":"This is Optional",
-                        "classname":"optionaluniqueclassnamecanbeaddedhere",
-                        "asset": {
-                            "media":"http://twitter.com/ArjunaSoriano/status/164181156147900416",
-                            "thumbnail":"optional-32x32px.jpg",
-                            "credit":"Credit Name Goes Here",
-                            "caption":"Caption text goes here"
-                        }
-                    }
-                ],
-                "era": [
-                    {
-                        "startDate":"2011,12,10",
-                        "endDate":"2011,12,11",
-                        "headline":"Headline Goes Here",
-                        "text":"<p>Body text goes here, some HTML is OK</p>",
+                        "startDate":"2015,6,10",
+                        "endDate":"2015,12,11",
+                        "headline":"这是什么？",
+                        "text":"不知道呀",
                         "tag":"This is Optional"
                     }
-
-                ]
+                ]*/
             }
         };
+
+        timeLineObj.timeline.date = logs.map(function (log) {
+            return {
+                "startDate": log.start,
+                "endDate": log.end,
+                "headline": log.tags.join(","),
+                "text": log.content,
+                "tag": log.tags.join(","),
+                "asset": {
+                    "credit":"what the hell",
+                    "caption":"do him do him"
+                }
+            };
+        });
+        return timeLineObj;
     },
 
 
@@ -165,13 +183,14 @@ var Logs = React.createClass({
 
     onTagFilterChange: function(tags) {
         if (!_.isEmpty(tags)) {
+            this._selectTags = tags;
             this.setFilter({
                 tags: tags.join(',')
             });
             this.loadLogs();
         } else {
             this.deleteFilter('tags');
-            this.loadLogs();
+            //this.loadLogs();
         }
     },
 
@@ -188,9 +207,10 @@ var Logs = React.createClass({
                 that.setState({
                     logs: logs,
                     logLoaded: true
-                }, function () {
-                    this.renderTimeline();
                 });
+            }).catch(function (err) {
+                console.error(err.stack);
+                Notify.error('load failed');
             });
         }
     },
