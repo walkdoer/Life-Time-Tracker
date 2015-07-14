@@ -189,3 +189,6 @@ function displayTime(timeAmount) {
 }
 
 exports.displayTime = displayTime;
+exports.DATE_FORMAT = 'YYYY-MM-DD';
+exports.TIME_FORMAT = 'HH:mm:ss';
+exports.DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
