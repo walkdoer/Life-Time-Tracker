@@ -46,7 +46,7 @@ var Logs = React.createClass({
         return (
             <div className="ltt_c-page ltt_c-page-logs ">
                 {this.renderFilters()}
-                <div className="ltt_c-page-logs-list">
+                <div className="ltt_c-page-logs-list" ref="list">
                     {this.renderLogs()}
                     <LoadingMask loaded={this.state.logLoaded}/>
                 </div>
@@ -62,12 +62,15 @@ var Logs = React.createClass({
             //return [log.date, log.start, log.end, log.len, log.tags.join(","), log.content];
         }
         if (logs && logs.length > 0) {
+             var $list = $(this.refs.list.getDOMNode());
+            var width = $list.width();
+            var height = $list.height();
             return <Table
                 rowHeight={50}
                 rowGetter={rowGetter}
                 rowsCount={logs.length}
-                width={1000}
-                height={800}
+                width={width}
+                height={height}
                 headerHeight={50}>
                 <Column label="Date" width={100} dataKey="date"/>
                 <Column label="Start" width={100} dataKey="start" />

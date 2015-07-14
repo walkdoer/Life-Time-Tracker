@@ -1,9 +1,17 @@
+.ltt_c-page-logs {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
 .ltt_c-page-logs-date{
     height: 34px;
     text-indent: 10px;
     font-size: 1.14rem;
 }
 
+.ltt_c-page-logs-list {
+    flex: 1;
+}
 
 .ltt_c-page-logs .filter-tags{
     margin-top:15px;
