@@ -42,7 +42,7 @@ var Logs = React.createClass({
             <div className="ltt_c-page ltt_c-page-logs">
                 {this.renderFilters()}
                 <div className="ltt_c-page-logs-list">
-                    {this.renderLogs()}
+                    <div id="ltt_c-page-logs-timeline"></div>
                     <LoadingMask loaded={this.state.logLoaded}/>
                 </div>
             </div>
@@ -60,6 +60,58 @@ var Logs = React.createClass({
         } else {
             return <Well className="align-center MT-20">找不到日志!</Well>
         }
+    },
+
+    renderTimeline: function () {
+        createStoryJS({
+            type:       'timeline',
+            width:      '800',
+            height:     '600',
+            source:     this.toTimelineData(this.state.logs),
+            embed_id:   "ltt_c-page-logs-timeline"
+        });
+    },
+
+    toTimelineData: function (logs) {
+        return {
+            "timeline":
+            {
+                "headline":"The Main Timeline Headline Goes here",
+                "type":"default",
+                "text":"<p>Intro body text goes here, some HTML is ok</p>",
+                "asset": {
+                    "media":"http://yourdomain_or_socialmedialink_goes_here.jpg",
+                    "credit":"Credit Name Goes Here",
+                    "caption":"Caption text goes here"
+                },
+                "date": [
+                    {
+                        "startDate":"2011,12,10,07,02,10",
+                        "endDate":"2011,12,11,08,11",
+                        "headline":"Headline Goes Here",
+                        "text":"<p>Body text goes here, some HTML is OK</p>",
+                        "tag":"This is Optional",
+                        "classname":"optionaluniqueclassnamecanbeaddedhere",
+                        "asset": {
+                            "media":"http://twitter.com/ArjunaSoriano/status/164181156147900416",
+                            "thumbnail":"optional-32x32px.jpg",
+                            "credit":"Credit Name Goes Here",
+                            "caption":"Caption text goes here"
+                        }
+                    }
+                ],
+                "era": [
+                    {
+                        "startDate":"2011,12,10",
+                        "endDate":"2011,12,11",
+                        "headline":"Headline Goes Here",
+                        "text":"<p>Body text goes here, some HTML is OK</p>",
+                        "tag":"This is Optional"
+                    }
+
+                ]
+            }
+        };
     },
 
 
@@ -136,6 +188,8 @@ var Logs = React.createClass({
                 that.setState({
                     logs: logs,
                     logLoaded: true
+                }, function () {
+                    this.renderTimeline();
                 });
             });
         }
