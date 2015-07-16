@@ -109,7 +109,7 @@ var LogEditor = React.createClass({
                     </div>
                     <div className="ltt_c-logEditor-header-right">
                         <ButtonToolbar>
-                            <Button onClick={this.onHighlightUnFinishLog} bsSize='small' title='show unfinish log' active={this.state.highlightUnFinishLog}><i className="fa fa-magic"></i></Button>
+                            <Button onClick={this.toggleHighlightUnFinishLog} bsSize='small' title='show unfinish log' active={this.state.highlightUnFinishLog}><i className="fa fa-magic"></i></Button>
                             <Button onClick={this.openReport} bsSize='small' title="open report"><i className="fa fa-line-chart"/></Button>
                             <Button onClick={this.sortLogs} bsSize='small' title="sort logs"><i className="fa fa-sort-alpha-asc"></i></Button>
                             <Button onClick={this.openHelpDoc} bsSize='small' title="open help document"><i className="fa fa-book"></i></Button>
@@ -495,6 +495,15 @@ var LogEditor = React.createClass({
                 var pos = {row: newIndex, column: newLine.length};
                 session.insert(pos, '\n');
                 that.gotoLine(newIndex + 1, timeStr.length);
+            }
+        });
+
+
+        commands.addCommand({
+            name: 'highlightUnFinishLog',
+            bindKey: {win: 'Ctrl-U', mac: 'Command-U'},
+            exec: function () {
+                that.toggleHighlightUnFinishLog();
             }
         });
     },
@@ -950,7 +959,7 @@ var LogEditor = React.createClass({
         return doingLog;
     },
 
-    onHighlightUnFinishLog: function () {
+    toggleHighlightUnFinishLog: function () {
         var highlight = !this.state.highlightUnFinishLog;
         this.setState({
             highlightUnFinishLog: highlight
