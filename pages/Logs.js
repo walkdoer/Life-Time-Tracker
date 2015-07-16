@@ -240,8 +240,16 @@ var Logs = React.createClass({
 
 var LogsTable = React.createClass({
 
+    getInitialState: function () {
+        return {
+            sortDir: null,
+            sortBy: null,
+            logs: this.props.logs
+        };
+    },
+
     render: function () {
-        var logs = this.props.logs;
+        var logs = this.state.logs;
         var clsssesConfig = config.classes;
 
         function rowGetter(index) {
@@ -281,6 +289,18 @@ var LogsTable = React.createClass({
             if (!clsConfig) {return cls;}
             return <span style={{color: clsConfig.color}}>{clsConfig.name}</span>
         }
+
+        var sortDir = this.state.sortDir;
+        var sortBy = this.state.sortBy;
+
+        function getLabel(label, cellDataKey) {
+            var sortDirArrow;
+            if (sortDir !== null){
+                sortDirArrow = (sortDir === SortTypes.DESC ? ' ↓' : ' ↑');
+            }
+            label = label + (sortBy === cellDataKey ? sortDirArrow : '');
+            return label;
+        }
         return <Table
             rowHeight={50}
             rowGetter={rowGetter}
@@ -288,16 +308,52 @@ var LogsTable = React.createClass({
             width={this.props.width}
             height={this.props.height}
             headerHeight={50}>
-            <Column label="Date" width={100} dataKey="date" fixed={true} cellRenderer={renderDate}/>
-            <Column label="Class" width={80} dateKey="classes" cellRenderer={renderClasses}/>
-            <Column label="Start" width={150} dataKey="start" cellRenderer={renderDateTime}/>
-            <Column label="End" width={150}  dataKey="end" cellRenderer={renderDateTime}/>
-            <Column label="Length" width={100} dataKey="len" cellRenderer={renderTimeLength}/>
-            <Column label="Project" width={150}  dataKey="project" cellRenderer={renderProject}/>
-            <Column label="Version" width={150}  dataKey="version" cellRenderer={renderVersion}/>
-            <Column label="Task" width={150}  dataKey="task" cellRenderer={renderTask}/>
+            <Column label={getLabel("Date", "date")}  width={100} dataKey="date" fixed={true} cellRenderer={renderDate}  headerRenderer={this._renderHeader}/>
+            <Column label={getLabel("Class", "classes")}  width={80} dateKey="classes" cellRenderer={renderClasses} headerRenderer={this._renderHeader}/>
+            <Column label={getLabel("Start", "start")}  width={150} dataKey="start" cellRenderer={renderDateTime} headerRenderer={this._renderHeader}/>
+            <Column label={getLabel("End" , "end" )} width={150}  dataKey="end" cellRenderer={renderDateTime} headerRenderer={this._renderHeader}/>
+            <Column label={getLabel("Length", "length")}  width={100} dataKey="len" cellRenderer={renderTimeLength} headerRenderer={this._renderHeader}/>
+            <Column label={getLabel("Project", "project")}  width={150}  dataKey="project" cellRenderer={renderProject} headerRenderer={this._renderHeader}/>
+            <Column label={getLabel("Version", "version")}  width={150}  dataKey="version" cellRenderer={renderVersion} headerRenderer={this._renderHeader}/>
+            <Column label={getLabel("Task", "task")}  width={150}  dataKey="task" cellRenderer={renderTask} headerRenderer={this._renderHeader}/>
             <Column label="Content" width={300} dataKey="content" />
         </Table>
+    },
+
+    _sortRowsBy: function (cellDataKey) {
+        var sortDir = this.state.sortDir;
+        var sortBy = cellDataKey;
+        if (sortBy === this.state.sortBy) {
+            sortDir = this.state.sortDir === SortTypes.ASC ? SortTypes.DESC : SortTypes.ASC;
+        } else {
+            sortDir = SortTypes.DESC;
+        }
+        var logs = this.state.logs.slice();
+        logs.sort(function (a, b) {
+            var sortVal = 0;
+            if ( a[sortBy] > b[sortBy]) {
+                sortVal = 1;
+            }
+            if ( a[sortBy] < b[sortBy]) {
+                sortVal = -1;
+            }
+
+            if (sortDir === SortTypes.DESC) {
+                sortVal = sortVal * -1;
+            }
+            return sortVal;
+        })
+        this.setState({
+            logs: logs,
+            sortBy: sortBy,
+            sortDir: sortDir
+        });
+    },
+
+    _renderHeader: function (label, cellDataKey) {
+        return (
+            <span className="sorter" onClick={this._sortRowsBy.bind(null, cellDataKey)}>{label}</span>
+        );
     }
 })
 
