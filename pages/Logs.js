@@ -30,7 +30,13 @@ var Util = require('../utils/Util');
 var DATE_TIME_FORMAT = Util.DATE_TIME_FORMAT;
 var DATE_FORMAT = Util.DATE_FORMAT;
 
+
+/**configs*/
 var config = require('../conf/config');
+var SortTypes = {
+  ASC: 'ASC',
+  DESC: 'DESC',
+};
 
 
 /*    <DatePicker
@@ -63,66 +69,11 @@ var Logs = React.createClass({
 
     renderLogs: function () {
         var logs = this.state.logs;
-        var clsssesConfig = config.classes;
-
-        function rowGetter(index) {
-            return logs[index];
-            //return [log.date, log.start, log.end, log.len, log.tags.join(","), log.content];
-        }
-        function renderDate(cellData) {
-            return Moment(cellData).format(DATE_FORMAT);
-        }
-        function renderDateTime(cellData) {
-            return Moment(cellData).format(DATE_TIME_FORMAT);
-        }
-        function renderTimeLength(cellData) {
-            return Util.displayTime(cellData);
-        }
-        function renderProject(project) {
-            return project && project.name;
-        }
-        function renderVersion (version) {
-            return version && version.name;
-        }
-        function renderTask(task) {
-            return task && task.name;
-        }
-        function renderTags(a,b,data) {
-            var tags = data.tags;
-            return tags && tags.map(function (tag) {
-                return <Tag>{tag}</Tag>;
-            });
-        }
-        function renderClasses(a,b,data) {
-            var classes = data.classes;
-            if (!classes) {return;}
-            var cls = classes[0];
-            if (!cls) {return;}
-            var clsConfig = clsssesConfig.filter(function (cfg) { return cfg._id === cls; })[0];
-            if (!clsConfig) {return cls;}
-            return <span style={{color: clsConfig.color}}>{clsConfig.name}</span>
-        }
         if (logs && logs.length > 0) {
-             var $list = $(this.refs.list.getDOMNode());
-            var width = $list.width();
-            var height = $list.height();
-            return <Table
-                rowHeight={50}
-                rowGetter={rowGetter}
-                rowsCount={logs.length}
-                width={width}
-                height={height}
-                headerHeight={50}>
-                <Column label="Date" width={100} dataKey="date" fixed={true} cellRenderer={renderDate}/>
-                <Column label="Class" width={80} dateKey="classes" cellRenderer={renderClasses}/>
-                <Column label="Start" width={150} dataKey="start" cellRenderer={renderDateTime}/>
-                <Column label="End" width={150}  dataKey="end" cellRenderer={renderDateTime}/>
-                <Column label="Length" width={100} dataKey="len" cellRenderer={renderTimeLength}/>
-                <Column label="Project" width={150}  dataKey="project" cellRenderer={renderProject}/>
-                <Column label="Version" width={150}  dataKey="version" cellRenderer={renderVersion}/>
-                <Column label="Task" width={150}  dataKey="task" cellRenderer={renderTask}/>
-                <Column label="Content" width={300} dataKey="content" />
-            </Table>
+            var $tableContaner = $(this.refs.list.getDOMNode());
+            var width = $tableContaner.width();
+            var height = $tableContaner.height();
+            return <LogsTable logs={logs} height={height} width={width}/>
         } else if (!logs){
             return <Well className="align-center MT-20">通过条件查找日志</Well>
         } else {
@@ -285,6 +236,70 @@ var Logs = React.createClass({
         delete this._filterParams[filterName];
     }
 });
+
+
+var LogsTable = React.createClass({
+
+    render: function () {
+        var logs = this.props.logs;
+        var clsssesConfig = config.classes;
+
+        function rowGetter(index) {
+            return logs[index];
+            //return [log.date, log.start, log.end, log.len, log.tags.join(","), log.content];
+        }
+        function renderDate(cellData) {
+            return Moment(cellData).format(DATE_FORMAT);
+        }
+        function renderDateTime(cellData) {
+            return Moment(cellData).format(DATE_TIME_FORMAT);
+        }
+        function renderTimeLength(cellData) {
+            return Util.displayTime(cellData);
+        }
+        function renderProject(project) {
+            return project && project.name;
+        }
+        function renderVersion (version) {
+            return version && version.name;
+        }
+        function renderTask(task) {
+            return task && task.name;
+        }
+        function renderTags(a,b,data) {
+            var tags = data.tags;
+            return tags && tags.map(function (tag) {
+                return <Tag>{tag}</Tag>;
+            });
+        }
+        function renderClasses(a,b,data) {
+            var classes = data.classes;
+            if (!classes) {return;}
+            var cls = classes[0];
+            if (!cls) {return;}
+            var clsConfig = clsssesConfig.filter(function (cfg) { return cfg._id === cls; })[0];
+            if (!clsConfig) {return cls;}
+            return <span style={{color: clsConfig.color}}>{clsConfig.name}</span>
+        }
+        return <Table
+            rowHeight={50}
+            rowGetter={rowGetter}
+            rowsCount={logs.length}
+            width={this.props.width}
+            height={this.props.height}
+            headerHeight={50}>
+            <Column label="Date" width={100} dataKey="date" fixed={true} cellRenderer={renderDate}/>
+            <Column label="Class" width={80} dateKey="classes" cellRenderer={renderClasses}/>
+            <Column label="Start" width={150} dataKey="start" cellRenderer={renderDateTime}/>
+            <Column label="End" width={150}  dataKey="end" cellRenderer={renderDateTime}/>
+            <Column label="Length" width={100} dataKey="len" cellRenderer={renderTimeLength}/>
+            <Column label="Project" width={150}  dataKey="project" cellRenderer={renderProject}/>
+            <Column label="Version" width={150}  dataKey="version" cellRenderer={renderVersion}/>
+            <Column label="Task" width={150}  dataKey="task" cellRenderer={renderTask}/>
+            <Column label="Content" width={300} dataKey="content" />
+        </Table>
+    }
+})
 
 
 
