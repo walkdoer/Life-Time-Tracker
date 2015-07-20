@@ -1383,6 +1383,13 @@ var Accomplishment = React.createClass({
                     var url = getUrl(item)
                     return <p className="item clickable" onClick={this.openLink.bind(this, url)}>
                         {item.name}
+                        {!_.isEmpty(item.children) ?
+                            <ul>
+                            {item.children.map(function (childItem) {
+                                return <li onClick={this.openLink.bind(this, getUrl(item))}>{childItem.name}</li>
+                            }, this)}
+                            </ul> : null
+                        }
                     </p>
                 }, this)}
             </Popover>
