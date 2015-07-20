@@ -107,6 +107,9 @@ var LogEditor = React.createClass({
                         </span>
                         <span className="ltt_c-logEditor-title">{this.props.title}</span>
                     </div>
+                    <div className="ltt_c-logEditor-header-middle">
+                        <Accomplishment date={this.props.title} ref="accomplishment"/>
+                    </div>
                     <div className="ltt_c-logEditor-header-right">
                         <ButtonToolbar>
                             <Button onClick={this.toggleHighlightUnFinishLog} bsSize='small' title='show unfinish log' active={this.state.highlightUnFinishLog}><i className="fa fa-magic"></i></Button>
@@ -885,6 +888,7 @@ var LogEditor = React.createClass({
         return !hasError && DataAPI.importLogContent(title, content).then(function () {
             NProgress.done();
             that.props.onSave(content);
+            that.refs.accomplishment.update();
             that.__saveing = false;
             console.log('import cost' + (new Date().getTime() - start));
             /*
@@ -1106,7 +1110,7 @@ var LogEditor = React.createClass({
         this.refs.helpDoc.toggle({
             width: $(this.getDOMNode()).width()
         });
-    }
+    },
 });
 
 var Editor = React.createClass({
@@ -1320,7 +1324,61 @@ var Calendar = React.createClass({
         return view.getEventSegs();
     }
 
-})
+});
+
+var Accomplishment = React.createClass({
+
+    getInitialState: function () {
+        return {
+            versionAmount: null,
+            projectAmount: null,
+            taskAmount: null
+        };
+    },
+
+    componentDidMount: function () {
+        this.load();
+    },
+
+    render: function () {
+        return (
+            <div className="ltt_c-logEditor-accomplishment">
+            <i className="fa fa-trophy"></i>
+            {this.state.projectAmount > 0 ? <span>project {this.state.projectAmount}</span> : null}
+            {this.state.versionAmount > 0 ? <span>version {this.state.versionAmount}</span> : null}
+            {this.state.taskAmount > 0 ? <span>task {this.state.taskAmount}</span> : null}
+            </div>
+        );
+    },
+
+    update: function () {
+        this.load();
+    },
+
+    componentWillReceiveProps: function (nextProps) {
+        if (this.props.date === nextProps.date) {
+            return false;
+        }
+        this.load(nextProps.date);
+    },
+
+    load: function (date) {
+        var that = this;
+        date = date || this.props.date;
+        DataAPI.Task.load({
+            populate: false,
+            start: new Moment(date).startOf('day').toDate(),
+            end: new Moment(date).endOf('day').toDate(),
+            status: 'done'
+        }).then(function (data) {
+            that.setState({
+                taskAmount: data.length
+            });
+        }).catch(function (err) {
+            console.error(err.stack);
+        });
+    }
+});
 
 
 function getEventTitle(log) {
@@ -1339,5 +1397,7 @@ function getEventTitle(log) {
 function displayTime(timeAmount) {
     return Moment.duration(timeAmount, "minutes").format("M[m],d[d],h[h],mm[min]")
 }
+
+
 
 module.exports = LogEditor;
