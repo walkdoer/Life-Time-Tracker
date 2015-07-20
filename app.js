@@ -383,7 +383,7 @@ var Footer = React.createClass({
                     }
                 }
                 Ltt.sdk.notify({
-                    title: '😁' + '你在' + classesMap[doingLog.classes[0]] +'上投入了' + start.fromNow(true),
+                    title: '😁' + '你在' + classesMap[doingLog.classes[0]] +'上投入了' + Util.displayTime(lastMinutes),
                     subtitle: subtitle,
                     icon: path.join(__dirname, './images/me.jpg'),
                     sound: true,
