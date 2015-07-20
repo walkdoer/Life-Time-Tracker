@@ -311,3 +311,9 @@
 .ltt_c-page-logEditor-Calendar {
   width: 100px;
 }
+
+.ltt_c-page-logEditor-taskInfo {
+  padding: 10px;
+  border-top: 1px solid #E7E7E7;
+  margin-top: 10px;
+}

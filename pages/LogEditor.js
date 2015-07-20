@@ -104,6 +104,7 @@ var Page = React.createClass({
                         <Button bsSize='xsmall'><Link to="/reports/today">More Detail</Link></Button>
                     </ButtonToolbar>
                     <div className="overtimeLog" ref="overtimeLog"></div>
+                    <TaskInfo ref="taskInfo"/>
                 </aside>
             </div>
         );
@@ -201,15 +202,52 @@ var Page = React.createClass({
         Bus.emit(EVENT.CURRENT_LOG, log);
     },
 
-    onSave: function () {
+    onSave: function (content) {
+        var that = this;
         this.refs.logClassPie.update();
+        this.refs.logEditor.getUnfinishLog(
+            new Moment().startOf('day').toDate(),
+            new Moment().endOf('day').toDate()
+        ).then(function (unfinishLogs) {
+            that.refs.taskInfo.update({
+                unfinishAmount: unfinishLogs.length
+            });
+        });
         Bus.emit(EVENT.UPDATE_APP_INFO);
+        Bus.emit(EVENT.LOG_CHANGE, this.state.current, content);
         //Bus.emit(EVENT.CHECK_SYNC_STATUS);
     },
 
     onEditorLoad: function (content, doingLog) {
         console.log('loaded and fire doingLog');
         Bus.emit(EVENT.DOING_LOG, doingLog);
+        if (doingLog) {
+            Bus.emit(EVENT.CURRENT_LOG, doingLog);
+        }
+    }
+});
+
+
+var TaskInfo = React.createClass({
+
+    getInitialState: function () {
+        return {
+            finishAmount: null,
+            unfinishAmount: null
+        };
+    },
+
+    render: function () {
+        return (
+            <div className="ltt_c-page-logEditor-taskInfo">
+                { this.state.finishAmount > 0 ? <p>Finish task: {this.state.finishAmount}</p> : null }
+                { this.state.unfinishAmount > 0 ? <p>Unfinish logs: {this.state.unfinishAmount}</p> : null }
+            </div>
+        )
+    },
+
+    update: function (data) {
+        this.setState(_.pick(data, ['finishAmount', 'unfinishAmount']));
     }
 });
 
@@ -347,7 +385,7 @@ var ProjectInfo = React.createClass({
                                 </div>
                                 <Progress max={100} value={project.progress}/>
                             </div>
-                            <TaskInfo tasks={project.lastTasks} date={date}/>
+                            <TaskDetail tasks={project.lastTasks} date={date}/>
                         </div>
                     );
                 })}
@@ -372,7 +410,7 @@ var ProjectInfo = React.createClass({
 });
 
 
-var TaskInfo = React.createClass({
+var TaskDetail = React.createClass({
     getDefaultProps: function () {
         return {
             tasks: []
@@ -412,7 +450,7 @@ var TaskInfo = React.createClass({
                                 </div>
                                 <Progress max={100} value={task.progress}/>
                             </div>
-                            <TaskInfo className="subtask" tasks={task.subTasks} date={date}/>
+                            <TaskDetail className="subtask" tasks={task.subTasks} date={date}/>
                         </div>
                     );
                 })}

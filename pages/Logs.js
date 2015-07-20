@@ -248,6 +248,15 @@ var LogsTable = React.createClass({
         };
     },
 
+
+    componentWillReceiveProps: function (nextProps) {
+        this.setState({
+            logs: nextProps.logs,
+            sortBy: null,
+            sortDir: null
+        });
+    },
+
     render: function () {
         var logs = this.state.logs;
         var clsssesConfig = config.classes;
