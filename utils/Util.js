@@ -150,6 +150,12 @@ exports.isInYesterday = function (date) {
     return range.contains(date);
 };
 
+exports.getProjectUrl = function (proj) {
+    var url = '';
+    if (!proj) {return url;}
+    return '/projects/' + proj._id;
+};
+
 
 exports.getTaskUrl = function (task) {
     var url = '';

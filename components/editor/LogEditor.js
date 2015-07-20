@@ -1,16 +1,21 @@
 var React = require('react');
+var Router = require('react-router');
 var _ = require('lodash');
 var Q = require('q');
 var RB = require('react-bootstrap');
 var Button = RB.Button;
 var ButtonToolbar = RB.ButtonToolbar;
 var DropdownButton = RB.DropdownButton;
+var OverlayTrigger = RB.OverlayTrigger;
+var Link = RB.Link;
+var Popover = RB.Popover;
 var MenuItem = RB.MenuItem;
 var Moment = require('moment');
 var Color = require('color');
 var TrackerHelper = require('tracker/helper');
 var SlidePanel = require('../SlidePanel');
 var mui = require('material-ui');
+
 
 
 
@@ -1328,11 +1333,13 @@ var Calendar = React.createClass({
 
 var Accomplishment = React.createClass({
 
+    mixins: [Router.Navigation],
+
     getInitialState: function () {
         return {
-            versionAmount: null,
-            projectAmount: null,
-            taskAmount: null
+            versions: [],
+            projects: [],
+            tasks: []
         };
     },
 
@@ -1344,11 +1351,47 @@ var Accomplishment = React.createClass({
         return (
             <div className="ltt_c-logEditor-accomplishment">
             <i className="fa fa-trophy"></i>
-            {this.state.projectAmount > 0 ? <span>project {this.state.projectAmount}</span> : null}
-            {this.state.versionAmount > 0 ? <span>version {this.state.versionAmount}</span> : null}
-            {this.state.taskAmount > 0 ? <span>task {this.state.taskAmount}</span> : null}
+            {this.state.projects.length > 0 ?
+                <OverlayTrigger trigger="click" placement="bottom"
+                    overlay={this.renderPopOver(this.state.projects, "Project Today Achievement", function (proj) { return Util.getProjectUrl(proj)})}>
+                    <span className="accomplishment-item projects">
+                        project: <span className="ltt_c-number">{this.state.projects.length}</span>
+                    </span>
+                </OverlayTrigger> : null}
+            {this.state.versions.length > 0 ?
+                <OverlayTrigger trigger="click" placement="bottom"
+                    overlay={this.renderPopOver(this.state.versions, "Version Today Achievement", function (version) { return Util.getVersionUrl(version);})}>
+                    <span className="accomplishment-item task">
+                        version: <span className="ltt_c-number">{this.state.versions.length}</span>
+                    </span>
+                </OverlayTrigger> : null}
+            {this.state.tasks.length > 0 ?
+                <OverlayTrigger trigger="click" placement="bottom"
+                    overlay={this.renderPopOver(this.state.tasks, "Task Today Achievement", function (task) { return Util.getTaskUrl(task)})}>
+                    <span className="accomplishment-item task">
+                        task:<span className="ltt_c-number">{this.state.tasks.length}</span>
+                    </span>
+                </OverlayTrigger> : null}
             </div>
         );
+    },
+
+    renderPopOver: function (data, title, getUrl) {
+        var popOver = (
+            <Popover title={title}>
+                {data.map(function (item) {
+                    var url = getUrl(item)
+                    return <p className="item" onClick={this.openLink.bind(this, url)}>
+                        {item.name}
+                    </p>
+                }, this)}
+            </Popover>
+        );
+        return popOver;
+    },
+
+    openLink: function (url) {
+        this.transitionTo(url);
     },
 
     update: function () {
@@ -1372,7 +1415,7 @@ var Accomplishment = React.createClass({
             status: 'done'
         }).then(function (data) {
             that.setState({
-                taskAmount: data.length
+                tasks: data
             });
         }).catch(function (err) {
             console.error(err.stack);
