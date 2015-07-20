@@ -80,3 +80,18 @@
 .ltt_c-logEditor-accomplishment .accomplishment-item{
     cursor: pointer;
 }
+
+
+.ltt_c-logEditor-accomplishment-popOver .item{
+    margin: 0px;
+    padding: 10px;
+}
+
+.ltt_c-logEditor-accomplishment-popOver .popover-content{
+    padding: 0px;
+}
+
+.ltt_c-logEditor-accomplishment-popOver .item:hover{
+    background-color: #F2F2F2;
+}
+

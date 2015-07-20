@@ -215,3 +215,7 @@
 .nav-tabs > li > a{
     border-radius: 0px;
 }
+
+.clickable{
+    cursor: pointer;
+}

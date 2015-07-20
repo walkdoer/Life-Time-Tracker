@@ -1378,10 +1378,10 @@ var Accomplishment = React.createClass({
 
     renderPopOver: function (data, title, getUrl) {
         var popOver = (
-            <Popover title={title}>
+            <Popover title={title} className="ltt_c-logEditor-accomplishment-popOver">
                 {data.map(function (item) {
                     var url = getUrl(item)
-                    return <p className="item" onClick={this.openLink.bind(this, url)}>
+                    return <p className="item clickable" onClick={this.openLink.bind(this, url)}>
                         {item.name}
                     </p>
                 }, this)}
