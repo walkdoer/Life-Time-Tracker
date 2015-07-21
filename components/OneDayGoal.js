@@ -52,10 +52,11 @@ var OneDayGoal = React.createClass({
     },
 
     render: function () {
+        var date = this.props.date;
         return (
             <div className="ltt_c-OneDayGoal">
             {this.state.goals.map(function (goal) {
-                return <Goal data={goal} key={goal._id}/>
+                return <Goal data={goal}  date={date} key={goal._id}/>
             })}
             </div>
         );
@@ -95,8 +96,14 @@ var Goal = React.createClass({
         </div>
     },
 
-    componentDidUpdate: function () {
-        this._draw();
+
+    componentWillReceiveProps: function (nextProps) {
+        if (this.props.date !== nextProps.date) {
+            this._todayProgress = 0;
+            this._totalProgress = 0;
+            this._todayProgressOfTotal = 0;
+            this.calculate(nextProps.date).then(this._draw.bind(this));
+        }
     },
 
     _createChart: function (element, percent) {
@@ -107,31 +114,22 @@ var Goal = React.createClass({
     },
 
     componentDidMount: function () {
-        this.calculate().then(function () {
-            this._draw();
-        });
+        this.calculate().then(this._draw.bind(this));
     },
 
     _draw: function () {
-        if (!this.drawed) {
-            this._todayProgressChart = this._createChart(this.refs.todayProgress.getDOMNode(), this._todayProgress);
-            this._totalProgressChart = this._createChart(this.refs.totalProgress.getDOMNode(), this._totalProgress);
-            this._todayProgressOfTotalChart = this._createChart(this.refs.todayProgressOfTotal.getDOMNode(), this._todayProgressOfTotal);
-            this.drawed = true;
-        } else {
-            this._todayProgressChart.update(this._todayProgress);
-            this._totalProgressChart.update(this._totalProgress);
-            this._todayProgressOfTotalChart.update(this._todayProgressOfTotal);
-        }
-
+        this._createChart(this.refs.todayProgress.getDOMNode(), this._todayProgress);
+        this._createChart(this.refs.totalProgress.getDOMNode(), this._totalProgress);
+        this._createChart(this.refs.todayProgressOfTotal.getDOMNode(), this._todayProgressOfTotal);
     },
 
-    calculate: function () {
+    calculate: function (date) {
         var deferred = Q.defer();
         var that = this;
         var goal = this.props.data;
+        date = date || this.props.date;
         Q.all([
-            this.getTodayTime(goal),
+            this.getTodayTime(goal, date),
             this.getTotalTime(goal)
         ]).spread(function (todayTime, totalTime) {
             var result = {
@@ -154,8 +152,7 @@ var Goal = React.createClass({
         return this._calculateTime(goal, dateInfo);
     },
 
-    getTodayTime: function (goal) {
-        var date = this.props.date;
+    getTodayTime: function (goal, date) {
         return this._calculateTime(goal, {
             start: new Moment(date).startOf('day').toDate(),
             end: new Moment(date).endOf('day').toDate()
