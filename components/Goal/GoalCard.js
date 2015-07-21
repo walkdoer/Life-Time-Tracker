@@ -104,7 +104,6 @@ module.exports = React.createClass({
     },
 
     loadActivities: function (filter) {
-        console.log('loadActivities');
         var goal = this.props.goal;
         var dateInfo = Util.toDate(goal.granularity);
         var groupOption = this.getGroupOption(goal.granularity);

@@ -87,6 +87,10 @@
     padding: 10px;
 }
 
+.ltt_c-logEditor-accomplishment-popOver .item .unfinish{
+    color: #A0A0A0;
+}
+
 .ltt_c-logEditor-accomplishment-popOver .popover-content{
     padding: 0px;
 }

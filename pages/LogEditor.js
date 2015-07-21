@@ -27,7 +27,7 @@ var Progress = require('../components/Progress');
 var DataAPI = require('../utils/DataAPI');
 var BindStore = require('../mixins/BindStore');
 var LogClassPie = require('../components/LogClassPie');
-
+var OneDayGoal =  require('../components/OneDayGoal');
 
 /** Store */
 var ProjectStore = require('../stores/ProjectStore');
@@ -42,6 +42,8 @@ var DataAPI = require('../utils/DataAPI');
 
 var Ltt = global.Ltt;
 var DATE_FORMAT = 'YYYY-MM-DD';
+
+
 
 
 
@@ -80,10 +82,10 @@ var Page = React.createClass({
 
     render: function () {
         var days = this.state.days;
-        console.log('########render');
+        var date = this.state.current;
         return (
             <div className="ltt_c-page ltt_c-page-logEditor">
-                <LogEditor title={this.state.current}
+                <LogEditor title={date}
                     onNextDay={this.gotoNextDay}
                     onPrevDay={this.gotoPrevDay}
                     onGotoToday={this.gotoToday}
@@ -95,16 +97,17 @@ var Page = React.createClass({
                     locate={this._initOrigin}
                     ref="logEditor"/>
                 <aside>
-                    <LogDatePicker select={this.state.current}
+                    <LogDatePicker select={date}
                         onDateChange={this.onDateChange}
                         ref="datePicker"/>
                     <ModalTrigger modal={<DateGoToWindow onGoto={this.gotoDate}/>} ref="dateGoToWindow"><span></span></ModalTrigger>
-                    <LogClassPie date={this.state.current} backgroundColor="#f6f6f6" ref="logClassPie"/>
+                    <LogClassPie date={date} backgroundColor="#f6f6f6" ref="logClassPie"/>
                     <ButtonToolbar>
                         <Button bsSize='xsmall'><Link to="/reports/today">More Detail</Link></Button>
                     </ButtonToolbar>
                     <div className="overtimeLog" ref="overtimeLog"></div>
                     <TaskInfo ref="taskInfo"/>
+                    <OneDayGoal date={date}/>
                 </aside>
             </div>
         );

@@ -1,4 +1,5 @@
 var React = require('react');
+var cx = React.addons.classSet;
 var Router = require('react-router');
 var _ = require('lodash');
 var Q = require('q');
@@ -1350,7 +1351,6 @@ var Accomplishment = React.createClass({
     render: function () {
         return (
             <div className="ltt_c-logEditor-accomplishment">
-            <i className="fa fa-trophy"></i>
             {this.state.projects.length > 0 ?
                 <OverlayTrigger trigger="click" placement="bottom"
                     overlay={this.renderPopOver(this.state.projects, "Project Today Achievement", function (proj) { return Util.getProjectUrl(proj)})}>
@@ -1382,11 +1382,12 @@ var Accomplishment = React.createClass({
                 {data.map(function (item) {
                     var url = getUrl(item)
                     return <p className="item clickable" onClick={this.openLink.bind(this, url)}>
-                        {item.name}
+                        <span className={cx({"unfinish": item.progress !== 100})}>{item.name}</span>
                         {!_.isEmpty(item.children) ?
                             <ul>
                             {item.children.map(function (childItem) {
-                                return <li onClick={this.openLink.bind(this, getUrl(item))}>{childItem.name}</li>
+                                return <li onClick={this.openLink.bind(this, getUrl(item))} className="clickable">
+                                 {childItem.name}</li>
                             }, this)}
                             </ul> : null
                         }
