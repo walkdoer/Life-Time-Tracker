@@ -24,7 +24,8 @@
     "select2": "~3.5.2",
     "sweetalert": "~0.5.0",
     "fullcalendar": "~2.3.1",
-    "pick-a-color": "~1.2.3"
+    "pick-a-color": "~1.2.3",
+    "jquery.easy-pie-chart": "~2.1.6"
   },
   "devDependencies": {},
   "keywords": [

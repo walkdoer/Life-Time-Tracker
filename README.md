@@ -12,6 +12,7 @@ Life Time Tracker是一个做个人时间统计的工具，读了《奇特的一
 
 - node
 - gulp
+- bower
 - mongodb
 
 #### 生成App所需要执行的命令
