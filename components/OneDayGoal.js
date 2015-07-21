@@ -10,6 +10,7 @@ var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var ReactBootStrap = require('react-bootstrap');
 var Q = require('q');
 var Moment = require('moment');
+var EasyPieChart = require('easyPieChart');
 
 /** Utils */
 var Util = require('../utils/Util');
@@ -75,41 +76,74 @@ var Goal = React.createClass({
         var dateInfo = Util.toDate(goal.granularity);
         var estimatedTime = goal.estimatedTime;
         var oneDayTime = estimatedTime / dateInfo.diff;
+        this._todayProgress = (this.state.todayTime / oneDayTime * 100).toFixed(1);
+        this._totalProgress = (this.state.totalTime / estimatedTime * 100).toFixed(1);
+        this._todayProgressOfTotal = (this.state.todayTime / estimatedTime * 100).toFixed(1);
         return <div className="ltt_c-OneDayGoal-goal">
-            <p className="goal-name">{goal.name}</p>
-            <p>
+            <p className="ltt_c-OneDayGoal-goal-name">{goal.name}</p>
+            <p className="ltt_c-OneDayGoal-goal-charts">
                 {this.state.calculated ?
-                <span className="progress">
-                    <span className="today">今日目标完成了: ({(this.state.todayTime / oneDayTime * 100).toFixed(1)})</span>
-                    <span className="total">总目标: ({(this.state.totalTime / estimatedTime * 100).toFixed(1)})</span>
-                    <span className="todayProgress">今日推进了: ({(this.state.todayTime / estimatedTime * 100).toFixed(1)})</span>
-                </span>
+                <div className="ltt_c-OneDayGoal-goal-progress">
+                    <div className="pieChart todayProgress" ref="todayProgress" data-percent={this._todayProgress}>{this._todayProgress + '%'}</div>
+                    <div className="pieChart totalProgress" ref="totalProgress" data-percent={this._totalProgress}>{this._totalProgress + '%'}</div>
+                    <div className="pieChart todayProgressOfTotal" data-percent={this._todayProgressOfTotal} ref="todayProgressOfTotal">{this._todayProgressOfTotal + '%'}</div>
+                </div>
                 :
-                <span className="fa fa-spinner fa-spin"></span>
+                <div className="fa fa-spinner fa-spin"></div>
             }
             </p>
         </div>
     },
 
+    componentDidUpdate: function () {
+        this._draw();
+    },
+
+    _createChart: function (element) {
+        return new EasyPieChart(element, {size: 70});
+    },
+
     componentDidMount: function () {
-        this.calculate();
+        this.calculate().then(function () {
+            this._draw();
+        });
+    },
+
+    _draw: function () {
+        if (!this.drawed) {
+            this._todayProgressChart = this._createChart(this.refs.todayProgress.getDOMNode(), this._todayProgress);
+            this._totalProgressChart = this._createChart(this.refs.totalProgress.getDOMNode(), this._totalProgress);
+            this._todayProgressOfTotalChart = this._createChart(this.refs.todayProgressOfTotal.getDOMNode(), this._todayProgressOfTotal);
+            this.drawed = true;
+        } else {
+            this._todayProgressChart.update(this._todayProgress);
+            this._totalProgressChart.update(this._totalProgress);
+            this._todayProgressOfTotalChart.update(this._todayProgressOfTotal);
+        }
+
     },
 
     calculate: function () {
+        var deferred = Q.defer();
         var that = this;
         var goal = this.props.data;
-        return Q.all([
+        Q.all([
             this.getTodayTime(goal),
             this.getTotalTime(goal)
         ]).spread(function (todayTime, totalTime) {
-            that.setState({
+            var result = {
                 calculated: true,
                 todayTime: todayTime,
                 totalTime: totalTime
+            };
+            that.setState(result, function () {
+                deferred.resolve(result);
             });
         }).catch(function (err) {
             console.error(err.stack);
+            deferred.reject(err);
         });
+        return deferred.promise;
     },
 
     getTotalTime: function (goal) {

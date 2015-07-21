@@ -123,3 +123,24 @@
 .ltt_c-chart-GoalChart .circle.over.current{
     fill: rgb(64, 203, 93);
 }
+
+
+.ltt_c-OneDayGoal-goal-progress{
+    display: flex;
+    height: 70px;
+}
+
+.ltt_c-OneDayGoal-goal-progress > .pieChart {
+    position: relative;
+    text-align: center;
+    flex:1;
+    font-size:0.63rem;
+    color: #646464;
+    line-height: 70px;
+}
+
+.ltt_c-OneDayGoal-goal-progress > .pieChart canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
