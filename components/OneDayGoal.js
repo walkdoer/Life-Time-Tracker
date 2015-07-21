@@ -76,17 +76,17 @@ var Goal = React.createClass({
         var dateInfo = Util.toDate(goal.granularity);
         var estimatedTime = goal.estimatedTime;
         var oneDayTime = estimatedTime / dateInfo.diff;
-        this._todayProgress = (this.state.todayTime / oneDayTime * 100).toFixed(1);
-        this._totalProgress = (this.state.totalTime / estimatedTime * 100).toFixed(1);
-        this._todayProgressOfTotal = (this.state.todayTime / estimatedTime * 100).toFixed(1);
+        this._todayProgress = (this.state.todayTime / oneDayTime * 100);
+        this._totalProgress = (this.state.totalTime / estimatedTime * 100);
+        this._todayProgressOfTotal = (this.state.todayTime / estimatedTime * 100);
         return <div className="ltt_c-OneDayGoal-goal">
             <p className="ltt_c-OneDayGoal-goal-name">{goal.name}</p>
             <p className="ltt_c-OneDayGoal-goal-charts">
                 {this.state.calculated ?
                 <div className="ltt_c-OneDayGoal-goal-progress">
-                    <div className="pieChart todayProgress" ref="todayProgress" data-percent={this._todayProgress}>{this._todayProgress + '%'}</div>
-                    <div className="pieChart totalProgress" ref="totalProgress" data-percent={this._totalProgress}>{this._totalProgress + '%'}</div>
-                    <div className="pieChart todayProgressOfTotal" data-percent={this._todayProgressOfTotal} ref="todayProgressOfTotal">{this._todayProgressOfTotal + '%'}</div>
+                    <div className="pieChart todayProgress" ref="todayProgress" data-percent={this._todayProgress}>{this._todayProgress.toFixed(1) + '%'}</div>
+                    <div className="pieChart totalProgress" ref="totalProgress" data-percent={this._totalProgress}>{this._totalProgress.toFixed(1) + '%'}</div>
+                    <div className="pieChart todayProgressOfTotal" data-percent={this._todayProgressOfTotal} ref="todayProgressOfTotal">{this._todayProgressOfTotal.toFixed(1) + '%'}</div>
                 </div>
                 :
                 <div className="fa fa-spinner fa-spin"></div>
@@ -99,8 +99,11 @@ var Goal = React.createClass({
         this._draw();
     },
 
-    _createChart: function (element) {
-        return new EasyPieChart(element, {size: 70});
+    _createChart: function (element, percent) {
+        var colors = ['#86e01e', '#f2d31b', '#f2b01e', '#f27011', '#f63a0f'].reverse();
+        var max = 100;
+        var level = percent < max ? (Math.ceil(percent/ (max / colors.length)) - 1) : (colors.length - 1);
+        return new EasyPieChart(element, {size: 70, barColor: colors[level]});
     },
 
     componentDidMount: function () {
