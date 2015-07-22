@@ -51,12 +51,22 @@ var OneDayGoal = React.createClass({
         GoalStore.removeChangeListener(this._onStoreChange);
     },
 
+    update: function () {
+        var refs = this.refs;
+        this.state.goals.forEach(function (goal){
+            var goalRef = refs[goal._id];
+            if (goalRef) {
+                goalRef.update();
+            }
+        });
+    },
+
     render: function () {
         var date = this.props.date;
         return (
             <div className="ltt_c-OneDayGoal">
             {this.state.goals.map(function (goal) {
-                return <Goal data={goal}  date={date} key={goal._id}/>
+                return <Goal data={goal}  date={date} key={goal._id} ref={goal._id}/>
             })}
             </div>
         );
@@ -114,6 +124,10 @@ var Goal = React.createClass({
     },
 
     componentDidMount: function () {
+        this.calculate().then(this._draw.bind(this));
+    },
+
+    update: function () {
         this.calculate().then(this._draw.bind(this));
     },
 

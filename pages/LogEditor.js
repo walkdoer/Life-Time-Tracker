@@ -107,7 +107,7 @@ var Page = React.createClass({
                     </ButtonToolbar>
                     <div className="overtimeLog" ref="overtimeLog"></div>
                     <TaskInfo ref="taskInfo"/>
-                    <OneDayGoal date={date}/>
+                    <OneDayGoal date={date} ref="oneDayGoal"/>
                 </aside>
             </div>
         );
@@ -208,6 +208,7 @@ var Page = React.createClass({
     onSave: function (content) {
         var that = this;
         this.refs.logClassPie.update();
+        this.refs.oneDayGoal.update();
         this.refs.logEditor.getUnfinishLog(
             new Moment().startOf('day').toDate(),
             new Moment().endOf('day').toDate()
