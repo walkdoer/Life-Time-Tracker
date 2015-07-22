@@ -1,8 +1,13 @@
-var server = require('../conf/config').server;
+'use strict';
+
 var ServerAction = require('../actions/ServerAction');
 var Q = require('q');
 var isNodeWebkit = true;
 var _ = require('lodash');
+
+/** Global variables */
+
+var _totalTime; //total active time
 
 try {
     var a = global.process.version;
@@ -110,8 +115,23 @@ module.exports = {
     },
 
     Log: {
+
         load: function (params) {
             return get(url('/logs'), params);
+        },
+
+        totalTime: function (force) {
+            if (_totalTime !== undefined && !force) {
+                return Q(_totalTime);
+            }
+            return get(url('/logs'), {
+                sum: true
+            }).then(function (data) {
+                if (data && data[0]) {
+                    _totalTime = data[0].totalTime;
+                }
+                return _totalTime;
+            });
         }
     },
 

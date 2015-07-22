@@ -16,6 +16,7 @@ var Well = RB.Well;
 var FixedDataTable = require('fixed-data-table');
 var Table = FixedDataTable.Table;
 var Column = FixedDataTable.Column;
+var EasyPieChart = require('easyPieChart');
 
 /* components */
 var Log = require('../components/Log');
@@ -50,15 +51,31 @@ var Logs = React.createClass({
         return {
             logs: null,
             tags: [],
+            totalTime: null,
             tagOperatorAnd: false,
             logLoaded: true
         };
     },
 
     render: function () {
+        var emptyLogs = _.isEmpty(this.state.logs);
+        var totalTime = this.state.totalTime;
+        var sumTime;
+        if (!emptyLogs) {
+            sumTime = this.state.logs.reduce(function (sum, log) { return sum + log.len;}, 0);
+        }
         return (
-            <div className="ltt_c-page ltt_c-page-logs ">
+            <div className="ltt_c-page ltt_c-page-logs">
                 {this.renderFilters()}
+                <div className="Grid Grid-gutters">
+                    { !emptyLogs ?
+                    <div className="Grid-cell u-1of3">
+                        {Util.displayTime(sumTime)}
+                        {totalTime > 0 ? <Pie value={sumTime} total={totalTime}/> : null }
+                    </div> : null
+                    }
+                    { !emptyLogs ? <div className="Grid-cell u-2of3"></div> : null }
+                </div>
                 <div className="ltt_c-page-logs-list" ref="list">
                     {this.renderLogs()}
                     <LoadingMask loaded={this.state.logLoaded}/>
@@ -165,6 +182,7 @@ var Logs = React.createClass({
 
     componentDidMount: function () {
         var that = this;
+        this.loadTotalTime();
         DataAPI.Tag.load().then(function (tags) {
             console.log('tags length:' + tags.length);
             that.setState({
@@ -234,6 +252,16 @@ var Logs = React.createClass({
 
     deleteFilter: function (filterName) {
         delete this._filterParams[filterName];
+    },
+
+    loadTotalTime: function () {
+        var that = this;
+        DataAPI.Log.totalTime()
+            .then(function (total) {
+                that.setState({
+                    totalTime: total
+                });
+            });
     }
 });
 
@@ -366,6 +394,26 @@ var LogsTable = React.createClass({
     }
 })
 
+
+var Pie = React.createClass({
+
+    render: function () {
+        var percent = this.props.value / this.props.total * 100;
+        return <div className="ltt_c-EasyPieChart" data-percent={percent}>{percent.toFixed(2) + '%'}</div>
+    },
+
+    componentDidMount: function () {
+        this._plot();
+    },
+
+    componentDidUpdate: function () {
+        this._plot();
+    },
+
+    _plot: function (props) {
+        return new EasyPieChart(this.getDOMNode(), {size: 150});
+    }
+});
 
 
 

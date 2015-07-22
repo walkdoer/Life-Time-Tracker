@@ -2,6 +2,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    padding:0px;
 }
 .ltt_c-page-logs-date{
     height: 34px;
@@ -16,10 +17,18 @@
 .ltt_c-page-logs-list .sorter{
     cursor: pointer;
 }
+.ltt_c-page-logs-filters{
+    margin: 20px;
+}
 
 .ltt_c-page-logs .filter-tags{
     margin-top:15px;
     margin-bottom: 15px;
     margin-right: 10px;
+    height:34px;
     width: 50%;
+}
+
+.ltt_c-page-logs .well{
+    margin: 20px;
 }
