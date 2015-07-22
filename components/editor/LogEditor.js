@@ -528,7 +528,7 @@ var LogEditor = React.createClass({
     getTagCompletions: function (prefix, cb) {
         console.log('get tag completions start');
         var that = this;
-        Ltt.sdk.tags({name: prefix}).then(function (tags) {
+        DataAPI.Tag.load({name: prefix}).then(function (tags) {
             if (_.isEmpty(tags)) {
                 return cb(null, []);
             }
@@ -545,7 +545,7 @@ var LogEditor = React.createClass({
         console.log('getProjectCompletions start');
         var start = new Date().getTime();
         var that = this;
-        Ltt.sdk.projects({aggregate: false, versions: false}).then(function(projects) {
+        DataAPI.Project.load({aggregate: false, versions: false}).then(function(projects) {
             //if not projects, then no need to create typeahead
             if (_.isEmpty(projects)) {return cb(null, [])}
             var end = new Date().getTime();
@@ -569,7 +569,7 @@ var LogEditor = React.createClass({
             var info = that._getCurrentLogInformation();
             console.log(info);
             if (!info.projectId) { return cb(null, []); }
-            return Ltt.sdk.versions({projectId: info.projectId}).then(function (versions) {
+            return DataAPI.Version.load({projectId: info.projectId}).then(function (versions) {
                 console.log('versions', versions);
                 if (_.isEmpty(versions)) { return cb(null, []); }
                 var completions = versions.map(function(ver) {
@@ -592,7 +592,7 @@ var LogEditor = React.createClass({
             var info = that._getCurrentLogInformation();
             console.log(info);
             if (!info.projectId) { return cb(null, []); }
-            return Ltt.sdk.tasks({projectId: info.projectId, versionId: info.versionId, populate: false, parent: info.taskId})
+            return DataAPI.Task.load({projectId: info.projectId, versionId: info.versionId, populate: false, parent: info.taskId})
                 .then(function (tasks) {
                     if (_.isEmpty(tasks)) { return cb(null, []); }
                     console.log(tasks);
@@ -934,11 +934,70 @@ var LogEditor = React.createClass({
         var that = this;
         console.log('_updateCurrentInfomation start');
         var start = new Date().getTime();
-        return Ltt.sdk.getDetailFromLogLineContent(this.props.title, currentLine)
+        return this._getDetailFromLogLineContent(this.props.title, currentLine)
             .then(function (result) {
                 console.log('_updateCurrentInfomation end ' + (new Date().getTime() - start));
                 that._currentLog = result;
             });
+    },
+
+    _getDetailFromLogLineContent: function (date, lineContent) {
+        var deferred = Q.defer();
+        var includeNoTimeLog = true,
+            result = {},
+            log;
+        try {
+            log = TrackerHelper.getLogs(lineContent, date, includeNoTimeLog)[0];
+            if (log) {
+                var versionName;
+                var project = log.projects && log.projects[0];
+                var logVersion = log.version;
+                var logTask = log.task;
+                var subTask = log.subTask;
+                if (project) {
+                    if (logVersion) {
+                        versionName = logVersion.name;
+                    }
+                    DataAPI.Project.load({name: project.name, aggregate: false}).then(function (projects) {
+                        var version;
+                        var project = projects[0];
+                        if (project) {
+                            console.log('project', project);
+                            result.project = project;
+                            if (versionName) {
+                                version = project.versions.filter(function (ver) {
+                                    return ver.name === versionName;
+                                })[0];
+                                console.log('version', version);
+                                result.version = version;
+                            }
+                            if (logTask) {
+                                DataAPI.Task.load({
+                                    name: logTask.name,
+                                    projectId: project.id,
+                                    versionId: version && version._id,
+                                    populate: false
+                                }).then(function (tasks) {
+                                    console.log('task', tasks[0]);
+                                    result.task = tasks[0];
+                                    deferred.resolve(result);
+                                });
+                            } else {
+                                return deferred.resolve(result);
+                            }
+                        } else {
+                            return deferred.resolve(result);
+                        }
+                    });
+                }
+            } else {
+                deferred.resolve(result);
+            }
+        } catch (e) {
+            console.error(e.stack);
+            deferred.resolve(result);
+        }
+        return deferred.promise;
     },
 
     _getCurrentLogInformation: function () {
