@@ -1,0 +1,14 @@
+.ltt_c-EasyPieChart {
+    position: relative;
+    text-align:center;
+}
+
+.ltt_c-EasyPieChart .text{
+
+}
+
+.ltt_c-EasyPieChart canvas{
+    position:absolute;
+    top: 0;
+    left: 0;
+}

@@ -19,6 +19,7 @@
 }
 .ltt_c-page-logs-filters{
     margin: 20px;
+    margin-bottom: 5px;
 }
 
 .ltt_c-page-logs .filter-tags{
@@ -31,4 +32,20 @@
 
 .ltt_c-page-logs .well{
     margin: 20px;
+}
+
+.ltt_c-page-logs .charts {
+    padding: 10px;
+}
+
+.ltt_c-page-logs .charts .totalTimePercent{
+    margin-left: 0px;
+    margin-right: 10px;
+}
+
+.ltt_c-page-logs .charts .totalTimePercent,
+.ltt_c-page-logs .charts .calendarHeatMap {
+    background-color:#FFF;
+    box-shadow: 0 0 5px #CCC;
+    padding:10px 20px;
 }

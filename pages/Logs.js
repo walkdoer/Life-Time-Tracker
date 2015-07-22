@@ -16,7 +16,6 @@ var Well = RB.Well;
 var FixedDataTable = require('fixed-data-table');
 var Table = FixedDataTable.Table;
 var Column = FixedDataTable.Column;
-var EasyPieChart = require('easyPieChart');
 
 /* components */
 var Log = require('../components/Log');
@@ -24,6 +23,9 @@ var DatePicker = require('../components/DatePicker');
 var LoadingMask = require('../components/LoadingMask');
 var Notify = require('../components/Notify');
 var Tag = require('../components/Tag');
+var EasyPieChart = require('../components/charts/EasyPie');
+var CalendarHeatMap = require('../components/charts/CalendarHeatMap');
+
 
 /* utils */
 var DataAPI = require('../utils/DataAPI');
@@ -67,14 +69,20 @@ var Logs = React.createClass({
         return (
             <div className="ltt_c-page ltt_c-page-logs">
                 {this.renderFilters()}
-                <div className="Grid Grid-gutters">
+                <div className="Grid charts Grid-gutters">
                     { !emptyLogs ?
-                    <div className="Grid-cell u-1of3">
+                    <div className="totalTimePercent" style={{width: 150}}>
                         {Util.displayTime(sumTime)}
-                        {totalTime > 0 ? <Pie value={sumTime} total={totalTime}/> : null }
+                        {totalTime > 0 ? <EasyPieChart size={110} value={sumTime} total={totalTime}/> : null }
                     </div> : null
                     }
-                    { !emptyLogs ? <div className="Grid-cell u-2of3"></div> : null }
+                    { !emptyLogs ?
+                    <div className="Grid-cell calendarHeatMap">
+                        <CalendarHeatMap
+                            getData={this.loadCalendarHeatMapData}
+                            empty="no data"
+                            filled="{date} {count}分钟"/>
+                    </div> : null }
                 </div>
                 <div className="ltt_c-page-logs-list" ref="list">
                     {this.renderLogs()}
@@ -230,6 +238,21 @@ var Logs = React.createClass({
                 Notify.error('load failed');
             });
         }
+    },
+
+    loadCalendarHeatMapData: function () {
+        var params = this.getRequestParams();
+        return DataAPI.Log.load(_.extend({
+            sum: true,
+            group: 'date.day'
+        }, params)).then(function (data) {
+            return data.map(function (item) {
+                return {
+                    date: item._id,
+                    count: item.totalTime
+                }
+            });
+        });
     },
 
     getRequestParams: function () {
@@ -392,30 +415,7 @@ var LogsTable = React.createClass({
             <span className="sorter" onClick={this._sortRowsBy.bind(null, cellDataKey)}>{label}</span>
         );
     }
-})
-
-
-var Pie = React.createClass({
-
-    render: function () {
-        var percent = this.props.value / this.props.total * 100;
-        return <div className="ltt_c-EasyPieChart" data-percent={percent}>{percent.toFixed(2) + '%'}</div>
-    },
-
-    componentDidMount: function () {
-        this._plot();
-    },
-
-    componentDidUpdate: function () {
-        this._plot();
-    },
-
-    _plot: function (props) {
-        return new EasyPieChart(this.getDOMNode(), {size: 150});
-    }
 });
-
-
 
 
 module.exports = Logs;
