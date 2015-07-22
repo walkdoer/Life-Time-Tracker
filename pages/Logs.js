@@ -72,7 +72,7 @@ var Logs = React.createClass({
                 <div className="Grid charts Grid-gutters">
                     { !emptyLogs ?
                     <div className="totalTimePercent" style={{width: 150}}>
-                        {Util.displayTime(sumTime)}
+                        <div className="time">{Util.displayTime(sumTime)}</div>
                         {totalTime > 0 ? <EasyPieChart size={110} value={sumTime} total={totalTime}/> : null }
                     </div> : null
                     }
@@ -81,6 +81,7 @@ var Logs = React.createClass({
                         <CalendarHeatMap
                             getData={this.loadCalendarHeatMapData}
                             empty="no data"
+                            ref="calendarHeatMap"
                             filled="{date} {count}分钟"/>
                     </div> : null }
                 </div>
@@ -97,7 +98,7 @@ var Logs = React.createClass({
         if (logs && logs.length > 0) {
             var $tableContaner = $(this.refs.list.getDOMNode());
             var width = $tableContaner.width();
-            var height = $tableContaner.height();
+            var height = $tableContaner.height() + 64 + 180;
             return <LogsTable logs={logs} height={height} width={width}/>
         } else if (!logs){
             return <Well className="align-center MT-20">通过条件查找日志</Well>
@@ -185,6 +186,9 @@ var Logs = React.createClass({
             tagOperatorAnd: !this.state.tagOperatorAnd
         }, function () {
             this.loadLogs();
+            if (this.refs.calendarHeatMap) {
+                this.refs.calendarHeatMap.update();
+            }
         });
     },
 
@@ -213,6 +217,9 @@ var Logs = React.createClass({
                 tags: tags.join(',')
             });
             this.loadLogs();
+            if (this.refs.calendarHeatMap) {
+                this.refs.calendarHeatMap.update();
+            }
         } else {
             this.deleteFilter('tags');
             //this.loadLogs();

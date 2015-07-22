@@ -41,6 +41,11 @@
 .ltt_c-page-logs .charts .totalTimePercent{
     margin-left: 0px;
     margin-right: 10px;
+    text-align: center;
+}
+
+.totalTimePercent .time{
+    margin-bottom: 10px;
 }
 
 .ltt_c-page-logs .charts .totalTimePercent,

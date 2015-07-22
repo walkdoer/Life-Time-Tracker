@@ -18,8 +18,13 @@ var CalendarHeatMap = React.createClass({
             data: this.props.data || []
         };
     },
+
     componentDidMount: function () {
-        var that = this;
+        this._renderChart();
+    },
+
+    _renderChart: function () {
+        var that = this
         if (_.isFunction(this.props.getData)) {
             this.props.getData()
                 .then(function (data) {
@@ -31,9 +36,11 @@ var CalendarHeatMap = React.createClass({
     },
 
     componentWillReceiveProps: function (nextProps) {
-        this.setState({
-            data: nextProps.data
-        });
+        if (nextProps.data !== undefined) {
+            this.setState({
+                data: nextProps.data
+            });
+        }
     },
 
     componentDidUpdate: function () {
@@ -115,6 +122,10 @@ var CalendarHeatMap = React.createClass({
                 {longestStreakSpan}
             </div>
         );
+    },
+
+    update: function () {
+        this._renderChart();
     }
 });
 
