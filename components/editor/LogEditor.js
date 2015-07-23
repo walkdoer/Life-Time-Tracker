@@ -543,6 +543,22 @@ var LogEditor = React.createClass({
                 that.props.onPrevLog(that.getCurrentLog());
             }
         });
+
+        commands.addCommand({
+            name: 'gotoLastLog',
+            bindKey: {win: 'Ctrl-shift-.', mac: 'Command-shift-.'},
+            exec: function () {
+                that.props.onNextLog(that.getCurrentLog(), true);
+            }
+        });
+
+        commands.addCommand({
+            name: 'gotoFirstLog',
+            bindKey: {win: 'Ctrl-shift-,', mac: 'Command-shift-,'},
+            exec: function () {
+                that.props.onPrevLog(that.getCurrentLog(), true);
+            }
+        });
     },
 
     finishCurrentActivity: function () {

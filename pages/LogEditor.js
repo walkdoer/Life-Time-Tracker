@@ -233,27 +233,27 @@ var Page = React.createClass({
         }
     },
 
-    gotoPrevLog: function (log) {
+    gotoPrevLog: function (log, gotoFirst) {
         var current = this.state.current;
         var that = this;
         var params = this.getLogInfoParams(log);
         DataAPI.Log.load(_.extend({
             populate: false,
             limit: 1,
-            sort: "start:-1",
+            sort: gotoFirst ? "start:1" : "start:-1",
             endTime: log.start
         }, params)).then(function (result) {
             that.jumpLog(result && result[0]);
         });
     },
 
-    gotoNextLog: function (log) {
+    gotoNextLog: function (log, gotoLast) {
         var that = this;
         var params = this.getLogInfoParams(log);
         DataAPI.Log.load(_.extend({
             populate: false,
             limit: 1,
-            sort: "start:1",
+            sort: gotoLast ? "start:-1" : "start:1",
             startTime: log.end
         }, params)).then(function (result) {
             that.jumpLog(result && result[0]);
