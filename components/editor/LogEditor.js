@@ -527,6 +527,22 @@ var LogEditor = React.createClass({
                 }
             });
         }, that);
+
+        commands.addCommand({
+            name: 'gotoNextLog',
+            bindKey: {win: 'Ctrl-alt-.', mac: 'Command-alt-.'},
+            exec: function () {
+                that.props.onNextLog(that.getCurrentLog());
+            }
+        });
+
+        commands.addCommand({
+            name: 'gotoPrevLog',
+            bindKey: {win: 'Ctrl-alt-,', mac: 'Command-alt-,'},
+            exec: function () {
+                that.props.onPrevLog(that.getCurrentLog());
+            }
+        });
     },
 
     finishCurrentActivity: function () {
@@ -663,6 +679,22 @@ var LogEditor = React.createClass({
         console.log('listen to editro');
     },
 
+    getCurrentLine: function () {
+        var selection = this.editor.getSelection();
+        var session = this.editor.getSession();
+        var row = selection.getCursor().row;
+        return session.getLine(row);
+    },
+
+    getCurrentLog: function () {
+        var line = this.getCurrentLine();
+        var log = null;
+        if (line) {
+            log = this.toLogObject(line)[0];
+        }
+        return log;
+    },
+
     _detachListenToEditor: function () {
         var session = this.editor.getSession();
         session.removeAllListeners('change');
@@ -797,6 +829,7 @@ var LogEditor = React.createClass({
                 that._highLightDoingLine(content);
                 that._listenToEditor();
                 that._activeCurrentLine();
+                that.props.onLoad(content, that.getDoingLog(content));
             });
     },
 
@@ -1116,6 +1149,13 @@ var LogEditor = React.createClass({
         if (this.editor) {
             this.editor.gotoLine(row, column);
             this._currentRow = row - 1;
+        }
+    },
+
+    gotoLineByContent: function (lineContent) {
+        var index = this.getLineIndex(lineContent);
+        if (index !== undefined) {
+            this.gotoLine(index + 1);
         }
     },
 

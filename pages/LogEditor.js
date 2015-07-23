@@ -227,36 +227,61 @@ var Page = React.createClass({
         if (doingLog) {
             Bus.emit(EVENT.CURRENT_LOG, doingLog);
         }
+        if (_.isFunction (this.jumpWhenEditorLoad)) {
+            this.jumpWhenEditorLoad();
+            this.jumpWhenEditorLoad = null;
+        }
     },
 
     gotoPrevLog: function (log) {
+        var current = this.state.current;
+        var that = this;
         var params = this.getLogInfoParams(log);
         DataAPI.Log.load(_.extend({
             populate: false,
-            skip: 1,
             limit: 1,
+            sort: "start:-1",
             endTime: log.start
         }, params)).then(function (result) {
-            console.log(result);
+            that.jumpLog(result && result[0]);
         });
     },
 
     gotoNextLog: function (log) {
+        var that = this;
         var params = this.getLogInfoParams(log);
         DataAPI.Log.load(_.extend({
             populate: false,
-            skip:1,
             limit: 1,
+            sort: "start:1",
             startTime: log.end
         }, params)).then(function (result) {
-            console.log(result);
+            that.jumpLog(result && result[0]);
         });
+    },
+
+    jumpLog: function (log) {
+        console.log(log);
+        if (log) {
+            var logDate = new Moment(log.date).format(DATE_FORMAT);
+            if ( logDate === this.state.current) {
+                this.refs.logEditor.gotoLineByContent(log.origin);
+            } else {
+                this.setState({
+                    current: logDate
+                }, function () {
+                    this.jumpWhenEditorLoad = (function (logContent) {
+                        this.refs.logEditor.gotoLineByContent(logContent);
+                    }).bind(this, log.origin);
+                });
+            }
+        }
     },
 
     getLogInfoParams: function (log) {
         var params = {};
-        if (log.project) {
-            params.projects = log.project.name;
+        if (!_.isEmpty(log.projects)) {
+            params.projects = log.projects[0].name;
         }
         if (log.version) {
             params.versions = log.version.name;
