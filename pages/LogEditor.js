@@ -44,9 +44,6 @@ var Ltt = global.Ltt;
 var DATE_FORMAT = 'YYYY-MM-DD';
 
 
-
-
-
 var Page = React.createClass({
 
     mixins: [PureRenderMixin, Router.State, Router.Navigation],
@@ -87,6 +84,8 @@ var Page = React.createClass({
             <div className="ltt_c-page ltt_c-page-logEditor">
                 <LogEditor title={date}
                     onNextDay={this.gotoNextDay}
+                    onNextLog={this.gotoNextLog}
+                    onPrevLog={this.gotoPrevLog}
                     onPrevDay={this.gotoPrevDay}
                     onGotoToday={this.gotoToday}
                     onCtrlO={this.openGotoDayWindow}
@@ -228,6 +227,47 @@ var Page = React.createClass({
         if (doingLog) {
             Bus.emit(EVENT.CURRENT_LOG, doingLog);
         }
+    },
+
+    gotoPrevLog: function (log) {
+        var params = this.getLogInfoParams(log);
+        DataAPI.Log.load(_.extend({
+            populate: false,
+            skip: 1,
+            limit: 1,
+            endTime: log.start
+        }, params)).then(function (result) {
+            console.log(result);
+        });
+    },
+
+    gotoNextLog: function (log) {
+        var params = this.getLogInfoParams(log);
+        DataAPI.Log.load(_.extend({
+            populate: false,
+            skip:1,
+            limit: 1,
+            startTime: log.end
+        }, params)).then(function (result) {
+            console.log(result);
+        });
+    },
+
+    getLogInfoParams: function (log) {
+        var params = {};
+        if (log.project) {
+            params.projects = log.project.name;
+        }
+        if (log.version) {
+            params.versions = log.version.name;
+        }
+        if (log.task) {
+            params.tasks = log.task.name;
+        }
+        if (log.subTask) {
+            params.tasks = log.subTask.name;
+        }
+        return params;
     }
 });
 
