@@ -515,6 +515,18 @@ var LogEditor = React.createClass({
                 that.toggleHighlightUnFinishLog();
             }
         });
+
+        _.range(9).forEach(function (val) {
+            var that = this;
+            var numberKey = val + 1;
+            commands.addCommand({
+                name: 'gotoLogByTimeConsumeOrder' + numberKey,
+                bindKey: {win: 'Ctrl-' + numberKey, mac: 'Command-' + numberKey},
+                exec: function () {
+                    that.gotoLogByTimeConsumeOrder(val);
+                }
+            });
+        }, that);
     },
 
     finishCurrentActivity: function () {
@@ -1072,6 +1084,17 @@ var LogEditor = React.createClass({
         return session.getDocument().getAllLines();
     },
 
+    getContent: function () {
+        return this.editor.getSession().getValue();
+    },
+
+
+    getAllLogs: function () {
+        var content = this.getContent();
+        var logs = TrackerHelper.getLogs(content, this.props.title);
+        return logs;
+    },
+
     highlightLine: function (index, highlightClass) {
         var editor = this.editor;
         var session = editor.getSession();
@@ -1176,6 +1199,17 @@ var LogEditor = React.createClass({
             width: $(this.getDOMNode()).width()
         });
     },
+
+    gotoLogByTimeConsumeOrder: function (order) {
+        var lines = this.getAllLogs();
+        var line = lines.sort(function (a, b) {
+            return b.len - a.len;
+        })[order];
+        if (line) {
+            var index = this.getLineIndex(line.origin);
+            this.gotoLine(index + 1);
+        }
+    }
 });
 
 var Editor = React.createClass({
@@ -1388,6 +1422,7 @@ var Calendar = React.createClass({
         var view = this.$calendar.fullCalendar('getView');
         return view.getEventSegs();
     }
+
 
 });
 
