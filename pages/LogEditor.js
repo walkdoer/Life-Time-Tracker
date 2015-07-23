@@ -149,6 +149,7 @@ var Page = React.createClass({
 
     onDateChange: function (date) {
         date = new Moment(date).format(DATE_FORMAT)
+        this.jumpWhenEditorLoad = null;
         this.setState({
             current: date
         });
@@ -160,11 +161,13 @@ var Page = React.createClass({
         this.setState({
             current: prevDay.format(DATE_FORMAT)
         });
+        this.jumpWhenEditorLoad = null;
         this.transitionTo('logEditor', {date: prevDay.format(DATE_FORMAT)});
     },
 
     gotoNextDay: function () {
-        var next = new Moment(this.state.current).add(1, 'day')
+        var next = new Moment(this.state.current).add(1, 'day');
+        this.jumpWhenEditorLoad = null;
         this.setState({
             current: next.format(DATE_FORMAT)
         });
@@ -172,7 +175,8 @@ var Page = React.createClass({
     },
 
     gotoToday: function () {
-        var today = new Moment().format(DATE_FORMAT)
+        var today = new Moment().format(DATE_FORMAT);
+        this.jumpWhenEditorLoad = null;
         console.log('goto today', today);
         this.setState({
             current: today
@@ -181,7 +185,8 @@ var Page = React.createClass({
     },
 
     gotoDate: function (date) {
-        date = new Moment(date).format(DATE_FORMAT)
+        date = new Moment(date).format(DATE_FORMAT);
+        this.jumpWhenEditorLoad = null;
         this.setState({
             current: date
         });

@@ -706,7 +706,12 @@ var LogEditor = React.createClass({
         var line = this.getCurrentLine();
         var log = null;
         if (line) {
-            log = this.toLogObject(line)[0];
+            var logs = this.getAllLogs();
+            logs.some(function (logItem) {
+                if (logItem.origin === line) {
+                    log = logItem;
+                }
+            });
         }
         return log;
     },
