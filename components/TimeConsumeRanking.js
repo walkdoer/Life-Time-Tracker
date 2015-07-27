@@ -77,12 +77,12 @@ module.exports = React.createClass({
             return null;
         }
         return (
-            !_.isEmpty(this.state.rankingData) ? this.renderRankingData(this.state.rankingData) : null
+            !_.isEmpty(this.state.rankingData) ? this.renderRankingData(rankType, this.state.rankingData) : null
         );
     },
 
-    renderRankingData: function (data) {
-        return <Bar data={this.convertData(data)} exporting={false} labelWidth={this._width * 0.3} legend={false}/>
+    renderRankingData: function (rankType, data) {
+        return <Bar data={rankType === 'classes' ? this.convertClassesData(data) : this.convertData(data)} exporting={false} labelWidth={this._width * 0.3} legend={false}/>
     },
 
     componentDidMount: function () {
@@ -140,6 +140,26 @@ module.exports = React.createClass({
                 name = item._id.name;
             } else {
                 name = item._id || 'unknow';
+            }
+            return {
+                label: name,
+                value: item.totalTime
+            };
+        });
+    },
+
+    convertClassesData: function (data) {
+        var logClasses = config.classes;
+        return data.map(function (item) {
+            var name;
+            var itemId = item._id;
+            if (itemId && itemId.name) {
+                name = itemId.name;
+            } else if (itemId){
+                var clsConfig = logClasses.filter(function (cls) {
+                    return cls._id === itemId;
+                })[0];
+                name = clsConfig ? clsConfig.name : "unknow";
             }
             return {
                 label: name,
