@@ -1,7 +1,12 @@
-(function(window, undefined) {
+/**
+ * 使用 XMLHttpRequest 来请求文件，可以知道文件的加载进度
+ * @author andrew(zhangmhao@gmail.com)
+ */
+(function(win, doc, undefined) {
     'use strict';
+    var head = doc.head;
     var EMPTY_FUN = function () {};
-    var isArray = Array.isArray || function (el) { return Object.prototype.toString.call(el) === "[object Array]";}
+    var isArray = Array.isArray || function (el) { return Object.prototype.toString.call(el) === "[object Array]";};
 
     /**
      * use XMLHttpRequest to load file
@@ -11,7 +16,6 @@
             return;
         }
         var onProgress = options.onProgress || EMPTY_FUN;
-        var onExcuted = options.onExcuted || EMPTY_FUN;
         var onError = options.onError || EMPTY_FUN;
         var onAbort = options.onAbort || EMPTY_FUN;
         var onComplete = options.onComplete || EMPTY_FUN;
@@ -65,7 +69,7 @@
         return sum / (scriptLength);
     }
 
-    window.loadFile = function (urls, options) {
+    win.loadFile = function (urls, options) {
         var onProgress = options.onProgress || EMPTY_FUN;
         var onError = options.onError || EMPTY_FUN;
         var onAbort = options.onAbort || EMPTY_FUN;
@@ -80,40 +84,43 @@
         var scriptProgresses = Object.create(null);
         var responseCache = {};
         urls.forEach(function (url) {
-            loadFile(url, {
-                onProgress: function (progress) {
-                    scriptProgresses[url] = progress;
-                    var totalProgress = calculateTotalProgress(scriptProgresses, scriptLength);
-                    if (totalProgress !== null) {
-                        onProgress(totalProgress);
+            var timer = win.setTimeout(function () {
+                loadFile(url, {
+                    onProgress: function (progress) {
+                        scriptProgresses[url] = progress;
+                        var totalProgress = calculateTotalProgress(scriptProgresses, scriptLength);
+                        if (totalProgress !== null) {
+                            onProgress(totalProgress);
+                        }
+                    },
+
+                    onComplete: function (e) {
+                        var index = queue.indexOf(url);
+                        var element = e.target;
+                        queue.splice(index, 1);
+                        responseCache[url] = element.responseText;
+                        if (queue.length === 0) {
+                            onComplete.apply(null, urls.map(function (url) {
+                                return responseCache[url];
+                            }));
+                        }
+                    },
+
+                    onError: function () {
+                        onError(url);
+                    },
+
+                    onAbort: function () {
+                        onAbort(url);
                     }
-                },
-
-                onComplete: function (e) {
-                    var index = queue.indexOf(url);
-                    var element = e.target;
-                    queue.splice(index, 1);
-                    responseCache[url] = element.responseText;
-                    if (queue.length === 0) {
-                        onComplete.apply(null, urls.map(function (url) {
-                            return responseCache[url];
-                        }));
-                    }
-                },
-
-                onError: function () {
-                    onError(url);
-                },
-
-                onAbort: function () {
-                    onAbort(url);
-                }
-            });
+                });
+                clearTimeout(timer);
+                timer = null;
+            }, 0);
         });
     };
-    window.loadJS = function (urls, options) {
+    win.loadJS = function (urls, options) {
         var onProgress = options.onProgress || EMPTY_FUN;
-        var onExcuted = options.onExcuted || EMPTY_FUN;
         var onError = options.onError || EMPTY_FUN;
         var onAbort = options.onAbort || EMPTY_FUN;
         var onComplete = options.onComplete || EMPTY_FUN;
@@ -140,9 +147,9 @@
                     var index = queue.indexOf(url);
                     var element = e.target;
                     var insertResponse = function (response) {
-                        var scriptDOM = document.createElement("script");
+                        var scriptDOM = doc.createElement("script");
                         scriptDOM.innerHTML = response;
-                        document.documentElement.appendChild(scriptDOM);
+                        head.appendChild(scriptDOM);
                     };
 
                     if (index === 0) {
@@ -170,11 +177,6 @@
                     onError(url);
                 },
 
-                onExcuted: function () {
-                    onExcuted(url);
-                    console.log('excuted:' + url);
-                },
-
                 onAbort: function () {
                     onAbort(url);
                 }
@@ -182,4 +184,4 @@
         });
     };
 
-})(window);
+})(window, document);
