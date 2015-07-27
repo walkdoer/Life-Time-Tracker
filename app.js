@@ -24,7 +24,7 @@ var Popover = ReactBootStrap.Popover;
 var Button = ReactBootStrap.Button;
 var Badge = ReactBootStrap.Badge;
 var Q = require('q');
-var classesMap = require('./conf/config').classesMap;
+var config = require('./conf/config');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 
 /** Components */
@@ -343,6 +343,7 @@ var Footer = React.createClass({
         }
         tickTime(doingLog);
         this.updateTimeIntervalId = this.setInterval(function () {
+            var logClasses = config.classes;
             var notifyInfo = that.notifyInfo;
             //check if this doing log is notify before
             if (notifyInfo && notifyInfo.id !== notifyId) {
@@ -382,8 +383,11 @@ var Footer = React.createClass({
                         subtitle = '🐴上休息啦，喝口水，运动下再战';
                     }
                 }
+                var logClass = doingLog.classes[0];
+                var logClassConfig = logClasses.filter(function (cls) { return cls._id === logClass; })[0];
+                var logClassLabel = logClassCofig ? logClassConfig.name : "unknow";
                 Ltt.sdk.notify({
-                    title: '😁' + '你在' + classesMap[doingLog.classes[0]] +'上投入了' + Util.displayTime(lastMinutes),
+                    title: '😁' + '你在' + logClassLabel +'上投入了' + Util.displayTime(lastMinutes),
                     subtitle: subtitle,
                     icon: path.join(__dirname, './images/me.jpg'),
                     sound: true,

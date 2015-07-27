@@ -16,6 +16,8 @@
 - `Command-T` 输出当前时间，格式为 `HH:mm` 例如 `09:23`
 - `Command-Alt-,` 上一条同类型的日志
 - `Command-Alt-.` 下一条同类型的日志
+- `Command-Shift-,` 最早一条同类型的日志
+- `Command-Shift-.` 最后一条同类型的日志
 
 
 #### 其他操作
