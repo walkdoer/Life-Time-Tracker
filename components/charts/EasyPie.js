@@ -4,6 +4,8 @@ var EasyPieChart = require('easyPieChart');
 module.exports = React.createClass({
 
     propTypes: {
+        value: React.PropTypes.number.isRequired,
+        total: React.PropTypes.number.isRequired,
         size: React.PropTypes.number.isRequired
     },
 

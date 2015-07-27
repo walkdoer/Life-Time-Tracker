@@ -37,6 +37,7 @@ var Task = require('../Task/Task');
 var LogList = require('../LogList');
 var TaskDetail = require('../Task/TaskDetail');
 var Notify = require('../Notify');
+var EasyPie = require('../charts/EasyPie');
 
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
@@ -673,7 +674,10 @@ var ProjectInfo = React.createClass({
                     {this.state.showProjectDetail ? <div className="ltt_c-projectDetail-basicInfo-detail">
                         <p className="ltt_c-projectDetail-tags">{tags}</p>
                     </div> : null}
-                    {this.props.versionId ? <VersionInfo id={this.props.versionId} onDeleteVersion={this.props.onDeleteVersion}/> : null}
+                    {this.props.versionId ?
+                        <VersionInfo id={this.props.versionId}
+                            projectTotalTime={project.totalTime}
+                            onDeleteVersion={this.props.onDeleteVersion}/> : null}
                 </section>
             );
         } else {
@@ -713,6 +717,7 @@ var VersionInfo = React.createClass({
     },
     render: function () {
         var version = this.state.version;
+        var projectTotalTime = this.props.projectTotalTime;
         return version ? (
             <div className="ltt_p-projectDetail-versionInfo">
                 <div className="ltt_p-projectDetail-versionInfo-content">
@@ -732,6 +737,10 @@ var VersionInfo = React.createClass({
                     <span className="ltt-M2">
                         <i className="fa fa-clock-o" title="Total time"></i>
                         {Moment.duration(version.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {new Moment(version.createTime).from(version.lastActiveTime, true)}
+                        <span className="percent">
+                            <span className="num">{(version.totalTime / projectTotalTime * 100).toFixed(1)}%</span>
+                            of project time
+                        </span>
                     </span>
                 </div>
                 <div className="ltt_p-projectDetail-versionInfo-btns">

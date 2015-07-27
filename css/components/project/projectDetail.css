@@ -30,3 +30,12 @@
 .ltt_c-projectDetail-times .fa{
    margin: 0 5px;
 }
+
+.ltt_p-projectDetail-versionInfo .percent{
+    margin-left:7px;
+}
+
+.ltt_p-projectDetail-versionInfo .percent .num{
+    font-style: italic;
+    font-weight:bold;
+}
