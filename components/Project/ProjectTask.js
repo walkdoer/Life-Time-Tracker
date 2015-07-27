@@ -617,6 +617,7 @@ var ProjectInfo = React.createClass({
     getInitialState: function () {
         return {
             showProjectDetail: false,
+            allTotalTime: null,
             selectTags: []
         };
     },
@@ -625,6 +626,10 @@ var ProjectInfo = React.createClass({
         this.setState({
             showProjectDetail: !this.state.showProjectDetail
         });
+    },
+
+    componentWillMount: function () {
+        this.loadTotalTime();
     },
 
     render: function () {
@@ -647,7 +652,7 @@ var ProjectInfo = React.createClass({
             var mProjectCreateTime = new Moment(project.createdTime);
             var mProjectLastActiveTime = new Moment(project.lastActiveTime);
             projectBasicInfo = (
-                <section className="ltt_c-projectDetail-basicInfo">
+                <section className="ltt_c-projectDetail-projectInfo">
                     <h1>
                         {project.name}
                         <span className="ltt_c-projectDetail-logClasses">{logClasses}</span>
@@ -665,13 +670,21 @@ var ProjectInfo = React.createClass({
                             <span className="ltt-M2">
                                 <i className="fa fa-clock-o" title="Total time"></i>
                                 {Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {mProjectLastActiveTime.from(mProjectCreateTime, true)}
+                                {this.state.allTotalTime ? <span className="percent">
+                                    <span className="num">{(project.totalTime / this.state.allTotalTime * 100).toFixed(1)}%</span>
+                                    of total time
+                                </span> : null}
                             </span>
                         </span>
                     </h1>
                     <span className="openDetail" onClick={this.toggleProjectDetail}>
                         <i className={this.state.showProjectDetail ? "fa fa-chevron-circle-down" : "fa fa-chevron-circle-right"}></i>
                     </span>
-                    {this.state.showProjectDetail ? <div className="ltt_c-projectDetail-basicInfo-detail">
+                    {this.state.showProjectDetail ? <div className="ltt_c-projectDetail-projectInfo-detail">
+                    <span className="percent">
+                            <span className="num">{(version.totalTime / projectTotalTime * 100).toFixed(1)}%</span>
+                            of project time
+                        </span>
                         <p className="ltt_c-projectDetail-tags">{tags}</p>
                     </div> : null}
                     {this.props.versionId ?
@@ -699,6 +712,16 @@ var ProjectInfo = React.createClass({
         }, function () {
             this.props.onFilterTags && this.props.onFilterTags(this.state.selectTags);
         });
+    },
+
+    loadTotalTime: function () {
+        var that = this;
+        DataAPI.Log.totalTime()
+            .then(function (total) {
+                that.setState({
+                    allTotalTime: total
+                });
+            });
     }
 });
 

@@ -200,7 +200,7 @@
   margin:10px 0px;
 }
 
-.ltt_c-projectDetail-basicInfo{
+.ltt_c-projectDetail-projectInfo{
   position: relative;
 }
 
@@ -208,10 +208,10 @@
 
 
 
-.ltt_c-projectDetail-basicInfo-detail{
+.ltt_c-projectDetail-projectInfo-detail{
   padding-bottom: 10px;
 }
-.ltt_c-projectDetail-basicInfo .openDetail{
+.ltt_c-projectDetail-projectInfo .openDetail{
   position:absolute;
   top: 0;
   right: 20px;

@@ -31,10 +31,11 @@
    margin: 0 5px;
 }
 
+.ltt_c-projectDetail-projectInfo .percent,
 .ltt_p-projectDetail-versionInfo .percent{
     margin-left:7px;
 }
-
+.ltt_c-projectDetail-projectInfo .percent .num,
 .ltt_p-projectDetail-versionInfo .percent .num{
     font-style: italic;
     font-weight:bold;
