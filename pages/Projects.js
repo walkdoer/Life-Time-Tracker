@@ -10,6 +10,7 @@ var Moment = require('moment');
 var _ = require('lodash');
 var swal = require('sweetalert');
 var Mt = window.Mousetrap;
+var Isotope = require("isotope-layout");
 /*components*/
 var DateRangePicker = require('../components/DateRangePicker');
 var Pinyin = require('../components/Pinyin');
@@ -17,6 +18,7 @@ var ProjectCard = require('../components/Project/ProjectCard');
 var Notify = require('../components/Notify');
 var DataAPI = require('../utils/DataAPI');
 var LoadingMask = require('../components/LoadingMask');
+var pinyin = new Pinyin();
 
 /** Utils */
 var Bus = require('../utils/Bus');
@@ -93,6 +95,48 @@ var Projects = React.createClass({
         );
     },
 
+    initGrid: function () {
+        var grid = this.refs.projectCards.getDOMNode();
+        this.iso = new Isotope(grid, {
+            itemSelector: '.ltt_c-projectCard'
+        });
+    },
+
+    filterProject: function (text) {
+        var allProjects = this.allProjects;
+        text = text.trim();
+        this.iso.arrange({
+            filter: function (index, itemElement) {
+                var project;
+                var projectId = itemElement.dataset.id;
+                if (!projectId) {return false;}
+                allProjects.some(function (item) {
+                    if (projectId === item._id) {
+                        project = item;
+                        return true;
+                    }
+                    return false;
+                });
+                if (!project) { return false; }
+                var name = project.name;
+                var py = pinyin.getCamelChars(name).toLowerCase();
+                var fullPy = pinyin.getFullChars(name).toLowerCase();
+                var tags = project.tags || [];
+                var matchTag = tags.some(function (tag) {
+                    var tagPy = pinyin.getCamelChars(tag).toLowerCase();
+                    var tagFullPy = pinyin.getFullChars(tag).toLowerCase();
+                    return tag.indexOf(text) >= 0 || tagFullPy.indexOf(text) >= 0 || tagPy.indexOf(text) >= 0;
+                });
+                var matchClass = (project.classes || []).some(function (cls) {
+                    var upperCode = cls.toUpperCase();
+                    var upperText = text.toUpperCase();
+                    return upperCode.indexOf(upperText) >= 0;
+                });
+                return name.indexOf(text) >= 0 || fullPy.indexOf(text) >= 0 || py.indexOf(text) >= 0 || matchTag || matchClass;
+            }
+        });
+    },
+
     isIndex: function () {
         return this.isActive('projectManage');
     },
@@ -130,6 +174,8 @@ var Projects = React.createClass({
             that.setState({
                 loading: false,
                 projects: projects
+            }, function () {
+                this.initGrid();
             });
         }).fail(function (err) {
             console.error(err.stack);
@@ -147,32 +193,6 @@ var Projects = React.createClass({
             }).fail(function (err) {
                 Notify.error('delete fail ' + err.message);
             });
-    },
-
-    filterProject: function (text) {
-        var pinyin = new Pinyin();
-        text = text.trim();
-        var result = [];
-        result = this.allProjects.filter(function (project) {
-            var name = project.name;
-            var py = pinyin.getCamelChars(name).toLowerCase();
-            var fullPy = pinyin.getFullChars(name).toLowerCase();
-            var tags = project.tags || [];
-            var matchTag = tags.some(function (tag) {
-                var tagPy = pinyin.getCamelChars(tag).toLowerCase();
-                var tagFullPy = pinyin.getFullChars(tag).toLowerCase();
-                return tag.indexOf(text) >= 0 || tagFullPy.indexOf(text) >= 0 || tagPy.indexOf(text) >= 0;
-            });
-            var matchClass = (project.classes || []).some(function (cls) {
-                var upperCode = cls.toUpperCase();
-                var upperText = text.toUpperCase();
-                return upperCode.indexOf(upperText) >= 0;
-            });
-            return name.indexOf(text) >= 0 || fullPy.indexOf(text) >= 0 || py.indexOf(text) >= 0 || matchTag || matchClass;
-        });
-        this.setState({
-            projects: result
-        });
     }
 
 });

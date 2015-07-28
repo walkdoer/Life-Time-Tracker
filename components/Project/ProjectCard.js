@@ -84,7 +84,7 @@ var ProjectCard = React.createClass({
 
         /* <p className="ltt_c-projectCard-logClasses">{logClasses}</p> */
         return (
-            <div className="ltt_c-projectCard">
+            <div className="ltt_c-projectCard" data-id={projectData._id}>
                 <h1>
                     <Link to={'/projects/' + projectData._id}>{projectData.name}</Link>
                     <span className="ltt_c-projectCard-delete" onClick={this.props.onDelete}><i className="fa fa-close" title="delete project"></i></span>

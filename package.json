@@ -28,8 +28,8 @@
     "express": "~4.8.8",
     "extend": "~2.0.0",
     "flux": "~2.0.1",
-    "halogen": "^0.1.10",
     "he": "~0.5.0",
+    "isotope-layout": "^2.2.1",
     "jquery": "~2.1.1",
     "jquery-ui": "^1.10.5",
     "lodash": "^3.0.0",
@@ -50,7 +50,7 @@
     "randomcolor": "^0.2.0",
     "react": "^0.13.3",
     "react-bootstrap": "~0.13.0",
-    "react-router": "~0.11.0",
+    "react-router": "^0.13.3",
     "select2": "^3.5.2-browserify",
     "store2": "^2.2.2",
     "sweetalert": "^1.0.0-beta"
