@@ -287,7 +287,7 @@ var Logs = React.createClass({
             });
         } else {
             this.deleteFilter('tags');
-            //this.loadLogs();
+            this.loadLogs();
         }
     },
 
@@ -339,7 +339,6 @@ var Logs = React.createClass({
     loadLogs: function (cb) {
         var that = this;
         var filter = this.getFilter();
-        this.setState({ logLoaded: false });
         if (_.isEmpty(filter)) {
             this.setState({
                 logs: null
@@ -379,7 +378,7 @@ var Logs = React.createClass({
 
     loadTasks: function (cb) {
         var that = this;
-        DataAPI.Task.load()
+        DataAPI.Task.load({hierarchy: 1})
             .then(function (tasks) {
                 that.setState({
                     tasks: tasks
