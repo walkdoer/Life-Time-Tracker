@@ -54,6 +54,8 @@ var Logs = React.createClass({
             logs: null,
             tags: [],
             projects: [],
+            tasks: [],
+            versions: [],
             totalTime: null,
             tagOperatorAnd: false,
             logLoaded: true
@@ -172,21 +174,43 @@ var Logs = React.createClass({
     renderFilters: function () {
         return (
             <div className="ltt_c-page-logs-filters">
-                <div>
-                    Tags: <select className="filter-tags" ref="tagFilter" multiple="multiple">
-                    {this.state.tags.map(function (tag) {
-                        return <option value={tag.name}>{tag.name}</option>
-                    })}
-                    </select>
-                    <Button bsSize='small' active={this.state.tagOperatorAnd} onClick={this.onTagOperatorChange}>And</Button>
+                <div className="Grid">
+                    <div className="Grid-cell Grid">
+                        <label className="filter-label">Project:</label>
+                        <select className="filter-input" ref="projectFilter">
+                            <option></option>
+                            {this.state.projects.map(function (project) {
+                                return <option value={project.name}>{project.name}</option>
+                            })}
+                        </select>
+                    </div>
+                    <div className="Grid-cell Grid">
+                        <label className="filter-label">Version:</label>
+                        <select className="filter-input" ref="versionFilter">
+                            <option></option>
+                            {this.state.versions.map(function (item) {
+                                return <option value={item.name}>{item.name}</option>
+                            })}
+                        </select>
+                    </div>
+                    <div className="Grid-cell Grid">
+                        <label className="filter-label">Task:</label>
+                        <select className="filter-input" ref="taskFilter">
+                            <option></option>
+                        {this.state.tasks.map(function (item) {
+                            return <option value={item.name}>{item.name}</option>
+                        })}
+                        </select>
+                    </div>
                 </div>
                 <div>
-                    project: <select className="filter-tags" ref="projectFilter">
-                    <option></option>
-                    {this.state.projects.map(function (project) {
-                        return <option value={project.name}>{project.name}</option>
-                    })}
+                    <label className="filter-label">Tags:</label>
+                    <select className="filter-input filter-tags" ref="tagFilter" multiple="multiple">
+                        {this.state.tags.map(function (tag) {
+                            return <option value={tag.name}>{tag.name}</option>
+                        })}
                     </select>
+                    <Button bsSize='small' active={this.state.tagOperatorAnd} onClick={this.onTagOperatorChange}>And</Button>
                 </div>
             </div>
         );
@@ -208,13 +232,36 @@ var Logs = React.createClass({
         this.loadProjects(function () {
             var $select = $(that.refs.projectFilter.getDOMNode());
             $select.select2({
-                placeholder: "Select a Project",
+                placeholder: "Select a project",
                 allowClear: true
             });
             $select.on('change', function (e) {
                  that.onProjectChange(e.val);
             });
         });
+
+        this.loadVersions(function () {
+            var $select = $(that.refs.versionFilter.getDOMNode());
+            $select.select2({
+                placeholder: "Select a version",
+                allowClear: true
+            });
+            $select.on('change', function (e) {
+                 that.onVersionChange(e.val);
+            });
+        });
+
+        this.loadTasks(function () {
+            var $select = $(that.refs.taskFilter.getDOMNode());
+            $select.select2({
+                placeholder: "Select a task",
+                allowClear: true
+            });
+            $select.on('change', function (e) {
+                 that.onTaskChange(e.val);
+            });
+        });
+
         DataAPI.Tag.load().then(function (tags) {
             console.log('tags length:' + tags.length);
             that.setState({
@@ -257,6 +304,32 @@ var Logs = React.createClass({
         });
     },
 
+    onVersionChange: function (version) {
+        if (!version) {
+            this.deleteFilter("versions");
+        } else {
+            this.setFilter({
+                versions: version
+            });
+        }
+        this.loadLogs(function () {
+            this.updateCalendarHeatMap();
+        });
+    },
+
+    onTaskChange: function (task) {
+        if (!task) {
+            this.deleteFilter("tasks");
+        } else {
+            this.setFilter({
+                tasks: task
+            });
+        }
+        this.loadLogs(function () {
+            this.updateCalendarHeatMap();
+        });
+    },
+
     updateCalendarHeatMap: function () {
         if (this.refs.calendarHeatMap) {
             this.refs.calendarHeatMap.update();
@@ -290,6 +363,26 @@ var Logs = React.createClass({
             .then(function (projects) {
                 that.setState({
                     projects: projects
+                }, cb);
+            });
+    },
+
+    loadVersions: function (cb) {
+        var that = this;
+        DataAPI.Version.load()
+            .then(function (versions) {
+                that.setState({
+                    versions: versions
+                }, cb);
+            });
+    },
+
+    loadTasks: function (cb) {
+        var that = this;
+        DataAPI.Task.load()
+            .then(function (tasks) {
+                that.setState({
+                    tasks: tasks
                 }, cb);
             });
     },

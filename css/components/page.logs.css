@@ -54,3 +54,14 @@
     box-shadow: 0 0 5px #CCC;
     padding:10px 20px;
 }
+
+.ltt_c-page-logs-filters .filter-input{
+    flex:1;
+    margin-left:10px;
+    margin-right:10px;
+}
+
+.ltt_c-page-logs-filters .filter-label{
+    line-height: 26px;
+    margin-bottom: 0px;
+}
