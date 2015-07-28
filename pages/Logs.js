@@ -30,7 +30,7 @@ var CalendarHeatMap = require('../components/charts/CalendarHeatMap');
 /* utils */
 var DataAPI = require('../utils/DataAPI');
 var Util = require('../utils/Util');
-var DATE_TIME_FORMAT = Util.DATE_TIME_FORMAT;
+var TIME_FORMAT = "HH:mm";
 var DATE_FORMAT = Util.DATE_FORMAT;
 
 
@@ -327,7 +327,7 @@ var LogsTable = React.createClass({
             return Moment(cellData).format(DATE_FORMAT);
         }
         function renderDateTime(cellData) {
-            return Moment(cellData).format(DATE_TIME_FORMAT);
+            return Moment(cellData).format(TIME_FORMAT);
         }
         function renderTimeLength(cellData) {
             return Util.displayTime(cellData);
@@ -383,7 +383,7 @@ var LogsTable = React.createClass({
             <Column label={getLabel("Project", "project")}  width={150}  dataKey="project" cellRenderer={renderProject} headerRenderer={this._renderHeader}/>
             <Column label={getLabel("Version", "version")}  width={150}  dataKey="version" cellRenderer={renderVersion} headerRenderer={this._renderHeader}/>
             <Column label={getLabel("Task", "task")}  width={150}  dataKey="task" cellRenderer={renderTask} headerRenderer={this._renderHeader}/>
-            <Column label="Content" width={300} dataKey="content" />
+            <Column label="Content" width={300} headerRenderer={this._renderHeader} dataKey="content" />
         </Table>
     },
 
@@ -396,20 +396,42 @@ var LogsTable = React.createClass({
             sortDir = SortTypes.DESC;
         }
         var logs = this.state.logs.slice();
-        logs.sort(function (a, b) {
-            var sortVal = 0;
-            if ( a[sortBy] > b[sortBy]) {
-                sortVal = 1;
-            }
-            if ( a[sortBy] < b[sortBy]) {
-                sortVal = -1;
-            }
-
-            if (sortDir === SortTypes.DESC) {
-                sortVal = sortVal * -1;
-            }
-            return sortVal;
-        })
+        var sortCoefficient = (sortDir === SortTypes.DESC ? -1 : 1);
+        var sortFun;
+        if (['project', 'version', 'task'].indexOf(cellDataKey) >= 0 ){
+            sortFun = function (a, b) {
+                var aItem = a[sortBy];
+                var bItem = b[sortBy];
+                var aVal = (aItem ? aItem.name : "");
+                var bVal = (bItem ? bItem.name : "");
+                return aVal.localeCompare(bVal) * sortCoefficient;
+            };
+        } else if (['date', 'start', 'end'].indexOf(cellDataKey) >= 0) {
+            sortFun = function (a, b) {
+                var aUnix = new Date(a[sortBy]).getTime();
+                var bUnix = new Date(b[sortBy]).getTime();
+                return (aUnix - bUnix) * sortCoefficient;
+            };
+        } else if (["content"].indexOf(cellDataKey) >= 0) {
+            sortFun = function (a, b) {
+                var aVal = (a[sortBy] || "");
+                var bVal = (b[sortBy] || "");
+                return aVal.localeCompare(bVal) * sortCoefficient;
+            };
+        } else {
+            sortFun = function (a, b) {
+                var sortVal = 0;
+                var aVal = a[sortBy];
+                var bVal = b[sortBy];
+                if ( aVal > bVal) {
+                    sortVal = 1;
+                } else if ( aVal < bVal){
+                    sortVal = -1;
+                }
+                return sortVal * sortCoefficient;
+            };
+        }
+        logs.sort(sortFun);
         this.setState({
             logs: logs,
             sortBy: sortBy,
