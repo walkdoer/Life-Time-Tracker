@@ -53,6 +53,7 @@ var Logs = React.createClass({
         return {
             logs: null,
             tags: [],
+            projects: [],
             totalTime: null,
             tagOperatorAnd: false,
             logLoaded: true
@@ -171,12 +172,22 @@ var Logs = React.createClass({
     renderFilters: function () {
         return (
             <div className="ltt_c-page-logs-filters">
-                Tags: <select className="filter-tags" ref="tagFilter" multiple="multiple">
+                <div>
+                    Tags: <select className="filter-tags" ref="tagFilter" multiple="multiple">
                     {this.state.tags.map(function (tag) {
                         return <option value={tag.name}>{tag.name}</option>
                     })}
-                </select>
-                <Button bsSize='small' active={this.state.tagOperatorAnd} onClick={this.onTagOperatorChange}>And</Button>
+                    </select>
+                    <Button bsSize='small' active={this.state.tagOperatorAnd} onClick={this.onTagOperatorChange}>And</Button>
+                </div>
+                <div>
+                    project: <select className="filter-tags" ref="projectFilter">
+                    <option></option>
+                    {this.state.projects.map(function (project) {
+                        return <option value={project.name}>{project.name}</option>
+                    })}
+                    </select>
+                </div>
             </div>
         );
     },
@@ -185,22 +196,30 @@ var Logs = React.createClass({
         this.setState({
             tagOperatorAnd: !this.state.tagOperatorAnd
         }, function () {
-            this.loadLogs();
-            if (this.refs.calendarHeatMap) {
-                this.refs.calendarHeatMap.update();
-            }
+            this.loadLogs(function () {
+                this.updateCalendarHeatMap();
+            });
         });
     },
 
     componentDidMount: function () {
         var that = this;
         this.loadTotalTime();
+        this.loadProjects(function () {
+            var $select = $(that.refs.projectFilter.getDOMNode());
+            $select.select2({
+                placeholder: "Select a Project",
+                allowClear: true
+            });
+            $select.on('change', function (e) {
+                 that.onProjectChange(e.val);
+            });
+        });
         DataAPI.Tag.load().then(function (tags) {
             console.log('tags length:' + tags.length);
             that.setState({
                 tags: tags
             }, function () {
-                console.log(that.refs.tagFilter);
                 var $select = $(that.refs.tagFilter.getDOMNode());
                 $select.select2();
                 $select.on('change', _.debounce(function (e) {
@@ -216,17 +235,35 @@ var Logs = React.createClass({
             this.setFilter({
                 tags: tags.join(',')
             });
-            this.loadLogs();
-            if (this.refs.calendarHeatMap) {
-                this.refs.calendarHeatMap.update();
-            }
+            this.loadLogs(function () {
+                this.updateCalendarHeatMap();
+            });
         } else {
             this.deleteFilter('tags');
             //this.loadLogs();
         }
     },
 
-    loadLogs: function () {
+    onProjectChange: function (project) {
+        if (!project) {
+            this.deleteFilter("projects");
+        } else {
+            this.setFilter({
+                projects: project
+            });
+        }
+        this.loadLogs(function () {
+            this.updateCalendarHeatMap();
+        });
+    },
+
+    updateCalendarHeatMap: function () {
+        if (this.refs.calendarHeatMap) {
+            this.refs.calendarHeatMap.update();
+        }
+    },
+
+    loadLogs: function (cb) {
         var that = this;
         var filter = this.getFilter();
         this.setState({ logLoaded: false });
@@ -239,12 +276,22 @@ var Logs = React.createClass({
                 that.setState({
                     logs: logs,
                     logLoaded: true
-                });
+                }, cb);
             }).catch(function (err) {
                 console.error(err.stack);
                 Notify.error('load failed');
             });
         }
+    },
+
+    loadProjects: function (cb) {
+        var that = this;
+        DataAPI.Project.load()
+            .then(function (projects) {
+                that.setState({
+                    projects: projects
+                }, cb);
+            });
     },
 
     loadCalendarHeatMapData: function () {
