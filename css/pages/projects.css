@@ -39,6 +39,15 @@
     height: 200px;
     position: relative;
 }
+.ltt_c-projectCard-task .done{
+    text-decoration: line-through;
+    color: #A3A3A3;
+}
+.ltt_c-projectCard-task-progress{
+  margin-left: 5px;
+  font-style: italic;
+  font-weight: bold;
+}
 
 .ltt_c-projectDetail-logs {
 }

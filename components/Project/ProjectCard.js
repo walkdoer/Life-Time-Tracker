@@ -5,6 +5,7 @@
 
 
 var React = require('react');
+var cx = React.addons.classSet;
 var Moment = require('moment');
 require("moment-duration-format");
 var Tag = require('../Tag');
@@ -72,10 +73,14 @@ var ProjectCard = React.createClass({
                     href += '/versions/' + lastVersionData._id;
                 }
                 href += '/tasks/' + task._id;
+                var taskPg = task.progress;
                 return (
                     <li className="ltt_c-projectCard-task">
                         <i className="fa fa-angle-right"></i>
-                        <Link to={href}>{task.name}</Link>
+                        <Link to={href}>
+                            <span className={cx({done: taskPg === 100})}>{task.name}</span>
+                            {taskPg < 100 && taskPg >= 0 ? <span className="ltt_c-projectCard-task-progress">{taskPg + '%'}</span> : null}
+                        </Link>
                     </li>
                 );
             });
