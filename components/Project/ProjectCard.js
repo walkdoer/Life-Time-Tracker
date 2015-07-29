@@ -15,15 +15,8 @@ var Router = require('react-router');
 var Link = Router.Link;
 var D3SimpleColumn = require('../charts/D3SimpleColumn.js');
 
-var LogClassColors = {
-    NT: '#CCC',
-    WK: '#84cbbc',
-    SPR: '#fdc53b',
-    STU: '#BAED86',
-    TK: '#000',
-    BRK: '#6D6C99'
-};
 
+var config = require('../../conf/config');
 var DataAPI = require('../../utils/DataAPI');
 
 var ProjectCard = React.createClass({
@@ -118,10 +111,14 @@ var ProjectCard = React.createClass({
     getLogClassIndicators: function () {
         var logClasses = this.props.data.classes,
             indicators;
+        var logClassesColors = {};
+        config.classes.forEach(function (item) {
+            logClassesColors[item._id] = item.color;
+        });
         if (!_.isEmpty(logClasses)) {
             indicators = logClasses.map(function (cls) {
                 var style = {
-                    'background-color': LogClassColors[cls]
+                    'background-color': logClassesColors[cls]
                 };
                 return <i title={cls.name} style={style}></i>
             });
