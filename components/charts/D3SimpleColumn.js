@@ -47,6 +47,9 @@ module.exports = React.createClass({
         var w = $el.width();
         var h = $el.height();
         var barPadding = 1;
+        if (dataLen * barPadding > w * 0.3) {
+          barPadding = 0;
+        }
         var y = d3.scale.linear()
             .domain([0, d3.max(data)])
             .range([0, h]);
