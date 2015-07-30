@@ -91,7 +91,10 @@ var Goal = React.createClass({
         this._totalProgress = (this.state.totalTime / estimatedTime * 100);
         this._todayProgressOfTotal = (this.state.todayTime / estimatedTime * 100);
         return <div className="ltt_c-OneDayGoal-goal">
-            <p className="ltt_c-OneDayGoal-goal-name">{goal.name}</p>
+            <p className="ltt_c-OneDayGoal-goal-name">
+                {goal.name}
+                <span className="ltt_c-OneDayGoal-goal-time">{Util.displayTime(oneDayTime)}</span>
+            </p>
             <p className="ltt_c-OneDayGoal-goal-charts">
                 {this.state.calculated ?
                 <div className="ltt_c-OneDayGoal-goal-progress">
