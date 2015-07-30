@@ -22,6 +22,7 @@ var LoadingMask = require('../components/LoadingMask');
 var Board = require('../components/Borad');
 var LogClassPie = require('../components/LogClassPie');
 var Settings = require('./Settings');
+var VerticleTimeline = require('../components/VerticleTimeline');
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
@@ -42,41 +43,65 @@ var Dashboard = React.createClass({
 
     mixins: [PureRenderMixin],
 
+    getInitialState: function () {
+        return {
+            activityLoaded: false
+        };
+    },
+
+    componentDidMount: function () {
+        var that = this;
+        this.loadActivities().then(function (activitys){
+            that.setState({
+                activitys: activitys,
+                activityLoaded: true
+            });
+        });
+    },
+
     render: function () {
         return (
             <div className="ltt_c-page ltt_c-page-dashboard">
                 <Board/>
-                <div className="ltt_c-page-com">
-                    <RecentActivity initialTab={'today'}/>
-                </div>
-                <div className="ltt_c-page-com">
-                    <p className="ltt_c-page-title">Sport Cal-Heatmap</p>
-                    <CalendarHeatMap
-                        getData={this.loadSportCalendar}
-                        empty="no sport data"
-                        filled="{date} 运动时间 {count}分钟"/>
-                </div>
-                <div className="ltt_c-page-com">
-                    <p className="ltt_c-page-title">Meditation</p>
-                    <CalendarHeatMap
-                        getData={this.loadMeditationCalendar}
-                        empty="do not meditate this day"
-                        filled="{date} meditate {count}"/>
-                </div>
-                <div className="ltt_c-page-com">
-                    <p className="ltt_c-page-title">Thinking</p>
-                    <CalendarHeatMap
-                        getData={this.loadThinkingCalendar}
-                        empty="do not meditate this day"
-                        filled="{date} meditate {count}"/>
-                </div>
-                <div className="Grid Grid--gutters Grid--stretch">
-                    <div className="Grid-cell u-1of3">
-                        <MonthCountDown height={250} padding={0}
-                            itemPadding={2} lifeYear={70} birthday={Settings.get('birthday')}/>
+                <div className="Grid Grid--gutters">
+                    <div className="Grid-cell u-2of3">
+                        <div className="ltt_c-page-com">
+                            <RecentActivity initialTab={'today'}/>
+                        </div>
+                        <div className="ltt_c-page-com">
+                            <p className="ltt_c-page-title">Sport Cal-Heatmap</p>
+                            <CalendarHeatMap
+                                getData={this.loadSportCalendar}
+                                empty="no sport data"
+                                filled="{date} 运动时间 {count}分钟"/>
+                        </div>
+                        <div className="ltt_c-page-com">
+                            <p className="ltt_c-page-title">Meditation</p>
+                            <CalendarHeatMap
+                                getData={this.loadMeditationCalendar}
+                                empty="do not meditate this day"
+                                filled="{date} meditate {count}"/>
+                        </div>
+                        <div className="ltt_c-page-com">
+                            <p className="ltt_c-page-title">Thinking</p>
+                            <CalendarHeatMap
+                                getData={this.loadThinkingCalendar}
+                                empty="do not meditate this day"
+                                filled="{date} meditate {count}"/>
+                        </div>
+                        <div className="Grid Grid--gutters Grid--stretch">
+                            <div className="Grid-cell u-1of3">
+                                <MonthCountDown height={250} padding={0}
+                                    itemPadding={2} lifeYear={70} birthday={Settings.get('birthday')}/>
+                            </div>
+                            <div className="Grid-cell u-1of3" ref="logClassPieContainer">
+                                <LogClassPie title="All Time's Class distribution" start={new Moment(Settings.get('startDate'))} end={new Moment()} compare={false} legend={true}/>
+                            </div>
+                        </div>
                     </div>
-                    <div className="Grid-cell u-1of3" ref="logClassPieContainer">
-                        <LogClassPie title="All Time's Class distribution" start={new Moment(Settings.get('startDate'))} end={new Moment()} compare={false} legend={true}/>
+                    <div className="Grid-cell u-1of3">
+                        <VerticleTimeline activitys={this.state.activitys}/>
+                        <LoadingMask loaded={this.state.activityLoaded}/>
                     </div>
                 </div>
             </div>
@@ -134,9 +159,37 @@ var Dashboard = React.createClass({
                 }
             });
         });
+    },
+
+    loadActivities: function () {
+        return DataAPI.Log.load({
+            skip: 0,
+            limit: 10,
+            populate: true,
+            sort: 'start:-1'
+        }).then(function (logs) {
+            return logs.map(function (log) {
+                log.title = getTitle(log);
+                return log;
+            })
+        });
     }
 
 });
+
+function getTitle(log) {
+    var title = '';
+    if (!_.isEmpty(log.classes)) {
+        title += log.classes.join(',');
+    }
+    if (!_.isEmpty(log.tags)) {
+        title += '[' + log.tags.join(',') + ']';
+    }
+    if (log.task) {
+        title += log.task.name;
+    }
+    return title;
+}
 
 var RecentActivity = React.createClass({
 
