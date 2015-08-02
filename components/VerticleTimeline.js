@@ -6,6 +6,8 @@ var _ = require('lodash');
 var Moment = require('moment');
 var Q = require('q');
 
+/** Compoentns */
+var Tag = require('../components/Tag');
 
 module.exports = React.createClass({
 
@@ -34,24 +36,53 @@ module.exports = React.createClass({
 });
 
 
+
+
 var Activity = React.createClass({
 
     render: function () {
         var activity = this.props.data;
         var mStart = Moment(activity.start);
+        var signs = activity.signs;
+        var iconStyle;
+        if (!_.isEmpty(activity.classes)) {
+            var activityCls = activity.classes[0];
+            iconStyle = {
+                backgroundColor: activityCls.color
+            };
+        }
+        var icon;
+        if (!_.isEmpty(signs)) {
+            if (signs.indexOf("wake"))  {
+                icon = <i className="fa fa-sun-o"></i>
+            } else if (signs.indexOf("sleep")) {
+                icon = <i className="fa fa-bed"></i>
+            }
+        }
         return (
             <li className="ltt_c-VerticleTimeline-Activity">
                 <time className="cbp_tmtime" datetime={activity.start}>
                     <span className="cbp_date">{mStart.format('YYYY-MM-DD')}</span>
                     <span className="cbp_time">{mStart.format('HH:mm')}</span>
                 </time>
-                <div className="cbp_tmicon cbp_tmicon-phone"></div>
+                <div className="cbp_tmicon" style={iconStyle}>{icon}</div>
                 <div className="cbp_tmlabel">
                     <div className="arrow"></div>
-                    <div className="cbp_title">{activity.title}</div>
+                    <div className="cbp_title">
+                        {activity.project ? <span>{activity.project.name}</span> : null}
+                        {activity.version ? <span>{activity.version.name}</span> : null}
+                        {activity.task ? <span>{activity.task.name}</span> : null}
+                    </div>
+                    <div className="cbp_tags">
+                    {
+                        activity.tags ? activity.tags.map(function (tag) {
+                            return <Tag>{tag}</Tag>
+                        }) : null
+                    }
+                    </div>
                     <div className="cbp_content">{activity.content}</div>
                 </div>
             </li>
         );
     }
-})
+});

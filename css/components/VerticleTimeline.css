@@ -61,7 +61,6 @@
     margin: 0px 0 15px 130px;
     background: #FFFFFF;
     padding: 2em;
-    font-size: 1.2em;
     font-weight: 300;
     line-height: 1.4;
     position: relative;
@@ -78,7 +77,24 @@
 .cbp_tmtimeline > li .cbp_tmlabel .cbp_title {
     margin-top: 0px;
     padding: 0 0 10px 0;
+    font-size:1.1rem;
+    font-weight: 500;
     border-bottom: 1px solid rgba(255,255,255,0.4);
+}
+
+.cbp_tmtimeline > li .cbp_tmlabel .cbp_content {
+    color: #6E6E6E;
+}
+
+.cbp_tmtimeline > li .cbp_tmlabel .ltt_c-tag {
+    background-color: #E6EEF0;
+    color: #404040;
+    text-shadow: none;
+}
+
+.cbp_tmtimeline > li .cbp_tmlabel .ltt_c-tag .fa-tag{
+    color: #404040;
+    display: none;
 }
 
 /* The triangle */

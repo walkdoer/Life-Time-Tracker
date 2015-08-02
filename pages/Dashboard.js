@@ -28,6 +28,9 @@ var VerticleTimeline = require('../components/VerticleTimeline');
 var DataAPI = require('../utils/DataAPI');
 var Util = require('../utils/Util');
 
+/** Configs */
+var config = require('../conf/config');
+
 /**
  <div className="ltt_c-page-com">
                     <p className="ltt_c-page-title">Sleep Period</p>
@@ -168,8 +171,13 @@ var Dashboard = React.createClass({
             populate: true,
             sort: 'start:-1'
         }).then(function (logs) {
+            var classConfigs = config.classes;
             return logs.map(function (log) {
-                log.title = getTitle(log);
+                log.classes = log.classes.map(function (clsId) {
+                    return classConfigs.filter(function (cls) {
+                        return cls._id === clsId;
+                    })[0] || clasId;
+                });
                 return log;
             })
         });
@@ -177,19 +185,6 @@ var Dashboard = React.createClass({
 
 });
 
-function getTitle(log) {
-    var title = '';
-    if (!_.isEmpty(log.classes)) {
-        title += log.classes.join(',');
-    }
-    if (!_.isEmpty(log.tags)) {
-        title += '[' + log.tags.join(',') + ']';
-    }
-    if (log.task) {
-        title += log.task.name;
-    }
-    return title;
-}
 
 var RecentActivity = React.createClass({
 
