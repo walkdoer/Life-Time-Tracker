@@ -335,7 +335,7 @@ var LogEditor = React.createClass({
             }
         }
         var newLine = index;
-        if (allLines[index]) {
+        if (allLines[index - 1]) {
             log += '\n';
         }
         session.insert({row: newLine, column: 0}, log);
@@ -432,7 +432,7 @@ var LogEditor = React.createClass({
 
         commands.addCommand({
             name: 'startNewLog',
-            bindKey: {win: 'Ctrl-n', mac: 'Command-n'},
+            bindKey: {win: 'Ctrl-i', mac: 'Command-i'},
             exec: function (editor) {
                 var log = new Moment().format('HH:mm') + '~';
                 var line = that.insertLogToLastValidLogLine(log);
