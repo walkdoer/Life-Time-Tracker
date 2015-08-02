@@ -358,7 +358,7 @@ var LogClassCard = React.createClass({
 
     getInitialState: function () {
         var data = this.props.data;
-        return  _.pick(data, ['name', '_id', 'description', 'color']);
+        return  _.pick(data, ['name', '_id', 'description', 'color', 'icon']);
     },
 
     render: function () {
@@ -367,6 +367,7 @@ var LogClassCard = React.createClass({
             <form className='form-horizontal logClassCard'>
                 <Input type='text' value={this.state._id} label='Code' disabled={true} labelClassName='col-xs-2' wrapperClassName='col-xs-10' />
                 <Input type='text' name="name" value={this.state.name} label='Name' onChange={this.onFieldChange} labelClassName='col-xs-2' wrapperClassName='col-xs-10' />
+                <Input type='text' name="icon" value={this.state.icon} label='Icon' onChange={this.onFieldChange} labelClassName='col-xs-2' wrapperClassName='col-xs-10' />
                 <Input type='textarea' name="description" value={this.state.description} onChange={this.onFieldChange} label='Description' labelClassName='col-xs-2' wrapperClassName='col-xs-10' placeholder="log class description."/>
                 <div className="form-group">
                     <label className="control-label col-xs-2"><span>Color</span></label>
@@ -406,7 +407,7 @@ var LogClassCard = React.createClass({
         var newState = {};
         newState[name] = val;
         this.setState(newState, function () {
-            DataAPI.Class.update(extend({}, this.props.data, _.pick(this.state, 'name')))
+            DataAPI.Class.update(extend({}, this.props.data, _.pick(this.state, ['name', "icon", "description"])))
                 .then(updateClassesConfig);
         });
     }

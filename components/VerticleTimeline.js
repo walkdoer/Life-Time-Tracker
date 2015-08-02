@@ -45,8 +45,11 @@ var Activity = React.createClass({
         var mStart = Moment(activity.start);
         var signs = activity.signs;
         var iconStyle;
+        var activityCls;
         if (!_.isEmpty(activity.classes)) {
-            var activityCls = activity.classes[0];
+            activityCls = activity.classes[0];
+        }
+        if (activityCls) {
             iconStyle = {
                 backgroundColor: activityCls.color
             };
@@ -58,6 +61,9 @@ var Activity = React.createClass({
             } else if (signs.indexOf("sleep")) {
                 icon = <i className="fa fa-bed"></i>
             }
+        }
+        if (!icon && activityCls && activityCls.icon) {
+            icon = <i className={"fa fa-" + activityCls.icon}/>
         }
         return (
             <li className="ltt_c-VerticleTimeline-Activity">
