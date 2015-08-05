@@ -489,13 +489,6 @@ var LogEditor = React.createClass({
             }
         });
 
-        commands.addCommand({
-            name: 'gotoFirstLog',
-            bindKey: {win: 'Ctrl-shift-b', mac: 'Command-shift-b'},
-            exec: function () {
-                editor.session.replace(new Range(row, 0, row, Number.MAX_VALUE), newText)
-            }
-        });
 
         commands.addCommand({
             name: 'updateEndTime',
