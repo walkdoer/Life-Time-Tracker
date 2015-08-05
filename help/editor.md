@@ -7,6 +7,7 @@
 - `Command-[` Go to prev day 打开前一天日志
 - `Command-O` Open date 打开**任意一天**日志
 
+
 #### 日志操作
 
 - `Command-I` Insert a new log 插入一条新日志，以当前时间为起始时间
@@ -18,7 +19,7 @@
 - `Command-Alt-.` Next log of same type 下一条同类型的日志
 - `Command-Shift-,` First log of same type 最早一条同类型的日志
 - `Command-Shift-.` Last log of same type 最后一条同类型的日志
-
+- `Command-[1..9]` 跳到耗时排行第n的日志行
 
 #### 其他操作
 
