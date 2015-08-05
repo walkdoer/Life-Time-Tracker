@@ -490,8 +490,59 @@ var LogEditor = React.createClass({
         });
 
         commands.addCommand({
+            name: 'gotoFirstLog',
+            bindKey: {win: 'Ctrl-shift-b', mac: 'Command-shift-b'},
+            exec: function () {
+                editor.session.replace(new Range(row, 0, row, Number.MAX_VALUE), newText)
+            }
+        });
+
+        commands.addCommand({
+            name: 'updateEndTime',
+            bindKey: {win: 'Ctrl-Shift-E', mac: 'Command-Shift-E'},
+            exec: function () {
+                var endRegexp = /\s*[~～-]\s*\d{1,2}\s*[:]\s*\d{1,2}/ig;
+                var pos = editor.getCursorPosition();
+                var row = pos.row;
+                var line = that.getCurrentLine();
+                if (line) {
+                    var time = line.match(endRegexp);
+                    if (time && (time = time[0])) {
+                        time = time.trim().slice(1);
+                        var spliterPos = line.indexOf('~');
+                        var replacePos = line.indexOf(time, spliterPos)
+                        if (replacePos < 0) {return;}
+                        editor.session.replace(new Range(row, replacePos, row, replacePos + time.length), new Moment().format('HH:mm'))
+                    }
+                }
+            }
+        });
+
+        commands.addCommand({
+            name: 'updateBeginTime',
+            bindKey: {win: 'Ctrl-shift-B', mac: 'Command-shift-B'},
+            exec: function () {
+                var beginRegexp = /\d{1,2}\s*[:]\s*\d{1,2}\s*[~～-]\s*/ig;
+                var pos = editor.getCursorPosition();
+                var row = pos.row;
+                var line = that.getCurrentLine();
+                if (line) {
+                    var time = line.match(beginRegexp);
+                    if (time && (time = time[0])) {
+                        time = time.trim();
+                        time = time.slice(0, time.indexOf('~'));
+                        var replacePos = line.indexOf(time);
+                        if (replacePos < 0) {return;}
+                        editor.session.replace(new Range(row, replacePos, row, replacePos + time.length), new Moment().format('HH:mm'))
+                    }
+                }
+            }
+        });
+
+
+        commands.addCommand({
             name: 'finishActivity',
-            bindKey: {win: 'Ctrl-Shift-f', mac: 'Command-Shift-f'},
+            bindKey: {win: 'Ctrl-E', mac: 'Command-E'},
             exec: function (editor) {
                 that.finishCurrentActivity();
             }

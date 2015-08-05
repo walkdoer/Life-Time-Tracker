@@ -11,8 +11,10 @@
 #### 日志操作
 
 - `Command-I` Insert a new log 插入一条新日志，以当前时间为起始时间
-- `Command-B` Begig a log开始一条日志
-- `Command-F` Finish a log 完成一条日志
+- `Command-B` Begig a log 开始一条日志
+- `Command-Shift-B` Update Begin Time 更新开始时间
+- `Command-E` End a log 完成一条日志
+- `Command-Shift-E` Update End Time 更新结束时间
 - `Command-shift-C` Continue a log 继续一条日志
 - `Command-T` Input current time 输出当前时间，格式为 `HH:mm` 例如 `09:23`
 - `Command-Alt-,` Prev log of same type 上一条同类型的日志
