@@ -385,8 +385,8 @@ var Footer = React.createClass({
                 }
                 var logClass = doingLog.classes[0];
                 var logClassConfig = logClasses.filter(function (cls) { return cls._id === logClass; })[0];
-                var logClassLabel = logClassCofig ? logClassConfig.name : "unknow";
-                Ltt.sdk.notify({
+                var logClassLabel = logClassConfig ? logClassConfig.name : "unknow";
+                Ltt.sdk &&  Ltt.sdk.notify && Ltt.sdk.notify({
                     title: '😁' + '你在' + logClassLabel +'上投入了' + Util.displayTime(lastMinutes),
                     subtitle: subtitle,
                     icon: path.join(__dirname, './images/me.jpg'),

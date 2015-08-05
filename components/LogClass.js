@@ -1,16 +1,13 @@
 var React = require('react');
 var _ = require('lodash');
-var icon = {
-    NT: 'fa-briefcase',
-    WK: 'fa-desktop',
-    SPR: 'fa-bicycle',
-    STU: 'fa-mortar-board',
-    TK: 'fa-lightbulb-o',
-    BRK: 'fa-smile-o'
-};
+var config = require('../conf/config');
 
 var LogClass = React.createClass({
     render: function () {
+        var icon = {};
+        config.classes.forEach(function (cls) {
+            icon[cls._id] = cls.icon;
+        });
         var data = this.props.data;
         var iconClass, name;
         if (_.isString(data)) {
@@ -22,7 +19,7 @@ var LogClass = React.createClass({
         }
         return (
             <span className="ltt_c-logClass">
-                <i className={['fa', iconClass].join(' ')}></i>
+                <i className={['fa', 'fa-' + iconClass].join(' ')}></i>
                 {name}
             </span>
         );

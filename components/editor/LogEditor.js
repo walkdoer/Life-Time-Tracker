@@ -373,6 +373,17 @@ var LogEditor = React.createClass({
         }
     },
 
+    _saveWorkBeforeDestroy: function () {
+        var that = this;
+        if (this.isContentChange()) {
+            return this._persistCache().then(function () {
+                return that.save(that.editor.getValue());
+            });
+        } else {
+            return Q();
+        }
+    },
+
     _initEditorCommand: function () {
         var that = this;
         var editor = this.editor;
@@ -821,8 +832,6 @@ var LogEditor = React.createClass({
             this.state.highlightUnFinishLog !== nextState.highlightUnFinishLog ||
             this.state.showCalendar !== nextState.showCalendar;
         if (title !== nextProps.title) {
-            //only change the content will write to cache, it means if the content doesn't change
-            //then no need to write the file to disk
             this._persistCache();
             this._removeFromLocalStorage();
             this._destroyEditor();
@@ -900,14 +909,22 @@ var LogEditor = React.createClass({
         });
     },
 
+    isContentChange: function () {
+        var title = this.props.title;
+        return !!contentCache[title];
+    },
 
     _persistCache: function () {
         var title = this.props.title;
         var content = contentCache[title];
-        if (content) {
+        if (content !== undefined) {
             console.log('persist file ' + title);
-            this.writeLog(title, content);
-            delete contentCache[title];
+            return this.writeLog(title, content)
+                .then(function () {
+                    delete contentCache[title];
+                });
+        } else {
+            return Q(1);
         }
     },
 
@@ -930,68 +947,71 @@ var LogEditor = React.createClass({
 
     save: function (content) {
         var that = this;
-        var title = this.props.title;
-        if (this.__saveing) { console.log('saving log is going'); return; }
-        this.__saveing = true;
-        NProgress.start();
-        //write to local filesystem
-        var checkResult = Util.checkLogContent(title, content);
-        /* use sessioon.setAnnotations(annotations) to display error message
-            [{
-                row: error.line-1, // must be 0 based
-                column: error.character,  // must be 0 based
-                text: error.message,  // text to show in tooltip
-                type: "error"|"warning"|"info"
-            }]
-        */
-        var hasError = !_.isEmpty(checkResult.errors);
-        if (hasError) {
-            Notify.error('error occur when import log ' + checkResult.errors.map(function (error) {
-                return error.origin + error.message;
-            }).join('\n'));
-            NProgress.done();
-            that.__saveing = false;
-        }
-        if (!_.isEmpty(checkResult.warns)) {
+        var beforeSave = function () {
+            NProgress.start();
+        }, onWarn = function() {
             Notify.warning('warn from import log');
-        }
-        var start = new Date().getTime();
-        //import into database, for stat purpose
-        return !hasError && DataAPI.importLogContent(title, content).then(function () {
+        };
+        return this._save(
+            this.props.title, content,
+            beforeSave, onWarn
+        ).then(function (cost) {
             NProgress.done();
             that.props.onSave(content);
             that.refs.accomplishment.update();
-            that.__saveing = false;
-            console.log('import cost' + (new Date().getTime() - start));
-            /*
-            //don't need to sync if already syncing.
-            if (that.state.syncStatus === SYNCING) { return; }
-            var timer = setTimeout(function () {
-                //start back up log file after log import successfully
-                //may have change since the content may have changed
-                //use the timer to optimize the performerce
-                console.log('start backup' + (new Date().getTime() - start));
-                that.setState({syncStatus: SYNCING}, function () {
-                    DataAPI.backUpLogFile(title, content).then(function (result) {
-                        console.error('done');
-                        that.setState({syncStatus: NO_SYNC}, function () {
-                            console.log('save total cost' + (new Date().getTime() - start));
-                            //init the project typeahead component again because the projects
-                            //that._initProjectTypeahead();
-                        });
-                    }).catch(function (err) {
-                        console.error(err.stack);
-                        that.setState({syncStatus: SYNC_ERROR});
-                        Notify.error('Save to evernote failed' + err.message, {timeout: 3500});
-                    });
-                });
-                clearTimeout(timer);
-            }, 200);*/
+            console.log('import cost' + cost);
         }).catch(function (err) {
-            that.__saveing = false;
+            var errorMsg = 'error occur when import log ';
+            if (err.message) {
+                errorMsg += err.message;
+            }
+            if (err.detail) {
+                errorMsg += '<br/>detail:' + err.detail.map(function (i) {
+                return i.origin + i.message;
+                }).join('\n');
+            }
+            Notify.error(errorMsg);
             NProgress.done();
-            console.error(err.stack);
-            Notify.error('Import failed', {timeout: 3500});
+        });
+    },
+
+    _save: function (title, content, beforeSave, onWarn) {
+        var that = this;
+        if (this.__saveing) { return; }
+        this.__saveing = true;
+        return Q.promise(function (resolve, reject) {
+            beforeSave && beforeSave();
+            var checkResult = Util.checkLogContent(title, content);
+            /* use sessioon.setAnnotations(annotations) to display error message
+                [{
+                    row: error.line-1, // must be 0 based
+                    column: error.character,  // must be 0 based
+                    text: error.message,  // text to show in tooltip
+                    type: "error"|"warning"|"info"
+                }]
+            */
+            var hasError = !_.isEmpty(checkResult.errors);
+            if (hasError) {
+                that.__saveing = false;
+                return reject({
+                    message: 'File content is not valid.',
+                    detail: checkResult.errors
+                });
+            }
+            if (!_.isEmpty(checkResult.warns)) {
+                onWarn && onWarn(checkResult.warns);
+            }
+            var start = new Date().getTime();
+            //import into database, for stat purpose
+            DataAPI.importLogContent(title, content).then(function () {
+                var cost = new Date().getTime() - start;
+                that.__saveing = false;
+                resolve(cost);
+            }).catch(function (err) {
+                that.__saveing = false;
+                console.error(err.stack);
+                reject(err);
+            });
         });
     },
 
