@@ -67,7 +67,7 @@ var OneDayGoal = React.createClass({
             <div className="ltt_c-OneDayGoal">
             {this.state.goals.map(function (goal) {
                 return <Goal data={goal}  date={date} key={goal._id} ref={goal._id}/>
-            })}
+            }, this)}
             </div>
         );
     },
@@ -75,6 +75,7 @@ var OneDayGoal = React.createClass({
 
 
 var Goal = React.createClass({
+
 
     getInitialState: function () {
         return {

@@ -114,6 +114,10 @@ module.exports = {
         }
     },
 
+    totalTime: function (forceUpdate) {
+        return this.Log.totalTime(forceUpdate);
+    },
+
     Log: {
 
         load: function (params) {

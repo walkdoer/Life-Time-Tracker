@@ -4,6 +4,7 @@ require('moment-range');
 var TrackerHelper = require('tracker/helper');
 var _ = require('lodash');
 var config = require('../conf/config');
+var path = require('path');
 
 
 function walkTree(parentElement, func) {
@@ -198,3 +199,21 @@ exports.displayTime = displayTime;
 exports.DATE_FORMAT = 'YYYY-MM-DD';
 exports.TIME_FORMAT = 'HH:mm:ss';
 exports.DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+
+
+exports.notify = function (title, subtitle, message) {
+    if (Ltt.sdk &&  Ltt.sdk.notify) {
+        Ltt.sdk.notify({
+            title: title,
+            subtitle: subtitle,
+            icon: path.join(__dirname, './images/me.jpg'),
+            sound: true,
+            wait: false,
+            message: message
+        }, {
+            click: function () {
+                console.log("test");
+            }
+        });
+    }
+};

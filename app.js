@@ -158,6 +158,13 @@ var Footer = React.createClass({
                         <i className="fa fa-file"></i>
                         <span className="ltt_c-number">{this.state.logCount}</span>
                     </span>
+                    {
+                    this.state.totalTime > 0?
+                    <span className="ltt_c-appInfo-totalTime">
+                        <i className="fa fa-clock-o"></i>
+                        <span className="ltt_c-number">{Util.displayTime(this.state.totalTime)}</span>
+                    </span> : null
+                    }
                 </div>
             </footer>
         );
@@ -232,15 +239,18 @@ var Footer = React.createClass({
     componentWillMount: function () {
         this.updateLastTimeToken = this.updateLastTime.bind(this);
         this.updateCurrentLogToken = this.updateCurrentLog.bind(this);
+        this.loadTotalTimeToken = this.loadTotalTime.bind(this);
         Bus.addListener(EVENT.DOING_LOG, this.updateLastTimeToken);
         Bus.addListener(EVENT.CURRENT_LOG, this.updateCurrentLogToken);
         Bus.addListener(EVENT.UPDATE_APP_INFO, this.loadAppInfo);
+        Bus.addListener(EVENT.UPDATE_APP_INFO, this.loadTotalTimeToken);
         //Bus.addListener(EVENT.CHECK_SYNC_STATUS, this.checkSyncStatus);
     },
 
     componentDidMount: function () {
         var that = this;
         this.loadAppInfo();
+        this.loadTotalTime();
         //this.checkSyncStatus();
     },
 
@@ -248,6 +258,7 @@ var Footer = React.createClass({
         Bus.removeListener(EVENT.DOING_LOG, this.updateLastTimeToken);
         Bus.removeListener(EVENT.UPDATE_APP_INFO, this.loadAppInfo);
         Bus.removeListener(EVENT.CURRENT_LOG, this.updateCurrentLogToken);
+        Bus.removeListener(EVENT.UPDATE_APP_INFO, this.loadTotalTimeToken);
         //Bus.removeListener(EVENT.CHECK_SYNC_STATUS, this.checkSyncStatus);
     },
 
@@ -255,6 +266,15 @@ var Footer = React.createClass({
         var that = this;
         return DataAPI.getAppInfo().then(function (info) {
             that.setState(info);
+        });
+    },
+
+    loadTotalTime: function () {
+        var that = this;
+        DataAPI.totalTime(true).then(function (totalTime) {
+            that.setState({
+                totalTime: totalTime
+            });
         });
     },
 

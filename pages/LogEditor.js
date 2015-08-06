@@ -112,6 +112,14 @@ var Page = React.createClass({
         );
     },
 
+    onGoalAchieved: function (goal) {
+        Util.notify(
+            'Awesome!!! You just Achieve the goal',
+            goal.name,
+            ' time: ' + goal.totalTime + ' , percent: ' + goal.percent + ' , push total:' + goal.pushTotal
+        );
+    },
+
     /*renderOverTimeLog: function (allLogs) {
         var overtimeLogs = this.getOverTimeLog(allLogs);
         if (_.isEmpty(overtimeLogs)) {

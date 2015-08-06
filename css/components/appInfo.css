@@ -4,9 +4,19 @@
 
 .ltt_c-appInfo .fa{
     margin: 0 4px;
-    color: #939393;
-    text-shadow: -1px 1px #2C2727;
+    color: #E4E4E4;
 }
 
 .ltt_c-appInfo-projectCount .ltt_c-number{
+}
+
+.ltt_c-appInfo .ltt_c-number{
+    font-weight:100;
+    font-style:italic;
+}
+
+.ltt_c-appInfo .ltt_c-appInfo-totalTime{
+    color: rgb(255, 210, 104);
+    font-size: 13px;
+    font-weight: 400;
 }
