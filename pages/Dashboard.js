@@ -23,7 +23,7 @@ var Board = require('../components/Borad');
 var LogClassPie = require('../components/LogClassPie');
 var Settings = require('./Settings');
 var VerticleTimeline = require('../components/VerticleTimeline');
-
+var TodayGoal = require('../components/TodayGoal');
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
 var Util = require('../utils/Util');
@@ -71,6 +71,14 @@ var Dashboard = React.createClass({
                         <div className="ltt_c-page-com">
                             <RecentActivity initialTab={'today'}/>
                         </div>
+                        <div className="Grid Grid--gutters Grid--stretch">
+                            <div className="Grid-cell u-2of3">
+                                <TodayGoal date={new Moment().subtract(1, 'day').format(Util.DATE_FORMAT)}/>
+                            </div>
+                            <div className="Grid-cell u-1of3" ref="logClassPieContainer">
+                                <LogClassPie title="All Time's Class distribution" start={new Moment(Settings.get('startDate'))} end={new Moment()} compare={false} legend={true}/>
+                            </div>
+                        </div>
                         <div className="ltt_c-page-com">
                             <p className="ltt_c-page-title">Sport Cal-Heatmap</p>
                             <CalendarHeatMap
@@ -96,9 +104,6 @@ var Dashboard = React.createClass({
                             <div className="Grid-cell u-1of3">
                                 <MonthCountDown height={250} padding={0}
                                     itemPadding={2} lifeYear={70} birthday={Settings.get('birthday')}/>
-                            </div>
-                            <div className="Grid-cell u-1of3" ref="logClassPieContainer">
-                                <LogClassPie title="All Time's Class distribution" start={new Moment(Settings.get('startDate'))} end={new Moment()} compare={false} legend={true}/>
                             </div>
                         </div>
                     </div>

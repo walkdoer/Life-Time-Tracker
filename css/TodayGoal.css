@@ -1,0 +1,41 @@
+.ltt_c-TodayGoal {
+    background: #FFF;
+    padding: 10px;
+}
+
+.ltt_c-TodayGoal-goal {
+    line-height:45px;
+    padding: 5px 0px;
+    border-bottom: 1px solid #ccc;
+}
+
+.ltt_c-TodayGoal-goal:last-child {
+    border-bottom: none;
+}
+
+.ltt_c-TodayGoal-goal-progress{
+    display: flex;
+    height: 45px;
+    margin-right: 10px;
+}
+
+.ltt_c-TodayGoal-goal-progress > .pieChart {
+    position: relative;
+    text-align: center;
+    flex:1;
+    font-size:0.40rem;
+    color: #646464;
+    line-height: 45px;
+}
+
+.ltt_c-TodayGoal-goal-progress > .pieChart canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.ltt_c-TodayGoal-goal-time{
+    margin-left: 5px;
+    font-style: italic;
+    color:#ccc;
+}
