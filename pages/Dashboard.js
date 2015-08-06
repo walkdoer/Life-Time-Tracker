@@ -73,7 +73,10 @@ var Dashboard = React.createClass({
                         </div>
                         <div className="Grid Grid--gutters Grid--stretch">
                             <div className="Grid-cell u-2of3">
-                                <TodayGoal date={new Moment().subtract(1, 'day').format(Util.DATE_FORMAT)}/>
+                                <div className="ltt_c-page-dashboard-com yesterdayGoals">
+                                    <p className="ltt_c-page-title">Yesterday Goal Achievement</p>
+                                    <TodayGoal date={new Moment().subtract(1, 'day').format(Util.DATE_FORMAT)}/>
+                                </div>
                             </div>
                             <div className="Grid-cell u-1of3" ref="logClassPieContainer">
                                 <LogClassPie title="All Time's Class distribution" start={new Moment(Settings.get('startDate'))} end={new Moment()} compare={false} legend={true}/>

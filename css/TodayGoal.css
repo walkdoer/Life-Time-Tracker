@@ -1,12 +1,11 @@
 .ltt_c-TodayGoal {
     background: #FFF;
-    padding: 10px;
 }
 
 .ltt_c-TodayGoal-goal {
     line-height:45px;
     padding: 5px 0px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #F3F3F3;
 }
 
 .ltt_c-TodayGoal-goal.achieve{

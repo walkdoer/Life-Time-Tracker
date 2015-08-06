@@ -71,3 +71,23 @@
 .ltt_c-Board-item:last-child{
     border-right: 0px;
 }
+.ltt_c-page-dashboard .ltt_c-page-dashboard-com {
+    background-color: #FFF;
+}
+
+.ltt_c-page-dashboard .yesterdayGoals{
+    height: 309px;
+    padding: 10px;
+}
+
+.ltt_c-page-dashboard .yesterdayGoals{
+    display: flex;
+    flex-direction: column;
+}
+
+
+.ltt_c-page-dashboard .yesterdayGoals .ltt_c-TodayGoal{
+    flex: 1;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
