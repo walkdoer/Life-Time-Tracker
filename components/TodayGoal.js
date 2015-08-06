@@ -10,6 +10,7 @@ var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var ReactBootStrap = require('react-bootstrap');
 var Q = require('q');
 var Moment = require('moment');
+var cx = React.addons.classSet;
 var EasyPieChart = require('easyPieChart');
 
 /** Utils */
@@ -101,8 +102,9 @@ var Goal = React.createClass({
         var estimatedTime = goal.estimatedTime;
         var oneDayTime = estimatedTime / dateInfo.diff;
         this._todayProgress = (this.state.todayTime / oneDayTime * 100);
+        var achieve = this._todayProgress >= 100;
         return (
-            <div className="ltt_c-TodayGoal-goal Grid">
+            <div className={cx({"ltt_c-TodayGoal-goal": true, Grid: true, achieve: achieve, notAchieve: !achieve})}>
                 <div style={{width: this.props.pieSize}} className="ltt_c-TodayGoal-goal-progress">
                     <div className="pieChart todayProgress" ref="todayProgress" data-percent={this._todayProgress}>{this._todayProgress.toFixed(1) + '%'}</div>
                 </div>

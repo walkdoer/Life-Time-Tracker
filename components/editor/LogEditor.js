@@ -19,8 +19,6 @@ var mui = require('material-ui');
 
 
 
-
-
 /**Components*/
 var TodayReport = require('../../reports/TodayReport');
 var HelpDocument= require('../HelpDocument');

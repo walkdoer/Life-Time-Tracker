@@ -9,6 +9,14 @@
     border-bottom: 1px solid #ccc;
 }
 
+.ltt_c-TodayGoal-goal.achieve{
+    background-color: #F3FFF3;
+}
+
+.ltt_c-TodayGoal-goal.notAchieve{
+    background-color: #FFF6F6;
+}
+
 .ltt_c-TodayGoal-goal:last-child {
     border-bottom: none;
 }
