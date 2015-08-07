@@ -999,6 +999,7 @@ var LogEditor = React.createClass({
             beforeSave, onWarn
         ).then(function (cost) {
             NProgress.done();
+            that._achieveGoal();
             that.props.onSave(content);
             that.refs.accomplishment.update();
             console.log('import cost' + cost);
@@ -1055,6 +1056,21 @@ var LogEditor = React.createClass({
                 reject(err);
             });
         });
+    },
+
+    _achieveGoal: function () {
+        DataAPI.achieveGoal(this.props.title).then(function (achievements) {
+            if (!_.isEmpty(achievements)) {
+                achievements.forEach(function (achievement) {
+                    var goal = achievement.goal;
+                    Util.notify({
+                        title: 'Awesome!!! You just Achieve goal ' + goal.name + '\'s today amount',
+                        subtitle : goal.name,
+                        message: ' time: ' + Util.displayTime(achievement.time) + ' , percent: ' + achievement.progress.toFixed(1) + '%'
+                    });
+                });
+            }
+        })
     },
 
     _updateCurrentInfomation: function (currentLine) {

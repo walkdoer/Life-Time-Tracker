@@ -200,20 +200,40 @@ exports.DATE_FORMAT = 'YYYY-MM-DD';
 exports.TIME_FORMAT = 'HH:mm:ss';
 exports.DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
+var noty = window.noty;
+var layout = 'bottomRight';
+var animation = {
+    open: 'animated flipInX',
+    close: 'animated flipOutX'
+};
 
-exports.notify = function (title, subtitle, message) {
+exports.notify = function (cfg) {
     if (Ltt.sdk &&  Ltt.sdk.notify) {
         Ltt.sdk.notify({
-            title: title,
-            subtitle: subtitle,
+            title: cfg.title,
+            subtitle: cfg.subtitle,
             icon: path.join(__dirname, './images/me.jpg'),
             sound: true,
             wait: false,
-            message: message
+            message: cfg.message
         }, {
             click: function () {
                 console.log("test");
             }
         });
+    } else {
+        var options = {
+            type: "success",
+            text: _.template([
+                "<div><%=title%></div>",
+                "<div><%=subtitle%></div>",
+                "<div><%=message%></div>"
+            ].join(""))(cfg),
+            dismissQueue: true,
+            theme : 'relax',
+            layout: layout,
+            animation: animation
+        };
+        noty(options);
     }
 };

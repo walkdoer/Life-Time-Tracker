@@ -34,6 +34,10 @@ module.exports = {
         return post(url(_url), data);
     },
 
+    achieveGoal: function (date) {
+        return get(url("/achieveGoal"), {date: date});
+    },
+
     getLogContent: function (date, params) {
         return get(url('/logContents/' + date), params)
             .then(function (result) { return result.fileContent;});
