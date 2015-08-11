@@ -69,12 +69,7 @@ module.exports = React.createClass({
     }
     this.setState({ open: !this.state.open }, function() {
       var that = this;
-      if (this.state.open) {
-        var timer = setTimeout(function () {
-          clearTimeout(timer);
-          that.props.onTransitionEnd();
-        }, this.props.duration);
-      }
+      this.afterOpen();
     });
     return this;
   },
@@ -85,6 +80,16 @@ module.exports = React.createClass({
     return this;
   },
 
+  afterOpen: function () {
+    var that = this;
+    if (this.state.open) {
+      var timer = setTimeout(function () {
+        clearTimeout(timer);
+        that.props.onTransitionEnd();
+      }, this.props.duration);
+    }
+  },
+
   getWidth: function () {
     return this._width || this.props.width;
   },
@@ -93,7 +98,9 @@ module.exports = React.createClass({
     if (options) {
       this._width = options.width;
     }
-    this.setState({ open: true });
+    this.setState({ open: true }, function () {
+      this.afterOpen();
+    });
     if (this.props.onOpen) this.props.onOpen();
     return this;
   },

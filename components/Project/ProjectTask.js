@@ -14,9 +14,13 @@ var Mt = window.Mousetrap;
 var RB = require('react-bootstrap');
 var ButtonToolbar = RB.ButtonToolbar;
 var Button = RB.Button;
+var ButtonGroup = RB.ButtonGroup;
 var Well = RB.Well;
 var extend = require('extend');
 var swal = require('sweetalert');
+var mui = require('material-ui');
+var ThemeManager = new mui.Styles.ThemeManager();
+
 
 /** mixins */
 var initParams = require('../mixins/initParams');
@@ -37,11 +41,10 @@ var Task = require('../Task/Task');
 var LogList = require('../LogList');
 var TaskDetail = require('../Task/TaskDetail');
 var Notify = require('../Notify');
+var SlidePanel = require('../SlidePanel');
 var EasyPie = require('../charts/EasyPie');
-
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
-
 
 /** Utils */
 var Util = require('../../utils/Util');
@@ -52,6 +55,10 @@ var Bus = require('../../utils/Bus');
 
 module.exports = React.createClass({
 
+    childContextTypes: {
+        muiTheme: React.PropTypes.object
+    },
+
     mixins: [PureRenderMixin, Router.State, Router.Navigation],
 
     getInitialState: function () {
@@ -60,6 +67,7 @@ module.exports = React.createClass({
             taskLoaded: false,
             openTreeMap: false,
             openTaskDetail: false,
+            openStastics: false,
             markedFilter: false,
             taskStatus: 'doing',
             period: 'month',
@@ -67,6 +75,13 @@ module.exports = React.createClass({
             tasks: []
         }, this.getStateFromParams());
     },
+
+    getChildContext: function() {
+        return {
+            muiTheme: ThemeManager.getCurrentTheme()
+        };
+    },
+
 
     getStateFromParams: function () {
         var params = this.getRequestParams();
@@ -134,12 +149,18 @@ module.exports = React.createClass({
                             <button className={"btn btn-xs btn-default " + (this.state.markedFilter ? 'active' : '')}
                                 onClick={that.onTaskMarkedFilter}><i className="fa fa-flag"></i></button>
                         </div>
-                        <div className="btn-group" style={{float: 'right'}}>
-                            <button className="btn btn-xs" onClick={this.openTreeMap}>TreeMap</button>
-                        </div>
+                        <ButtonToolbar style={{float: 'right'}}>
+                            <ButtonGroup>
+                                <Button bsSize='xsmall' onClick={this.openStastics}>statistic</Button>
+                                <Button bsSize='xsmall' onClick={this.openTreeMap}>TreeMap</Button>
+                            </ButtonGroup>
+                        </ButtonToolbar>
                     </div>
                     {this.state.openTreeMap ? <TreeMap ref="treeMap"
                         title={"Time TreeMap of " + project.name + (version ? '-' + version.name : '')}/> : null }
+                    <SlidePanel ref="statistics" open={false} openRight={true} onTransitionEnd={this.renderStatistics}>
+                        <div ref="statisticsContainer"></div>
+                    </SlidePanel>
                     {this.state.tasks.length > 0 ?
                         <TaskList select={taskId}>
                         {this.state.tasks.map(function (task) {
@@ -162,6 +183,14 @@ module.exports = React.createClass({
                 </main>
                 {this.renderTaskDetail()}
             </div>
+        );
+    },
+
+
+    renderStatistics: function () {
+        React.render(
+            <Statistics project={this.state.project}/>,
+            this.refs.statisticsContainer.getDOMNode()
         );
     },
 
@@ -523,6 +552,12 @@ module.exports = React.createClass({
         });
     },
 
+    openStastics: function () {
+        this.refs.statistics.open({
+            width: $(this.getDOMNode()).width() - 150
+        });
+    },
+
     selectTask: function (task) {
         this.currentTask = task;
     },
@@ -814,3 +849,66 @@ function getPeriod(createTime, lastActiveTime) {
     return period;
 }
 
+
+
+var Statistics = React.createClass({
+
+    getInitialState: function () {
+        return {
+            versionDataLoaded: false,
+            versionData: null
+        };
+    },
+
+    render: function () {
+        return <div className="ltt_c-projectTask-statistics">
+            {
+                !_.isEmpty(this.state.versionData) ?
+                <Bar data={this.convertData(data)} exporting={false} labelWidth={this._width * 0.3} legend={false}/>
+                :
+                null
+            }
+        </div>
+    },
+
+
+    componentDidMount: function () {
+        this.loadVersionData();
+    },
+
+
+    loadVersionData: function () {
+        var that = this;
+        DataAPI.Log.load({
+            projects: this.props.project.name,
+            sum: true,
+            group: 'versions'
+        }).then(function (list) {
+            return list.filter(function (item) {
+                return item._id !== null;
+            }).sort(function (a, b){
+                return b.totalTime - a.totalTime;
+            });
+        }).then(function (data) {
+            that.setState({
+                versionDataLoaded: true,
+                versionData: data
+            });
+        });
+    },
+
+    convertData: function (data) {
+        return data.map(function (item) {
+            var name;
+            if (item._id && item._id.name) {
+                name = item._id.name;
+            } else {
+                name = item._id || 'unknow';
+            }
+            return {
+                label: name,
+                value: item.totalTime
+            };
+        });
+    }
+})
