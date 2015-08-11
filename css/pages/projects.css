@@ -307,3 +307,15 @@
 .ltt_c-taskDetail-logs{
   border-top:1px solid #dcdcdc;
 }
+
+.ltt_c-projectTask .ltt_c-SlidePanel .paper{
+  padding:10px 40px 20px 10px;
+}
+.ltt_c-projectTask .ltt_c-SlidePanel .closeBtn{
+  position: absolute;
+  top: 0px;
+  cursor: pointer;
+  right: 0px;
+  font-size:1.5rem;
+  padding: 20px;
+}

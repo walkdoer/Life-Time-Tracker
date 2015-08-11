@@ -45,6 +45,7 @@ var SlidePanel = require('../SlidePanel');
 var EasyPie = require('../charts/EasyPie');
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
+var Bar = require('../charts/Bar');
 
 /** Utils */
 var Util = require('../../utils/Util');
@@ -70,6 +71,7 @@ module.exports = React.createClass({
             openStastics: false,
             markedFilter: false,
             taskStatus: 'doing',
+            project: null,
             period: 'month',
             todayTaskTime: [],
             tasks: []
@@ -159,6 +161,8 @@ module.exports = React.createClass({
                     {this.state.openTreeMap ? <TreeMap ref="treeMap"
                         title={"Time TreeMap of " + project.name + (version ? '-' + version.name : '')}/> : null }
                     <SlidePanel ref="statistics" open={false} openRight={true} onTransitionEnd={this.renderStatistics}>
+                        <h3>Statistis of {project ? project.name : null}</h3>
+                        <div className="closeBtn" onClick={this.closeStastics}><i className="fa fa-close"/></div>
                         <div ref="statisticsContainer"></div>
                     </SlidePanel>
                     {this.state.tasks.length > 0 ?
@@ -558,6 +562,11 @@ module.exports = React.createClass({
         });
     },
 
+
+    closeStastics: function () {
+        this.refs.statistics.close();
+    },
+
     selectTask: function (task) {
         this.currentTask = task;
     },
@@ -861,10 +870,11 @@ var Statistics = React.createClass({
     },
 
     render: function () {
+        var versionData = this.state.versionData;
         return <div className="ltt_c-projectTask-statistics">
             {
-                !_.isEmpty(this.state.versionData) ?
-                <Bar data={this.convertData(data)} exporting={false} labelWidth={this._width * 0.3} legend={false}/>
+                !_.isEmpty(versionData) ?
+                <Bar data={this.convertData(versionData)} exporting={false}  legend={false}/>
                 :
                 null
             }
@@ -882,7 +892,7 @@ var Statistics = React.createClass({
         DataAPI.Log.load({
             projects: this.props.project.name,
             sum: true,
-            group: 'versions'
+            group: 'version'
         }).then(function (list) {
             return list.filter(function (item) {
                 return item._id !== null;
