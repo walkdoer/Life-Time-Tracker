@@ -612,6 +612,15 @@ var LogEditor = React.createClass({
                 that.props.onPrevLog(that.getCurrentLog(), true);
             }
         });
+
+        commands.addCommand({
+            name: "toggleCalendar",
+            bindKey: {win: "Ctrl-K", mac: "Command-K"},
+            exec: function(editor) {
+                that.toggleCalendar();
+            }
+        });
+
     },
 
     finishCurrentActivity: function () {

@@ -26,5 +26,6 @@
 #### 其他操作
 
 - `Command-U` 高亮所有未完成任务
+- `Command-K` toggle calendar
 
 
