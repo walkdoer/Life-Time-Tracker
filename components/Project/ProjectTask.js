@@ -160,7 +160,7 @@ module.exports = React.createClass({
                     </div>
                     {this.state.openTreeMap ? <TreeMap ref="treeMap"
                         title={"Time TreeMap of " + project.name + (version ? '-' + version.name : '')}/> : null }
-                    <SlidePanel ref="statistics" open={false} openRight={true} onTransitionEnd={this.renderStatistics}>
+                    <SlidePanel key={this.props.projectId} ref="statistics" open={false} openRight={true} onTransitionEnd={this.renderStatistics}>
                         <h3>Statistis of {project ? project.name : null}</h3>
                         <div className="closeBtn" onClick={this.closeStastics}><i className="fa fa-close"/></div>
                         <div ref="statisticsContainer"></div>
@@ -193,7 +193,7 @@ module.exports = React.createClass({
 
     renderStatistics: function () {
         React.render(
-            <Statistics project={this.state.project}/>,
+            <Statistics project={this.state.project} key={this.state.project._id}/>,
             this.refs.statisticsContainer.getDOMNode()
         );
     },
@@ -885,7 +885,6 @@ var Statistics = React.createClass({
     componentDidMount: function () {
         this.loadVersionData();
     },
-
 
     loadVersionData: function () {
         var that = this;
