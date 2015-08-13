@@ -64,6 +64,7 @@ var Task = React.createClass({
         var task = this.props.data;
         var taskId = this.props.taskId;
         var version = this.props.version;
+        var project = this.props.project;
         var todayTime = this.props.todayTime;
         var todayTimeChildren;
         var url;
@@ -136,6 +137,13 @@ var Task = React.createClass({
                                     <span className="overDue">due {dueTime.fromNow()} at {dueTime.format('YYYY-MM-DD HH:mm')}</span>
                                 }
                             </span> : null}
+                        </div>
+                        <div className="ltt_c-task-basicInfo-percent">
+                        {!version ?
+                            <span className="num">{(task.totalTime / project.totalTime * 100).toFixed(1)}% of {project.name}</span>
+                            :
+                            <span className="num">{(task.totalTime / version.totalTime * 100).toFixed(1)}% of {version.name}</span>
+                        }
                         </div>
                         <div className="ltt_c-task-timeInfo">
                             <span className="ltt_c-task-timeInfo-item" title={new Moment(task.createTime).format('YYYY-MM-DD HH:mm:ss')}>

@@ -94,6 +94,7 @@ module.exports = React.createClass({
         var loadingMsg, taskList;
         var project = this.state.project;
         var version;
+        var versionDetail = this.state.version;
         var that = this;
         var taskId = this.state.taskId;
         var taskStatus = this.state.taskStatus;
@@ -177,13 +178,13 @@ module.exports = React.createClass({
                                 data={task}
                                 key={childTaskId}
                                 taskId={childTaskId}
+                                defaultIsOpen={taskStatus === "doing" && ["year", "all"].indexOf(period) < 0}
                                 todayTime={todayTask}
-                                version={!currentVersionId && project.versions.filter(function (version) {
-                                    return version._id === task.versionId;
-                                })[0]}
+                                version={versionDetail}
                                 onTaskChange={this.onTaskChange}
                                 onClick={that.openTask}
-                                selected={taskId === childTaskId}/>
+                                selected={taskId === childTaskId}
+                                project={project}/>
                         })}
                         </TaskList> : <Well><i className="fa fa-beer"></i>No Task. Simple life.</Well>
                     }
@@ -329,7 +330,8 @@ module.exports = React.createClass({
             this.setState(_.extend({
                 projectLoaded: false,
                 openTaskDetail: false,
-                taskLoaded: false
+                taskLoaded: false,
+                version: null
             }, params), function () {
                 this.loadProject(nextProps.projectId);
                 //this.loadTasks(_.pick(nextProps, ['projectId', 'versionId']));
@@ -382,6 +384,7 @@ module.exports = React.createClass({
             return DataAPI.Version.get(versionId).then(function (version) {
                 var period = getPeriod(version.createTime, version.lastActiveTime);
                 that.setState({
+                    version: version,
                     period: period
                 });
             });
@@ -728,10 +731,6 @@ var ProjectInfo = React.createClass({
                         <i className={this.state.showProjectDetail ? "fa fa-chevron-circle-down" : "fa fa-chevron-circle-right"}></i>
                     </span>
                     {this.state.showProjectDetail ? <div className="ltt_c-projectDetail-projectInfo-detail">
-                    <span className="percent">
-                            <span className="num">{(version.totalTime / projectTotalTime * 100).toFixed(1)}%</span>
-                            of project time
-                        </span>
                         <p className="ltt_c-projectDetail-tags">{tags}</p>
                     </div> : null}
                     {this.props.versionId ?
@@ -785,6 +784,7 @@ var VersionInfo = React.createClass({
             version: null
         };
     },
+
     render: function () {
         var version = this.state.version;
         var projectTotalTime = this.props.projectTotalTime;
