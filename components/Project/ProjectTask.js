@@ -165,6 +165,9 @@ module.exports = React.createClass({
                         <div className="closeBtn" onClick={this.closeStastics}><i className="fa fa-close"/></div>
                         <div ref="statisticsContainer"></div>
                     </SlidePanel>
+                    <div className="ltt_c-projectTask-moreInfo">
+                        <span>Count: {this.state.tasks.length}</span>
+                    </div>
                     {this.state.tasks.length > 0 ?
                         <TaskList select={taskId}>
                         {this.state.tasks.map(function (task) {
