@@ -109,7 +109,10 @@ var LogEditor = React.createClass({
                             onClick={this.toggleCalendar}>
                             <i className="fa fa-calendar"></i>
                         </span>
-                        <span className="ltt_c-logEditor-title">{this.props.title}</span>
+                        <span className="ltt_c-logEditor-title">
+                            {this.props.title}
+                            <i ref="changeFlag" className="fa changeFlag fa-asterisk"/>
+                        </span>
                     </div>
                     <div className="ltt_c-logEditor-header-middle">
                         <Accomplishment date={this.props.title} ref="accomplishment"/>
@@ -739,6 +742,7 @@ var LogEditor = React.createClass({
             that._persistToLocalStorage(title, content);
             that._highLightDoingLine(content);
             that._annotationOverTimeLog(logs, content);
+            that._showContentChangeFlag();
             that.props.onChange(content, editor);
         }, 200));
 
@@ -762,6 +766,18 @@ var LogEditor = React.createClass({
         var session = this.editor.getSession();
         var row = selection.getCursor().row;
         return session.getLine(row);
+    },
+
+    _showContentChangeFlag: function () {
+        var node = this.refs.changeFlag.getDOMNode();
+        if (!node.classList.contains('changed')) {
+            node.classList.add('changed');
+        }
+    },
+
+    _hideContentChangeFlag: function () {
+        var node = this.refs.changeFlag.getDOMNode();
+        node.classList.remove('changed');
     },
 
     getCurrentLog: function () {
@@ -1011,7 +1027,8 @@ var LogEditor = React.createClass({
             that._achieveGoal();
             that.props.onSave(content);
             that.refs.accomplishment.update();
-            console.log('import cost' + cost);
+            //reset content change status to not change
+            that._hideContentChangeFlag();
         }).catch(function (err) {
             var errorMsg = 'error occur when import log ';
             if (err.message) {

@@ -52,6 +52,21 @@
     cursor: pointer;
 }
 
+.ltt_c-logEditor-title .changeFlag{
+    margin-left: 5px;
+    margin-right: 5px;
+    font-size: 13px;
+    transition-property: opacity;
+    transition-duration: .3s;
+    color: #F6610A;
+    opacity: 0;
+}
+
+.ltt_c-logEditor-title .changeFlag.changed{
+    opacity: 1;
+}
+
+
 .ltt_c-logEditor-header-toggleCalendar:hover{
     color: blue;
 }
