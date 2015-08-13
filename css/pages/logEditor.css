@@ -393,8 +393,15 @@ o.ltt_c-page-logEditor{
     border-left: 1px solid #ECECEC;
 }
 
+.ltt_c-page-logEditor aside .ltt_c-LogClassPie{
+  padding-top:234px;
+}
+
 .ltt_c-page-logEditor-datepicker{
   border-bottom: 1px solid #E8E8E8;
+  background-color: rgba(246, 246, 246, 0.92);
+  position: fixed;
+  z-index: 90;
 }
 
 /*************************/
