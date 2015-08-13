@@ -138,13 +138,7 @@ var Task = React.createClass({
                                 }
                             </span> : null}
                         </div>
-                        <div className="ltt_c-task-basicInfo-percent">
-                        {!version ?
-                            <span className="num">{(task.totalTime / project.totalTime * 100).toFixed(1)}% of {project.name}</span>
-                            :
-                            <span className="num">{(task.totalTime / version.totalTime * 100).toFixed(1)}% of {version.name}</span>
-                        }
-                        </div>
+                        {this.renderPercent()}
                         <div className="ltt_c-task-timeInfo">
                             <span className="ltt_c-task-timeInfo-item" title={new Moment(task.createTime).format('YYYY-MM-DD HH:mm:ss')}>
                                 <i className="fa fa-plus" title="create time"></i>
@@ -166,6 +160,24 @@ var Task = React.createClass({
                 </div>
                 {subTaskList}
             </li>
+        );
+    },
+
+    renderPercent: function () {
+        var version = this.props.version;
+        var project = this.props.project;
+        var task = this.props.data;
+        if (!task.totalTime || !version && !project) {
+            return null;
+        }
+        return (
+            <div className="ltt_c-task-basicInfo-percent">
+            {!version ?
+                <span className="num">{(task.totalTime / project.totalTime * 100).toFixed(1)}% of {project.name}</span>
+                :
+                <span className="num">{(task.totalTime / version.totalTime * 100).toFixed(1)}% of {version.name}</span>
+            }
+            </div>
         );
     },
 
