@@ -324,7 +324,38 @@ gulp.task('nw', function () {
           './nodeMain.js',
           './load.js',
           './main.js'
-        ].concat(dependencies);
+        ].concat(dependencies/*.filter(function (mod) {
+            return [
+              'chart.js',
+              'd3',
+              'flux',
+              'he',
+              'isotope-layout',
+              'jquery',
+              'jquery-ui',
+              'mousetrap',
+              'noty',
+              'nprogress',
+              'numeral',
+              'progress',
+              'randomcolor',
+              'react',
+              'react-bootstrap',
+              'react-router',
+              'select2',
+              'sweetalert',
+              'nvd3',
+              'bootstrap',
+              'noty',
+              'sweetalert',
+              'datetimepicker',
+              'highcharts',
+              'fullcalendar',
+              'tinyColor',
+              'colorPicker',
+              'easyPieChart'
+            ].indexOf(mod) < 0;
+        })*/);
 
     console.log(files);
     var nw = new NwBuilder({

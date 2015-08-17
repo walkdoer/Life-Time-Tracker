@@ -913,6 +913,7 @@ var LogEditor = React.createClass({
         if (prevProps.title === this.props.title) {
             return;
         }
+        this._hideContentChangeFlag();
         this._initEditor();
         this.readLog(this.props.title)
             .then(function (content) {

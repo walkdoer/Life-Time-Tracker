@@ -112,8 +112,8 @@ module.exports = React.createClass({
       root: {
         height: '100%',
         width: this.getWidth(),
-        position: 'absolute',
-        zIndex: 10,
+        position: this.props.position || 'absolute',
+        zIndex: this.props.zIndex || 10,
         left: 0,
         top: 0,
         transform: 'translate3d(' + x + ', 0, 0)',

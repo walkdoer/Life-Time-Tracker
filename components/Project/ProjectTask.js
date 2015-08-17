@@ -161,7 +161,9 @@ module.exports = React.createClass({
                     </div>
                     {this.state.openTreeMap ? <TreeMap ref="treeMap"
                         title={"Time TreeMap of " + project.name + (version ? '-' + version.name : '')}/> : null }
-                    <SlidePanel key={this.props.projectId} ref="statistics" open={false} openRight={true} onTransitionEnd={this.renderStatistics}>
+                    <SlidePanel key={this.props.projectId}
+                        ref="statistics" open={false} openRight={true} onTransitionEnd={this.renderStatistics}
+                        position="fixed" zIndex={888}>
                         <h3>Statistis of {project ? project.name : null}</h3>
                         <div className="closeBtn" onClick={this.closeStastics}><i className="fa fa-close"/></div>
                         <div ref="statisticsContainer"></div>
