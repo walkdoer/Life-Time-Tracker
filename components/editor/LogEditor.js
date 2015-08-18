@@ -36,6 +36,8 @@ var ThemeManager = new mui.Styles.ThemeManager();
 var EventConstant = require('../../constants/EventConstant');
 var EVENT_HIGHLIGHT_CLASS = 'event-highlight';
 var NotEmpty = function(a) {return !!a};
+var LOG_NOT_VALID = 'log_not_valid';
+
 /**util*/
 var DataAPI = require('../../utils/DataAPI');
 var Bus = require('../../utils/Bus');
@@ -1035,14 +1037,34 @@ var LogEditor = React.createClass({
             if (err.message) {
                 errorMsg += err.message;
             }
-            if (err.detail) {
-                errorMsg += '<br/>detail:' + err.detail.map(function (i) {
-                return i.origin + i.message;
-                }).join('\n');
-            }
             Notify.error(errorMsg);
             NProgress.done();
         });
+    },
+
+    _annotationError: function (errors) {
+
+        var errorAnnotations = _.isArray(errors) ? errors.map(function (error) {
+            return {
+                row: error.index,
+                column: 0,  // must be 0 based
+                text: error.message,
+                type: "error"
+            }
+        }, this) : [];
+        this.editor.getSession().setAnnotations(errorAnnotations);
+    },
+
+    _annotationWarnings: function (warnings) {
+        var warningAnnotations = _.isArray(warnings) ? warnings.map(function (warning) {
+            return {
+                row: warning.index,
+                column: 0,  // must be 0 based
+                text: warning.message,
+                type: "warning"
+            }
+        }, this) : [];
+        this.editor.getSession().setAnnotations(warningAnnotations);
     },
 
     _save: function (title, content, beforeSave, onWarn) {
@@ -1063,12 +1085,15 @@ var LogEditor = React.createClass({
             var hasError = !_.isEmpty(checkResult.errors);
             if (hasError) {
                 that.__saveing = false;
+                that._annotationError(checkResult.errors);
                 return reject({
+                    type: LOG_NOT_VALID,
                     message: 'File content is not valid.',
                     detail: checkResult.errors
                 });
             }
             if (!_.isEmpty(checkResult.warns)) {
+                that._annotationWarnings(checkResult.warns);
                 onWarn && onWarn(checkResult.warns);
             }
             var start = new Date().getTime();
