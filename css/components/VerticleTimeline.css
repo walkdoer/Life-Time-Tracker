@@ -229,3 +229,6 @@
 .ltt_c-VerticleTimeline-Activity{
     position:relative;
 }
+.ltt_c-VerticleTimeline-Activity .cbp_content{
+    word-break:break-all;
+}
