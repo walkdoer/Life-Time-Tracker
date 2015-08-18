@@ -1020,7 +1020,7 @@ var LogEditor = React.createClass({
         var beforeSave = function () {
             NProgress.start();
         }, onWarn = function() {
-            Notify.warning('warn from import log');
+            //Notify.warning('warn from import log');
         };
         return this._save(
             this.props.title, content,
@@ -1033,20 +1033,27 @@ var LogEditor = React.createClass({
             //reset content change status to not change
             that._hideContentChangeFlag();
         }).catch(function (err) {
-            var errorMsg = 'error occur when import log ';
-            if (err.message) {
-                errorMsg += err.message;
+            if (err.type !== LOG_NOT_VALID) {
+                var errorMsg = 'error occur when import log ';
+                if (err.message) {
+                    errorMsg += err.message;
+                }
+                Notify.error(errorMsg);
             }
-            Notify.error(errorMsg);
             NProgress.done();
         });
     },
 
     _annotationError: function (errors) {
-
         var errorAnnotations = _.isArray(errors) ? errors.map(function (error) {
+            var index;
+            if (error.type === 'sequence_error') {
+                index = this.getLineIndex(error.origin[0]);
+            } else {
+                index = this.getLineIndex(error.origin);
+            }
             return {
-                row: error.index,
+                row: index,
                 column: 0,  // must be 0 based
                 text: error.message,
                 type: "error"
