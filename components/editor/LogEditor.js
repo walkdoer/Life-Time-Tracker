@@ -180,6 +180,7 @@ var LogEditor = React.createClass({
             that._highLightDoingLine(content);
             that.gotoDoingLogLine(content);
             that._gotoLocate(content, that.props.locate);
+            that._checkLogValid(content);
             that.props.onLoad(content, that.getDoingLog(content));
             editor.focus();
             if (_insertLog) {
@@ -927,6 +928,7 @@ var LogEditor = React.createClass({
                 }
                 that.gotoDoingLogLine(content);
                 that._highLightDoingLine(content);
+                that._checkLogValid(content);
                 that._listenToEditor();
                 that._activeCurrentLine();
                 that.props.onLoad(content, that.getDoingLog(content));
@@ -1074,6 +1076,19 @@ var LogEditor = React.createClass({
         this.editor.getSession().setAnnotations(warningAnnotations);
     },
 
+
+    _checkLogValid: function (content) {
+        var title = this.props.title;
+        var checkResult = Util.checkLogContent(title, content);
+        var hasError = !_.isEmpty(checkResult.errors);
+        if (hasError) {
+            this._annotationError(checkResult.errors);
+        }
+        if (!_.isEmpty(checkResult.warns)) {
+            this._annotationWarnings(checkResult.warns);
+        }
+    },
+
     _save: function (title, content, beforeSave, onWarn) {
         var that = this;
         if (this.__saveing) { return; }
@@ -1081,14 +1096,6 @@ var LogEditor = React.createClass({
         return Q.promise(function (resolve, reject) {
             beforeSave && beforeSave();
             var checkResult = Util.checkLogContent(title, content);
-            /* use sessioon.setAnnotations(annotations) to display error message
-                [{
-                    row: error.line-1, // must be 0 based
-                    column: error.character,  // must be 0 based
-                    text: error.message,  // text to show in tooltip
-                    type: "error"|"warning"|"info"
-                }]
-            */
             var hasError = !_.isEmpty(checkResult.errors);
             if (hasError) {
                 that.__saveing = false;
