@@ -129,7 +129,7 @@ var Task = React.createClass({
                     </span>
                     <div className="ltt_c-task-basicInfo">
                         <div className="ltt_c-task-basicInfo-version">
-                            {version ? <span><i className="fa fa fa-sitemap"></i>{version.name}</span> : null}
+                            {_.isObject(task.versionId) ? <span><i className="fa fa fa-sitemap"></i>{task.versionId.name}</span> : null}
                             {dueTime ? <span className="ltt_c-task-timeInfo-item" title={dueTime.format('YYYY-MM-DD HH:mm:ss')}>
                                 {dueTime.diff(Date.now()) > 0 ?
                                     <span className={cx({"willDue": true,  "warning": dueDiffDays > 0 && dueDiffDays <= 3})}>will due {dueTime.fromNow()} at {dueTime.format('YYYY-MM-DD HH:mm')}</span>

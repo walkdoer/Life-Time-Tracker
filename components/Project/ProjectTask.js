@@ -482,6 +482,9 @@ module.exports = React.createClass({
         //defaultParams.parent = "null";
         params = _.extend({}, defaultParams, params);
         params.calculateTimeConsume = true;
+        if (!params.versionId) {
+            params.populateFields = 'version';
+        }
         DataAPI.Task.load(params)
             .then(function (tasks) {
                 that.setState({
