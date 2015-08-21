@@ -23,9 +23,15 @@ var DataAPI = require('../utils/DataAPI');
 
 module.exports = React.createClass({
 
+    getDefaultProps: function () {
+        return {
+            showDatePicker : true
+        };
+    },
+
     getInitialState: function () {
         return {
-            date: new Moment()
+            date: new Moment(this.props.date)
         };
     },
 
@@ -33,11 +39,16 @@ module.exports = React.createClass({
         var date = this.state.date;
         return (
             <div className="ltt_c-page ltt_c-report-TodayReport">
+                {
+                this.props.showDatePicker ?
                 <div className="Grid Grid--gutters">
                     <div className="Grid-cell u-1of4">
                         <DatePicker date={date} onChange={this.onDateChange}/>
                     </div>
                 </div>
+                :
+                null
+                }
                 <div className="Grid Grid--gutters Grid--stretch ltt_c-report-TodayReport-header">
                     <div className="Grid-cell">
                         <PieDetail className="chart" date={date} type="classes"/>

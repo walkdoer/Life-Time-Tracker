@@ -1367,7 +1367,10 @@ var LogEditor = React.createClass({
     },
 
     renderTodayReport: function () {
-        React.render(<TodayReport/>, this.refs.reportContainer.getDOMNode());
+        React.render(
+            <TodayReport key={this.props.title} date={this.props.title} showDatePicker={false}/>,
+            this.refs.reportContainer.getDOMNode()
+        );
     },
 
     sortLogs: function () {
