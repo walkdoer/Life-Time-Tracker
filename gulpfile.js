@@ -19,11 +19,11 @@ var jasminePhantomJs = require('gulp-jasmine2-phantomjs');
 var packageJSON = require('./package.json');
 var inject = require("gulp-inject");
 var rename = require('gulp-rename');
-var NwBuilder = require('node-webkit-builder');
 var watch = require('gulp-watch');
 var buildDir = './';
 var babelify = require("babelify");
 var argv = require('yargs').argv;
+var NwBuilder = require('nw-builder');
 
 // We create an array of dependencies. These are NPM modules you have
 // installed in node_modules. Think: "require('react')" or "require('underscore')"
