@@ -20,6 +20,7 @@ var extend = require('extend');
 var swal = require('sweetalert');
 var mui = require('material-ui');
 var ThemeManager = new mui.Styles.ThemeManager();
+var IScroll = require('../../libs/iscroll');
 
 
 /** mixins */
@@ -171,6 +172,8 @@ module.exports = React.createClass({
                     <div className="ltt_c-projectTask-moreInfo">
                         <span>Count: {this.state.tasks.length}</span>
                     </div>
+                    <div className="ltt_c-projectTask-wrapper" ref="iscrollWrapper">
+                        <div className="ltt_c-projectTask-wrapper-scroller">
                     {this.state.tasks.length > 0 ?
                         <TaskList select={taskId}>
                         {this.state.tasks.map(function (task) {
@@ -190,6 +193,8 @@ module.exports = React.createClass({
                         })}
                         </TaskList> : <Well><i className="fa fa-beer"></i>No Task. Simple life.</Well>
                     }
+                        </div>
+                    </div>
                 </main>
                 {this.renderTaskDetail()}
             </div>
@@ -223,7 +228,18 @@ module.exports = React.createClass({
         this.onLogTaskToken = this.onLogTask.bind(this);
         Mt.bind(['command+d', 'ctrl+d'], this.onDeleteTaskToken);
         Mt.bind(['command+l', 'ctrl+l'], this.onLogTaskToken);
+        this.myScroll = new IScroll(this.refs.iscrollWrapper.getDOMNode(), {
+            mouseWheel: true,
+            scrollbars: true,
+            interactiveScrollbars: true,
+            shrinkScrollbars: 'scale',
+            fadeScrollbars: true
+        });
     },
+
+    componentDidUpdate: function () {
+         this.myScroll.refresh();
+     },
 
     onDeleteTask: function (e) {
         e.preventDefault();

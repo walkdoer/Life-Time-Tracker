@@ -58,7 +58,7 @@ module.exports = React.createClass({
                         versionId={this.state.versionId}/>
                 </aside>
                 <main>
-                    <RouteHandler {... _.pick(this.state, ['projectId', 'versionId'])} onVersionDeleted={this.onVersionDeleted}/>
+                    <RouteHandler {... _.pick(this.state, ['projectId', 'versionId'])}  key={this.state.projectId} onVersionDeleted={this.onVersionDeleted}/>
                 </main>
             </section>
         );
