@@ -232,13 +232,12 @@
 }
 
 .ltt_c-projectTask main{
-  flex: 2;
+  flex: 1;
   padding:10px;
-  overflow-y: auto;
   background: #FFF;
-  overflow-x: hidden;
   height: 100%;
   background: #f6f6f6;
+  overflow-y:scroll;
   border-right: 1px solid #DCDCDC;
 }
 
