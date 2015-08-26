@@ -135,15 +135,9 @@ module.exports = React.createClass({
 
     calculateProgress: function () {
         var totalTime;
-        if (this.props.goal.granularity === 'day') {
-            totalTime = this.state.activities.reduce(function (total, item) {
-                return total + (item.len || 0);
-            }, 0);
-        } else {
-            totalTime = this.state.activities.reduce(function (total, item) {
-                return total + (item.totalTime || 0);
-            }, 0);
-        }
+        totalTime = this.state.activities.reduce(function (total, item) {
+            return total + (item.totalTime || 0);
+        }, 0);
         this.setState({
             progress: totalTime
         });
