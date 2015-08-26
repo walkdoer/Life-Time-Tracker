@@ -128,8 +128,9 @@ var Task = React.createClass({
                         <i className={this.state.marked ? 'fa fa-flag' : 'fa fa-flag-o'}></i>
                     </span>
                     <div className="ltt_c-task-basicInfo">
-                        <div className="ltt_c-task-basicInfo-version">
-                            {_.isObject(task.versionId) ? <span><i className="fa fa fa-sitemap"></i>{task.versionId.name}</span> : null}
+                        <div className="ltt_c-task-basicInfo-hierarchy">
+                            {_.isObject(task.projectId) ? <span className="hierarchy-item"><i className="fa  fa-rocket"></i>{task.projectId.name}</span> : null}
+                            {_.isObject(task.versionId) ? <span className="hierarchy-item"><i className="fa  fa-sitemap"></i>{task.versionId.name}</span> : null}
                             {dueTime ? <span className="ltt_c-task-timeInfo-item" title={dueTime.format('YYYY-MM-DD HH:mm:ss')}>
                                 {dueTime.diff(Date.now()) > 0 ?
                                     <span className={cx({"willDue": true,  "warning": dueDiffDays > 0 && dueDiffDays <= 3})}>will due {dueTime.fromNow()} at {dueTime.format('YYYY-MM-DD HH:mm')}</span>
@@ -138,7 +139,6 @@ var Task = React.createClass({
                                 }
                             </span> : null}
                         </div>
-                        {this.renderPercent()}
                         <div className="ltt_c-task-timeInfo">
                             <span className="ltt_c-task-timeInfo-item" title={new Moment(task.createTime).format('YYYY-MM-DD HH:mm:ss')}>
                                 <i className="fa fa-plus" title="create time"></i>

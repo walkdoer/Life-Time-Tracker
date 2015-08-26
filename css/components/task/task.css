@@ -87,8 +87,12 @@
    justify-content: space-between;
 }
 
-.ltt_c-task-basicInfo-version{
+.ltt_c-task-basicInfo-hierarchy{
    color: #ADADAD;
+}
+
+.ltt_c-task-basicInfo-hierarchy .hierarchy-item{
+  margin-right: 10px;
 }
 .ltt_c-task-timeInfo{
     color: #ADADAD;

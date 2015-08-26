@@ -147,6 +147,11 @@ var ProjectIndex = React.createClass({
         this.loadDoingTaskNotActivieInAPeriod();
     },
 
+    loadTasks: function (params) {
+        params.populateFields = 'version,project';
+        return DataAPI.Task.load(params);
+    },
+
     loadMarkedTasks: function () {
         var that = this;
         //load marked task
@@ -156,7 +161,7 @@ var ProjectIndex = React.createClass({
         if (!this.state.showDone) {
             params.status = 'doing';
         }
-        DataAPI.Task.load(params).then(function (markedTasks) {
+        this.loadTasks(params).then(function (markedTasks) {
             that.setState({
                 markedTasks: markedTasks
             });
@@ -168,7 +173,7 @@ var ProjectIndex = React.createClass({
         if (days) {
             days = parseInt(days, 10);
         }
-        DataAPI.Task.load({
+        this.loadTasks({
             status: 'doing',
             dueDays: days || 15, //default load task that will due in 15 days
             populate: false
@@ -180,7 +185,7 @@ var ProjectIndex = React.createClass({
     },
 
     loadOverDueTasks: function () {
-        DataAPI.Task.load({
+        this.loadTasks({
             status: 'doing',
             populate: false,
             overDue: true
@@ -208,7 +213,7 @@ var ProjectIndex = React.createClass({
 
     loadDoingTaskNotActivieInAPeriod: function (days) {
         var that = this;
-        DataAPI.Task.load({
+        this.loadTasks({
             status: 'doing',
             start: new Moment().subtract(30, 'day').startOf('day').toDate(),
             end: new Moment().endOf('day').toDate(),
