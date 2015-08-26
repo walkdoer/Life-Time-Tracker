@@ -75,24 +75,11 @@ function genId(){
     return text;
 }
 
-function getUrlFromTask(task) {
-    var url;
-    if (!task) {return;}
-    if (task.versionId) {
-        url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
-    } else {
-        url = '/projects/' + task.projectId + '/tasks/' + task._id;
-    }
-    return url;
-}
-
-
-
 
 exports.walkTree = walkTree;
 exports.toDate = toDate;
 exports.genId = genId;
-exports.getUrlFromTask = getUrlFromTask;
+
 exports.checkLogContent = function (date, content) {
     var includeErrorInfo = true;
     var includeLogWithoutTime = false;
@@ -158,13 +145,29 @@ exports.getProjectUrl = function (proj) {
 };
 
 
-exports.getTaskUrl = function (task) {
+exports.getTaskUrl = exports.getUrlFromTask= function (task) {
     var url = '';
     if (!task) {return url;}
-    if (task.versionId) {
-        url = '/projects/' + task.projectId + '/versions/' + task.versionId + '/tasks/' + task._id;
-    } else {
-        url = '/projects/' + task.projectId + '/tasks/' + task._id;
+    var version = task.versionId;
+    var project = task.projectId;
+    if (version && project) {
+        url += adaptUrl('/projects', project);
+        url += adaptUrl('/versions', version);
+    } else if (project && !version){
+        url += adaptUrl('/projects', project);
+    } else if (!project && version) {
+        //do nothing
+    }
+    url += adaptUrl('/tasks', task);
+
+    function adaptUrl(prefix, item) {
+        var url;
+        if (_.isString(item)) {
+            url = prefix + '/' + item;
+        } else {
+            url = prefix + '/' + item._id;
+        }
+        return url;
     }
     return url;
 };

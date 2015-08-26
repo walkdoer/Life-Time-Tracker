@@ -238,7 +238,23 @@ module.exports = React.createClass({
     },
 
     componentDidUpdate: function () {
-         this.myScroll.refresh();
+        this.myScroll.refresh();
+        if (this.state.openTaskDetail) {
+            if (!this.taskDetailScroller && this.refs.taskDetailWrapper) {
+                this.taskDetailScroller = new IScroll(this.refs.taskDetailWrapper.getDOMNode(), {
+                    mouseWheel: true,
+                    scrollbars: true,
+                    interactiveScrollbars: true,
+                    shrinkScrollbars: 'scale',
+                    fadeScrollbars: true
+                });
+            }
+            if (this.taskDetailScroller) {
+                this.taskDetailScroller.refresh();
+            }
+        } else {
+            this.taskDetailScroller = null;
+        }
      },
 
     onDeleteTask: function (e) {
@@ -413,11 +429,22 @@ module.exports = React.createClass({
 
     renderTaskDetail: function () {
         if (this.state.openTaskDetail) {
-            return <TaskDetail  {... _.pick(this.state, ['projectId', 'versionId'])}
-                key={this.currentTask._id}
-                onHidden={this.onLogListHidden}
-                onChange={this.onTaskChange}
-                task={this.currentTask}/>
+            return <aside className="ltt_c-taskDetail-wrapper" ref="taskDetailWrapper">
+                <div className="ltt_c-taskDetail-wrapper-scroller">
+                    <TaskDetail  {... _.pick(this.state, ['projectId', 'versionId'])}
+                        key={this.currentTask._id}
+                        onHidden={this.onLogListHidden}
+                        onLogsLoaded={this.onTaskLogsLoaded}
+                        onChange={this.onTaskChange}
+                        task={this.currentTask}/>
+                </div>
+            </aside>
+        }
+    },
+
+    onTaskLogsLoaded: function () {
+        if (this.taskDetailScroller) {
+            this.taskDetailScroller.refresh();
         }
     },
 

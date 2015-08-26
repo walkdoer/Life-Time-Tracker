@@ -251,6 +251,9 @@ var Footer = React.createClass({
         var that = this;
         this.loadAppInfo();
         this.loadTotalTime();
+        Ltt.on('quit', function () {
+            that._stopNotify();
+        });
         //this.checkSyncStatus();
     },
 
@@ -351,84 +354,19 @@ var Footer = React.createClass({
     updateLastTime: function (doingLog) {
         var that = this;
         var lastTime = this.refs.lastTime.getDOMNode();
-        if (this.updateTimeIntervalId) {
+        if (this.updateTimeIntervalId !== null) {
             this.clearInterval(this.updateTimeIntervalId);
+            this.updateTimeIntervalId = null;
         }
         this._doingLog = doingLog;
         if (!doingLog) {return tickTime(doingLog);}
-        var start = new Moment(doingLog.start);
-        var notifyId = start.unix();
         if (!this._currentLog) {
             this.renderLog(doingLog);
         }
         tickTime(doingLog);
         this.updateTimeIntervalId = this.setInterval(function () {
-            var logClasses = config.classes;
-            var notifyInfo = that.notifyInfo;
-            //check if this doing log is notify before
-            if (notifyInfo && notifyInfo.id !== notifyId) {
-                console.log('new');
-                that.notifyInfo = notifyInfo = null;
-            }
             tickTime(doingLog);
-            var prevNotifyMoment = notifyInfo ? notifyInfo.time : null;
-            var lastMinutes = new Moment().diff(start, 'minute');
-            //remind again after first remind
-            var needNotify = prevNotifyMoment ? new Moment().diff(prevNotifyMoment, 'minute') > 15 : true;
-            if (lastMinutes > 45 && needNotify) {
-                var message = '',
-                    task = doingLog.task,
-                    project = doingLog.projects[0],
-                    subTask = doingLog.subTask,
-                    tag = (doingLog.tags || []).join(',');
-                if (tag) {
-                    message = '[' + tag + '] ';
-                }
-                if (project) {
-                    message = project.name
-                }
-                if (task) {
-                    message += ' ' + task.name;
-                }
-                if (subTask) {
-                    message += ' ' + subTask.name;
-                }
-                var subtitle = '要休息一下啦';
-                if (notifyInfo) {
-                    var count = notifyInfo.count;
-                    if (count === 1) {
-                        subtitle = '╮(╯_╰)╭累了效率不高的，休息一下吧';
-                    }
-                    if (count > 1) {
-                        subtitle = '🐴上休息啦，喝口水，运动下再战';
-                    }
-                }
-                var logClass = doingLog.classes[0];
-                var logClassConfig = logClasses.filter(function (cls) { return cls._id === logClass; })[0];
-                var logClassLabel = logClassConfig ? logClassConfig.name : "unknow";
-                Ltt.sdk &&  Ltt.sdk.notify && Ltt.sdk.notify({
-                    title: '😁' + '你在' + logClassLabel +'上投入了' + Util.displayTime(lastMinutes),
-                    subtitle: subtitle,
-                    icon: path.join(__dirname, './images/me.jpg'),
-                    sound: true,
-                    wait: false,
-                    message: message
-                }, {
-                    click: function () {
-                        alert('test');
-                    }
-                });
-                if (!notifyInfo) {
-                    that.notifyInfo = {
-                        time: new Moment(),
-                        count: 1,
-                        id: notifyId
-                    }
-                } else {
-                    notifyInfo.count++;
-                    notifyInfo.time = new Moment();
-                }
-            }
+            that._notify(doingLog);
         }, 1000);
 
         function tickTime(doingLog) {
@@ -446,6 +384,82 @@ var Footer = React.createClass({
             }
             React.render(content, lastTime);
         }
+    },
+
+    _notify: function (doingLog) {
+        if (this.__lttStopNotify) {return;}
+        var that = this;
+        var start = new Moment(doingLog.start);
+        var notifyId = start.unix();
+        var logClasses = config.classes;
+        var notifyInfo = that.notifyInfo;
+        //check if this doing log is notify before
+        if (notifyInfo && notifyInfo.id !== notifyId) {
+            that.notifyInfo = notifyInfo = null;
+        }
+        var prevNotifyMoment = notifyInfo ? notifyInfo.time : null;
+        var lastMinutes = new Moment().diff(start, 'minute');
+        //remind again after first remind
+        var needNotify = prevNotifyMoment ? new Moment().diff(prevNotifyMoment, 'minute') > 15 : true;
+        if (lastMinutes > 45 && needNotify) {
+            var message = '',
+                task = doingLog.task,
+                project = doingLog.projects[0],
+                subTask = doingLog.subTask,
+                tag = (doingLog.tags || []).join(',');
+            if (tag) {
+                message = '[' + tag + '] ';
+            }
+            if (project) {
+                message = project.name
+            }
+            if (task) {
+                message += ' ' + task.name;
+            }
+            if (subTask) {
+                message += ' ' + subTask.name;
+            }
+            var subtitle = '要休息一下啦';
+            if (notifyInfo) {
+                var count = notifyInfo.count;
+                if (count === 1) {
+                    subtitle = '╮(╯_╰)╭累了效率不高的，休息一下吧';
+                }
+                if (count > 1) {
+                    subtitle = '🐴上休息啦，喝口水，运动下再战';
+                }
+            }
+            var logClass = doingLog.classes[0];
+            var logClassConfig = logClasses.filter(function (cls) { return cls._id === logClass; })[0];
+            var logClassLabel = logClassConfig ? logClassConfig.name : "unknow";
+            Ltt.sdk &&  Ltt.sdk.notify && Ltt.sdk.notify({
+                title: '😁' + '你在' + logClassLabel +'上投入了' + Util.displayTime(lastMinutes),
+                subtitle: subtitle,
+                icon: path.join(__dirname, './images/me.jpg'),
+                sound: true,
+                wait: false,
+                message: message
+            }, {
+                click: function () {
+                    //todo
+                }
+            });
+            if (!notifyInfo) {
+                that.notifyInfo = {
+                    time: new Moment(),
+                    count: 1,
+                    id: notifyId
+                }
+            } else {
+                notifyInfo.count++;
+                notifyInfo.time = new Moment();
+            }
+        }
+
+    },
+
+    _stopNotify: function () {
+        this.__lttStopNotify__ = true;
     },
 
     openProject: function (project) {

@@ -93,6 +93,25 @@
         isNodeWebkit = true;
     }
 
+    extend(Ltt, {
+        fns: {},
+        on: function (event, fn) {
+            if (!this.fns[event]) {
+                this.fns[event] = [];
+            }
+            this.fns[event].push(fn);
+        },
+
+        emit: function (event) {
+            var eventFns = this.fns[event];
+            if (eventFns) {
+                eventFns.forEach(function (fn) {
+                    fn.call();
+                });
+            }
+        }
+    });
+
 
     if (!isNodeWebkit) {
         console.log('init Ltt Api for browser invironment');
@@ -143,6 +162,7 @@
             // Hide the window to give user the feeling of closing immediately
             this.hide();
             if (event === 'quit') {
+                this.emit('quit');
                 this.close(true);
             }
         });

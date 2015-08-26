@@ -22,6 +22,7 @@ var LogLine = require('../charts/LogLine');
 var DataAPI = require('../../utils/DataAPI');
 var DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 var DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+var noop = function () {};
 
 module.exports = React.createClass({
 
@@ -36,7 +37,8 @@ module.exports = React.createClass({
 
     getDefaultProps: function () {
         return {
-            onHidden: function () {}
+            onHidden: noop,
+            onLogsLoaded: noop
         };
     },
 
@@ -44,7 +46,7 @@ module.exports = React.createClass({
         var task = this.props.task;
 
         return (
-            <aside className="ltt_c-projectTask-logs ltt_c-taskDetail">
+            <div className="ltt_c-projectTask-logs ltt_c-taskDetail">
                 <div className="ltt_c-LogList" key={task._id}>
                     <div className="ltt_c-LogList-header">
                         <span className="searchInput">{task.name}</span>
@@ -100,7 +102,7 @@ module.exports = React.createClass({
                     {this.renderLogs()}
                     <LoadingMask loaded={this.state.loaded}/>
                 </div>
-            </aside>
+            </div>
         );
     },
 
@@ -190,6 +192,12 @@ module.exports = React.createClass({
 
     componentDidMount: function () {
         this.load();
+    },
+
+    componentDidUpdate: function () {
+        if (this.state.loaded) {
+            this.props.onLogsLoaded()
+        }
     },
 
 
