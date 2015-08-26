@@ -17,34 +17,9 @@ var history = window.history;
 var Mt = window.Mousetrap;
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin
 var Router = require('react-router');
-
-var disabledBackButton = true,
-    disabledForwardButton = true,
-    urls = [location.href];
-window.addEventListener('hashchange', function (e) {
-    disabledBackButton = false;
-    disabledForwardButton = false;
-    var newURL = e.newURL;
-    var urlIndex;
-    var alreadyInUrls = urls.some(function (url, index) {
-        if (url === newURL) {
-            urlIndex = index;
-            return true;
-        }
-        return false;
-    });
-    if (urlIndex === urls.length - 1) {
-        disabledForwardButton = true;
-    }
-    if (urlIndex === 0) {
-        disabledBackButton = true;
-    }
-    if (!alreadyInUrls) {
-        urls.push(newURL);
-        disabledForwardButton = true;
-    }
-});
-
+var urls = [location.href];
+var FORWARD = 1;
+var BACKWARD = -1;
 
 var Header = React.createClass({
 
@@ -52,7 +27,9 @@ var Header = React.createClass({
 
     getInitialState: function () {
         return {
-            syncStatus: NO_SYNC
+            syncStatus: NO_SYNC,
+            disabledForwardButton: true,
+            disabledBackButton: true
         };
     },
 
@@ -100,10 +77,10 @@ var Header = React.createClass({
                     </div>
                         <ButtonToolbar>
                             <ButtonGroup className="history-btn-group">
-                                <Button className="ltt_c-header-backBtn" disabled={disabledBackButton} onClick={this.back}>
+                                <Button className="ltt_c-header-backBtn" disabled={this.state.disabledBackButton} onClick={this.back}>
                                     <i className="fa fa-angle-left"></i>
                                 </Button>
-                                <Button className="ltt_c-header-forwardBtn" disabled={disabledForwardButton} onClick={this.forward}>
+                                <Button className="ltt_c-header-forwardBtn" disabled={this.state.disabledForwardButton} onClick={this.forward}>
                                     <i className="fa fa-angle-right"></i>
                                 </Button>
                             </ButtonGroup>
@@ -130,11 +107,13 @@ var Header = React.createClass({
 
     back: function (e) {
         e.preventDefault();
+        this.direction = BACKWARD;
         history.back();
     },
 
     forward: function (e) {
         e.preventDefault();
+        this.direction = FORWARD;
         history.forward();
     },
 
@@ -151,8 +130,50 @@ var Header = React.createClass({
     },
 
     componentDidMount: function () {
+        console.log('test');
         Mt.bind(['shift+]'], this.forward);
         Mt.bind(['shift+['], this.back);
+
+        window.addEventListener('hashchange', function (e) {
+            var newURL = e.newURL;
+            if (this.direction === FORWARD) {
+                this.setState({
+                    disabledBackButton: false
+                });
+            } else if (this.direction === BACKWARD){
+                this.setState({
+                    disabledForwardButton: false
+                });
+
+            } else {
+
+            }
+            var urlIndex;
+            var alreadyInUrls = urls.some(function (url, index) {
+                if (url === newURL) {
+                    urlIndex = index;
+                    return true;
+                }
+                return false;
+            });
+            if (urlIndex === urls.length - 1) {
+                this.setState({
+                    disabledForwardButton : true
+                });
+            }
+            if (urlIndex === 0) {
+                this.setState({
+                    disabledBackButton : true
+                });
+            }
+            if (!alreadyInUrls) {
+                urls.push(newURL);
+                this.setState({
+                    disabledForwardButton : true,
+                    disabledBackButton : false
+                });
+            }
+        }.bind(this));
     },
 
     componentWillUnmount: function () {
