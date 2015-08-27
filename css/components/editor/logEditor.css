@@ -47,6 +47,10 @@
     background: rgb(255, 236, 201) !important;
 }
 
+.ace-github .ace_marker-layer .log-star{
+    background: rgb(240, 223, 255) !important;
+}
+
 .ltt_c-logEditor-header-toggleCalendar {
     margin-right: 5px;
     cursor: pointer;

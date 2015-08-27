@@ -55,6 +55,8 @@ Bus.on(EventConstant.INSERT_LOG_FROM_TASK, function (log) {
 
 /** cache */
 var contentCache = {};
+var __starLines = {};
+
 //window.contentCache = contentCache;
 var LogEditor = React.createClass({
 
@@ -180,6 +182,7 @@ var LogEditor = React.createClass({
             that._highLightDoingLine(content);
             that.gotoDoingLogLine(content);
             that._gotoLocate(content, that.props.locate);
+            that._updateHighlightStarLine();
             that._checkLogValid(content);
             that.props.onLoad(content, that.getDoingLog(content));
             editor.focus();
@@ -226,6 +229,11 @@ var LogEditor = React.createClass({
         session.setUseWrapMode(true);
         var langTools = ace.require("ace/ext/language_tools");
         langTools.resetCompleters();
+        var title = this.props.title;
+        console.log('init');
+        if (_.isEmpty(__starLines[title])) {
+            __starLines[title] = [];
+        }
         editor.setOptions({
             enableSnippets: false,
             enableBasicAutocompletion: true,
@@ -627,6 +635,14 @@ var LogEditor = React.createClass({
             }
         });
 
+        commands.addCommand({
+            name: 'toggleStarLine',
+            bindKey: {win: 'Ctrl-\'', mac: 'Command-\''},
+            exec: function () {
+                that.toggleStarLine();
+            }
+        });
+
     },
 
     finishCurrentActivity: function () {
@@ -750,6 +766,7 @@ var LogEditor = React.createClass({
                 that.unhighlightUnFinishLog();
                 that.highlightUnFinishLog();
             }
+            that._updateHighlightStarLine();
             that.props.onChange(content, editor);
         }, 200));
 
@@ -768,11 +785,16 @@ var LogEditor = React.createClass({
         console.log('listen to editro');
     },
 
+    getCurrentLineIndex: function () {
+        var selection = this.editor.getSelection();
+        var session = this.editor.getSession();
+        return selection.getCursor().row;
+    },
+
     getCurrentLine: function () {
         var selection = this.editor.getSelection();
         var session = this.editor.getSession();
-        var row = selection.getCursor().row;
-        return session.getLine(row);
+        return session.getLine(selection.getCursor().row);
     },
 
     _showContentChangeFlag: function () {
@@ -930,6 +952,7 @@ var LogEditor = React.createClass({
                 if (that.state.highlightUnFinishLog) {
                     that.highlightUnFinishLog();
                 }
+                that._updateHighlightStarLine();
                 that.gotoDoingLogLine(content);
                 that._highLightDoingLine(content);
                 that._checkLogValid(content);
@@ -1248,6 +1271,39 @@ var LogEditor = React.createClass({
             highlightUnFinishLog: highlight
         });
         this[highlight ? 'highlightUnFinishLog' : 'unhighlightUnFinishLog']();
+    },
+
+    toggleStarLine: function () {
+        var index = this.getCurrentLineIndex();
+        var log = this.getCurrentLine();
+        var starLines = __starLines[this.props.title];
+        var foundIndex;
+        var found = starLines.some(function (l, i) {
+            if (l === log) {
+                foundIndex = i;
+                return true;
+            }
+            return false;
+        });
+        if (found) {
+            this.unhighlightLine(index);
+            starLines.splice(foundIndex, 1);
+        } else {
+            this._starLine(index);
+            starLines.push(log);
+        }
+    },
+
+    _starLine: function (index) {
+        this.highlightLine(index, 'log-star');
+    },
+
+    _updateHighlightStarLine: function () {
+        var content = this.getContent();
+        __starLines[this.props.title].forEach(function (line) {
+            var lineIndex = this.getLineIndex(line, content);
+            this._starLine(lineIndex);
+        }, this);
     },
 
     highlightUnFinishLog: function () {
