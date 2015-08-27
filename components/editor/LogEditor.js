@@ -182,7 +182,7 @@ var LogEditor = React.createClass({
             that._highLightDoingLine(content);
             that.gotoDoingLogLine(content);
             that._gotoLocate(content, that.props.locate);
-            that._updateHighlightStarLine();
+            that._starCacheLines();
             that._checkLogValid(content);
             that.props.onLoad(content, that.getDoingLog(content));
             editor.focus();
@@ -768,7 +768,7 @@ var LogEditor = React.createClass({
             }
             that._updateHighlightStarLine();
             that.props.onChange(content, editor);
-        }, 200));
+        }, 100));
 
         selection.on('changeCursor', _.debounce(function (e, selection) {
             var row = selection.getCursor().row;
@@ -898,6 +898,10 @@ var LogEditor = React.createClass({
         return index;
     },
 
+    getLine: function (lineIndex) {
+        return this.editor.getSession().getLine(lineIndex);
+    },
+
     getLineIndex: function (line, content) {
         var index;
         if (!content) {
@@ -952,7 +956,7 @@ var LogEditor = React.createClass({
                 if (that.state.highlightUnFinishLog) {
                     that.highlightUnFinishLog();
                 }
-                that._updateHighlightStarLine();
+                that._starCacheLines();
                 that.gotoDoingLogLine(content);
                 that._highLightDoingLine(content);
                 that._checkLogValid(content);
@@ -1279,31 +1283,56 @@ var LogEditor = React.createClass({
         var starLines = __starLines[this.props.title];
         var foundIndex;
         var found = starLines.some(function (l, i) {
-            if (l === log) {
+            if (l.log === log) {
                 foundIndex = i;
                 return true;
             }
             return false;
         });
         if (found) {
-            this.unhighlightLine(index);
-            starLines.splice(foundIndex, 1);
+            this._unStarLine(index, foundIndex);
         } else {
-            this._starLine(index);
-            starLines.push(log);
+            this._starLine(index, log);
         }
     },
 
-    _starLine: function (index) {
+    _starLine: function (index, log) {
+        var starLines = __starLines[this.props.title];
         this.highlightLine(index, 'log-star');
+        starLines.push({lineIndex: index, log: log});
+    },
+
+    _unStarLine: function (index, foundIndex) {
+        var starLines = __starLines[this.props.title];
+        this.unhighlightLine(index, 'log-star');
+        starLines.splice(foundIndex, 1);
+    },
+
+    _starCacheLines: function () {
+        var content = this.getContent();
+        __starLines[this.props.title].forEach(function (l) {
+            var lineIndex = this.getLineIndex(l.log, content);
+            this._starLine(lineIndex, l.log);
+        }, this);
     },
 
     _updateHighlightStarLine: function () {
-        var content = this.getContent();
-        __starLines[this.props.title].forEach(function (line) {
-            var lineIndex = this.getLineIndex(line, content);
-            this._starLine(lineIndex);
-        }, this);
+        var that = this;
+        var timer = setTimeout(function () {
+            var content = that.getContent();
+            var starLines = __starLines[that.props.title];
+            var newStarLines = [];
+            starLines.forEach(function (l) {
+                this.unhighlightLine(l.lineIndex, 'log-star');
+            }, that);
+            starLines.forEach(function (l) {
+                var newIndex = this.getLineIndex(l.log, content);
+                this.highlightLine(newIndex, 'log-star');
+                newStarLines.push({lineIndex: newIndex, log: l.log});
+            }, that);
+            __starLines[that.props.title] = newStarLines;
+            clearTimeout(timer);
+        }, 0);
     },
 
     highlightUnFinishLog: function () {
@@ -1330,7 +1359,7 @@ var LogEditor = React.createClass({
         var that = this;
         if (!_.isEmpty(that._highlightUnFinishLogIndex)) {
             that._highlightUnFinishLogIndex.forEach(function (index) {
-                that.unhighlightLine(index);
+                that.unhighlightLine(index, 'log-unfinish');
             });
             that._highlightUnFinishLogIndex = null;
         }
@@ -1358,13 +1387,13 @@ var LogEditor = React.createClass({
         var session = editor.getSession();
         var range = new Range(index, 0, index, Infinity);
         var marker = session.addMarker(range, "ace_step " + highlightClass || "", "fullLine");
-        this._highlightMaker[index] = marker;
+        this._highlightMaker[index + highlightClass] = marker;
     },
 
-    unhighlightLine: function (index) {
+    unhighlightLine: function (index, highlightClass) {
         var editor = this.editor;
         var session = editor.getSession();
-        var marker =this._highlightMaker[index];
+        var marker =this._highlightMaker[index + highlightClass];
         if (marker) {
             session.removeMarker(marker);
         }
