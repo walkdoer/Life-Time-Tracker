@@ -736,7 +736,7 @@ var LogEditor = React.createClass({
         var session = editor.getSession();
         var selection = editor.getSelection();
         session.on('change', _.debounce(function (e) {
-            console.log('editor content change');
+            //console.log('editor content change');
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = session.getValue();
             contentCache[title] = content;
@@ -746,6 +746,10 @@ var LogEditor = React.createClass({
             that._highLightDoingLine(content);
             that._annotationOverTimeLog(logs, content);
             that._showContentChangeFlag();
+            if (that.state.highlightUnFinishLog) {
+                that.unhighlightUnFinishLog();
+                that.highlightUnFinishLog();
+            }
             that.props.onChange(content, editor);
         }, 200));
 
