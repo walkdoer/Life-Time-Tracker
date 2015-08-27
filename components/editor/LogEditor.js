@@ -1327,8 +1327,15 @@ var LogEditor = React.createClass({
             }, that);
             starLines.forEach(function (l) {
                 var newIndex = this.getLineIndex(l.log, content);
-                this.highlightLine(newIndex, 'log-star');
-                newStarLines.push({lineIndex: newIndex, log: l.log});
+                if (Number.isInteger(newIndex)) {
+                    this.highlightLine(newIndex, 'log-star');
+                    newStarLines.push({lineIndex: newIndex, log: l.log});
+                } else {
+                    var currentLineIndex = this.getCurrentLineIndex();
+                    var currentLine = this.getCurrentLine();
+                    this.highlightLine(currentLineIndex, 'log-star');
+                    newStarLines.push({lineIndex: currentLineIndex, log: currentLine});
+                }
             }, that);
             __starLines[that.props.title] = newStarLines;
             clearTimeout(timer);
