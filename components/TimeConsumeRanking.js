@@ -108,8 +108,8 @@ module.exports = React.createClass({
 
     loadRankingData: function (rankType, params) {
         var that = this;
-        var start = this.props.start;
-        var end = this.props.end;
+        var start = Moment(this.props.start);
+        var end = Moment(this.props.end);
         if (params) {
             start = params.start;
             end = params.end;

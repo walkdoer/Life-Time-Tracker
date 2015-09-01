@@ -29,6 +29,11 @@ var Reports = React.createClass({
             path: '/reports/today',
             icon: 'fa fa-sun-o'
         }, {
+            text: 'Weekly',
+            key: 'weekly',
+            path: '/reports/weekly',
+            icon: 'fa fa-calendar'
+        }, {
             text: 'Tag',
             key: 'tags',
             path: '/reports/tags',

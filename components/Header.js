@@ -130,7 +130,6 @@ var Header = React.createClass({
     },
 
     componentDidMount: function () {
-        console.log('test');
         Mt.bind(['shift+]'], this.forward);
         Mt.bind(['shift+['], this.back);
 

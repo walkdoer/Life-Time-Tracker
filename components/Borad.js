@@ -21,6 +21,12 @@ module.exports = React.createClass({
 
     mixins: [PureRenderMixin],
 
+    getDefaultProps: function () {
+        return {
+            type: 'day'
+        };
+    },
+
     getInitialState: function () {
         return {
             loaded: false
@@ -28,42 +34,42 @@ module.exports = React.createClass({
     },
 
     render: function () {
-        var today = this.state.today;
-        var yesterday = this.state.yesterday;
+        var currentPeriod = this.state.currentPeriod;
+        var prevPeriod = this.state.prevPeriod;
         var logClasses = config.classes;
-        var logClassTime, yesterDayLogClassTime;
-        if (today) {
-            logClassTime = today.classTime;
+        var currentLogClassTime, prevLogClassTime;
+        if (currentPeriod) {
+            currentLogClassTime = currentPeriod.classTime;
         }
-        if (yesterday) {
-            yesterDayLogClassTime = yesterday.classTime;
+        if (prevPeriod) {
+            prevLogClassTime = prevPeriod.classTime;
         }
         return (
             <div className="ltt_c-Board">
                 {logClasses.map(function (logClass) {
-                    var time = 0, yesterdayTime;
+                    var time = 0, prevPeriodTime;
                     var classId = logClass._id;
                     var data;
-                    if (!_.isEmpty(logClassTime)) {
-                        data = logClassTime.filter(function(item) {
+                    if (!_.isEmpty(currentLogClassTime)) {
+                        data = currentLogClassTime.filter(function(item) {
                             return item.id === classId;
                         })[0];
                         if (data) {
                             time = data.count;
                         }
                     }
-                    if (!_.isEmpty(yesterDayLogClassTime)) {
-                        data = yesterDayLogClassTime.filter(function(item) {
+                    if (!_.isEmpty(prevLogClassTime)) {
+                        data = prevLogClassTime.filter(function(item) {
                             return item.id === classId;
                         })[0];
                         if (data) {
-                            yesterdayTime = data.count;
+                            prevPeriodTime = data.count;
                         }
                     }
                     var progressNumber, progressPercentage, progress;
-                    if (yesterdayTime > 0) {
-                        progressNumber = time - yesterdayTime;
-                        progressPercentage = progressNumber / yesterdayTime;
+                    if (prevPeriodTime > 0) {
+                        progressNumber = time - prevPeriodTime;
+                        progressPercentage = progressNumber / prevPeriodTime;
                         progress = (
                             <span className={progressNumber > 0 ? 'rise' : (progressNumber < 0 ? 'down' : 'equal')}>
                                 <i className={"fa fa-" + (progressNumber > 0 ? 'long-arrow-up' :
@@ -87,22 +93,23 @@ module.exports = React.createClass({
 
     componentDidMount: function (argument) {
         var that = this;
+        var dateType = this.props.type;
         DataAPI.stat({
-            start: new Moment().startOf('day').format(DATE_FORMAT),
-            end: new Moment().endOf('day').format(DATE_FORMAT)
+            start: new Moment().startOf(dateType).format(DATE_FORMAT),
+            end: new Moment().endOf(dateType).format(DATE_FORMAT)
         }).then(function (statResult) {
             that.setState({
                 loaded: true,
-                today: statResult
+                currentPeriod: statResult
             });
         }).then(function () {
             return DataAPI.stat({
-                start: new Moment().subtract(1, 'day').startOf('day').format(DATE_FORMAT),
-                end: new Moment().subtract(1, 'day').endOf('day').format(DATE_FORMAT)
+                start: new Moment().subtract(1, dateType).startOf(dateType).format(DATE_FORMAT),
+                end: new Moment().subtract(1, dateType).endOf(dateType).format(DATE_FORMAT)
             });
         }).then(function (statResult) {
             that.setState({
-                yesterday: statResult
+                prevPeriod: statResult
             });
         });
     }

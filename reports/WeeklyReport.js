@@ -15,63 +15,44 @@ var config = require('../conf/config');
 var LoadingMask = require('../components/LoadingMask');
 var PieDetail = require('../components/PieDetail');
 var TimeConsumeRanking = require('../components/TimeConsumeRanking');
-var DatePicker = require('../components/DatePicker');
+var Board = require('../components/Borad');
+
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
 
 
-module.exports = React.createClass({
+var WeeklyReport = React.createClass({
 
     getDefaultProps: function () {
         return {
+            week: new Moment().week(), //default week is current date week
             showDatePicker : true
         };
     },
 
-    getInitialState: function () {
-        return {
-            date: new Moment(this.props.date)
-        };
-    },
-
     render: function () {
-        var date = this.state.date;
+        var week = this.props.week;
         return (
-            <div className="ltt_c-report ltt_c-report-TodayReport">
-                {
-                this.props.showDatePicker ?
-                <div className="Grid Grid--gutters">
-                    <div className="Grid-cell u-1of4">
-                        <DatePicker date={date} onChange={this.onDateChange}/>
-                    </div>
-                </div>
-                :
-                null
-                }
-                <div className="Grid Grid--gutters Grid--stretch ltt_c-report-TodayReport-header">
+            <div className="ltt_c-report ltt_c-report-WeeklyReport">
+                <div className="Grid Grid--gutters Grid--stretch ltt_c-report-WeeklyReport-board">
                     <div className="Grid-cell">
-                        <PieDetail className="chart" date={date} type="classes"/>
+                        <Board type="week"/>
                     </div>
                 </div>
                 <div className="Grid Grid--gutters Grid--stretch">
                     <div className="Grid-cell u-1of2">
                         <TimeConsumeRanking className="chart"
-                            start={Moment(date).startOf('day')}
-                            end={Moment(date).endOf('day')} />
+                            start={Moment().week(this.props.week).startOf('week').toDate()}
+                            end={Moment().week(this.props.week).endOf('week').toDate()} />
                     </div>
                     <div className="Grid-cell u-1of2">
-                        <div className="chart"></div>
+                        
                     </div>
                 </div>
             </div>
         );
-    },
-
-
-    onDateChange: function (date) {
-        this.setState({
-            date: date
-        });
     }
 });
+
+module.exports = WeeklyReport;

@@ -89,7 +89,6 @@ var LogEditor = React.createClass({
 
     render: function () {
         var start = new Date().getTime();
-        console.log('render component logEditor');
         var syncIcon = 'fa ';
         NProgress.configure({parent: '.ltt_c-logEditor', showSpinner: false});
         var syncStatus = this.state.syncStatus;
@@ -165,7 +164,7 @@ var LogEditor = React.createClass({
         this.readLog(title).then(function (content) {
             var cacheContent = that._recoveryFromLocalStorage();
             if (cacheContent) {
-                console.log('recover ' + title + ' from localStorage');
+                console.info('recover ' + title + ' from localStorage');
                 content = cacheContent;
                 that.writeLog(title, content).then(function (result) {
                     if (!result.success) {
@@ -230,7 +229,7 @@ var LogEditor = React.createClass({
         var langTools = ace.require("ace/ext/language_tools");
         langTools.resetCompleters();
         var title = this.props.title;
-        console.log('init');
+        console.info('init editor');
         if (_.isEmpty(__starLines[title])) {
             __starLines[title] = [];
         }
@@ -246,7 +245,7 @@ var LogEditor = React.createClass({
                 var line = session.getLine(pos.row);
                 var tokenType = token.type;
                 var tokenValue = token.value;
-                console.log('tokenValue:' + tokenValue + ' prefix:' + prefix);
+                console.info('tokenValue:' + tokenValue + ' prefix:' + prefix);
                 if (tokenType === 'text') {
                     if (tokenValue === '<') {
                         that.getProjectCompletions(line, callback);
@@ -330,7 +329,6 @@ var LogEditor = React.createClass({
         if (log) {
             var line = session.getLength();
             log = log.replace(/\d{1,2}\s*[:]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:]\s*\d{1,2})*/ig, '').trim();
-            console.log('插入到第' + (line + 1) + '行: ' + log);
             session.insert({row: line + 1, column: 0}, '\n' + log);
             this.gotoLine(line + 1, log.length);
         }
@@ -373,7 +371,7 @@ var LogEditor = React.createClass({
 
 
     _destroyEditor: function () {
-        console.log('Destroy editor start');
+        console.info('Destroy editor start');
         if (this.editor) {
             this.editor.destroy();
             this._highlightMaker = {};
@@ -381,7 +379,7 @@ var LogEditor = React.createClass({
             this._currentRow = null;
             this.refs.editor.getDOMNode().innerHTML = '';
             this.editor = null;
-            console.log('Destroy editor end');
+            console.info('Destroy editor end');
         }
     },
 
@@ -654,7 +652,6 @@ var LogEditor = React.createClass({
 
 
     getTagCompletions: function (prefix, cb) {
-        console.log('get tag completions start');
         var that = this;
         DataAPI.Tag.load({name: prefix}).then(function (tags) {
             if (_.isEmpty(tags)) {
@@ -663,25 +660,20 @@ var LogEditor = React.createClass({
             var completions = tags.map(function (tag) {
                 return {name: tag.name, value: tag.name, meta: 'tag'};
             });
-            console.log('tags :' + completions);
             cb(null, completions);
         });
     },
 
     getProjectCompletions: function (line, cb) {
         //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
-        console.log('getProjectCompletions start');
-        var start = new Date().getTime();
         var that = this;
         DataAPI.Project.load({aggregate: false, versions: false}).then(function(projects) {
             //if not projects, then no need to create typeahead
             if (_.isEmpty(projects)) {return cb(null, [])}
-            var end = new Date().getTime();
             var completions = projects.map(function(proj) {
                 var score = new Date(proj.lastActiveTime).getTime()
                 return {name: proj.name, value: proj.name, score: score, meta: progressTpl(proj)};
             });
-            console.log('getProjectCompletions end cost ' + (end - start))
             cb(null, completions);
         });
     },
@@ -695,10 +687,8 @@ var LogEditor = React.createClass({
         ]);*/
         this._updateCurrentInfomation(line).then(function () {
             var info = that._getCurrentLogInformation();
-            console.log(info);
             if (!info.projectId) { return cb(null, []); }
             return DataAPI.Version.load({projectId: info.projectId}).then(function (versions) {
-                console.log('versions', versions);
                 if (_.isEmpty(versions)) { return cb(null, []); }
                 var completions = versions.map(function(ver) {
                     var score = new Date(ver.lastActiveTime).getTime();
@@ -718,12 +708,10 @@ var LogEditor = React.createClass({
         var that = this;
         this._updateCurrentInfomation(line).then(function () {
             var info = that._getCurrentLogInformation();
-            console.log(info);
             if (!info.projectId) { return cb(null, []); }
             return DataAPI.Task.load({projectId: info.projectId, versionId: info.versionId, populate: false, parent: info.taskId})
                 .then(function (tasks) {
                     if (_.isEmpty(tasks)) { return cb(null, []); }
-                    console.log(tasks);
                     var completions = tasks.map(function(task) {
                         var score = new Date(task.lastActiveTime).getTime();
                         return {
@@ -746,13 +734,11 @@ var LogEditor = React.createClass({
     },
 
     _listenToEditor: function () {
-        console.log('listen to editor');
         var that = this;
         var editor = this.editor;
         var session = editor.getSession();
         var selection = editor.getSelection();
         session.on('change', _.debounce(function (e) {
-            //console.log('editor content change');
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = session.getValue();
             contentCache[title] = content;
@@ -782,7 +768,6 @@ var LogEditor = React.createClass({
                 that._currentRow = row;
             }
         }, 200));
-        console.log('listen to editro');
     },
 
     getCurrentLineIndex: function () {
@@ -846,7 +831,6 @@ var LogEditor = React.createClass({
             removeHighlight(this._doingLogMarker);
             this._doingLogMarker = null;
         }
-        console.log('doing log index = ' + index);
         return index;
 
         function highlight(index) {
@@ -992,11 +976,9 @@ var LogEditor = React.createClass({
     },
 
     readLog: function (title) {
-        var start = Date.now();
         var editor = this.editor;
         return DataAPI.getLogContent(title)
             .then(function (content) {
-                console.log('read log cost:' + (Date.now() - start));
                 return content;
             })
             .catch(function (err) {
@@ -1021,7 +1003,7 @@ var LogEditor = React.createClass({
         var title = this.props.title;
         var content = contentCache[title];
         if (content !== undefined) {
-            console.log('persist file ' + title);
+            console.info('persist file ' + title);
             return this.writeLog(title, content)
                 .then(function () {
                     delete contentCache[title];
@@ -1044,7 +1026,7 @@ var LogEditor = React.createClass({
 
     _removeFromLocalStorage: function () {
         var key = 'file_' + this.props.title;
-        console.log('remove from local storage ' + key);
+        console.info('remove from local storage ' + key);
         localStorage.removeItem(key);
     },
 
@@ -1173,11 +1155,8 @@ var LogEditor = React.createClass({
     _updateCurrentInfomation: function (currentLine) {
         var includeNoTimeLog = true;
         var that = this;
-        console.log('_updateCurrentInfomation start');
-        var start = new Date().getTime();
         return this._getDetailFromLogLineContent(this.props.title, currentLine)
             .then(function (result) {
-                console.log('_updateCurrentInfomation end ' + (new Date().getTime() - start));
                 that._currentLog = result;
             });
     },
@@ -1203,13 +1182,11 @@ var LogEditor = React.createClass({
                         var version;
                         var project = projects[0];
                         if (project) {
-                            console.log('project', project);
                             result.project = project;
                             if (versionName) {
                                 version = project.versions.filter(function (ver) {
                                     return ver.name === versionName;
                                 })[0];
-                                console.log('version', version);
                                 result.version = version;
                             }
                             if (logTask) {
@@ -1219,7 +1196,6 @@ var LogEditor = React.createClass({
                                     versionId: version && version._id,
                                     populate: false
                                 }).then(function (tasks) {
-                                    console.log('task', tasks[0]);
                                     result.task = tasks[0];
                                     deferred.resolve(result);
                                 });
@@ -1243,7 +1219,6 @@ var LogEditor = React.createClass({
 
     _getCurrentLogInformation: function () {
         var log = this._currentLog;
-        console.log(log);
         var info = {};
         if (log) {
             var project = log.project;
@@ -1582,7 +1557,7 @@ var Calendar = React.createClass({
                     that.setTimelineInterval();
                     that.scrollToAdaptiveEvent();
                 }).catch(function (err) {
-                    console.log(err.stack);
+                    console.error(err.stack);
                     Notify.error('Sorry, failed to show calendar events!');
                 });
             }

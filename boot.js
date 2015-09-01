@@ -49,7 +49,8 @@ var OverviewReport = require('./reports/Overview'),
     ClassesReport = require('./reports/ClassesReport'),
     TagsReport = require('./reports/TagsReport'),
     TodayReport = require('./reports/todayReport'),
-    ProjectReport = require('./reports/ProjectReport');
+    ProjectReport = require('./reports/ProjectReport'),
+    WeeklyReport = require('./reports/WeeklyReport');
 
 /** Utils */
 var DataAPI = require('./utils/DataAPI');
@@ -68,6 +69,7 @@ var routes = (
             <Route name="tagsReport" path="/reports/tags" handler={TagsReport}/>
             <Route name="classsesReport" path="/reports/classes" handler={ClassesReport}/>
             <Route name="todayReport" path="/reports/today" handler={TodayReport}/>
+            <Route name="weeklyReport" path="/reports/weekly" handler={WeeklyReport}/>
             <Route name="projectReport" path="/reports/projects" handler={ProjectReport}/>
             <DefaultRoute handler={OverviewReport}/>
         </Route>
