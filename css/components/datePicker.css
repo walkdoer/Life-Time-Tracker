@@ -41,6 +41,7 @@
     display:inline-block;
     height: 34px;
     flex: 1;
+    text-align: center;
 }
 
 .ltt_c-datePicker  button[type="button"],

@@ -249,6 +249,22 @@
     flex: none!important
 }
 
+.u-1of5 {
+    width: 20%!important;
+    -webkit-box-flex: 0!important;
+    -webkit-flex: none!important;
+    -ms-flex: none!important;
+    flex: none!important
+}
+
+.u-1of6 {
+    width: 16.6%!important;
+    -webkit-box-flex: 0!important;
+    -webkit-flex: none!important;
+    -ms-flex: none!important;
+    flex: none!important
+}
+
 .u-3of4 {
     width: 75%!important;
     -webkit-box-flex: 0!important;

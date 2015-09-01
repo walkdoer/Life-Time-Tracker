@@ -92,7 +92,7 @@ var WeeklyReport = React.createClass({
             <div className="ltt_c-report ltt_c-report-WeeklyReport">
                 {this.props.showWeekPicker ?
                 <div className="Grid Grid--gutters Grid--stretch ltt_c-report-WeeklyReport-board">
-                    <div className="Grid-cell u-1of4">
+                    <div className="Grid-cell u-1of5">
                         <WeekPicker value={week} prevWeek={this.onPrevWeek} nextWeek={this.onNextWeek}/>
                     </div>
                 </div>
@@ -100,7 +100,7 @@ var WeeklyReport = React.createClass({
                 null}
                 <div className="Grid Grid--gutters Grid--stretch ltt_c-report-WeeklyReport-board">
                     <div className="Grid-cell">
-                        <Board className="ltt-box-shadow" type="week" week={week}/>
+                        <Board key={week} className="ltt-box-shadow" type="week" week={week}/>
                     </div>
                 </div>
                 <div className="Grid Grid--gutters Grid--stretch">
