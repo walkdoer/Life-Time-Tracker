@@ -1,6 +1,7 @@
 .ltt_c-datePicker{
     display: flex;
     height: 34px;
+    border-radius: 2px;
 }
 
 .ltt_c-FullDateRangePicker{
@@ -54,8 +55,10 @@
 .ltt_c-datePicker button[type="button"].prev,
 .ltt_c-dateRangePicker button[type="button"].prev{
     border-right: none;
+    border-radius: 2px 0 0 2px;
 }
 .ltt_c-datePicker button[type="button"].next,
 .ltt_c-dateRangePicker button[type="button"].next{
     border-left: none;
+    border-radius: 0 2px 2px 0;
 }

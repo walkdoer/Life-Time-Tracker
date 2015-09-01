@@ -45,8 +45,12 @@ module.exports = React.createClass({
         if (prevPeriod) {
             prevLogClassTime = prevPeriod.classTime;
         }
+        var className = 'ltt_c-Board';
+        if (this.props.className) {
+            className += ' ' + this.props.className;
+        }
         return (
-            <div className="ltt_c-Board">
+            <div className={className}>
                 {logClasses.map(function (logClass) {
                     var time = 0, prevPeriodTime;
                     var classId = logClass._id;
@@ -133,14 +137,14 @@ module.exports = React.createClass({
                 end: new Moment().endOf(type).format(DATE_FORMAT)
             };
         }
-        if ()
         return period;
     },
 
     _getPrevStartEnd: function () {
         var period = this._getStartEnd();
-        period.start.subtract(1, this.props.type);
-        period.end.subtract(1, this.props.type);
-        return period;
+        return {
+            start: Moment(period.start).subtract(1, this.props.type).toDate(),
+            end: Moment(period.end).subtract(1, this.props.type).toDate()
+        };
     }
 })

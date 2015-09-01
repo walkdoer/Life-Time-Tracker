@@ -21,30 +21,93 @@ var Board = require('../components/Borad');
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
 
+var noop = function () {};
 
-var WeeklyReport = React.createClass({
+var WeekPicker = React.createClass({
+
+    getInitialState: function () {
+        return {
+            week: this.props.value
+        };
+    },
 
     getDefaultProps: function () {
         return {
-            week: new Moment().week(), //default week is current date week
-            showDatePicker : true
+            nextWeek: noop,
+            prevWeek: noop
         };
     },
 
     render: function () {
-        var week = this.props.week;
+        var className = 'ltt_c-WeekPicker';
+        if (this.props.className) {
+            className += ' ' + this.props.className;
+        }
+        return <div className={className}>
+            <button className="prev" type="button" onClick={this.prevWeek} title="prev"><i className="fa fa-angle-double-left"></i></button>
+            <input ref="weekInput" className="input-week" value={this._getDisplayValue()}/>
+            <button className="next" type="button" onClick={this.nextWeek} title="next"><i className="fa fa-angle-double-right"></i></button>
+        </div>
+    },
+
+    _getDisplayValue: function() {
+        return Moment().year() + '-' + this.state.week;
+    },
+
+    prevWeek: function () {
+        this.setState({
+            week: this.state.week - 1
+        }, function () {
+            this.props.prevWeek(this.state.week);
+        });
+    },
+
+    nextWeek: function () {
+        this.setState({
+            week: this.state.week + 1
+        }, function () {
+            this.props.nextWeek(this.state.week);
+        });
+    }
+})
+
+var WeeklyReport = React.createClass({
+
+    getInitialState: function () {
+        return {
+            week: this.props.week
+        };
+    },
+
+    getDefaultProps: function () {
+        return {
+            week: new Moment().week(), //default week is current date week
+            showWeekPicker : true
+        };
+    },
+
+    render: function () {
+        var week = this.state.week;
         return (
             <div className="ltt_c-report ltt_c-report-WeeklyReport">
+                {this.props.showWeekPicker ?
+                <div className="Grid Grid--gutters Grid--stretch ltt_c-report-WeeklyReport-board">
+                    <div className="Grid-cell u-1of4">
+                        <WeekPicker value={week} prevWeek={this.onPrevWeek} nextWeek={this.onNextWeek}/>
+                    </div>
+                </div>
+                :
+                null}
                 <div className="Grid Grid--gutters Grid--stretch ltt_c-report-WeeklyReport-board">
                     <div className="Grid-cell">
-                        <Board type="week" week={this.props.week}/>
+                        <Board className="ltt-box-shadow" type="week" week={week}/>
                     </div>
                 </div>
                 <div className="Grid Grid--gutters Grid--stretch">
                     <div className="Grid-cell u-1of2">
                         <TimeConsumeRanking className="chart"
-                            start={Moment().week(this.props.week).startOf('week').toDate()}
-                            end={Moment().week(this.props.week).endOf('week').toDate()} />
+                            start={Moment().week(week).startOf('week').toDate()}
+                            end={Moment().week(week).endOf('week').toDate()} />
                     </div>
                     <div className="Grid-cell u-1of2">
                         
@@ -52,6 +115,18 @@ var WeeklyReport = React.createClass({
                 </div>
             </div>
         );
+    },
+
+    onNextWeek: function (week) {
+        this.setState({
+            week: week
+        });
+    },
+
+    onPrevWeek: function (week) {
+        this.setState({
+            week: week
+        });
     }
 });
 
