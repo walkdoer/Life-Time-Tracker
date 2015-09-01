@@ -36,7 +36,7 @@ module.exports = React.createClass({
     //mixins: [PureRenderMixin],
     getInitialState: function () {
         return {
-            progress: 0,
+            totalTime: 0,
             activitiesLoaded: false,
             activitiesLoadFailed: false,
             activities: []
@@ -79,8 +79,9 @@ module.exports = React.createClass({
                             yAxisLabel={false}/> : null)
                     }
                 </div>
+                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-totalTime" style={{width: 100}}>{Util.displayTime(this.state.totalTime)}</div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-progress" style={{width: 200}}>
-                    <Progress className="ltt_c-GoalCard-progress" max={goal.estimatedTime || 0} value={this.state.progress || 0}/>
+                    <Progress className="ltt_c-GoalCard-progress" max={goal.estimatedTime || 0} value={this.state.totalTime || 0}/>
                 </div>
             </div>
         )
@@ -139,7 +140,7 @@ module.exports = React.createClass({
             return total + (item.totalTime || 0);
         }, 0);
         this.setState({
-            progress: totalTime
+            totalTime: totalTime
         });
     },
 

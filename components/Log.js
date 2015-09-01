@@ -39,6 +39,7 @@ var LogClass = React.createClass({
 
         classes = classes.map(function(cls) {
             return R.li({
+                key: cls,
                 className: 'ltt_c-log-class-item',
                 'data-code': cls
             }, cls.name);
