@@ -23,7 +23,8 @@ module.exports = React.createClass({
 
     getDefaultProps: function () {
         return {
-            type: 'day'
+            type: 'day',
+            week: null
         };
     },
 
@@ -94,23 +95,52 @@ module.exports = React.createClass({
     componentDidMount: function (argument) {
         var that = this;
         var dateType = this.props.type;
-        DataAPI.stat({
-            start: new Moment().startOf(dateType).format(DATE_FORMAT),
-            end: new Moment().endOf(dateType).format(DATE_FORMAT)
-        }).then(function (statResult) {
+        var currentStartEnd = this._getStartEnd();
+        var prevStartEnd = this._getPrevStartEnd();
+        DataAPI.stat(currentStartEnd).then(function (statResult) {
             that.setState({
                 loaded: true,
                 currentPeriod: statResult
             });
         }).then(function () {
-            return DataAPI.stat({
-                start: new Moment().subtract(1, dateType).startOf(dateType).format(DATE_FORMAT),
-                end: new Moment().subtract(1, dateType).endOf(dateType).format(DATE_FORMAT)
-            });
+            return DataAPI.stat(prevStartEnd);
         }).then(function (statResult) {
             that.setState({
                 prevPeriod: statResult
             });
         });
+    },
+
+    _getStartEnd: function () {
+        var week = this.props.week;
+        var type = this.props.type;
+        var period;
+        if (type === 'week') {
+            if (_.isNumber(week)) {
+                period = {
+                    start: new Moment().week(week).startOf(type).format(DATE_FORMAT),
+                    end: new Moment().week(week).endOf(type).format(DATE_FORMAT)
+                };
+            } else {
+                period = {
+                    start: new Moment().startOf(type).format(DATE_FORMAT),
+                    end: new Moment().endOf(type).format(DATE_FORMAT)
+                };
+            }
+        } else if (type === 'day') {
+            period = {
+                start: new Moment().startOf(type).format(DATE_FORMAT),
+                end: new Moment().endOf(type).format(DATE_FORMAT)
+            };
+        }
+        if ()
+        return period;
+    },
+
+    _getPrevStartEnd: function () {
+        var period = this._getStartEnd();
+        period.start.subtract(1, this.props.type);
+        period.end.subtract(1, this.props.type);
+        return period;
     }
 })

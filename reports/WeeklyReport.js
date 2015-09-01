@@ -37,7 +37,7 @@ var WeeklyReport = React.createClass({
             <div className="ltt_c-report ltt_c-report-WeeklyReport">
                 <div className="Grid Grid--gutters Grid--stretch ltt_c-report-WeeklyReport-board">
                     <div className="Grid-cell">
-                        <Board type="week"/>
+                        <Board type="week" week={this.props.week}/>
                     </div>
                 </div>
                 <div className="Grid Grid--gutters Grid--stretch">
