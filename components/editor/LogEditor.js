@@ -754,7 +754,7 @@ var LogEditor = React.createClass({
             }
             that._updateHighlightStarLine();
             that.props.onChange(content, editor);
-        }, 100));
+        }, 50));
 
         selection.on('changeCursor', _.debounce(function (e, selection) {
             var row = selection.getCursor().row;
@@ -1255,6 +1255,9 @@ var LogEditor = React.createClass({
     toggleStarLine: function () {
         var index = this.getCurrentLineIndex();
         var log = this.getCurrentLine();
+        if (!_.isString(log) || !log.trim() ) {
+            return;
+        }
         var starLines = __starLines[this.props.title];
         var foundIndex;
         var found = starLines.some(function (l, i) {
@@ -1308,8 +1311,13 @@ var LogEditor = React.createClass({
                 } else {
                     var currentLineIndex = this.getCurrentLineIndex();
                     var currentLine = this.getCurrentLine();
+                    currentLine = currentLine.trim()
                     this.highlightLine(currentLineIndex, 'log-star');
-                    newStarLines.push({lineIndex: currentLineIndex, log: currentLine});
+                    if (currentLine) {
+                        newStarLines.push({lineIndex: currentLineIndex, log: currentLine});
+                    } else {
+                        this.unhighlightLine(l.lineIndex, 'log-star');
+                    }
                 }
             }, that);
             __starLines[that.props.title] = newStarLines;
