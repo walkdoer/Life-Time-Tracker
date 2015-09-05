@@ -1312,9 +1312,9 @@ var LogEditor = React.createClass({
                     var currentLineIndex = this.getCurrentLineIndex();
                     var currentLine = this.getCurrentLine();
                     currentLine = currentLine.trim()
-                    this.highlightLine(currentLineIndex, 'log-star');
                     if (currentLine) {
                         newStarLines.push({lineIndex: currentLineIndex, log: currentLine});
+                        this.highlightLine(currentLineIndex, 'log-star');
                     } else {
                         this.unhighlightLine(l.lineIndex, 'log-star');
                     }
@@ -1383,9 +1383,11 @@ var LogEditor = React.createClass({
     unhighlightLine: function (index, highlightClass) {
         var editor = this.editor;
         var session = editor.getSession();
-        var marker =this._highlightMaker[index + highlightClass];
+        var key = index + highlightClass;
+        var marker = this._highlightMaker[key];
         if (marker) {
             session.removeMarker(marker);
+            delete this._highlightMaker[key];
         }
     },
 
