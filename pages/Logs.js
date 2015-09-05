@@ -40,6 +40,7 @@ var SortTypes = {
   ASC: 'ASC',
   DESC: 'DESC',
 };
+var  CHART_HEIGHT = 180;
 
 
 /*    <DatePicker
@@ -72,22 +73,22 @@ var Logs = React.createClass({
         return (
             <div className="ltt_c-page ltt_c-page-logs">
                 {this.renderFilters()}
-                <div className="Grid charts Grid-gutters">
-                    { !emptyLogs ?
-                    <div className="totalTimePercent" style={{width: 150}}>
+                { !emptyLogs ?
+                <div className="Grid charts Grid-gutters" style={{height:CHART_HEIGHT}}>
+                    <div className="totalTimePercent ltt-box-shadow" style={{width: 150}}>
                         <div className="time">{Util.displayTime(sumTime)}</div>
                         {totalTime > 0 ? <EasyPieChart size={110} value={sumTime} total={totalTime}/> : null }
-                    </div> : null
-                    }
-                    { !emptyLogs ?
+                    </div>
                     <div className="Grid-cell calendarHeatMap">
                         <CalendarHeatMap
+                            className="ltt-box-shadow"
                             getData={this.loadCalendarHeatMapData}
                             empty="no data"
                             ref="calendarHeatMap"
                             filled="{date} {count}分钟"/>
-                    </div> : null }
+                    </div>
                 </div>
+                : null}
                 <div className="ltt_c-page-logs-list" ref="list">
                     {this.renderLogs()}
                     <LoadingMask loaded={this.state.logLoaded}/>
@@ -101,7 +102,7 @@ var Logs = React.createClass({
         if (logs && logs.length > 0) {
             var $tableContaner = $(this.refs.list.getDOMNode());
             var width = $tableContaner.width();
-            var height = $tableContaner.height() + 64 + 180;
+            var height = $tableContaner.height() - CHART_HEIGHT;
             return <LogsTable logs={logs} height={height} width={width}/>
         } else if (!logs){
             return <Well className="align-center MT-20">通过条件查找日志</Well>
