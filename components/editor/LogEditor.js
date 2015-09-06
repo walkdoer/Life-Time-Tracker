@@ -1290,7 +1290,7 @@ var LogEditor = React.createClass({
         var content = this.getContent();
         __starLines[this.props.title].forEach(function (l) {
             var lineIndex = this.getLineIndex(l.log, content);
-            this._starLine(lineIndex, l.log);
+            this.highlightLine(lineIndex, 'log-star');
         }, this);
     },
 
