@@ -66,7 +66,7 @@ var Logo = React.createClass({
             return "#241B61"
         } else if (hour >= 20 && hour < 22) {
             return "#1D1635";
-        } else if (hour >= 22 && hour < 23) {
+        } else if (hour >= 22 && hour <= 23) {
             return "#060423";
         }
     }

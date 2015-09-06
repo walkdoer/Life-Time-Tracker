@@ -118,3 +118,24 @@
     background-color: #F2F2F2;
 }
 
+
+
+.ltt_c-logEditor .ace_gutter-cell{
+    position:relative;
+}
+.ltt_c-logEditor .ace_gutter-cell.ace_log_star::before {
+    content: "\f069";
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+    position: absolute;
+    top: 0px;
+    left: 3px;
+    padding: 2px;
+    background: #E5E5E5;
+    color: #D02F68;
+}
