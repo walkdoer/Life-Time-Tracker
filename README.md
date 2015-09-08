@@ -142,14 +142,14 @@ Dashboard
 
 项目可视化
 
-![项目界面](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/project.png)
+![项目界面](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/projects.png)
 
 ![项目，报表，task的管理界面](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/project.task.png)
 
 
 搜索
 
-![搜索](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/report.png)
+![搜索](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/search.png)
 
 目标管理
 
@@ -160,7 +160,7 @@ Dashboard
 在生活中学到一些新的东西，如果有办法融入到软件里面的，就会进行开发，这个时候真的觉得写软件，就像是写书一样。
 
 ### License
----------------------------------------
+
 Creative Commons Attribution-NonCommercial 3.0 License.
 
 
