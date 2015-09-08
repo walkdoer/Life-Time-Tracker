@@ -6,6 +6,7 @@ Life Time Tracker
 
 Life Time Tracker是一个做个人时间统计的工具，读了《奇特的一生》之后，想实践柳比歇夫的统计方法。但是没有找到就手的工具，所以决定自己开发一个，顺便尝试一下`nwjs + react`的组合来开发桌面App，同时也实践近一段时间在学习的数据可视化。
 
+现在文档较少，请多包涵。
 
 ### 安装
 
@@ -125,6 +126,38 @@ clone项目之后，运行 `npm install` 和 `bower install` 安装依赖;
 ### Screenshot
 
 
+Dashboard
+
+![Dashboard](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/dashboard-v0.1.11.png)
+
+日志编辑器，提供快捷键提高编辑效率
+
+![log editor](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/editor.png)
+
+个人数据可视化
+
+这里列出的只是其中一份报表，还有更多类型的报表。
+
+![个人数据可视化](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/report-v0.1.11.png)
+
+项目可视化
+
+![项目界面](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/project.png)
+
+![项目，报表，task的管理界面](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/project.task.png)
+
+
+搜索
+
+![搜索](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/report.png)
+
+目标管理
+
+![goal](https://raw.githubusercontent.com/zhangmhao/Life-Time-Tracker/master/images/screenshots/goal.png)
+
+### 最后
+
+在生活中学到一些新的东西，如果有办法融入到软件里面的，就会进行开发，这个时候真的觉得写软件，就像是写书一样。
 
 ### License
 ---------------------------------------
