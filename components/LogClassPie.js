@@ -83,7 +83,7 @@ module.exports = React.createClass({
             <div className="ltt_c-LogClassPie" style={this.getStyle()}>
                 <h1>{this.props.title}</h1>
                 {currentData ? <Pie data={currentData} highchartOptions={highchartOptions} ref="pieChart"/> : null }
-                <LoadingMask loaded={this.state.loaded}/>
+                <LoadingMask loaded={this.state.loaded} opacity={1}/>
             </div>
         );
     },

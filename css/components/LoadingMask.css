@@ -1,10 +1,9 @@
 .loadingMask{
-    opacity: 0.556;
     top: 0;
     left: 0;
     z-index:999;
     position: absolute;
-    background-color: #FEFEFE;
+    background-color: rgba(254, 254, 254, 0.56);
     zoom: 1;
     cursor:wait;
     text-align: center;

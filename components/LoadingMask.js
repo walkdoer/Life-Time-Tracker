@@ -57,6 +57,9 @@ module.exports = React.createClass({
         } else {
             style.display = 'block';
         }
+        if (this.props.opacity !== undefined) {
+            style.backgroundColor = 'rgba(254, 254, 254,' +  (1 - this.props.opacity) + ')';
+        }
         return (
             <div className='loadingMask' style={style}>
                 <div className="vertical-align">

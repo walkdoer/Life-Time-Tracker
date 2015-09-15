@@ -56,6 +56,9 @@
   color:#393939;
   text-decoration: none;
 }
+.ltt_c-page-logEditor aside .ltt_c-LogClassPie{
+  min-height: 240px;
+}
 
 .ltt_c-page-logEditor aside{
     width: 230px;
