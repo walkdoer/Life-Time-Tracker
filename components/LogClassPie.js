@@ -80,40 +80,36 @@ module.exports = React.createClass({
             };
         });
         return (
-            <div className="ltt_c-LogClassPie">
+            <div className="ltt_c-LogClassPie" style={this.getStyle()}>
                 <h1>{this.props.title}</h1>
-                {currentData ? <Pie data={currentData} highchartOptions={highchartOptions}/> : null }
-                {this.props.compare ? this.renderCompare() : null}
+                {currentData ? <Pie data={currentData} highchartOptions={highchartOptions} ref="pieChart"/> : null }
                 <LoadingMask loaded={this.state.loaded}/>
             </div>
         );
+    },
+
+    getStyle: function () {
+        var style = {};
+        if (this.props.height) {
+            style.height = this.props.height;
+        }
+        return style;
     },
 
     renderCompare: function () {
         var currentData = this.state.currentData;
         var compareData = this.state.compareData;
         var logClasses = config.classes;
-        return (
-            <div className="ltt_c-LogClassPie-changes">
-            {logClasses.map(function (logClass) {
-                var time = 0, yesterdayTime;
-                var classId = logClass._id;
-                time = getTimeConsumeBy(classId, currentData);
-                yesterdayTime = getTimeConsumeBy(classId, compareData);
-                var cpToYesterday = compare(time, yesterdayTime);
-                return (
-                    <p className={'changeItem ' + (cpToYesterday > 0 ? 'rise' : (cpToYesterday < 0 ? 'down' : 'equal'))}>
-                        <span className="name">{logClass.name}</span>
-                        <span className="num">
-                        <i className={"fa fa-" + (cpToYesterday > 0 ? 'long-arrow-up' :
-                            (cpToYesterday < 0 ? 'long-arrow-down' : 'minus'))}></i>
-                        {numeral(cpToYesterday * 100).format('0.0')}%
-                        </span>
-                    </p>
-                );
-            })}
-            </div>
-        );
+        var pieChart = this.refs.pieChart;
+        logClasses.forEach(function (logClass) {
+            var time = 0, yesterdayTime;
+            var classId = logClass._id;
+            time = getTimeConsumeBy(classId, currentData);
+            yesterdayTime = getTimeConsumeBy(classId, compareData);
+            var cpToYesterday = compare(time, yesterdayTime);
+            var name = logClass.name + ' ' + numeral(cpToYesterday * 100).format('0.0') + '%';
+            pieChart.updateLegend(logClass.name, name);
+        });
     },
 
     loadData:function (nextProps) {
@@ -139,6 +135,10 @@ module.exports = React.createClass({
                 loaded: true,
                 currentData: current,
                 compareData: compare
+            }, function () {
+                if (this.props.compare) {
+                    this.renderCompare();
+                }
             });
         }).catch(function (err) {
             console.error(err.stack);

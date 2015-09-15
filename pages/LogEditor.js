@@ -102,7 +102,7 @@ var Page = React.createClass({
                             onDateChange={this.onDateChange}
                             ref="datePicker"/>
                         <ModalTrigger modal={<DateGoToWindow onGoto={this.gotoDate}/>} ref="dateGoToWindow"><span></span></ModalTrigger>
-                        <LogClassPie date={date} backgroundColor="#f6f6f6" ref="logClassPie"/>
+                        <LogClassPie date={date}  backgroundColor="#f6f6f6" ref="logClassPie" legend={true}/>
                         <ButtonToolbar>
                             <Button bsSize='xsmall'><Link to="/reports/today">More Detail</Link></Button>
                         </ButtonToolbar>

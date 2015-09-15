@@ -4,6 +4,7 @@
 'use strict';
 var React = require('react');
 var R = React.DOM;
+var _ = require('lodash');
 var chart = require('./chart');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var pieConvertor = require('../../convertors/pie');
@@ -44,6 +45,20 @@ var Pie = React.createClass({
         var chart = Highcharts.charts[index];
         data = pieConvertor.dispose(data);
         chart.series[0].setData(data.data);
+    },
+
+    updateLegend: function (legendName, label) {
+        var chart = Highcharts.charts[this.chart.data('highchartsChart')];
+        var allItems = chart.legend.allItems;
+        if (!_.isEmpty(allItems)) {
+            allItems.some(function (item) {
+                if (item.name === legendName) {
+                    item.update({name: label});
+                    return true;
+                }
+                return false;
+            });
+        }
     }
 });
 
