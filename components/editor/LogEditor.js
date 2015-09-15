@@ -8,6 +8,8 @@ var Button = RB.Button;
 var ButtonToolbar = RB.ButtonToolbar;
 var DropdownButton = RB.DropdownButton;
 var OverlayTrigger = RB.OverlayTrigger;
+var TabbedArea = RB.TabbedArea;
+var TabPane = RB.TabPane;
 var Link = RB.Link;
 var Popover = RB.Popover;
 var MenuItem = RB.MenuItem;
@@ -147,8 +149,15 @@ var LogEditor = React.createClass({
                         <div ref="reportContainer" style={{height: "100%"}}>
                         </div>
                     </SlidePanel>
-                    <SlidePanel className="helpDoc" ref="helpDoc" open={false}>
-                        <HelpDocument src="./help/editor.md"/>
+                    <SlidePanel className="helpDoc" ref="helpDoc" open={false} style={{padding: 20}}>
+                        <TabbedArea>
+                            <TabPane eventKey="shortcut" tab="Shortcuts">
+                                <HelpDocument src="./help/editor.shortcuts.md"/>
+                            </TabPane>
+                            <TabPane eventKey="logExample" tab="Log Example">
+                                <HelpDocument src="./help/editor.logExample.md"/>
+                            </TabPane>
+                        </TabbedArea>
                     </SlidePanel>
                 </div>
             </div>
