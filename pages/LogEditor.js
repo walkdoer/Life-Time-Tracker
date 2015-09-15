@@ -28,6 +28,7 @@ var DataAPI = require('../utils/DataAPI');
 var BindStore = require('../mixins/BindStore');
 var LogClassPie = require('../components/LogClassPie');
 var OneDayGoal =  require('../components/OneDayGoal');
+var IScroll = require('../libs/iscroll');
 
 /** Store */
 var ProjectStore = require('../stores/ProjectStore');
@@ -95,21 +96,34 @@ var Page = React.createClass({
                     onSave={this.onSave}
                     locate={this._initOrigin}
                     ref="logEditor"/>
-                <aside>
-                    <LogDatePicker select={date}
-                        onDateChange={this.onDateChange}
-                        ref="datePicker"/>
-                    <ModalTrigger modal={<DateGoToWindow onGoto={this.gotoDate}/>} ref="dateGoToWindow"><span></span></ModalTrigger>
-                    <LogClassPie date={date} backgroundColor="#f6f6f6" ref="logClassPie"/>
-                    <ButtonToolbar>
-                        <Button bsSize='xsmall'><Link to="/reports/today">More Detail</Link></Button>
-                    </ButtonToolbar>
-                    <div className="overtimeLog" ref="overtimeLog"></div>
-                    <TaskInfo ref="taskInfo"/>
-                    <OneDayGoal date={date} ref="oneDayGoal"/>
+                <aside className="ltt_c-IScroll" ref="asideScroller">
+                    <div className="ltt_c-IScroll-scroller">
+                        <LogDatePicker select={date}
+                            onDateChange={this.onDateChange}
+                            ref="datePicker"/>
+                        <ModalTrigger modal={<DateGoToWindow onGoto={this.gotoDate}/>} ref="dateGoToWindow"><span></span></ModalTrigger>
+                        <LogClassPie date={date} backgroundColor="#f6f6f6" ref="logClassPie"/>
+                        <ButtonToolbar>
+                            <Button bsSize='xsmall'><Link to="/reports/today">More Detail</Link></Button>
+                        </ButtonToolbar>
+                        <div className="overtimeLog" ref="overtimeLog"></div>
+                        <TaskInfo ref="taskInfo"/>
+                        <OneDayGoal date={date} ref="oneDayGoal"/>
+                    </div>
                 </aside>
             </div>
         );
+    },
+
+
+    componentDidMount: function () {
+        this.asideScroller = new IScroll(this.refs.asideScroller.getDOMNode(), {
+            mouseWheel: true,
+            scrollbars: true,
+            interactiveScrollbars: true,
+            shrinkScrollbars: 'scale',
+            fadeScrollbars: true
+        });
     },
 
     onGoalAchieved: function (goal) {

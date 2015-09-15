@@ -61,7 +61,7 @@
     width: 230px;
     position: relative;
     height: 100%;
-    overflow-y:auto;
+    overflow: hidden;
     border-left: 1px solid #ECECEC;
 }
 
@@ -254,27 +254,6 @@
   border-bottom: 1px #ddd solid;
   margin: 10px;
 }
-/*
-.ltt_c-page-logEditor .ltt_c-Board{
-  flex-direction: column;
-}
-.ltt_c-page-logEditor .ltt_c-Board,
-.ltt_c-page-logEditor .ltt_c-Board-item-number{
-  font-size: 15px;
-}
-.ltt_c-page-logEditor .ltt_c-Board-item{
-  display: flex;
-}
-
-.ltt_c-page-logEditor .ltt_c-Board-item-number{
-  margin-top:0px;
-}
-
-.ltt_c-page-logEditor .ltt_c-Board-item-number,
-.ltt_c-page-logEditor .ltt_c-Board-item-name,
-.ltt_c-page-logEditor .ltt_c-Board-item-change{
-  padding: 10px;
-}*/
 
 .ltt_c-page-logEditor .ltt_c-LogClassPie .ltt_c-chart-pie{
   height: 150px;
@@ -323,345 +302,34 @@
   padding: 5px;
 }
 
-.ltt_c-OneDayGoal-goal-name{
-  
-}
-o.ltt_c-page-logEditor{
-    height: 100%;
-    padding: 0px;
-    display:flex;
-    display: -webkit-flex;
-    flex-direction: row;
-    -webkit-flex-direction: row;
-    -webkit-align-content: stretch;
-    align-content: stretch;
-}
-.ltt_c-page-logEditor .ltt_c-logEditor{
-    height: 100%;
-    flex: 1;
-    position: relative;
-    padding-top: 41px;
-}
-
-.ltt_c-logEditor-content .ltt_c-SlidePanel .paper{
-    box-shadow: none !important;
-    overflow-y: auto !important;
-}
-
-.ltt_c-logEditor-header{
-    background:#FFF;
-    position: absolute;
-    top:0;
-    right: 0;
-    left: 0;
-    height: 41px;
-    line-height: 41px;
-    display: flex;
-    padding-left: 10px;
-    padding-right: 6px;
-    justify-content: space-between;
-    border-bottom: 1px solid #ECECEC;
-}
-
-.ltt_c-logEditor-header-right .btn-group{
-  margin-top:6px;
-}
-
-.ltt_c-page-logEditor .ltt_c-logEditor #ltt-logEditor{
-    height:100%;
-    margin-bottom: 0px;
-    border: none;
-    border-radius: 0px;
-}
-.ltt_c-page-logEditor aside .btn-toolbar{
-    display: flex;
-    padding-right: 10px;
-    padding-left: 10px;
-    justify-content: flex-end;
-}
-
-.ltt_c-page-logEditor aside .btn-toolbar .btn a{
-  color:#393939;
-  text-decoration: none;
-}
-
-.ltt_c-page-logEditor aside{
-    width: 230px;
-    position: relative;
-    height: 100%;
-    overflow-y:auto;
-    border-left: 1px solid #ECECEC;
-}
-
-
-.ltt_c-page-logEditor-datepicker{
-  border-bottom: 1px solid #E8E8E8;
-  background-color: rgba(246, 246, 246, 0.92);
-}
-
-/*************************/
-
-
-.ltt_c-filterableList{
-    background: #181B1D;
-    color:#FFF;
-}
-
-.ltt_c-filterableList .ltt_c-searchBox {
-    background: #292d30;
-
-    border-bottom: 1px solid #3D3D3D;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-}
-
-.ltt_c-filterableList-list{
-    height: 100%;
-    width: 100%;
-}
-
-.ltt_c-filterableList-list-item{
-
-}
-.ltt_c-filterableList-list-item.selected{
-    color: rgb(255, 208, 208);
-    background: #292d30;
-}
-.ltt_c-filterableList-list-item:hover{
-    background: #292d30;
-}
-
-.ltt_c-filterableList-list-item-name{
-    padding: 10px;
-}
-
-
-.ltt_c-lastTime{
-}
-.ltt_c-lastTime .fa{
-  margin-right: 4px;
-}
-.ltt_c-lastTime-name{
-    margin-right: 4px;
-}
-
-.ltt_c-lastTime-name .ltt_c-tag{
-  padding: 0px 4px;
-  margin:0px;
-  height: 23px;
-  line-height: 23px;
-  margin-right: 3px;
-  border: 1px solid #393939;
-  background: linear-gradient(to bottom, #636363 0%,#323232 100%);     border: 1px solid #434141;     
-  color: #D9D9D9;
-}
-.ltt_c-lastTime-name .ltt_c-tag .fa{
-  color: #999;
-  text-shadow: 0px 1px 0px #CECECE;
-}
-
-.ltt_c-lastTime-name .item{
-  margin-right:4px;
-}
-
-.ltt_c-lastTime-name .item .extenal-link {
-  margin-left: 2px;
-  margin-right: 2px;
-}
-.ltt_c-lastTime-name .item:hover{
-  cursor: pointer;
-}
-.ltt_c-lastTime-name .project{
-  font-weight:600;
-}
-.ltt_c-lastTime-time {
-  color: #FEF8D8;
-}
-/*.ltt_c-lastTime-name:after{
-  content: ":";
-  margin-left: 2px;
-}*/
-
-.ltt_c-logEditor-typeahead{
-    display: none;
-    position: absolute;
-    z-index: 211;
-}
-
-.ltt_c-logEditor-typeahead .typeahead{
-  height: 16px; 
-  line-height:16px;
-  border: none;
-  background:transparent;
-}
-
-.ltt_c-logEditor-typeahead .tt-dropdown-menu{
-    background: #FFF;
-    border: 1px solid #ccc;
-}
-
-.tt-query {
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-}
-
-.tt-hint {
-  color: #999
-}
-
-.tt-dropdown-menu {
-  width: 250px;
-  margin-top: 0px;
-  padding: 8px 0;
-  max-height: 350px;
-  overflow-y: auto;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  -webkit-border-radius: 8px;
-     -moz-border-radius: 8px;
-          border-radius: 8px;
-  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
-     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
-          box-shadow: 0 5px 10px rgba(0,0,0,.2);
-}
-
-.tt-suggestion {
-  padding: 3px 10px;
-  font-size: 13px;
-  line-height: 13px;
-}
-
-.tt-suggestion.tt-cursor {
-  color: #fff;
-  background-color: #0097cf;
-
-}
-
-.tt-suggestion p {
-  margin: 0;
-}
-
-.ltt_c-projectInfo{}
-.ltt_c-projectInfo .ltt_c-taskInfo,
-.ltt_c-projectInfo .ltt_c-taskInfo.subtask{
-  padding-left: 8px;
-}
-.ltt_c-taskInfo-task-header,
-.ltt_c-projectInfo-project-header{
-  display:flex;
-  height: 40px;
-  line-height: 40px;
-  padding: 0 10px;
-}
-
-.ltt_c-taskInfo-task-title,
-.ltt_c-projectInfo-title{
-  flex: 1;
-  padding: 0 10px;
+.ltt_c-IScroll{
+  position: relative;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
 
-.ltt_c-taskInfo-task .ltt_c-progress,
-.ltt_c-projectInfo-project .ltt_c-progress{
-  width: 80px;
-  margin-top: 15px;
-}
-.ltt_c-taskInfo .ltt_c-progress .ltt_c-progress-bar,
-.ltt_c-projectInfo .ltt_c-progress .ltt_c-progress-bar{
-  box-shadow: none;
-}
+  /* Prevent the callout on tap-hold and text selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
-
-.ltt_c-sidebar-splitline{
-  padding: 5px 0;
-  color: #939393;
-  border-bottom: 1px #ddd solid;
-  margin: 10px;
+  /* Prevent text resize on orientation change, useful for web-apps */
+  -webkit-text-size-adjust: none;
+  -moz-text-size-adjust: none;
+  -ms-text-size-adjust: none;
+  -o-text-size-adjust: none;
+  text-size-adjust: none;
 }
-/*
-.ltt_c-page-logEditor .ltt_c-Board{
-  flex-direction: column;
-}
-.ltt_c-page-logEditor .ltt_c-Board,
-.ltt_c-page-logEditor .ltt_c-Board-item-number{
-  font-size: 15px;
-}
-.ltt_c-page-logEditor .ltt_c-Board-item{
-  display: flex;
-}
+.ltt_c-IScroll-scroller{
+  position: absolute;
+  width: 100%;
+  /* Prevent elements to be highlighted on tap */
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
 
-.ltt_c-page-logEditor .ltt_c-Board-item-number{
-  margin-top:0px;
-}
-
-.ltt_c-page-logEditor .ltt_c-Board-item-number,
-.ltt_c-page-logEditor .ltt_c-Board-item-name,
-.ltt_c-page-logEditor .ltt_c-Board-item-change{
-  padding: 10px;
-}*/
-
-.ltt_c-page-logEditor .ltt_c-LogClassPie .ltt_c-chart-pie{
-  height: 150px;
-  min-height: 150px;
-}
-
-.ltt_c-LogClassPie-changes{
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.ltt_c-LogClassPie-changes .changeItem{
-  flex: 50%;
-  text-align: center;
-  font-size:12px;
-}
-
-.ltt_c-LogClassPie-changes .changeItem .name{
-  margin-right:1px;
-}
-
-.ltt_c-LogClassPie-changes .changeItem .fa{
-  margin-right:1px;
-}
-
-.ltt_c-LogClassPie-changes .changeItem.down .num{
-  color: #DC1313;
-}
-
-.ltt_c-LogClassPie-changes .changeItem.rise .num{
-  color:green;
-}
-
-.ltt_c-page-logEditor-Calendar {
-  width: 100px;
-}
-
-.ltt_c-page-logEditor-taskInfo {
-  padding: 10px;
-  border-top: 1px solid #E7E7E7;
-  margin-top: 10px;
-}
-
-
-.ltt_c-page-logEditor .ltt_c-OneDayGoal {
-  padding: 5px;
-}
-
-.ltt_c-OneDayGoal-goal-name{
-   overflow: hidden;
-   white-space: nowrap;
-   text-overflow: ellipsis;
-}
-
-.ltt_c-OneDayGoal-goal-time{
-  font-style: italic;
-  color: #6D6D6D;
-  margin-left: 2px;
-  margin-right: 2px;
+  /* Put the scroller into the HW Compositing layer right from the start */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  transform: translateZ(0);
 }
