@@ -798,7 +798,7 @@ var LogEditor = React.createClass({
         var line = this.getCurrentLine();
         var log = null;
         if (line) {
-            var logs = this.getAllLogs();
+            var logs = this.getAllLogs(true);
             logs.some(function (logItem) {
                 if (logItem.origin === line) {
                     log = logItem;
@@ -1366,9 +1366,9 @@ var LogEditor = React.createClass({
     },
 
 
-    getAllLogs: function () {
+    getAllLogs: function (includeNoTimeLog) {
         var content = this.getContent();
-        var logs = TrackerHelper.getLogs(content, this.props.title);
+        var logs = TrackerHelper.getLogs(content, this.props.title, includeNoTimeLog);
         return logs;
     },
 
