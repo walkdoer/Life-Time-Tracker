@@ -1810,6 +1810,7 @@ var Accomplishment = React.createClass({
         date = date || this.props.date;
         DataAPI.Task.load({
             populate: false,
+            calculateTimeConsume: false,
             start: new Moment(date).startOf('day').toDate(),
             end: new Moment(date).endOf('day').toDate(),
             status: 'done'

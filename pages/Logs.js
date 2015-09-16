@@ -9,9 +9,11 @@ require('../libs/bootstrap-datepicker');
 var Moment = require('moment');
 var Select2 = require('select2');
 var extend = require('extend');
+var Router = require('react-router');
 var _ = require('lodash');
 var RB = require('react-bootstrap');
 var Button = RB.Button;
+var Link = Router.Link;
 var Well = RB.Well;
 var FixedDataTable = require('fixed-data-table');
 var Table = FixedDataTable.Table;
@@ -437,6 +439,8 @@ var Logs = React.createClass({
 
 var LogsTable = React.createClass({
 
+    mixins: [Router.Navigation],
+
     getInitialState: function () {
         return {
             sortDir: null,
@@ -455,6 +459,7 @@ var LogsTable = React.createClass({
     },
 
     render: function () {
+        var that = this;
         var logs = this.state.logs;
         var clsssesConfig = config.classes;
 
@@ -472,13 +477,25 @@ var LogsTable = React.createClass({
             return Util.displayTime(cellData);
         }
         function renderProject(project) {
-            return project && project.name;
+            if (project) {
+                return <span className="ltt-link" data-turl={Util.getProjectUrl(project)}>{project.name}</span>;
+            } else {
+                return null;
+            }
         }
         function renderVersion (version) {
-            return version && version.name;
+            if (version) {
+                return <span className="ltt-link" data-turl={Util.getVersionUrl(version)}>{version.name}</span>;
+            } else {
+                return null;
+            }
         }
         function renderTask(task) {
-            return task && task.name;
+            if (task) {
+                return <span className="ltt-link" data-turl={Util.getTaskUrl(task)}>{task.name}</span>;
+            } else {
+                return null;
+            }
         }
         function renderTags(a,b,data) {
             var tags = data.tags;
@@ -513,6 +530,13 @@ var LogsTable = React.createClass({
             rowsCount={logs.length}
             width={this.props.width}
             height={this.props.height}
+            onRowClick={function (e) {
+                var $target = $(e.target);
+                var transitionUrl = $target.data('turl');
+                if (transitionUrl) {
+                    that.transitionTo(transitionUrl);
+                }
+            }}
             headerHeight={50}>
             <Column label={getLabel("Date", "date")}  width={100} dataKey="date" fixed={true} cellRenderer={renderDate}  headerRenderer={this._renderHeader}/>
             <Column label=""  width={80} dateKey="classes" cellRenderer={renderClasses} headerRenderer={this._renderHeader.bind(this, getLabel("Class", "classes"), "classes")}/>
