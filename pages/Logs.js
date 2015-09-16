@@ -264,7 +264,6 @@ var Logs = React.createClass({
         });
 
         DataAPI.Tag.load().then(function (tags) {
-            console.log('tags length:' + tags.length);
             that.setState({
                 tags: tags
             }, function () {
@@ -359,7 +358,7 @@ var Logs = React.createClass({
 
     loadProjects: function (cb) {
         var that = this;
-        DataAPI.Project.load()
+        DataAPI.Project.load({ aggregate: false, fields: '_id name'})
             .then(function (projects) {
                 that.setState({
                     projects: projects
@@ -379,7 +378,7 @@ var Logs = React.createClass({
 
     loadTasks: function (cb) {
         var that = this;
-        DataAPI.Task.load({hierarchy: 1})
+        DataAPI.Task.load({hierarchy: 1, fields: '_id name', calculateTimeConsume: false})
             .then(function (tasks) {
                 that.setState({
                     tasks: tasks
