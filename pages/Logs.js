@@ -469,7 +469,7 @@ var LogsTable = React.createClass({
         }
         function renderDate(cellData, a, row) {
             var dateStr = Moment(cellData).format(DATE_FORMAT);
-            return <span className="ltt-link" data-turl={"/logEditor/" + dateStr + '?logOrigin=' + row.origin}>{dateStr}</span>
+            return <span className="ltt-link" data-turl={"/logEditor/" + dateStr + '?logOrigin=' + encodeURIComponent(row.origin)}>{dateStr}</span>
         }
         function renderDateTime(cellData) {
             return Moment(cellData).format(TIME_FORMAT);
