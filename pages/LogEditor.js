@@ -75,6 +75,8 @@ var Page = React.createClass({
         }
         this.setState({
             current: date
+        }, function () {
+            this.asideScroller.refresh();
         });
     },
 
@@ -108,7 +110,7 @@ var Page = React.createClass({
                         </ButtonToolbar>
                         <div className="overtimeLog" ref="overtimeLog"></div>
                         <TaskInfo ref="taskInfo"/>
-                        <OneDayGoal date={date} ref="oneDayGoal"/>
+                        <OneDayGoal date={date} ref="oneDayGoal" onLoaded={this.onGoalLoaded}/>
                     </div>
                 </aside>
             </div>
@@ -124,6 +126,10 @@ var Page = React.createClass({
             shrinkScrollbars: 'scale',
             fadeScrollbars: true
         });
+    },
+
+    onGoalLoaded: function () {
+        this.asideScroller.refresh();
     },
 
     onGoalAchieved: function (goal) {

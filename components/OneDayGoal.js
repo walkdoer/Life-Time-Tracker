@@ -66,7 +66,7 @@ var OneDayGoal = React.createClass({
         return (
             <div className="ltt_c-OneDayGoal">
             {this.state.goals.map(function (goal) {
-                return <Goal data={goal}  date={date} key={goal._id} ref={goal._id}/>
+                return <Goal data={goal}  date={date} key={goal._id} ref={goal._id} onLoaded={this.props.onLoaded}/>
             }, this)}
             </div>
         );
@@ -76,6 +76,11 @@ var OneDayGoal = React.createClass({
 
 var Goal = React.createClass({
 
+    getDefaultProps: function () {
+        return {
+            onLoaded: function () {}
+        };
+    },
 
     getInitialState: function () {
         return {
@@ -116,7 +121,11 @@ var Goal = React.createClass({
             this._todayProgress = 0;
             this._totalProgress = 0;
             this._todayProgressOfTotal = 0;
-            this.calculate(nextProps.date).then(this._draw.bind(this));
+            this.calculate(nextProps.date)
+                .then(this._draw.bind(this))
+                .then(function () {
+                    this.props.onLoaded(this.props.data);
+                }.bind(this));
         }
     },
 
@@ -128,11 +137,19 @@ var Goal = React.createClass({
     },
 
     componentDidMount: function () {
-        this.calculate().then(this._draw.bind(this));
+        this._calculateDataAndDraw();
     },
 
     update: function () {
-        this.calculate().then(this._draw.bind(this));
+        this._calculateDataAndDraw();
+    },
+
+    _calculateDataAndDraw: function () {
+        this.calculate()
+            .then(this._draw.bind(this))
+            .then(function () {
+                this.props.onLoaded(this.props.data);
+            }.bind(this));
     },
 
     _draw: function () {
