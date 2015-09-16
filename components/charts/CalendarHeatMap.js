@@ -1,12 +1,13 @@
 var React = require('react');
 var d3 = require('d3');
-var moment = require('moment');
+var Moment = require('moment');
 var Q = require('q');
 var CalHeatMap = require('../../libs/cal-heatmap');
 var _ = require('lodash');
 var LoadingMask = require('../LoadingMask');
 var server = require('../../conf/config').server;
 var DataAPI = require('../../utils/DataAPI');
+var Util = require('../../utils/Util');
 
 
 var CalendarHeatMap = React.createClass({
@@ -91,35 +92,40 @@ var CalendarHeatMap = React.createClass({
     },
 
     getStreakInfo: function (data) {
+        data = data || [];
+        data.sort(function (a, b) {
+            return (new Date(a.date).getTime() - new Date(b.date).getTime());
+        });
         if (this.props.noStreak === true) {return null; }
-        var currentStreak = 0, longestStreak = 0, currentStreakSpan, longestStreakSpan;
+
+        var today = new Moment().format(Util.DATE_FORMAT);
+        var streak = 0;
         var streaks = [], prevDate;
         data.forEach(function (item, index) {
-            var mDate = new moment(item.date);
+            var date = item.date;
+            var mDate = new Moment(date);
             var count = item.count;
             if (prevDate && mDate.diff(prevDate, 'day') === 1) {
-                currentStreak++;
+                streak++;
             } else {
-                if (currentStreak > 0) {
-                    streaks.push(currentStreak);
+                if (streak > 0) {
+                    streaks.push(streak);
                 }
-                currentStreak = 1;
+                streak = 1;
             }
             prevDate = mDate;
         });
+        var currentStreak = getCurrentStreak(data);
         //get the longest streak
-        longestStreak = Math.max.apply(Math, streaks) || 0;
-
-        if (currentStreak >= 0) {
-            currentStreakSpan = <span className="streakItem">Current Streak: {currentStreak}</span>
-        }
-        if (longestStreak >= 0) {
-            longestStreakSpan = <span className="streakItem">Longest Streak: {longestStreak}</span>
+        var longestStreak = Math.max.apply(Math, streaks) || 0;
+        if (currentStreak === 0) {
+            lastActiveDate  = getLastActiveDate(data);
         }
         return (
             <div className="ltt_c-calendarHeapMap-streak">
-                {currentStreakSpan}
-                {longestStreakSpan}
+                <span className="streakItem">Current Streak: {currentStreak}</span>
+                {currentStreak === 0 && lastActiveDate ? <span className="streakItem">last activite is {new Moment(lastActiveDate).from(today)}</span> : null}
+                <span className="streakItem">Longest Streak: {longestStreak}</span>
             </div>
         );
     },
@@ -129,10 +135,39 @@ var CalendarHeatMap = React.createClass({
     }
 });
 
+function getLastActiveDate(data) {
+    var len = data.length;
+    if (len === 0) {return null;}
+    return data[len - 1].date;
+}
+
+function getCurrentStreak(data) {
+    var len = data.length;
+    var prevDate, mDate, streak = 0;
+    if (len === 0) {return streak;}
+    var latestActivity = data[len -1];
+    var today = new Moment().format(Util.DATE_FORMAT);
+    if (latestActivity.date !== today) { return streak; }
+    prevDate = new Moment(latestActivity.date);
+    streak = 1;
+    //backward search array get current streaks
+    for (var i = len - 2, item; i>=0;i--) {
+        item = data[i];
+        mDate = new Moment(item.date);
+        if (prevDate.diff(mDate, 'day') === 1) {
+            streak++;
+        } else {
+            break;
+        }
+        prevDate = mDate;
+    }
+    return streak;
+}
+
  function createCalHealMap(data, options) {
     var calendar = new CalHeatMap();
     var that = this;
-    var now = new moment();
+    var now = new Moment();
     if (!that.isMounted()) {
         return;
     }
@@ -168,7 +203,7 @@ var CalendarHeatMap = React.createClass({
         },
         legendColor: this.props.legendColor,
         subDomainDateFormat: function(date) {
-            return moment(date).format('D号 dddd');
+            return Moment(date).format('D号 dddd');
         }
     };
     calendar.init(_.extend({}, defaulOptions, options));
