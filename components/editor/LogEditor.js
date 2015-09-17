@@ -501,7 +501,9 @@ var LogEditor = React.createClass({
                 var range = new Range(row, 0, row, Infinity);
                 session.moveText(range, {row: newIndex, column: 0});
                 var pos = {row: newIndex, column: line.length};
-                //session.insert(pos, '\n');
+                if (session.getLine(newIndex).trim() !== '') {
+                    session.insert(pos, '\n');
+                }
                 //insert time
                 session.insert({row: newIndex, column: 0}, timeStr);
                 that.gotoLine(newIndex + 1, timeStr.length);

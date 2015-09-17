@@ -17,7 +17,7 @@ Life Time Tracker是一个做个人时间统计的工具，读了《奇特的一
 - node
 - gulp
 - bower
-- mongodb
+- mongodb >= 3.0.0
 
 #### 生成App
 
@@ -32,7 +32,10 @@ bower install
 
 ```
 gulp deploy
+#默认使用最新版本的nw.js
 gulp nw
+#如果最新版本的使用不了，可以指定版本号进行构建
+gulp nw --version 0.12.3
 ```
 
 就这样子完成了，然后会在 productions目录下生成app文件
@@ -73,8 +76,6 @@ gulp nw
 ```
 
 #### 日志格式
-
-下面是一份模拟的日志，记录了下一天的生活。
 
 其中涉及到几个分类的方式
 
