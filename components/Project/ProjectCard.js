@@ -118,7 +118,7 @@ var ProjectCard = React.createClass({
         if (!_.isEmpty(logClasses)) {
             indicators = logClasses.map(function (cls) {
                 var style = {
-                    'background-color': logClassesColors[cls]
+                    'backgroundColor': logClassesColors[cls]
                 };
                 return <i title={cls.name} style={style}></i>
             });

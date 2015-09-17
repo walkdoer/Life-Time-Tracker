@@ -29,7 +29,7 @@ var Progress = React.createClass({
             'height': this.props.height
         };
         var barStyle = {
-            'background-color': colors[level]
+            'backgroundColor': colors[level]
         };
         if (reverse) {
             barStyle.width = (100 - progress) + '%';

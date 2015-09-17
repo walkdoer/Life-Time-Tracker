@@ -6,7 +6,7 @@ Life Time Tracker
 
 Life Time Tracker是一个做个人时间统计的工具，读了《奇特的一生》之后，想实践柳比歇夫的统计方法。但是没有找到就手的工具，所以决定自己开发一个，顺便尝试一下`nwjs + react`的组合来开发桌面App，同时也实践近一段时间在学习的数据可视化。
 
-现在文档较少，请多包涵。
+现在文档较少，bug比较多,还是请多包涵。
 
 ### 安装
 
@@ -17,7 +17,28 @@ Life Time Tracker是一个做个人时间统计的工具，读了《奇特的一
 - node
 - gulp  `npm install -g gulp`
 - bower `npm instll -g bower`
-- mongodb >= 3.0.0 如果你是osx， 先 `brew update`  然后 `brew install mongodb` 即可安装，如果没有homebrew，[请看这里](http://brew.sh/)，如果是windows, 可以到[mongodb官网](https://www.mongodb.org/downloads)下载
+- mongodb >= 3.0.0
+
+##### mongodb的安装
+如果你是osx， 可以通过homebrew进行安装，如果没有homebrew，[请看这里](http://brew.sh/)
+
+```
+brew update
+brew install mongodb
+```
+启动
+
+```
+mongod
+```
+
+或者可以指定数据的保存位置, 注意，文件夹要先创建好，否则会报错
+
+```
+mongod --dbpath ~/data/db
+```
+
+如果是windows, 可以到[mongodb官网](https://www.mongodb.org/downloads)下载
 
 #### 生成App
 

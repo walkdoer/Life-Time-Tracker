@@ -4,6 +4,8 @@ var ServerAction = require('../actions/ServerAction');
 var Q = require('q');
 var isNodeWebkit = true;
 var _ = require('lodash');
+var config = require('../conf/config.js');
+
 
 /** Global variables */
 
@@ -17,11 +19,7 @@ try {
 
 
 function url(src) {
-    if (isNodeWebkit) {
-        return 'http://localhost:3333' + src;
-    } else {
-        return 'http://localhost:3333' + src;
-    }
+    return  src;
 }
 
 
