@@ -15,9 +15,9 @@ Life Time Tracker是一个做个人时间统计的工具，读了《奇特的一
 #### 安装前请确定你有下列依赖
 
 - node
-- gulp
-- bower
-- mongodb >= 3.0.0
+- gulp  `npm install -g gulp`
+- bower `npm instll -g bower`
+- mongodb >= 3.0.0 如果你是osx， 先 `brew update`  然后 `brew install mongodb` 即可安装，如果没有homebrew，[请看这里](http://brew.sh/)，如果是windows, 可以到[mongodb官网](https://www.mongodb.org/downloads)下载
 
 #### 生成App
 
