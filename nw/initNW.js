@@ -191,28 +191,27 @@
             label: 'Server',
             items: [{
                 label: 'Start Server',
-                enabled: !sdk.isServerRunning(),
+                enabled: !serverWin,
                 key: 'S',
                 click: function () {
-                    console.log('start server');
                     var menu = this;
-                    sdk.startServer()
+                    startServer();
+                    menu.enabled = false;
+                    getMenu(menubar, ['Server', 'Stop Server']).enabled = true;
+                    /*sdk.startServer()
                         .then(function () {
-                            console.log('server started');
-                            menu.enabled = false;
-                            getMenu(menubar, ['Server', 'Stop Server']).enabled = true;
                         })
-                        .fail(function () {
-                            console.error('start server fail');
-                        });
+                        .fail(function (err) {
+                            alert('start server fail ' + err.message);
+                        });*/
                 }
             }, {
                 label: 'Stop Server',
                 key: 'C',
-                enabled: sdk.isServerRunning(),
+                enabled: !!serverWin,
                 click: function () {
                     console.log('stop server');
-                    sdk.stopServer();
+                    stopServer();
                     this.enabled = false;
                     getMenu(menubar, ['Server', 'Start Server']).enabled = true;
                 }
@@ -285,11 +284,24 @@
             gui.App.registerGlobalHotKey(shortcut);
         });
     }
+    var serverWin = null;
+    function startServer() {
+        //use new-instanse window to start server
+        serverWin = gui.Window.open('./server.html', {"new-instance": true, show: false});
+    }
+
+    function stopServer() {
+        serverWin.close(true);
+        serverWin = null;
+    }
 
     if (isNodeWebkit === true) {
         var gui = require('nw.gui');
-        console.log('init Ltt Api for node-webkit invironment');
+        var serverPort = sdk.getSetting('serverPort');
+        console.log('init Ltt Api for node-webkit invironment port=' + serverPort);
         extend(Ltt, {
+
+            serverPort: serverPort,
 
             init: function () {
                 var win = this.getWindow();
@@ -340,10 +352,14 @@
                     gui.Shell.openExternal(link);
                 }
             },
+
+            restartServer: function () {
+                stopServer();
+                startServer();
+            }
         });
         global.Ltt = Ltt;
+        startServer();
         initApp();
-        //use new-instanse window to start server
-        var serverWin = gui.Window.open('./server.html', {"new-instance": true, show: false});
     }
 })();

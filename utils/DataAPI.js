@@ -19,7 +19,11 @@ try {
 
 
 function url(src) {
-    return  src;
+    if (isNodeWebkit) {
+        return 'http://localhost:' + Ltt.serverPort + src;
+    } else {
+        return src;
+    }
 }
 
 

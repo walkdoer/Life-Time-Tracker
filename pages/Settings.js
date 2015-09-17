@@ -37,7 +37,7 @@ var defaultValue = {
 };
 
 var _settings = {};
-
+var _currentPort = null;
 
 module.exports = React.createClass({
 
@@ -152,7 +152,8 @@ module.exports = React.createClass({
                     <hr/>
                     <Row>
                         <Col xs={4} md={2}>
-                            <Input type='text' label='Server Port' placeholder='default is 3333' name="serverPort"
+                            <Input type='text' label='Server Port'  name="serverPort"
+                                help="If server port is ocupy, you can change here"
                                 onChange={this.onSettingChange}
                                 value={settings.serverPort}/>
                         </Col>
@@ -241,11 +242,19 @@ module.exports = React.createClass({
             that.setState({
                 settings: data
             });
+            _currentPort = data.serverPort;
         });
     },
 
     save: function () {
+        var that = this;
         DataAPI.Settings.save(this.state.settings).then(function () {
+            var newPort = that.state.settings.serverPort;
+            if (_currentPort !== newPort) {
+                _currentPort = newPort;
+                Ltt.serverPort = newPort;
+                Ltt.restartServer();
+            }
             Notify.success('Change setting success!');
         }).catch(function (err) {
             Notify.error('Change settting failed', err);
