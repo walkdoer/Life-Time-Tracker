@@ -66,6 +66,7 @@ node_modules/ltt-addLog/.DS_Store
 node_modules/tracker/conf/token.json
 node_modules/tracker/node_modules
 node_modules/tracker/.DS_Store
+node_modules/tracker/conf/userSettings.json
 
 # sdk module #
 !node_modules/ltt-sdk/
