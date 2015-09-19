@@ -105,7 +105,7 @@ module.exports = React.createClass({
     },
 
     renderApplicationSettings: function () {
-        var settings = this.state.settings;
+        var settings = this.state;
         return (
             <form className='ltt_c-page-settings-form'>
                 <Grid>
@@ -239,17 +239,15 @@ module.exports = React.createClass({
     loadSettings: function () {
         var that = this;
         DataAPI.Settings.load().then(function (data) {
-            that.setState({
-                settings: data
-            });
+            that.setState(data);
             _currentPort = data.serverPort;
         });
     },
 
     save: function () {
         var that = this;
-        DataAPI.Settings.save(this.state.settings).then(function () {
-            var newPort = that.state.settings.serverPort;
+        DataAPI.Settings.save(this.state).then(function () {
+            var newPort = that.state.serverPort;
             if (_currentPort !== newPort) {
                 _currentPort = newPort;
                 Ltt.serverPort = newPort;
@@ -266,14 +264,11 @@ module.exports = React.createClass({
     },
 
     onSettingChange: function (e) {
-        console.log(e);
-        var settings = this.state.settings;
         var target = e.target;
         var name = target.name;
-        settings[name] = target.value;
-        this.setState({
-            settings: settings
-        }, function () {
+        var setting = {}
+        setting[name] = target.value;
+        this.setState(setting, function () {
             _settings = this.state;
         });
     },
