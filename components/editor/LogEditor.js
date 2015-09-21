@@ -958,6 +958,13 @@ var LogEditor = React.createClass({
                 that._listenToEditor();
                 that._activeCurrentLine();
                 that.props.onLoad(content, that.getDoingLog(content));
+                var timer = setTimeout(function() {
+                    if (that.__reportOpened) {
+                        that.renderTodayReport();
+                    }
+                    clearTimeout(timer);
+                    timer = null;
+                }, 500);
             });
     },
 
@@ -1453,6 +1460,7 @@ var LogEditor = React.createClass({
     },
 
     openReport: function () {
+        this.__reportOpened = !this.__reportOpened;
         this.refs.todayReport.toggle({
             width: $(this.getDOMNode()).width()
         });
