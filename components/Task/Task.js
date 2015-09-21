@@ -9,6 +9,7 @@ var Link = Router.Link;
 var Q = require('q');
 var _ = require('lodash');
 var cx = React.addons.classSet;
+var Router = require('react-router');
 
 
 /**components*/
@@ -23,6 +24,8 @@ var Util = require('../../utils/Util.js');
 var EMPTY_FUN = function () {};
 
 var Task = React.createClass({
+
+    mixins: [Router.State, Router.Navigation],
 
     getInitialState: function () {
         return {
@@ -129,8 +132,12 @@ var Task = React.createClass({
                     </span>
                     <div className="ltt_c-task-basicInfo">
                         <div className="ltt_c-task-basicInfo-hierarchy">
-                            {_.isObject(task.projectId) ? <span className="hierarchy-item"><i className="fa  fa-rocket"></i>{task.projectId.name}</span> : null}
-                            {_.isObject(task.versionId) ? <span className="hierarchy-item"><i className="fa  fa-sitemap"></i>{task.versionId.name}</span> : null}
+                            {_.isObject(task.projectId) ?
+                                <span className="hierarchy-item ltt-link" onClick={this.gotoProject}><i className="fa  fa-rocket"></i>{task.projectId.name}</span>
+                                :null}
+                            {_.isObject(task.versionId) ?
+                                <span className="hierarchy-item ltt-link" onClick={this.gotoVersion}><i className="fa  fa-sitemap"></i>{task.versionId.name}</span>
+                                : null}
                             {dueTime ? <span className="ltt_c-task-timeInfo-item" title={dueTime.format('YYYY-MM-DD HH:mm:ss')}>
                                 {dueTime.diff(Date.now()) > 0 ?
                                     <span className={cx({"willDue": true,  "warning": dueDiffDays > 0 && dueDiffDays <= 3})}>will due {dueTime.fromNow()} at {dueTime.format('YYYY-MM-DD HH:mm')}</span>
@@ -179,6 +186,23 @@ var Task = React.createClass({
             }
             </div>
         );
+    },
+
+    gotoProject: function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var task = this.props.data;
+        var projectId = task.projectId._id || task.projectId;
+        this.transitionTo('projectTask', {projectId: projectId});
+    },
+
+    gotoVersion: function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var task = this.props.data;
+        var projectId = task.projectId._id || task.projectId;
+        var versionId = task.versionId._id || task.versionId;
+        this.transitionTo('projectVersionTask', {projectId: projectId, versionId: versionId});
     },
 
     select: function (e) {

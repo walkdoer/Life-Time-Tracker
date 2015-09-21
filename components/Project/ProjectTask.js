@@ -79,6 +79,15 @@ module.exports = React.createClass({
         }, this.getStateFromParams());
     },
 
+    componentWillMount: function () {
+        console.log(this.state.taskId);
+        if (this.state.taskId) {
+            this.setState({
+                openTaskDetail: true
+            });
+        }
+    },
+
     getChildContext: function() {
         return {
             muiTheme: ThemeManager.getCurrentTheme()
@@ -429,6 +438,19 @@ module.exports = React.createClass({
 
     renderTaskDetail: function () {
         if (this.state.openTaskDetail) {
+            if (!this.currentTask) {
+                var taskId = this.state.taskId;
+                var cTask;
+                this.state.tasks.some(function (task) {
+                    if (task._id === taskId) {
+                        cTask = task;
+                        return true;
+                    }
+                    return false;
+                });
+                this.currentTask = cTask;
+            }
+            if (!this.currentTask) { return; }
             return <aside className="ltt_c-taskDetail-wrapper" ref="taskDetailWrapper">
                 <div className="ltt_c-taskDetail-wrapper-scroller">
                     <TaskDetail  {... _.pick(this.state, ['projectId', 'versionId'])}
