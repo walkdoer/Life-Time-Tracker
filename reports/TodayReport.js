@@ -30,8 +30,9 @@ module.exports = React.createClass({
     },
 
     getInitialState: function () {
+        var date = this.props.date || this.props.query.date;
         return {
-            date: new Moment(this.props.date)
+            date: new Moment(date)
         };
     },
 

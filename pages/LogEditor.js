@@ -106,7 +106,7 @@ var Page = React.createClass({
                         <ModalTrigger modal={<DateGoToWindow onGoto={this.gotoDate}/>} ref="dateGoToWindow"><span></span></ModalTrigger>
                         <LogClassPie key={date} date={date}  backgroundColor="#f6f6f6" ref="logClassPie" legend={true} compare={false}/>
                         <ButtonToolbar>
-                            <Button bsSize='xsmall'><Link to="/reports/today">More Detail</Link></Button>
+                            <Button bsSize='xsmall'><Link to={"/reports/today?date=" + date}>More Detail</Link></Button>
                         </ButtonToolbar>
                         <div className="overtimeLog" ref="overtimeLog"></div>
                         <TaskInfo ref="taskInfo"/>
