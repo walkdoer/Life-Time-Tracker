@@ -19,7 +19,11 @@ module.exports = React.createClass({
     },
 
     render: function() {
-        return <div className="ltt_c-chart ltt_c-chart-TreeMap">
+        var className = "ltt_c-chart ltt_c-chart-TreeMap";
+        if (this.props.className) {
+            className += ' ' + this.props.className
+        }
+        return <div className={className}>
             <div className="ltt_c-chart-title">{this.props.title}</div>
             <svg className="ltt_c-chart-TreeMap-content"></svg>
         </div>;

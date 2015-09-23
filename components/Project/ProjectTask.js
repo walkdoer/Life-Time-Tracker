@@ -67,7 +67,6 @@ module.exports = React.createClass({
         return extend({
             projectLoaded: false,
             taskLoaded: false,
-            openTreeMap: false,
             openTaskDetail: false,
             openStastics: false,
             markedFilter: false,
@@ -169,8 +168,13 @@ module.exports = React.createClass({
                             </ButtonGroup>
                         </ButtonToolbar>
                     </div>
-                    {this.state.openTreeMap ? <TreeMap ref="treeMap"
-                        title={"Time TreeMap of " + project.name + (version ? '-' + version.name : '')}/> : null }
+                    <SlidePanel key={this.props.projectId}
+                        ref="treeMapSlider" open={false} openRight={true} onTransitionEnd={this.renderTreeMap}
+                        position="fixed" zIndex={888}>
+                        <h3>Time TreeMap of {(project ? project.name : '') + (version ? '-' + version.name : '')}</h3>
+                        <div className="closeBtn" onClick={this.closeTreeMap}><i className="fa fa-close"/></div>
+                        <div ref="treeMapContainer"></div>
+                    </SlidePanel>
                     <SlidePanel key={this.props.projectId}
                         ref="statistics" open={false} openRight={true} onTransitionEnd={this.renderStatistics}
                         position="fixed" zIndex={888}>
@@ -215,6 +219,19 @@ module.exports = React.createClass({
         React.render(
             <Statistics project={this.state.project} key={this.state.project._id}/>,
             this.refs.statisticsContainer.getDOMNode()
+        );
+    },
+
+    renderTreeMap: function () {
+        var that = this;
+        React.render(
+            //"Time TreeMap of " + project.name + (version ? '-' + version.name : '')
+            <TreeMap className="ltt_c-ProjectTask-treeMap"/>,
+            this.refs.treeMapContainer.getDOMNode(),
+            function () {
+                that._treeMap = this;
+                that.plotTreeMap();
+            }
         );
     },
 
@@ -498,7 +515,7 @@ module.exports = React.createClass({
             taskStatus: status
         }, function () {
             this.loadTasks(this.getRequestParams()).then(function () {
-                if (that.state.openTreeMap) {
+                if (that.__treeMapOpened) {
                     that.plotTreeMap();
                 }
             });
@@ -511,7 +528,7 @@ module.exports = React.createClass({
             period: period
         }, function () {
             this.loadTasks(this.getRequestParams()).then(function () {
-                if (that.state.openTreeMap) {
+                if (that.__treeMapOpened) {
                     that.plotTreeMap();
                 }
             });
@@ -524,7 +541,7 @@ module.exports = React.createClass({
             markedFilter: !this.state.markedFilter
         }, function () {
             this.loadTasks(this.getRequestParams()).then(function () {
-                if (that.state.openTreeMap) {
+                if (that.__treeMapOpened) {
                     that.plotTreeMap();
                 }
             });
@@ -566,7 +583,7 @@ module.exports = React.createClass({
     },
 
     plotTreeMap: function () {
-        if (!this.refs.treeMap) {return;}
+        if (!this._treeMap) {return;}
         var root = {
             name: this.state.project.name,
             children: []
@@ -582,7 +599,12 @@ module.exports = React.createClass({
                     return _.extend({
                         name: version.name,
                         children: tasks.filter(function(task) {
-                            return task.versionId === versionId;
+                            var taskVersionId = task.versionId;
+                            if (_.isObject(taskVersionId)) {
+                                return taskVersionId._id === versionId;
+                            } else {
+                                return taskVersionId === versionId;
+                            }
                         })
                     });
                 })
@@ -619,17 +641,20 @@ module.exports = React.createClass({
                 currentNode = newNode;
             }
         }
-        this.refs.treeMap.plot(root);
+        this._treeMap.plot(root);
     },
 
     openTreeMap: function () {
-        this.setState({
-            openTreeMap: !this.state.openTreeMap
-        }, function () {
-            if (this.state.openTreeMap) {
-                this.plotTreeMap();
-            }
+        this.__treeMapOpened = true;
+        this.refs.treeMapSlider.open({
+            width: $(this.getDOMNode()).width() - 150
         });
+    },
+
+    closeTreeMap: function () {
+        this.__treeMapOpened = false;
+        this._treeMap = null;
+        this.refs.treeMapSlider.close();
     },
 
     openStastics: function () {

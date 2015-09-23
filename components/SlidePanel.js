@@ -25,7 +25,7 @@ module.exports = React.createClass({
     onChange: React.PropTypes.func,
     onOpen: React.PropTypes.func,
     onTransitionEnd: React.PropTypes.func,
-    onNavClose: React.PropTypes.func,
+    onClose: React.PropTypes.func,
     openRight: React.PropTypes.bool,
   },
 
@@ -76,7 +76,7 @@ module.exports = React.createClass({
 
   close: function() {
     this.setState({ open: false });
-    if (this.props.onNavClose) this.props.onNavClose();
+    if (this.props.onClose) this.props.onClose();
     return this;
   },
 
