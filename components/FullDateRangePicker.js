@@ -9,21 +9,45 @@ var RB = require('react-bootstrap');
 var ButtonToolbar = RB.ButtonToolbar;
 var ButtonGroup = RB.ButtonGroup;
 var Button = RB.Button;
+var extend = require('extend');
+var _ = require('lodash');
 
+/** Utils */
+var Util = require('../utils/Util');
+function isPeriodEqualDateRange(period, dateRange) {
+    var periodDateRange = Util.toDate(period);
+    if (dateRange.start && dateRange.end &&
+            (new Moment(dateRange.start).diff(periodDateRange.start) !== 0 ||
+                new Moment(dateRange.end).diff(periodDateRange.end) !== 0)) {
+        return false;
+    } else {
+        return true;
+    }
+}
 module.exports = React.createClass({
     getInitialState: function () {
-        return {
-            period: this.props.period,
+        var period = this.props.period;
+        var dateRange;
+        if (!isPeriodEqualDateRange(period, _.pick(this.props, 'start', 'end'))) {
+            period = null;
+        }
+        if (this.props.start && this.props.end) {
+            dateRange = _.pick(this.props, 'start', 'end');
+        }
+        return extend({
+            period: period,
             granularity: this.props.granularity
-        };
+        }, dateRange);
     },
 
     getDefaultProps: function () {
         return {
             showCompare: true,
-            period: 'today'
+            period: 'today',
+            granularity: 'week'
         };
     },
+
 
     render: function () {
         var granularity = this.state.granularity;
@@ -43,11 +67,11 @@ module.exports = React.createClass({
             <div className={className}>
                 <div className="ltt_c-FullDateRangePicker-dateRange">
                     <DateRangePicker ref="dateRange"
-                        start={this.props.start}
+                        start={this.state.start}
+                        end={this.state.end}
                         bsSize={this.props.bsSize}
-                        end={this.props.end}
                         granularity={this.state.granularity}
-                        onDateRangeChange={this.props.onDateRangeChange}/>
+                        onDateRangeChange={this.onDateRangeChange}/>
                     {this.props.showCompare ? <input ref="isCompared" type="checkbox" onChange={this.onCompare}/> : null }
                     {compareComponents}
                 </div>
@@ -57,7 +81,8 @@ module.exports = React.createClass({
                             {label: 'Yesterday', value: 'yesterday'},
                             {label: 'Today', value: 'today'},
                             {label: 'Week', value: 'week'},
-                            {label: 'Month', value: 'month'}
+                            {label: 'Month', value: 'month'},
+                            {label: 'Year', value: 'year'}
                         ].map(function (btn) {
                             return <Button active={period === btn.value} bsSize={this.props.bsSize}
                                 onClick={this.onPeriodChange.bind(this, btn.value)}>{btn.label}</Button>;
@@ -65,10 +90,10 @@ module.exports = React.createClass({
                     </ButtonGroup>
                     <ButtonGroup>
                         {[
-                            {label: 'day', value: 'day'},
-                            {label: 'Week', value: 'week'},
-                            {label: 'Month', value: 'month'},
-                            {label: 'Year', value: 'year'}
+                            {label: 'Daily', value: 'day'},
+                            {label: 'Weekly', value: 'week'},
+                            {label: 'Monthly', value: 'month'},
+                            {label: 'Annual', value: 'year'}
                         ].map(function (btn) {
                             return <Button active={btn.value === granularity} bsSize={this.props.bsSize}
                                 onClick={this.onGranularityChange.bind(this, btn.value)}>{btn.label}</Button>;
@@ -77,6 +102,19 @@ module.exports = React.createClass({
                 </ButtonToolbar>
             </div>
         );
+    },
+
+    onDateRangeChange: function (start, end) {
+        if (!isPeriodEqualDateRange(this.state.period, {start:start, end: end})) {
+            period = null;
+        }
+        this.setState({
+            start: start,
+            end: end,
+            period: period
+        }, function () {
+            this.props.onDateRangeChange(this.state.start, this.state.end);
+        });
     },
 
     onCompare: function (e) {
@@ -118,8 +156,11 @@ module.exports = React.createClass({
     },
 
     onGranularityChange: function (granularity) {
-        this.setState({
+        var params = Util.toDate(granularity);
+        this.setState(extend({
             granularity: granularity
+        }, params), function () {
+            this.props.onDateRangeChange(params.start, params.end);
         });
     }
 });

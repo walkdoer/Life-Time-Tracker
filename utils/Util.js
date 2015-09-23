@@ -58,6 +58,9 @@ function toDate(type) {
     } else if (type === 'last_month') {
         params.start = new Moment().subtract(1, 'month').startOf('day').toDate();
         params.end = new Moment().endOf('day').toDate();
+    } else if (type === 'annual' || type === 'year') {
+        params.start = new Moment().startOf('year').toDate();
+        params.end = new Moment().endOf('year').toDate();
     }
     params.diff = Moment(params.end).diff(params.start, 'day') + 1;
     return params;

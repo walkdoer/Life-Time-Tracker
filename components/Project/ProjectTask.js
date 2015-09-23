@@ -73,14 +73,12 @@ module.exports = React.createClass({
             markedFilter: false,
             taskStatus: 'doing',
             project: null,
-            period: 'month',
             todayTaskTime: [],
             tasks: []
-        }, this.getStateFromParams());
+        }, Util.toDate('month'), this.getStateFromParams());
     },
 
     componentWillMount: function () {
-        console.log(this.state.taskId);
         if (this.state.taskId) {
             this.setState({
                 openTaskDetail: true
@@ -128,6 +126,16 @@ module.exports = React.createClass({
                     </div>
                     <div className="ltt_c-projectTask-toolbar">
                         <div className="btn-group">
+                        <FullDateRangePicker
+                            bsSize="xsmall"
+                            period="week"
+                            granularity="week"
+                            compare={false}
+                            showCompare={false}
+                            onDateRangeChange={this.onDateRangeChange}
+                            className="ltt_c-projectTask-dateRange"/>
+                        </div>
+                        <div className="btn-group">
                             {[
                                 {label: 'All', status: 'all'},
                                 {label: 'Doing', status: 'doing'},
@@ -140,16 +148,6 @@ module.exports = React.createClass({
                                 return <button className={className}
                                     onClick={that.onTaskStatusChange.bind(that, btn.status)}>{btn.label}</button>;
                             })}
-                        </div>
-                        <div className="btn-group">
-                        <FullDateRangePicker
-                            bsSize="xsmall"
-                            start= {this.state.start}
-                            end= {this.state.end}
-                            compare={false}
-                            showCompare={false}
-                            onDateRangeChange={this.onDateRangeChange}
-                            className="ltt_c-projectTask-dateRange"/>
                         </div>
                         <div className="btn-group">
                             <button className={"btn btn-xs btn-default " + (this.state.markedFilter ? 'active' : '')}
@@ -358,7 +356,7 @@ module.exports = React.createClass({
         };
         if (this.state) {
             var period = this.state.period;
-            var dateParams = _.pick(this.state, ['start, end'])
+            var dateParams = {start: this._start, end: this._end};
             var markedFilter = this.state.markedFilter;
             if (markedFilter) {
                 defaultParams.parent = undefined;
@@ -517,15 +515,12 @@ module.exports = React.createClass({
     },
 
     onDateRangeChange: function (start, end) {
-        this.setState({
-            start: start,
-            end: end
-        }, function () {
-            this.loadTasks(this.getRequestParams()).then(function () {
-                if (that.__treeMapOpened) {
-                    that.plotTreeMap();
-                }
-            });
+        this._start = start;
+        this._end = end;
+        this.loadTasks(this.getRequestParams()).then(function () {
+            if (that.__treeMapOpened) {
+                that.plotTreeMap();
+            }
         });
     },
 
