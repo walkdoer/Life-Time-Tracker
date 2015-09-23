@@ -40,6 +40,9 @@ var DateRangePicker = React.createClass({
         if (this.props.className) {
             className += ' ' + this.props.className;
         }
+        if (this.props.bsSize === 'xsmall') {
+            className += ' ltt_c-dateRangePicker__xsmall';
+        }
         return (
             <div className={className}>
                 <button className="prev" type="button" onClick={this.prevDateRange} title="prev"><i className="fa fa-angle-double-left"></i></button>

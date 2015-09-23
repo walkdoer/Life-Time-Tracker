@@ -44,6 +44,7 @@ module.exports = React.createClass({
                 <div className="ltt_c-FullDateRangePicker-dateRange">
                     <DateRangePicker ref="dateRange"
                         start={this.props.start}
+                        bsSize={this.props.bsSize}
                         end={this.props.end}
                         granularity={this.state.granularity}
                         onDateRangeChange={this.props.onDateRangeChange}/>
@@ -58,7 +59,7 @@ module.exports = React.createClass({
                             {label: 'Week', value: 'week'},
                             {label: 'Month', value: 'month'}
                         ].map(function (btn) {
-                            return <Button active={period === btn.value}
+                            return <Button active={period === btn.value} bsSize={this.props.bsSize}
                                 onClick={this.onPeriodChange.bind(this, btn.value)}>{btn.label}</Button>;
                         }, this)}
                     </ButtonGroup>
@@ -69,7 +70,7 @@ module.exports = React.createClass({
                             {label: 'Month', value: 'month'},
                             {label: 'Year', value: 'year'}
                         ].map(function (btn) {
-                            return <Button active={btn.value === granularity}
+                            return <Button active={btn.value === granularity} bsSize={this.props.bsSize}
                                 onClick={this.onGranularityChange.bind(this, btn.value)}>{btn.label}</Button>;
                         }, this)}
                     </ButtonGroup>

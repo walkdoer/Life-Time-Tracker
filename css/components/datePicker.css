@@ -11,6 +11,7 @@
 
 .ltt_c-FullDateRangePicker-dateRange{
     display: flex;
+    margin-right:10px;
 }
 .ltt_c-FullDateRangePicker input[type="checkbox"]{
     margin:auto 10px;
@@ -20,6 +21,7 @@
 .ltt_c-dateRangePicker{
     display: flex;
     align-items: stretch;
+    line-height: 1;
     justify-content: space-between;
 }
 
@@ -44,6 +46,10 @@
     text-align: center;
 }
 
+.ltt_c-dateRangePicker__xsmall .input-daterange{
+    height: 22px;
+}
+
 .ltt_c-datePicker  button[type="button"],
 .ltt_c-dateRangePicker button[type="button"]{
     border: 1px solid #ccc;
@@ -52,6 +58,11 @@
     background-image: linear-gradient(to bottom, #FFFFFF 0%, #e0e0e0 100%);
     display:inline-block;
     height: 34px;
+}
+
+.ltt_c-dateRangePicker__xsmall button[type="button"]{
+    height: 22px;
+    text-indent:0;
 }
 .ltt_c-datePicker button[type="button"].prev,
 .ltt_c-dateRangePicker button[type="button"].prev{

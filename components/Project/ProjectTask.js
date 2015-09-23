@@ -44,6 +44,7 @@ var TaskDetail = require('../Task/TaskDetail');
 var Notify = require('../Notify');
 var SlidePanel = require('../SlidePanel');
 var EasyPie = require('../charts/EasyPie');
+var FullDateRangePicker = require('../FullDateRangePicker');
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
 var Bar = require('../charts/Bar');
@@ -141,21 +142,14 @@ module.exports = React.createClass({
                             })}
                         </div>
                         <div className="btn-group">
-                            {[
-                                {label: 'Yesterday', value: 'yesterday'},
-                                {label: 'Today', value: 'today'},
-                                {label: 'Week', value: 'week'},
-                                {label: 'Month', value: 'month'},
-                                {label: 'Year', value: 'year'},
-                                {label: 'All', value: 'all'},
-                            ].map(function (btn) {
-                                var className = "btn btn-xs btn-default";
-                                if (btn.value === period) {
-                                    className += ' active';
-                                }
-                                return <button className={className}
-                                    onClick={that.onPeriodChange.bind(that, btn.value)}>{btn.label}</button>;
-                            })}
+                        <FullDateRangePicker
+                            bsSize="xsmall"
+                            start= {this.state.start}
+                            end= {this.state.end}
+                            compare={false}
+                            showCompare={false}
+                            onDateRangeChange={this.onDateRangeChange}
+                            className="ltt_c-projectTask-dateRange"/>
                         </div>
                         <div className="btn-group">
                             <button className={"btn btn-xs btn-default " + (this.state.markedFilter ? 'active' : '')}
@@ -196,7 +190,7 @@ module.exports = React.createClass({
                                 data={task}
                                 key={childTaskId}
                                 taskId={childTaskId}
-                                defaultIsOpen={taskStatus === "doing" && ["year", "all"].indexOf(period) < 0}
+                                defaultIsOpen={taskStatus === "doing"}
                                 todayTime={todayTask}
                                 version={versionDetail}
                                 onTaskChange={this.onTaskChange}
@@ -364,7 +358,7 @@ module.exports = React.createClass({
         };
         if (this.state) {
             var period = this.state.period;
-            var dateParams = Util.toDate(period);
+            var dateParams = _.pick(this.state, ['start, end'])
             var markedFilter = this.state.markedFilter;
             if (markedFilter) {
                 defaultParams.parent = undefined;
@@ -413,10 +407,10 @@ module.exports = React.createClass({
                 if (taskId) {
                     DataAPI.Task.get(taskId).then(function (task) {
                         var lastActiveTime = task.lastActiveTime;
-                        var period = getPeriod(task.createTime, lastActiveTime);
+                        //var period = getPeriod(task.createTime, lastActiveTime);
                         that.setState({
-                            taskStatus: task.progress === 100 ? 'done' : (task.progress < 0 ? 'all' : 'doing'),
-                            period: period
+                            taskStatus: task.progress === 100 ? 'done' : (task.progress < 0 ? 'all' : 'doing')
+                            //period: period
                         }, function () {
                             loadTasks();
                         });
@@ -442,10 +436,10 @@ module.exports = React.createClass({
         var versionId = this.state.versionId;
         if (this.state.versionId) {
             return DataAPI.Version.get(versionId).then(function (version) {
-                var period = getPeriod(version.createTime, version.lastActiveTime);
+                //var period = getPeriod(version.createTime, version.lastActiveTime);
                 that.setState({
-                    version: version,
-                    period: period
+                    version: version
+                    //period: period
                 });
             });
         } else {
@@ -513,6 +507,19 @@ module.exports = React.createClass({
         var that = this;
         this.setState({
             taskStatus: status
+        }, function () {
+            this.loadTasks(this.getRequestParams()).then(function () {
+                if (that.__treeMapOpened) {
+                    that.plotTreeMap();
+                }
+            });
+        });
+    },
+
+    onDateRangeChange: function (start, end) {
+        this.setState({
+            start: start,
+            end: end
         }, function () {
             this.loadTasks(this.getRequestParams()).then(function () {
                 if (that.__treeMapOpened) {
@@ -839,6 +846,7 @@ var ProjectInfo = React.createClass({
         }
         return projectBasicInfo;
     },
+
 
     onTagClick: function (tag, select) {
         var selectTags = this.state.selectTags;
