@@ -48,12 +48,6 @@ var Dashboard = React.createClass({
 
     mixins: [PureRenderMixin],
 
-    getInitialState: function () {
-        return {
-            activityLoaded: false
-        };
-    },
-
     render: function () {
         return (
             <div className="ltt_c-page ltt_c-page-dashboard">
@@ -164,6 +158,13 @@ var Dashboard = React.createClass({
 });
 
 var ActivityLogs = React.createClass({
+
+    getInitialState: function () {
+        return {
+            activityLoaded: false,
+            activitys: []
+        };
+    },
 
     componentDidMount: function () {
         var that = this;
