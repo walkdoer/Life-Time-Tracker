@@ -14,6 +14,7 @@ var Mt = window.Mousetrap;
 /*components*/
 var DateRangePicker = require('../components/DateRangePicker');
 var Pinyin = require('../components/Pinyin');
+var Scroller = require('../components/Scroller');
 
 
 var config = require('../conf/config');
@@ -52,16 +53,21 @@ module.exports = React.createClass({
     render: function () {
         return (
             <section className="ltt_c-page ltt_c-page-projectsNew">
-                <aside className="ltt_c-page-projectsNew-sidebar">
+                <Scroller className="ltt_c-page-projectsNew-sidebar" ref="scroller">
                     <FilterableProjects projects={this.state.projects}
                         projectId={this.state.projectId}
-                        versionId={this.state.versionId}/>
-                </aside>
+                        versionId={this.state.versionId}
+                        filterEnd={this.updateScroller}/>
+                </Scroller>
                 <main>
                     <RouteHandler {... _.pick(this.state, ['projectId', 'versionId'])}  key={this.state.projectId} onVersionDeleted={this.onVersionDeleted}/>
                 </main>
             </section>
         );
+    },
+
+    updateScroller: function () {
+        this.refs.scroller.refresh();
     },
 
     componentDidMount: function () {
@@ -131,7 +137,8 @@ module.exports = React.createClass({
 var FilterableProjects = React.createClass({
     getDefaultProps: function () {
         return {
-            projects: []
+            projects: [],
+            filterEnd: function () {}
         };
     },
 
@@ -234,6 +241,8 @@ var FilterableProjects = React.createClass({
         });
         this.setState({
             projects: result
+        }, function () {
+            this.props.filterEnd();
         });
     }
 })
