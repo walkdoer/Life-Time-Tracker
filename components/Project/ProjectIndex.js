@@ -56,7 +56,7 @@ var ProjectIndex = React.createClass({
                             {overDueTasks.map(function (task) {
                                 return <Task data={task}
                                     dueTime={true}
-                                    totalTime={false}
+                                    totalTime={true}
                                     onTitleClick={that.gotoTaskInProject.bind(that, task)}
                                     key={'overDue:' + task._id}/>
                             })}
@@ -80,7 +80,7 @@ var ProjectIndex = React.createClass({
                             {dueTasks.map(function (task) {
                                 return <Task data={task}
                                     dueTime={true}
-                                    totalTime={false}
+                                    totalTime={true}
                                     onTitleClick={that.gotoTaskInProject.bind(that, task)}
                                     key={'due:' + task._id}/>
                             })}
@@ -109,7 +109,7 @@ var ProjectIndex = React.createClass({
                             {notActiveDoingTasks.map(function (task) {
                                 return <Task data={task}
                                     dueTime={true}
-                                    totalTime={false}
+                                    totalTime={true}
                                     onTitleClick={that.gotoTaskInProject.bind(that, task)}
                                     key={'notActive:' + task._id}/>
                             })}
@@ -129,7 +129,7 @@ var ProjectIndex = React.createClass({
                         {markedTasks.map(function (task) {
                             return <Task data={task}
                                 displayChildren={false}
-                                totalTime={false}
+                                totalTime={true}
                                 onTitleClick={that.gotoTaskInProject.bind(that, task)}
                                 key={'marked:' + task._id}/>
                         })}
@@ -149,6 +149,7 @@ var ProjectIndex = React.createClass({
 
     loadTasks: function (params) {
         params.populateFields = 'version,project';
+        params.calculateTimeConsume = true;
         return DataAPI.Task.load(params);
     },
 
@@ -156,7 +157,8 @@ var ProjectIndex = React.createClass({
         var that = this;
         //load marked task
         var params = {
-            marked: true
+            marked: true,
+            calculateTimeConsume: true
         };
         if (!this.state.showDone) {
             params.status = 'doing';

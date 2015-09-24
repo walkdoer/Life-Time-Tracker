@@ -168,7 +168,7 @@ var cssTask = function (options) {
 
 // Starts our development workflow
 gulp.task('default', function () {
-  livereload.listen();
+  livereload.listen({port: 35475});
   browserifyTask({
     development: true,
     src: './boot.js',

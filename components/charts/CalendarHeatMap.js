@@ -101,12 +101,16 @@ var CalendarHeatMap = React.createClass({
         var today = new Moment().format(Util.DATE_FORMAT);
         var streak = 0;
         var streaks = [], prevDate;
+        var lastIndex = data.length - 1;
         data.forEach(function (item, index) {
             var date = item.date;
             var mDate = new Moment(date);
             var count = item.count;
             if (prevDate && mDate.diff(prevDate, 'day') === 1) {
                 streak++;
+                if (index === lastIndex) {
+                    streaks.push(streak);
+                }
             } else {
                 if (streak > 0) {
                     streaks.push(streak);

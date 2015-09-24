@@ -37,7 +37,6 @@
 .ltt_c-dateRangePicker .input-daterange{
     width: 185px;
     border: 1px solid #ccc;
-    text-indent:10px;
     outline:none;
     background-image: linear-gradient(to bottom, #FFFFFF 0%, #e0e0e0 100%);
     display:inline-block;
@@ -48,6 +47,9 @@
 
 .ltt_c-dateRangePicker__xsmall .input-daterange{
     height: 22px;
+    font-size: 11px;
+    width: 144px;
+    text-indent: 0px;
 }
 
 .ltt_c-datePicker  button[type="button"],

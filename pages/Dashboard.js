@@ -42,6 +42,8 @@ var config = require('../conf/config');
  */
 
 var DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+
+
 var Dashboard = React.createClass({
 
     mixins: [PureRenderMixin],
@@ -50,16 +52,6 @@ var Dashboard = React.createClass({
         return {
             activityLoaded: false
         };
-    },
-
-    componentDidMount: function () {
-        var that = this;
-        this.loadActivities().then(function (activitys){
-            that.setState({
-                activitys: activitys,
-                activityLoaded: true
-            });
-        });
     },
 
     render: function () {
@@ -101,7 +93,7 @@ var Dashboard = React.createClass({
                             <CalendarHeatMap
                                 getData={this.loadThinkingCalendar}
                                 empty="do not meditate this day"
-                                filled="{date} meditate {count}"/>
+                                filled="{date} think {count}"/>
                         </div>
                         <div className="Grid Grid--gutters Grid--stretch">
                             <div className="Grid-cell u-1of3">
@@ -110,10 +102,7 @@ var Dashboard = React.createClass({
                             </div>
                         </div>
                     </div>
-                    <div className="Grid-cell u-1of3">
-                        <VerticleTimeline activitys={this.state.activitys}/>
-                        <LoadingMask loaded={this.state.activityLoaded}/>
-                    </div>
+                    <ActivityLogs className="Grid-cell u-1of3"/>
                 </div>
             </div>
         );
@@ -170,6 +159,27 @@ var Dashboard = React.createClass({
                 }
             });
         });
+    }
+
+});
+
+var ActivityLogs = React.createClass({
+
+    componentDidMount: function () {
+        var that = this;
+        this.loadActivities().then(function (activitys){
+            that.setState({
+                activitys: activitys,
+                activityLoaded: true
+            });
+        });
+    },
+
+    render: function () {
+        return <div className={"ltt_c-ActivityLogs " + (this.props.className || '')}>
+            <VerticleTimeline activitys={this.state.activitys}/>
+            <LoadingMask loaded={this.state.activityLoaded}/>
+        </div>
     },
 
     loadActivities: function () {
@@ -190,7 +200,6 @@ var Dashboard = React.createClass({
             })
         });
     }
-
 });
 
 
