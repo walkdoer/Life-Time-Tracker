@@ -11,6 +11,9 @@ var ReactBootStrap = require('react-bootstrap');
 var Q = require('q');
 var Moment = require('moment');
 var EasyPieChart = require('easyPieChart');
+var RB =require('react-bootstrap');
+var OverlayTrigger = RB.OverlayTrigger;
+var Tooltip = RB.Tooltip;
 
 /** Utils */
 var Util = require('../utils/Util');
@@ -93,13 +96,20 @@ var Goal = React.createClass({
         var dateInfo = Util.toDate(goal.granularity);
         var estimatedTime = goal.estimatedTime;
         var oneDayTime = estimatedTime / dateInfo.diff;
-        this._todayProgress = (this.state.todayTime / oneDayTime * 100);
+        var todayTime = this.state.todayTime
+        this._todayProgress = (todayTime / oneDayTime * 100);
         this._totalProgress = (this.state.totalTime / estimatedTime * 100);
-        this._todayProgressOfTotal = (this.state.todayTime / estimatedTime * 100);
+        this._todayProgressOfTotal = (todayTime / estimatedTime * 100);
+        var tooltip = (
+            <Tooltip>
+                {Util.displayTime(oneDayTime)} / <strong>{Util.displayTime(todayTime)}</strong>
+            </Tooltip>
+        );
         return <div className="ltt_c-OneDayGoal-goal">
-            <p className="ltt_c-OneDayGoal-goal-name">
-                {goal.name}
-                <span className="ltt_c-OneDayGoal-goal-time">{Util.displayTime(oneDayTime)}</span>
+            <p className="ltt_c-OneDayGoal-goal-name" ref="goalName">
+                <OverlayTrigger placement="bottom" overlay={tooltip} delay={0}>
+                    <span className="ltt_c-OneDayGoal-goal-name-text">{goal.name}</span>
+                </OverlayTrigger>
             </p>
             <p className="ltt_c-OneDayGoal-goal-charts">
                 {this.state.calculated ?
@@ -114,6 +124,7 @@ var Goal = React.createClass({
             </p>
         </div>
     },
+
 
 
     componentWillReceiveProps: function (nextProps) {

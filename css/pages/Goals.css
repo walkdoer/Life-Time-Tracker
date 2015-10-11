@@ -130,6 +130,23 @@
     height: 70px;
 }
 
+
+.ltt_c-OneDayGoal-goal-time.achieve{
+    color: #72BE1B;
+}
+
+.ltt_c-OneDayGoal-goal-time.notAchieve{
+    color: #DF6710;
+}
+
+.ltt_c-OneDayGoal-goal-time.hide{
+    display: none;
+}
+
+.ltt_c-OneDayGoal-goal-name-text{
+    margin-right: 5px;
+}
+
 .ltt_c-OneDayGoal-goal-progress > .pieChart {
     position: relative;
     text-align: center;
