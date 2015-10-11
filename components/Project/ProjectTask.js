@@ -818,8 +818,7 @@ var ProjectInfo = React.createClass({
                                 <i className="fa fa-clock-o" title="Total time"></i>
                                 {Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {mProjectLastActiveTime.from(mProjectCreateTime, true)}
                                 {this.state.allTotalTime ? <span className="percent">
-                                    <span className="num">{(project.totalTime / this.state.allTotalTime * 100).toFixed(1)}%</span>
-                                    of total time
+                                    <span className="num">{(project.totalTime / this.state.allTotalTime * 100).toFixed(1)}%</span> of total time
                                 </span> : null}
                             </span>
                         </span>
@@ -832,6 +831,7 @@ var ProjectInfo = React.createClass({
                     </div> : null}
                     {this.props.versionId ?
                         <VersionInfo id={this.props.versionId}
+                            project={this.props.project}
                             projectTotalTime={project.totalTime}
                             onDeleteVersion={this.props.onDeleteVersion}/> : null}
                 </section>
@@ -889,16 +889,16 @@ var VersionInfo = React.createClass({
         return version ? (
             <div className="ltt_p-projectDetail-versionInfo">
                 <div className="ltt_p-projectDetail-versionInfo-content">
-                    <span className="version-name"><i className="fa fa-sitemap">{version.name}</i></span>
+                    <span className="version-name"><i className="fa fa-sitemap"></i>{version.name}</span>
                     <span>
                         <i className="fa fa-tasks" title="Task count"></i>
                         {version.taskCount}
                     </span>
-                    <span title={new Moment(version.createTime).format('YYYY-MM-DD HH:mm:ss')}>
+                    <span title={'create at ' + new Moment(version.createTime).format('YYYY-MM-DD HH:mm:ss')}>
                         <i className="fa fa-plus" title="create time"></i>
                         {new Moment(version.createTime).fromNow()}
                     </span>
-                    <span title={new Moment(version.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
+                    <span title={'last active at ' + new Moment(version.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
                         <i className="fa fa-user" title="last active"></i>
                         {new Moment(version.lastActiveTime).fromNow()}
                     </span>
@@ -906,8 +906,7 @@ var VersionInfo = React.createClass({
                         <i className="fa fa-clock-o" title="Total time"></i>
                         {Moment.duration(version.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {new Moment(version.createTime).from(version.lastActiveTime, true)}
                         <span className="percent">
-                            <span className="num">{(version.totalTime / projectTotalTime * 100).toFixed(1)}%</span>
-                            of project time
+                            <span className="num">{(version.totalTime / projectTotalTime * 100).toFixed(1)}%</span> of {this.props.project.name}
                         </span>
                     </span>
                 </div>
