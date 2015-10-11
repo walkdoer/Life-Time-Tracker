@@ -104,7 +104,7 @@ var Logs = React.createClass({
         if (logs && logs.length > 0) {
             var $tableContaner = $(this.refs.list.getDOMNode());
             var width = $tableContaner.width();
-            var height = $tableContaner.height() - CHART_HEIGHT;
+            var height = $tableContaner.height();
             return <LogsTable logs={logs} height={height} width={width}/>
         } else if (!logs){
             return <Well className="align-center MT-20">通过条件查找日志</Well>
