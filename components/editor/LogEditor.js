@@ -498,6 +498,7 @@ var LogEditor = React.createClass({
                 } else {
                     row = pos.row;
                 }
+                if (!line) { return; }
                 var newIndex = validLog.index;
                 that.finishCurrentActivity();
                 //move line
