@@ -27,6 +27,7 @@ var Notify = require('../components/Notify');
 var Tag = require('../components/Tag');
 var EasyPieChart = require('../components/charts/EasyPie');
 var CalendarHeatMap = require('../components/charts/CalendarHeatMap');
+var DateRangePicker = require('../components/DateRangePicker');
 
 
 /* utils */
@@ -44,15 +45,12 @@ var SortTypes = {
 };
 var  CHART_HEIGHT = 180;
 
-
-/*    <DatePicker
-onChange={this.onDateChange}
-className="ltt_c-page-logs-date"/>*/
-
 var Logs = React.createClass({
 
     getInitialState: function () {
         this._filterParams = {};
+        var startDate = new Moment().startOf('year').toDate();
+        var endDate = new Moment().toDate();
         return {
             logs: null,
             tags: [],
@@ -61,7 +59,9 @@ var Logs = React.createClass({
             versions: [],
             totalTime: null,
             tagOperatorAnd: false,
-            logLoaded: true
+            logLoaded: true,
+            startDate: startDate,
+            endDate: endDate
         };
     },
 
@@ -179,6 +179,10 @@ var Logs = React.createClass({
             <div className="ltt_c-page-logs-filters">
                 <div className="Grid">
                     <div className="Grid-cell Grid">
+                         <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
+                            onDateRangeChange={this.onDateRangeChange}/>
+                    </div>
+                    <div className="Grid-cell Grid">
                         <label className="filter-label">Project:</label>
                         <select className="filter-input" ref="projectFilter">
                             <option></option>
@@ -217,6 +221,19 @@ var Logs = React.createClass({
                 </div>
             </div>
         );
+    },
+
+    onDateRangeChange: function (start, end) {
+        var that = this;
+        this.setState({
+            startDate: start,
+            endDate: end
+        }, function () {
+            var that = this;
+            this.loadLogs(function() {
+                that.updateCalendarHeatMap();
+            });
+        });
     },
 
     onTagOperatorChange: function () {
@@ -341,6 +358,7 @@ var Logs = React.createClass({
     loadLogs: function (cb) {
         var that = this;
         var filter = this.getFilter();
+
         if (_.isEmpty(filter)) {
             this.setState({
                 logs: null
@@ -405,7 +423,9 @@ var Logs = React.createClass({
 
     getRequestParams: function () {
         return _.extend({
-            tagOperator: this.state.tagOperatorAnd ? 'all' : 'or'
+            tagOperator: this.state.tagOperatorAnd ? 'all' : 'or',
+            start: this.state.startDate,
+            end: this.state.endDate
         }, this.getFilter());
     },
 
