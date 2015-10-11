@@ -354,6 +354,9 @@ var LogEditor = React.createClass({
             }
         }
         var newLine = index;
+        if (index === allLines.length) {
+            log = '\n' + log;
+        }
         if (allLines[index - 1]) {
             log += '\n';
         }

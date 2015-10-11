@@ -212,7 +212,7 @@ var FilterableProjects = React.createClass({
         var isMatch = projectId === project._id;
         var className = isMatch ? 'active' : null;
         var timeData = this.state.projectTime.filter(function (item) {return item.project === project._id;})
-        return <ProjectNav project={project} className={className}
+        return <ProjectNav key={project._id} project={project} className={className}
             timeData={timeData}
             defaultIsOpen={isMatch} versionId={this.props.versionId}/>
     },
