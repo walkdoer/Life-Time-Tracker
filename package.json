@@ -29,6 +29,7 @@
     "extend": "~2.0.0",
     "fixed-data-table": "^0.4.6",
     "flux": "~2.0.1",
+    "griddle-react": "^0.2.14",
     "he": "~0.5.0",
     "isotope-layout": "^2.2.1",
     "jets": "^0.4.0",
@@ -58,7 +59,8 @@
     "react-select": "^0.6.8",
     "select2": "^3.5.2-browserify",
     "store2": "^2.2.2",
-    "sweetalert": "^1.0.0-beta"
+    "sweetalert": "^1.0.0-beta",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "babelify": "^6.0.2",

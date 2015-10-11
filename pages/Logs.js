@@ -539,7 +539,7 @@ var LogsTable = React.createClass({
                 }
             }}
             headerHeight={50}>
-            <Column label={getLabel("Date", "date")}  width={100} dataKey="date" fixed={true} cellRenderer={renderDate}  headerRenderer={this._renderHeader}/>
+            <Column label={getLabel("Date", "date")}  width={100} dataKey="date" cellRenderer={renderDate}  headerRenderer={this._renderHeader}/>
             <Column label=""  width={80} dateKey="classes" cellRenderer={renderClasses} headerRenderer={this._renderHeader.bind(this, getLabel("Class", "classes"), "classes")}/>
             <Column label={getLabel("Start", "start")}  width={150} dataKey="start" cellRenderer={renderDateTime} headerRenderer={this._renderHeader}/>
             <Column label={getLabel("End" , "end" )} width={150}  dataKey="end" cellRenderer={renderDateTime} headerRenderer={this._renderHeader}/>
