@@ -160,14 +160,14 @@ module.exports = React.createClass({
                             </ButtonGroup>
                         </ButtonToolbar>
                     </div>
-                    <SlidePanel key={this.props.projectId}
+                    <SlidePanel key={this.props.projectId  + 's1'}
                         ref="treeMapSlider" open={false} openRight={true} onTransitionEnd={this.renderTreeMap}
                         position="fixed" zIndex={888}>
                         <h3>Time TreeMap of {(project ? project.name : '') + (version ? '-' + version.name : '')}</h3>
                         <div className="closeBtn" onClick={this.closeTreeMap}><i className="fa fa-close"/></div>
                         <div ref="treeMapContainer"></div>
                     </SlidePanel>
-                    <SlidePanel key={this.props.projectId}
+                    <SlidePanel key={this.props.projectId + 's2'}
                         ref="statistics" open={false} openRight={true} onTransitionEnd={this.renderStatistics}
                         position="fixed" zIndex={888}>
                         <h3>Statistis of {project ? project.name : null}</h3>
