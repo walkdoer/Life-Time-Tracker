@@ -72,58 +72,8 @@ var browserifyTask = function (options) {
           }));
     };
 
-    /* When we are developing we want to watch for changes and
-    trigger a rebundle */
-    if (options.development) {
-        appBundler = watchify(appBundler);
-        appBundler.on('update', rebundle);
-    }
-
-    // And trigger the initial bundling
-    rebundle();
-
-    if (options.development) {
-
-  //   // We need to find all our test files to pass to our test bundler
-  //   var testFiles = glob.sync('./specs/**/*-spec.js');
-
-  //   /* This bundle will include all the test files and whatever modules
-  //      they require from the application */
-  //   var testBundler = browserify({
-  //     entries: testFiles,
-  //     debug: true,
-  //     transform: [reactify],
-  //     cache: {}, packageCache: {}, fullPaths: true // Requirement of watchify
-  //   });
-
-  //   // Again we tell this bundle about our external dependencies
-  //   testBundler.external(dependencies);
-
-  //   /* Now this is the actual bundle process that ends up in a "specs.js" file
-  //     in our "build" folder */
-  //   var rebundleTests = function () {
-  //     var start = Date.now();
-  //     console.log('Building TEST bundle');
-  //     testBundler.bundle()
-  //       .on('error', gutil.log)
-  //       .pipe(source('specs.js'))
-  //       .pipe(gulp.dest(options.dest))
-  //       .pipe(livereload()) // Every time it rebundles it triggers livereload
-  //       .pipe(notify(function () {
-  //         console.log('TEST bundle built in ' + (Date.now() - start) + 'ms');
-  //       }));
-  //   };
-
-    // We watch our test bundle
-    //testBundler = watchify(testBundler);
-
-    // We make sure it rebundles on file change
-    //testBundler.on('update', rebundleTests);
-
-    // Then we create the first bundle
-    //rebundleTests();
-
-        /* And now we have to create our third bundle, which are our external dependencies,
+    function rebundleLib() {
+       /* And now we have to create our third bundle, which are our external dependencies,
       or vendors. This is React JS, underscore, jQuery etc. We only do this when developing
       as our deployed code will be one file with all application files and vendors */
         var vendorsBundler = browserify({
@@ -145,6 +95,18 @@ var browserifyTask = function (options) {
           }));
     }
 
+    /* When we are developing we want to watch for changes and
+    trigger a rebundle */
+    if (options.development) {
+        appBundler = watchify(appBundler);
+        appBundler.on('update', rebundle);
+        vendorsBundler = watchify(vendorsBundler);
+        vendorsBundler.on('update', rebundleLib);
+    }
+
+    // And trigger the initial bundling
+    rebundle();
+    rebundleLib();
 }
 
 // We also have a simple css task here that you can replace with
