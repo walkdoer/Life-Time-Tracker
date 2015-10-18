@@ -34,7 +34,6 @@ dependencies = dependencies.concat([
     'react/addons'
 ]);
 
-console.log(dependencies);
 
 
 // Now this task both runs your workflow and deploys the code,
@@ -290,12 +289,12 @@ gulp.task('nw', function () {
 
     var nw = new NwBuilder({
         files: files,
-        platforms: ['osx64'],
+        platforms: ['osx32', 'osx64'],
         buildDir: './production',
         macIcns: './app.icns',
         version: argv.version
     });
-    console.log(argv);
+
     // Log stuff you want
     nw.on('log', function (msg) {
         gutil.log('node-webkit-builder', msg);
