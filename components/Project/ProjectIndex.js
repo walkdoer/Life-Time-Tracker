@@ -12,7 +12,6 @@ var ButtonToolbar = RB.ButtonToolbar;
 var DropdownButton = RB.DropdownButton;
 var MenuItem = RB.MenuItem;
 var _ = require('lodash');
-var Select = require('react-select');
 
 /** Components */
 var Task = require('../Task/Task.js');
