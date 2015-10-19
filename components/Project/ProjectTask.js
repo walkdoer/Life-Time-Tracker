@@ -19,7 +19,8 @@ var Well = RB.Well;
 var extend = require('extend');
 var swal = require('sweetalert');
 var mui = require('material-ui');
-var ThemeManager = new mui.Styles.ThemeManager();
+var ThemeManager = require('material-ui/lib/styles/theme-manager');
+var DefaultRawTheme = require('material-ui/lib/styles/raw-themes/light-raw-theme');
 var IScroll = require('../../libs/iscroll');
 
 
@@ -88,7 +89,7 @@ module.exports = React.createClass({
 
     getChildContext: function() {
         return {
-            muiTheme: ThemeManager.getCurrentTheme()
+            muiTheme: ThemeManager.getMuiTheme(DefaultRawTheme)
         };
     },
 

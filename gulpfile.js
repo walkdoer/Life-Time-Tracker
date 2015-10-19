@@ -70,15 +70,15 @@ var browserifyTask = function (options) {
             console.log('APP bundle built in ' + (Date.now() - start) + 'ms');
           }));
     };
+    var vendorsBundler = browserify({
+        debug: false, // It is nice to have sourcemapping when developing
+        require: dependencies
+    });
 
     function rebundleLib() {
        /* And now we have to create our third bundle, which are our external dependencies,
       or vendors. This is React JS, underscore, jQuery etc. We only do this when developing
       as our deployed code will be one file with all application files and vendors */
-        var vendorsBundler = browserify({
-            debug: false, // It is nice to have sourcemapping when developing
-            require: dependencies
-        });
 
         /* We only run the vendor bundler once, as we do not care about changes here,
           as there are none */
@@ -99,8 +99,8 @@ var browserifyTask = function (options) {
     if (options.development) {
         appBundler = watchify(appBundler);
         appBundler.on('update', rebundle);
-        vendorsBundler = watchify(vendorsBundler);
-        vendorsBundler.on('update', rebundleLib);
+        //vendorsBundler = watchify(vendorsBundler);
+        //vendorsBundler.on('update', rebundleLib);
     }
 
     // And trigger the initial bundling

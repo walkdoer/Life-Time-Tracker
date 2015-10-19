@@ -18,6 +18,7 @@ var Color = require('color');
 var TrackerHelper = require('tracker/helper');
 var SlidePanel = require('../SlidePanel');
 var mui = require('material-ui');
+var DefaultRawTheme = require('material-ui/lib/styles/raw-themes/light-raw-theme');
 
 
 
@@ -33,7 +34,7 @@ var Mt = window.Mousetrap;
 var NProgress = require('nprogress');
 var NO_SYNC = 1, SYNCING = 2, SYNC_ERROR = 3;
 var Range = ace.require('ace/range').Range;
-var ThemeManager = new mui.Styles.ThemeManager();
+var ThemeManager = require('material-ui/lib/styles/theme-manager');
 /** constant */
 var EventConstant = require('../../constants/EventConstant');
 var EVENT_HIGHLIGHT_CLASS = 'event-highlight';
@@ -68,7 +69,7 @@ var LogEditor = React.createClass({
 
     getChildContext: function() {
         return {
-            muiTheme: ThemeManager.getCurrentTheme()
+            muiTheme: ThemeManager.getMuiTheme(DefaultRawTheme)
         };
     },
 
