@@ -99,8 +99,8 @@ var browserifyTask = function (options) {
     if (options.development) {
         appBundler = watchify(appBundler);
         appBundler.on('update', rebundle);
-        vendorsBundler = watchify(vendorsBundler);
-        vendorsBundler.on('update', rebundleLib);
+        //vendorsBundler = watchify(vendorsBundler);
+        //vendorsBundler.on('update', rebundleLib);
     }
 
     // And trigger the initial bundling
