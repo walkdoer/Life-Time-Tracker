@@ -66,7 +66,7 @@
     "envify": "~3.0.0",
     "express": "~4.8.8",
     "glob": "^5.0.5",
-    "gulp": "~3.8.10",
+    "gulp": "~3.9.0",
     "gulp-clean": "~0.3.1",
     "gulp-concat": "^2.5.2",
     "gulp-cssmin": "^0.1.6",
