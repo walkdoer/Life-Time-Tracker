@@ -133,6 +133,7 @@ module.exports = React.createClass({
                             granularity="week"
                             compare={false}
                             showCompare={false}
+                            onDateRangeInit={this.onDateRangeInit}
                             onDateRangeChange={this.onDateRangeChange}
                             className="ltt_c-projectTask-dateRange"/>
                         </div>
@@ -513,6 +514,11 @@ module.exports = React.createClass({
                 }
             });
         });
+    },
+
+    onDateRangeInit: function(start, end) {
+        this._start = start;
+        this._end = end;
     },
 
     onDateRangeChange: function (start, end) {
