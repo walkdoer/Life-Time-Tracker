@@ -202,10 +202,6 @@
 .ltt_c-projectTask-toolbar{
   margin-bottom:15px;
 }
-.ltt_c-projectTask-toolbar .btn-group{
-  margin-right: 10px;
-  /* margin-bottom: 5px; */
-}
 
 .ltt_c-projectTask .ltt_c-chart-TreeMap{
   margin:10px 0px;
@@ -356,6 +352,17 @@
 .ltt_c-projectTask-moreInfo{
   padding-bottom: 10px;
   color: #4F4F4F;
+  display: flex;
+  justify-content: space-between;
+}
+
+.ltt_c-projectTask-moreInfo .btn-group{
+  margin-right: 5px;
+}
+
+.ltt_c-projectTask-moreInfo .btn-container{}
+.ltt_c-projectTask-moreInfo .btn-group:last-child{
+  margin-right: 0px;
 }
 
 

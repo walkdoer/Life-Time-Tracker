@@ -126,7 +126,6 @@ module.exports = React.createClass({
                             onFilterTags={this.filterTaskWithTags}/>
                     </div>
                     <div className="ltt_c-projectTask-toolbar">
-                        <div className="btn-group">
                         <FullDateRangePicker
                             bsSize="xsmall"
                             period="week"
@@ -136,31 +135,6 @@ module.exports = React.createClass({
                             onDateRangeInit={this.onDateRangeInit}
                             onDateRangeChange={this.onDateRangeChange}
                             className="ltt_c-projectTask-dateRange"/>
-                        </div>
-                        <div className="btn-group">
-                            {[
-                                {label: 'All', status: 'all'},
-                                {label: 'Doing', status: 'doing'},
-                                {label: 'Done', status: 'done'}
-                            ].map(function (btn) {
-                                var className = "btn btn-xs btn-default";
-                                if (btn.status === taskStatus) {
-                                    className += ' active';
-                                }
-                                return <button className={className}
-                                    onClick={that.onTaskStatusChange.bind(that, btn.status)}>{btn.label}</button>;
-                            })}
-                        </div>
-                        <div className="btn-group">
-                            <button className={"btn btn-xs btn-default " + (this.state.markedFilter ? 'active' : '')}
-                                onClick={that.onTaskMarkedFilter}><i className="fa fa-flag"></i></button>
-                        </div>
-                        <ButtonToolbar style={{float: 'right'}}>
-                            <ButtonGroup>
-                                <Button bsSize='xsmall' onClick={this.openStastics}>statistic</Button>
-                                <Button bsSize='xsmall' onClick={this.openTreeMap}>TreeMap</Button>
-                            </ButtonGroup>
-                        </ButtonToolbar>
                     </div>
                     <SlidePanel key={this.props.projectId  + 's1'}
                         ref="treeMapSlider" open={false} openRight={true} onTransitionEnd={this.renderTreeMap}
@@ -178,6 +152,32 @@ module.exports = React.createClass({
                     </SlidePanel>
                     <div className="ltt_c-projectTask-moreInfo">
                         <span>Count: {this.state.tasks.length}</span>
+                        <div className="btn-container">
+                            <div className="btn-group">
+                                {[
+                                    {label: 'All', status: 'all'},
+                                    {label: 'Doing', status: 'doing'},
+                                    {label: 'Done', status: 'done'}
+                                ].map(function (btn) {
+                                    var className = "btn btn-xs btn-default";
+                                    if (btn.status === taskStatus) {
+                                        className += ' active';
+                                    }
+                                    return <button className={className}
+                                        onClick={that.onTaskStatusChange.bind(that, btn.status)}>{btn.label}</button>;
+                                })}
+                            </div>
+                            <div className="btn-group">
+                                <button className={"btn btn-xs btn-default " + (this.state.markedFilter ? 'active' : '')}
+                                    onClick={that.onTaskMarkedFilter}><i className="fa fa-flag"></i></button>
+                            </div>
+                            <ButtonToolbar style={{float: 'right'}}>
+                                <ButtonGroup>
+                                    <Button bsSize='xsmall' onClick={this.openStastics}>statistic</Button>
+                                    <Button bsSize='xsmall' onClick={this.openTreeMap}>TreeMap</Button>
+                                </ButtonGroup>
+                            </ButtonToolbar>
+                        </div>
                     </div>
                     <div className="ltt_c-projectTask-wrapper" ref="iscrollWrapper">
                         <div className="ltt_c-projectTask-wrapper-scroller">
