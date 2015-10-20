@@ -49,6 +49,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    position: relative;
 }
 .ltt_c-GoalCard-item{
     border-right:1px solid #dcdcdc;
@@ -72,21 +73,25 @@
     margin: 10px 0;
 }
 
+.ltt_c-GoalCard-title-btns{
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.15);
+    display: none;
+    color: #FFF;
+}
 .ltt_c-GoalCard-deleteBtn,
 .ltt_c-GoalCard-editBtn {
-    /* position: absolute; */
-    /* bottom: 2px; */
-    /* right: 6px; */
-    color: #ccc;
-    display: none;
+    /* color: #ccc; */
 }
-.ltt_c-GoalCard:hover .ltt_c-GoalCard-deleteBtn,
-.ltt_c-GoalCard:hover .ltt_c-GoalCard-editBtn{
-    display:inline-block;
+.ltt_c-GoalCard:hover .ltt_c-GoalCard-title-btns{
+    display:block;
 }
 
 .ltt_c-GoalCard-editBtn:hover{
-    color:#32F;
+    color: #30AB72;
     cursor: pointer;
 }
 
