@@ -22,7 +22,7 @@ var mui = require('material-ui');
 var ThemeManager = require('material-ui/lib/styles/theme-manager');
 var DefaultRawTheme = require('material-ui/lib/styles/raw-themes/light-raw-theme');
 var IScroll = require('../../libs/iscroll');
-
+var config = require('../../conf/config');
 
 /** mixins */
 var initParams = require('../mixins/initParams');
@@ -799,8 +799,9 @@ var ProjectInfo = React.createClass({
                 }, this);
             }
             if (!_.isEmpty(logClasses)) {
+                classesConfig = config.classes;
                 logClasses = logClasses.map(function(cls) {
-                    return (<LogClass data={cls}/>);
+                    return (<LogClass data={_.find(classesConfig, {'_id': cls})}/>);
                 });
             }
             var mProjectCreateTime = new Moment(project.createdTime);
