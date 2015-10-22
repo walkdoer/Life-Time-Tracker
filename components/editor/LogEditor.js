@@ -17,6 +17,7 @@ var Moment = require('moment');
 var Color = require('color');
 var TrackerHelper = require('tracker/helper');
 var SlidePanel = require('../SlidePanel');
+var Scroller = require('../Scroller');
 var mui = require('material-ui');
 var DefaultRawTheme = require('material-ui/lib/styles/raw-themes/light-raw-theme');
 
@@ -1784,22 +1785,33 @@ var Accomplishment = React.createClass({
     },
 
     renderPopOver: function (data, title, getUrl) {
+        var itemHeight = 40;
+        var height = (data.length > 6 ? 6 : data.length) * itemHeight;
         var popOver = (
             <Popover title={title} className="ltt_c-logEditor-accomplishment-popOver">
+                <Scroller className="ltt_c-logEditor-accomplishment-popOver-scroller" height={height}>
                 {data.map(function (item) {
-                    var url = getUrl(item)
+                    var url = getUrl(item);
+                    var projectSpan, versionSpan;
+                    if (_.isObject(item.projectId)) {
+                        projectSpan = <span className="project">{item.projectId.name}</span>
+                    }
+                    if (_.isObject(item.versionId)) {
+                        versionSpan = <span className="version">{item.versionId.name}</span>
+                    }
                     return <p className="item clickable" onClick={this.openLink.bind(this, url)}>
-                        <span className={cx({"unfinish": item.progress !== 100})}>{item.name}</span>
+                        <span className={cx({"unfinish": item.progress !== 100})}>{item.name} {projectSpan} {versionSpan}</span>
                         {!_.isEmpty(item.children) ?
                             <ul>
                             {item.children.map(function (childItem) {
                                 return <li onClick={this.openLink.bind(this, getUrl(item))} className="clickable">
-                                 {childItem.name}</li>
+                                 {childItem.name} </li>
                             }, this)}
                             </ul> : null
                         }
                     </p>
                 }, this)}
+                </Scroller>
             </Popover>
         );
         return popOver;
@@ -1824,7 +1836,8 @@ var Accomplishment = React.createClass({
         var that = this;
         date = date || this.props.date;
         DataAPI.Task.load({
-            populate: false,
+            populate: true,
+            populateFields: ['project', 'version'].join(','),
             calculateTimeConsume: false,
             start: new Moment(date).startOf('day').toDate(),
             end: new Moment(date).endOf('day').toDate(),

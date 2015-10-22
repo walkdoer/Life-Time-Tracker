@@ -102,6 +102,10 @@
 }
 
 
+.ltt_c-logEditor-accomplishment-popOver{
+    width: 380px;
+}
+
 .ltt_c-logEditor-accomplishment-popOver .item{
     margin: 0px;
     padding: 10px;
@@ -115,6 +119,12 @@
     padding: 0px;
 }
 
+.ltt_c-logEditor-accomplishment-popOver .item .project,
+.ltt_c-logEditor-accomplishment-popOver .item .version {
+    color: #ccc;
+    margin-right: 5px;
+    font-size:0.89em;
+}
 .ltt_c-logEditor-accomplishment-popOver .item:hover{
     background-color: #F2F2F2;
 }
