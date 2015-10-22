@@ -39,7 +39,7 @@ var Header = React.createClass({
      * @return {object}
     */
     render: function() {
-        var syncIcon;
+        /*var syncIcon;
         var syncStatus = this.state.syncStatus;
         if (syncStatus === SYNCING) {
             syncIcon = 'fa fa-refresh fa-spin';
@@ -47,7 +47,7 @@ var Header = React.createClass({
             syncIcon = 'fa fa-exclamation-circle';
         } else if (syncStatus === NO_SYNC){
             syncIcon = 'fa fa-refresh';
-        }
+        }*/
 
         var screenBtn = null;
         if (this.props.isFullscreen) {
@@ -73,9 +73,6 @@ var Header = React.createClass({
                             className="btn ltt_c-header-barBtn js-open-sidebar"
                             onClick={this.handleConfigBtnClick}
                         ><i className="fa fa-bars"></i></button>
-                        <button className="btn btn-default" onClick={this.syncNote}>
-                            <i className={syncIcon} title={this.state.syncStatus === SYNC_ERROR ? 'sync fail, click sync again' : 'sync'}></i>
-                        </button>
                     </div>
                         <ButtonToolbar>
                             <ButtonGroup className="history-btn-group">
@@ -183,7 +180,7 @@ var Header = React.createClass({
     },
 
     syncNote: function () {
-        var that = this;
+        /*var that = this;
         this.setState({
             syncStatus: SYNCING
         });
@@ -196,7 +193,7 @@ var Header = React.createClass({
         }, 5000);
         var timer = setInterval(function () {
             Bus.emit(EVENT.UPDATE_PROCESS_INDO, 'sync evernote' + Math.random());
-        }, 50);
+        }, 50);*/
 
         /*Ltt.sdk.syncEvernote().then(function (data) {
             if (data.success) {
