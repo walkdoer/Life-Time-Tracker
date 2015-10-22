@@ -289,7 +289,7 @@ gulp.task('nw', function () {
 
     var nw = new NwBuilder({
         files: files,
-        platforms: ['osx32', 'osx64'],
+        platforms: ['osx64'],
         buildDir: './production',
         macIcns: './app.icns',
         version: argv.version

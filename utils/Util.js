@@ -32,6 +32,7 @@ function walkTree(parentElement, func) {
     }
 }
 
+
 function toDate(type) {
     var params = {};
     if (type === 'yesterday') {

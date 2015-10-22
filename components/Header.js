@@ -20,6 +20,8 @@ var Router = require('react-router');
 var urls = [location.href];
 var FORWARD = 1;
 var BACKWARD = -1;
+var Bus = require('../utils/Bus');
+var EVENT = require('../constants/EventConstant');
 
 var Header = React.createClass({
 
@@ -185,7 +187,18 @@ var Header = React.createClass({
         this.setState({
             syncStatus: SYNCING
         });
-        Ltt.sdk.syncEvernote().then(function (data) {
+        setTimeout(function (){
+            that.setState({
+                syncStatus: NO_SYNC
+            });
+            Bus.emit(EVENT.UPDATE_PROCESS_INDO, null);
+            clearInterval(timer);
+        }, 5000);
+        var timer = setInterval(function () {
+            Bus.emit(EVENT.UPDATE_PROCESS_INDO, 'sync evernote' + Math.random());
+        }, 50);
+
+        /*Ltt.sdk.syncEvernote().then(function (data) {
             if (data.success) {
                 Notify.success('Successfully sync!', {timeout: 5000});
                 that.setState({
@@ -202,7 +215,7 @@ var Header = React.createClass({
             that.setState({
                 syncStatus: SYNC_ERROR
             });
-        });
+        });*/
     },
 
     openLogCheck: function () {
