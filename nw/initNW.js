@@ -180,22 +180,22 @@
                 items: [{
                     label: 'this week',
                     click: function () {
-
+                        window.__LttBus__.emit(window.EVENT.IMPORT_LOG_BY_DATE, 'week');
                     }
                 }, {
                     label: 'this month',
                     click: function () {
-                        
+                        window.__LttBus__.emit(window.EVENT.IMPORT_LOG_BY_DATE, 'month');
                     }
                 }, {
                     label: 'this year',
                     click: function () {
-                        
+                        window.__LttBus__.emit(window.EVENT.IMPORT_LOG_BY_DATE, 'year');
                     }
                 }, {
                     label: 'custom',
                     click: function () {
-                        
+                        window.__LttBus__.emit(window.EVENT.IMPORT_LOG_BY_DATE, 'custom');
                     }
                 }]
             }/*{

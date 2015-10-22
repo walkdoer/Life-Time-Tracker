@@ -5,5 +5,7 @@ module.exports = {
     DOING_LOG: 'doing_log',
     CURRENT_LOG: 'current_log',
     INSERT_LOG_FROM_TASK: 'insert_log_from_task',
-    LOG_CHANGE: 'log_change'
+    LOG_CHANGE: 'log_change',
+
+    IMPORT_LOG_BY_DATE: 'import_log_by_date'
 };

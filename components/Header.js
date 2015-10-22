@@ -82,6 +82,7 @@ var Header = React.createClass({
                                 <Button className="ltt_c-header-forwardBtn" disabled={this.state.disabledForwardButton} onClick={this.forward}>
                                     <i className="fa fa-angle-right"></i>
                                 </Button>
+
                             </ButtonGroup>
                             <ButtonGroup>
                                 <Button onClick={this.openLogCheck}>
@@ -102,6 +103,10 @@ var Header = React.createClass({
                 </div>
             </header>
         );
+    },
+
+    test: function () {
+        Bus.emit(EVENT.IMPORT_LOG_BY_DATE, 'week');
     },
 
     back: function (e) {

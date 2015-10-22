@@ -36,14 +36,16 @@ var Tag = require('./components/Tag');
 /* Const */
 var NAV_OPEN = 'ltt__navOpen';
 var EVENT = require('./constants/EventConstant');
+window.EVENT = EVENT;
 
 /** Utils */
 var Util =require('./utils/Util');
 var DataAPI = require('./utils/DataAPI');
 var Bus = require('./utils/Bus');
 window.__LttBus__ = Bus;
+var NWBridge = require('./NWBridge');
 
-
+NWBridge.init();
 
 var App = React.createClass({
 
