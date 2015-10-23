@@ -15,6 +15,7 @@ var Mt = window.Mousetrap;
 var DateRangePicker = require('../components/DateRangePicker');
 var Pinyin = require('../components/Pinyin');
 var Scroller = require('../components/Scroller');
+var TinyPie = require('../components/charts/TinyPie');
 
 
 var config = require('../conf/config');
@@ -188,22 +189,31 @@ var FilterableProjects = React.createClass({
     },
 
     loadTodayProjectTime: function () {
+        var that = this;
         return DataAPI.Log.load({
             start: new Moment().startOf('day').toDate(),
             end: new Moment().endOf('day').toDate(),
             group: 'project+version',
             sum: true
         }).then(function (data) {
-            return data.filter(function (item) {
-                return item._id !== null && item.project !== null;
+            var _otherTime = 0;
+            var _totalTime = 0;
+            var result = data.filter(function (item) {
+                var notOther = (item._id !== null && item.project !== null);
+                if (notOther) { _otherTime += item.totalTime; }
+                return notOther;
             }).map(function (item) {
                 var _id = item._id;
+                _totalTime += item.totalTime;
                 return {
                     project: _id.project,
                     version: _id.version,
                     totalTime: item.totalTime
                 };
             });
+            that._totalTime = _totalTime;
+            that._otherTime = _otherTime;
+            return result;
         });
     },
 
@@ -212,6 +222,7 @@ var FilterableProjects = React.createClass({
         var isMatch = projectId === project._id;
         var className = isMatch ? 'active' : null;
         var timeData = this.state.projectTime.filter(function (item) {return item.project === project._id;})
+        timeData._totalTime = this._totalTime;
         return <ProjectNav key={project._id} project={project} className={className}
             timeData={timeData}
             defaultIsOpen={isMatch} versionId={this.props.versionId}/>
@@ -308,13 +319,17 @@ var ProjectNav = React.createClass({
     }
     var params = {projectId: project._id};
     var iconClassName = ('fa ' + (this.state.isOpen ? 'fa-folder-open-o' : 'fa-folder-o'));
+    var percentValue;
+    if (timeData._totalTime) {
+        percentValue = [totalProjectTime, timeData._totalTime].join('/');
+    }
     return (
       <div className={className}>
         <h3 onClick={this.toggle}>
             <i className={iconClassName}/>
             <Link to="projectTask" params={params}>
                 {project.name}
-                {totalProjectTime ? <span className="timeAmount">{Util.displayTime(totalProjectTime)}</span> : null}
+                {totalProjectTime ? <span className="timeAmount">{Util.displayTime(totalProjectTime)}{percentValue !== undefined ? <TinyPie value={percentValue} height={10} width={10} fill={['#ff9900', "#FFF8EA"]}/> : null}</span> : null}
             </Link>
         </h3>
         <ul>{this.renderVersions()}</ul>

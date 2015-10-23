@@ -139,6 +139,11 @@
     background-color: #F8E3C4;
     border-radius: 4px;
 }
+
+.ltt_c-ProjectNav .timeAmount .peity{
+  margin-left: 5px;
+  vertical-align: bottom;
+}
 .ltt_c-ProjectNav ul{
   margin:0px;
   list-style: none;
