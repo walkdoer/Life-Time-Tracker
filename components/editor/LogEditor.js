@@ -41,6 +41,7 @@ var EventConstant = require('../../constants/EventConstant');
 var EVENT_HIGHLIGHT_CLASS = 'event-highlight';
 var NotEmpty = function(a) {return !!a};
 var LOG_NOT_VALID = 'log_not_valid';
+var noop = function () {};
 
 /**util*/
 var DataAPI = require('../../utils/DataAPI');
@@ -145,7 +146,7 @@ var LogEditor = React.createClass({
                     </div>
                 </div>
                 <div className="ltt_c-logEditor-content">
-                    {this.state.showCalendar ? <Calendar date={this.props.title} ref="calendar"/> : null }
+                    {this.state.showCalendar ? <Calendar date={this.props.title} onEventClick={this.onCalendarEventClick} ref="calendar"/> : null }
                     <Editor ref="editor"/>
                     <SlidePanel className="todayReport" ref="todayReport" open={false} onTransitionEnd={this.renderTodayReport}>
                         <div ref="reportContainer" style={{height: "100%"}}>
@@ -191,7 +192,7 @@ var LogEditor = React.createClass({
             that.setValue(content);
             that._highLightDoingLine(content);
             that.gotoDoingLogLine(content);
-            that._gotoLocate(content, that.props.locate);
+            that._gotoLocate(that.props.locate, content);
             that._starCacheLines();
             that._checkLogValid(content);
             that.props.onLoad(content, that.getDoingLog(content));
@@ -208,7 +209,7 @@ var LogEditor = React.createClass({
         });
     },
 
-    _gotoLocate: function (content, locate) {
+    _gotoLocate: function (locate, content, time) {
         if (!locate) { return; }
         var session = this.editor.getSession();
         var row = null;
@@ -223,7 +224,7 @@ var LogEditor = React.createClass({
             var marker = session.addMarker(range, "ace_step", "fullLine");
             setTimeout(function () {
                 session.removeMarker(marker);
-            }, 10000);
+            }, time || 10000);
         }
     },
 
@@ -990,6 +991,7 @@ var LogEditor = React.createClass({
         var columnPosition = doingLog.origin.indexOf('~') + 1;
         if (_.isNumber(index)) {
             this.gotoLine(index + 1, columnPosition);
+            this.allocateLogInCalendar(doingLog);
             return true;
         }
     },
@@ -1458,9 +1460,9 @@ var LogEditor = React.createClass({
             }
         }*/
         if (calendar) {
-            calendar.unHighlightEvent();
+            calendar.unHighlightEventEl();
             var event = calendar.scrollToEventByStartTime(log.start);
-            calendar.highlightEvent(event);
+            calendar.highlightEventEl(event.el);
             //calendar.scrollToEventByIndex(index - 1);
         }
     },
@@ -1522,8 +1524,14 @@ var LogEditor = React.createClass({
         if (line) {
             var index = this.getLineIndex(line.origin);
             this.gotoLine(index + 1);
+            this.allocateLogInCalendar(line);
         }
+    },
+
+    onCalendarEventClick: function (calEvent) {
+        this._gotoLocate(calEvent.origin, this.getContent(), 1000);
     }
+
 });
 
 var Editor = React.createClass({
@@ -1536,6 +1544,11 @@ var Editor = React.createClass({
     }
 });
 var Calendar = React.createClass({
+    getDefaultProps: function () {
+        return {
+            onEventClick: noop
+        };
+    },
 
     render: function () {
         return <div className="ltt_c-logEditor-Calendar"></div>
@@ -1572,7 +1585,7 @@ var Calendar = React.createClass({
                             title: getEventTitle(log),
                             start: new Moment(log.start),
                             end: new Moment(log.end)
-                        }, _.pick(log, ['project', 'version', 'task', 'content']));
+                        }, _.pick(log, ['project', 'version', 'task', 'content', 'origin']));
                         if (logClass) {
                             var logClassObj = classes.filter(function (cls) {
                                 return cls._id === logClass;
@@ -1595,9 +1608,15 @@ var Calendar = React.createClass({
                     console.error(err.stack);
                     Notify.error('Sorry, failed to show calendar events!');
                 });
+            },
+            eventClick: function(calEvent, jsEvent, view) {
+                that.unHighlightEventEl();
+                that.highlightEventEl($(this));
+                that.props.onEventClick(calEvent);
             }
         });
     },
+
 
     componentWillReceiveProps: function (nextProps) {
         var that = this;
@@ -1718,17 +1737,17 @@ var Calendar = React.createClass({
         return target;
     },
 
-    highlightEvent: function (event) {
-        event.el.addClass(EVENT_HIGHLIGHT_CLASS);
+    highlightEventEl: function (eventEl) {
+        $(eventEl).addClass(EVENT_HIGHLIGHT_CLASS);
     },
 
-    unHighlightEvent: function (event) {
+    unHighlightEventEl: function (eventEl) {
         if (!event) {
             this.getAllEvents().forEach(function (event) {
                 event.el.removeClass(EVENT_HIGHLIGHT_CLASS);
             });
         } else {
-            event.el.removeClass(EVENT_HIGHLIGHT_CLASS);
+            $(eventEl).removeClass(EVENT_HIGHLIGHT_CLASS);
         }
     },
 
