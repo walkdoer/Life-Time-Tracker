@@ -54,6 +54,7 @@ var Logs = React.createClass({
         return {
             logs: null,
             tags: [],
+            classes: [],
             projects: [],
             tasks: [],
             versions: [],
@@ -178,9 +179,18 @@ var Logs = React.createClass({
         return (
             <div className="ltt_c-page-logs-filters">
                 <div className="Grid">
-                    <div className="Grid-cell Grid">
+                    <div className="ltt_c-page-logs-filtersdateRange">
                          <DateRangePicker ref="dateRange" start={this.state.startDate} end={this.state.endDate}
                             onDateRangeChange={this.onDateRangeChange}/>
+                    </div>
+                    <div className="Grid-cell Grid">
+                        <label className="filter-label">Class:</label>
+                        <select className="filter-input" ref="classFilter">
+                            <option></option>
+                            {this.state.classes.map(function (cls) {
+                                return <option value={cls._id}>{cls.name}</option>
+                            })}
+                        </select>
                     </div>
                     <div className="Grid-cell Grid">
                         <label className="filter-label">Project:</label>
@@ -260,6 +270,17 @@ var Logs = React.createClass({
             });
         });
 
+        this.loadClasses(function () {
+            var $select = $(that.refs.classFilter.getDOMNode());
+            $select.select2({
+                placeholder: "Select a class",
+                allowClear: true
+            });
+            $select.on('change', function (e) {
+                 that.onClassChange(e.val);
+            });
+        });
+
         this.loadVersions(function () {
             var $select = $(that.refs.versionFilter.getDOMNode());
             $select.select2({
@@ -308,6 +329,19 @@ var Logs = React.createClass({
             this.deleteFilter('tags');
             this.loadLogs();
         }
+    },
+
+    onClassChange: function (cls) {
+        if (!cls) {
+            this.deleteFilter("classes");
+        } else {
+            this.setFilter({
+                classes: cls
+            });
+        }
+        this.loadLogs(function () {
+            this.updateCalendarHeatMap();
+        });
     },
 
     onProjectChange: function (project) {
@@ -382,6 +416,16 @@ var Logs = React.createClass({
             .then(function (projects) {
                 that.setState({
                     projects: projects
+                }, cb);
+            });
+    },
+
+    loadClasses: function (cb) {
+        var that = this;
+        DataAPI.Class.load()
+            .then(function (classes) {
+                that.setState({
+                    classes: classes
                 }, cb);
             });
     },

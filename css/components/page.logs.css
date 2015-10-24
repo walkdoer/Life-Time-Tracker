@@ -65,3 +65,16 @@
     line-height: 26px;
     margin-bottom: 0px;
 }
+
+.ltt_c-page-logs-filtersdateRange{
+    width: 220px;
+    margin-right: 10px;
+    height: 26px;
+    overflow: hidden;
+}
+
+
+.ltt_c-page-logs-filtersdateRange .ltt_c-dateRangePicker{
+    height: 26px;
+    font-size: 0.89em;
+}
