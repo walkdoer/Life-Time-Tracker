@@ -42,6 +42,10 @@ var Scroller = React.createClass({
             shrinkScrollbars: 'scale',
             fadeScrollbars: true
         });
+
+        if (this.props.onSrcollEnd) {
+            this.__scroller.on('scrollEnd', this.props.onSrcollEnd);
+        }
     }
 });
 
