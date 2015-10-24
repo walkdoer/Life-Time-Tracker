@@ -6,6 +6,7 @@ var React = require('react');
 var _ = require('lodash');
 var Moment = require('moment');
 var Color = require('color');
+var Router = require('react-router');
 
 /** Components */
 var Notify = require('../components/Notify');
@@ -14,6 +15,8 @@ var Notify = require('../components/Notify');
 var DataAPI = require('../utils/DataAPI');
 
 module.exports = React.createClass({
+
+    mixins: [Router.Navigation],
 
     render: function () {
         return (
@@ -31,8 +34,10 @@ module.exports = React.createClass({
     },
 
     initCalendar: function (classes) {
+        var that = this;
         var $container = $(this.refs.calendarContainer.getDOMNode());
         $container.fullCalendar({
+            height: $container.height(),
             header: {
                 left: 'prev,next today',
                 center: 'title',
@@ -57,7 +62,12 @@ module.exports = React.createClass({
                     });
                 }
             },
-            height: $container.height(),
+
+            eventClick: function(calEvent, jsEvent, view) {
+                var url = "/logEditor/" + calEvent.date + '?logOrigin=' + encodeURIComponent(calEvent.origin);
+                 that.transitionTo(url);
+            },
+
             events: function(start, end, timezone, callback) {
                 DataAPI.Log.load({
                     start: start.toDate(),
@@ -73,7 +83,7 @@ module.exports = React.createClass({
                             title: getEventTitle(log),
                             start: new Moment(log.start),
                             end: new Moment(log.end)
-                        }, _.pick(log, ['project', 'version', 'task', 'content']));
+                        }, _.pick(log, ['project', 'version', 'task', 'content', 'origin', 'date']));
                         if (logClass) {
                             var logClassObj = classes.filter(function (cls) {
                                 return cls._id === logClass;
