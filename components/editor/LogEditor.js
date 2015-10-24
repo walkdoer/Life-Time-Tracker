@@ -289,6 +289,30 @@ var LogEditor = React.createClass({
         return editor;
     },
 
+    _addColorToEditorGutter: function () {
+        var lines = this.getAllLines();
+        var colorMap = {};
+        config.classes.forEach(function (cls) {
+            colorMap[cls._id] = cls.color;
+        });
+        var $gutters = $(this.refs.editor.getDOMNode()).find('.ace_gutter-cell');
+
+        lines.forEach(function (log, index) {
+            if (!log) {return;}
+            var logObj = this.toLogObject(log)[0];
+            if (logObj && logObj.classes) {
+                var cls = logObj.classes[0];
+                if (cls) {
+                    $gutters.eq(index).css({
+                        'background-color': colorMap[cls],
+                        'color': '#FFF'
+                    });
+                }
+            }
+        }, this);
+    },
+
+
     getUnfinishLog: function (start, end) {
         var that = this;
         return DataAPI.Log.load({
@@ -1432,7 +1456,7 @@ var LogEditor = React.createClass({
     },
 
     toLogObject: function (line) {
-        var result = TrackerHelper.getLogs(line, this.props.title);
+        var result = TrackerHelper.getLogs(line, this.props.title, true);
         return result;
     },
 
