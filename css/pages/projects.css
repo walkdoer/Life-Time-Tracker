@@ -1,5 +1,7 @@
 .ltt_c-page-projects{
     margin-top:0px;
+    padding: 20px 20px 0px;
+    height: 100%;
 }
 
 .ltt_c-page-projects input[type=text],
@@ -21,7 +23,10 @@
 
 .ltt_c-page-projects-projectCards{
     margin:-1%;
-    margin-top:10px;
+    margin-top: 5px;
+    display: flex !important;
+    height: 100%;
+    flex-direction: column;
 }
 .ltt_c-page-projects-projectCards .ltt_c-projectCard .ltt_c-chart-D3SimpleColumn{
   position: absolute;
@@ -39,6 +44,11 @@
     height: 200px;
     position: relative;
 }
+
+.ltt_c-page-projects-projectCards .ltt_scroller{
+  flex: 1;
+}
+
 .ltt_c-projectCard-task .done{
     text-decoration: line-through;
     color: #A3A3A3;
@@ -55,6 +65,7 @@
 .ltt_c-page-projects-filter{
     display: flex;
     justify-content: space-between;
+    padding: 0 11px 5px;
 }
 
 .ltt_c-page-projects-filter-name{
@@ -143,6 +154,7 @@
 .ltt_c-ProjectNav .timeAmount .peity{
   margin-left: 5px;
   vertical-align: bottom;
+  margin-bottom: 1px;
 }
 .ltt_c-ProjectNav ul{
   margin:0px;

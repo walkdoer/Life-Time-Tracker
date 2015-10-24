@@ -19,6 +19,7 @@ var Notify = require('../components/Notify');
 var DataAPI = require('../utils/DataAPI');
 var LoadingMask = require('../components/LoadingMask');
 var pinyin = new Pinyin();
+var Scroller = require('../components/Scroller');
 
 /** Utils */
 var Bus = require('../utils/Bus');
@@ -73,22 +74,24 @@ var Projects = React.createClass({
                                 this.filterProject(text);
                             }.bind(this)}/>
                     </div>
-                    <div className="ltt_c-page-projects-projectCards" style={this.props.style} ref="projectCards">
-                        <LoadingMask loaded={!this.state.loading}/>
-                        {this.state.projects.map(function (project) {
-                            return (
-                                <ProjectCard
-                                    startDate={that.state.startDate}
-                                    endDate={that.state.endDate}
-                                    data={project} key={project._id}
-                                    onDelete={function (project, e) {
-                                        if (window.confirm("Are you sure to delete")) {
-                                            this.deleteProject(project);
-                                        }
-                                    }.bind(that, project)}/>
-                                );
-                        })}
-                    </div>
+                    <Scroller className="ltt_scroller" style={this.props.style} ref="scroller">
+                        <div ref="projectCards">
+                            <LoadingMask loaded={!this.state.loading}/>
+                            {this.state.projects.map(function (project) {
+                                return (
+                                    <ProjectCard
+                                        startDate={that.state.startDate}
+                                        endDate={that.state.endDate}
+                                        data={project} key={project._id}
+                                        onDelete={function (project, e) {
+                                            if (window.confirm("Are you sure to delete")) {
+                                                this.deleteProject(project);
+                                            }
+                                        }.bind(that, project)}/>
+                                    );
+                            })}
+                        </div>
+                    </Scroller>
                 </div>
                 <RouteHandler/>
             </section>
@@ -100,10 +103,12 @@ var Projects = React.createClass({
         this.iso = new Isotope(grid, {
             itemSelector: '.ltt_c-projectCard'
         });
+        this.refs.scroller.refresh();
     },
 
     filterProject: function (text) {
         var allProjects = this.allProjects;
+        var that = this;
         text = text.trim();
         this.iso.arrange({
             filter: function (index, itemElement) {
@@ -135,6 +140,7 @@ var Projects = React.createClass({
                 return name.indexOf(text) >= 0 || fullPy.indexOf(text) >= 0 || py.indexOf(text) >= 0 || matchTag || matchClass;
             }
         });
+        this.refs.scroller.refresh();
     },
 
     isIndex: function () {
