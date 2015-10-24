@@ -19,7 +19,7 @@ var TinyPie = require('../components/charts/TinyPie');
 
 
 var config = require('../conf/config');
-
+var noop  = function () {};
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
 var Util = require('../utils/Util');
@@ -54,12 +54,11 @@ module.exports = React.createClass({
     render: function () {
         return (
             <section className="ltt_c-page ltt_c-page-projectsNew">
-                <Scroller className="ltt_c-page-projectsNew-sidebar" ref="scroller">
-                    <FilterableProjects projects={this.state.projects}
+                <aside className="ltt_c-page-projectsNew-sidebar">
+                    <FilterableProjects projects={this.state.projects} ref="filterableProjects"
                         projectId={this.state.projectId}
-                        versionId={this.state.versionId}
-                        filterEnd={this.updateScroller}/>
-                </Scroller>
+                        versionId={this.state.versionId}/>
+                </aside>
                 <main>
                     <RouteHandler {... _.pick(this.state, ['projectId', 'versionId'])}  key={this.state.projectId} onVersionDeleted={this.onVersionDeleted}/>
                 </main>
@@ -67,13 +66,11 @@ module.exports = React.createClass({
         );
     },
 
-    updateScroller: function () {
-        this.refs.scroller.refresh();
-    },
 
     componentDidMount: function () {
         this.loadProjects();
     },
+
 
     componentWillReceiveProps: function () {
         this.setState(this.getStateFromParams());
@@ -99,7 +96,6 @@ module.exports = React.createClass({
             end: this.props.endDate,
             aggregate: false
         }).then(function (projects) {
-            that.allProjects = projects;
             that.setState({
                 loading: false,
                 projects: projects
@@ -145,15 +141,22 @@ var FilterableProjects = React.createClass({
 
     getInitialState: function () {
         return {
-            projects: this.props.projects,
+            projects: null,
             projectTime: []
         };
     },
 
-    componentWillReceiveProps: function (nextProps) {
-        this.setState({
-            projects: nextProps.projects
-        });
+    componentDidUpdate: function () {
+        if (!this.__inFilterMode && !this.__clickVisit) {
+            this.scrollToCurrent();
+        }
+    },
+
+    scrollToCurrent: function () {
+        var currentEl = this.current();
+        if (currentEl) {
+            this.refs.scroller.scrollToElement(currentEl);
+        }
     },
 
     componentDidMount: function () {
@@ -172,7 +175,6 @@ var FilterableProjects = React.createClass({
     },
 
     render: function () {
-        console.log('render filterProject');
         return (
             <div className="ltt_c-page-projectsNew-FilterableList">
                 <input ref="nameInput" type="text" placeholder="name/classs/tag"
@@ -181,9 +183,9 @@ var FilterableProjects = React.createClass({
                             var text = e.target.value;
                             this.filterProject(text);
                         }.bind(this)}/>
-                <div className="ltt_c-page-projectsNew-sidebar-projectTree">
-                    {this.state.projects.map(this.renderProject)}
-                </div>
+                <Scroller className="ltt_c-page-projectsNew-sidebar-projectTree" ref="scroller">
+                        {(this.__inFilterMode ? this.state.projects : this.props.projects).map(this.renderProject)}
+                </Scroller>
             </div>
         );
     },
@@ -219,44 +221,74 @@ var FilterableProjects = React.createClass({
 
     renderProject: function (project) {
         var projectId = this.props.projectId;
+        var versionId = this.props.versionId;
         var isMatch = projectId === project._id;
         var className = isMatch ? 'active' : null;
         var timeData = this.state.projectTime.filter(function (item) {return item.project === project._id;})
         timeData._totalTime = this._totalTime;
+        var defaultIsOpen = false;
+        if (versionId && !_.isEmpty(project.versions)) {
+            defaultIsOpen = project.versions.some(function (ver) {
+                return ver._id === versionId;
+            });
+        }
         return <ProjectNav key={project._id} project={project} className={className}
             timeData={timeData}
-            defaultIsOpen={isMatch} versionId={this.props.versionId}/>
+            onClick={this.onItemClick}
+            onVersionClick={this.onItemClick}
+            defaultIsOpen={defaultIsOpen} versionId={this.props.versionId}/>
+    },
+
+    onItemClick: function () {
+        this.__clickVisit = true;
     },
 
 
     filterProject: function (text) {
         var pinyin = new Pinyin();
         text = text.trim();
-        var result = [];
-        result = this.props.projects.filter(function (project) {
-            var name = project.name;
-            var py = pinyin.getCamelChars(name).toLowerCase();
-            var fullPy = pinyin.getFullChars(name).toLowerCase();
-            var tags = project.tags || [];
-            var matchTag = tags.some(function (tag) {
-                var tagPy = pinyin.getCamelChars(tag).toLowerCase();
-                var tagFullPy = pinyin.getFullChars(tag).toLowerCase();
-                return tag.indexOf(text) >= 0 || tagFullPy.indexOf(text) >= 0 || tagPy.indexOf(text) >= 0;
+        this.__inFilterMode = !!text;
+        var result = null;
+        if (this.__inFilterMode) {
+            result = [];
+            result = this.props.projects.filter(function (project) {
+                var name = project.name;
+                var py = pinyin.getCamelChars(name).toLowerCase();
+                var fullPy = pinyin.getFullChars(name).toLowerCase();
+                var tags = project.tags || [];
+                var matchTag = tags.some(function (tag) {
+                    var tagPy = pinyin.getCamelChars(tag).toLowerCase();
+                    var tagFullPy = pinyin.getFullChars(tag).toLowerCase();
+                    return tag.indexOf(text) >= 0 || tagFullPy.indexOf(text) >= 0 || tagPy.indexOf(text) >= 0;
+                });
+                var matchClass = (project.classes || []).some(function (cls) {
+                    var upperCode = cls.toUpperCase();
+                    var upperText = text.toUpperCase();
+                    return upperCode.indexOf(upperText) >= 0;
+                });
+                return name.indexOf(text) >= 0 || fullPy.indexOf(text) >= 0 || py.indexOf(text) >= 0 || matchTag || matchClass;
             });
-            var matchClass = (project.classes || []).some(function (cls) {
-                var upperCode = cls.toUpperCase();
-                var upperText = text.toUpperCase();
-                return upperCode.indexOf(upperText) >= 0;
-            });
-            return name.indexOf(text) >= 0 || fullPy.indexOf(text) >= 0 || py.indexOf(text) >= 0 || matchTag || matchClass;
-        });
+        } else {
+            this.__clickVisit = false;
+        }
         this.setState({
             projects: result
         }, function () {
-            this.props.filterEnd();
+            this.refs.scroller.refresh();
         });
+    },
+
+    current: function () {
+        var $el = $(this.getDOMNode());
+        var el = $el.find('.ltt_c-ProjectNav.active')[0];
+        if (el) {
+            el = $(el).find('.ltt_c-ProjectNav-Item.active')[0] || el;
+        }
+        return el;
     }
-})
+});
+
+
 
 var ProjectNav = React.createClass({
 
@@ -265,12 +297,11 @@ var ProjectNav = React.createClass({
   },
 
   getDefaultProps: function () {
-    return { defaultIsOpen: false };
-  },
-
-  componentWillReceiveProps: function (newProps) {
-    if (!this.state.isOpen)
-      this.setState({ isOpen: newProps.defaultIsOpen });
+    return {
+        defaultIsOpen: false,
+        onVersionClick: noop,
+        onClick: noop
+    };
   },
 
   toggle: function () {
@@ -295,7 +326,7 @@ var ProjectNav = React.createClass({
             totalVersionTime = versionTimeData.totalTime;
         }
         return (
-            <li className={className} key={version._id}>
+            <li className={className} key={version._id} onClick={this.onVersionClick}>
                 <i className="fa fa-sitemap" title="version"></i>
                 <Link to="projectVersionTask" params={params}>
                     {version.name}
@@ -304,6 +335,15 @@ var ProjectNav = React.createClass({
             </li>
         );
     }) : null;
+  },
+
+  onVersionClick: function () {
+      this.props.onVersionClick();
+  },
+
+  onClick: function () {
+      this.toggle();
+      this.props.onClick();
   },
 
   render: function () {
@@ -325,11 +365,15 @@ var ProjectNav = React.createClass({
     }
     return (
       <div className={className}>
-        <h3 onClick={this.toggle}>
+        <h3 onClick={this.onClick}>
             <i className={iconClassName}/>
             <Link to="projectTask" params={params}>
                 {project.name}
-                {totalProjectTime ? <span className="timeAmount">{Util.displayTime(totalProjectTime)}{percentValue !== undefined ? <TinyPie value={percentValue} height={10} width={10} fill={['#ff9900', "#FFF8EA"]}/> : null}</span> : null}
+                {totalProjectTime ?
+                    <span className="timeAmount">
+                        {Util.displayTime(totalProjectTime)}
+                        {percentValue !== undefined ? <TinyPie value={percentValue} height={10} width={10} fill={['#ff9900', "#FFF8EA"]}/> : null}
+                    </span> : null}
             </Link>
         </h3>
         <ul>{this.renderVersions()}</ul>

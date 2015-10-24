@@ -46,6 +46,10 @@ var Scroller = React.createClass({
         if (this.props.onSrcollEnd) {
             this.__scroller.on('scrollEnd', this.props.onSrcollEnd);
         }
+    },
+
+    scrollToElement: function () {
+        this.__scroller.scrollToElement.apply(this.__scroller, Array.prototype.slice.call(arguments, 0));
     }
 });
 
