@@ -228,6 +228,11 @@
   position: relative;
 }
 
+.ltt_c-projectDetail-projectInfo .external-link{
+  font-size: 0.5em;
+  margin-left: 5px;
+}
+
 .ltt_c-projectTask-statistics{
   padding: 10px;
 }

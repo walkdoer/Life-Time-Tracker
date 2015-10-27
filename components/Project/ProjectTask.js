@@ -9,6 +9,7 @@ var RouteHandler = Router.RouteHandler;
 var Link = Router.Link;
 var Q = require('q');
 var _ = require('lodash');
+var Ltt = window.Ltt;
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var Mt = window.Mousetrap;
 var RB = require('react-bootstrap');
@@ -806,10 +807,14 @@ var ProjectInfo = React.createClass({
             }
             var mProjectCreateTime = new Moment(project.createdTime);
             var mProjectLastActiveTime = new Moment(project.lastActiveTime);
+            var linkEl, link;
+            if (project.attributes && (link = project.attributes.link)) {
+                linkEl = <span className="external-link ltt-link" onClick={this.openExternalLink.bind(this, link)} title={link}><i className="fa fa-external-link"></i></span>
+            }
             projectBasicInfo = (
                 <section className="ltt_c-projectDetail-projectInfo">
                     <h1>
-                        {project.name}
+                        {project.name}{linkEl}
                         <span className="ltt_c-projectDetail-logClasses">{logClasses}</span>
                         <span className="ltt_c-projectDetail-times">
                             <span className="ltt-M2">
@@ -874,6 +879,10 @@ var ProjectInfo = React.createClass({
                     allTotalTime: total
                 });
             });
+    },
+
+    openExternalLink: function (link) {
+        Ltt.openExternalLink(link);
     }
 });
 

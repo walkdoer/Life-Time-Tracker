@@ -29,7 +29,8 @@ var ProjectCard = React.createClass({
 
     getInitialState: function () {
         return {
-            activityData: []
+            activityData: [],
+            loaded: false
         };
     },
 
@@ -135,7 +136,9 @@ var ProjectCard = React.createClass({
     },
 
     loadActivity: function () {
-        this._loadActivity(this.props);
+        if (!this.state.loaded) {
+            this._loadActivity(this.props);
+        }
     },
 
     componentWillReceiveProps: function (nextProps) {
@@ -171,7 +174,8 @@ var ProjectCard = React.createClass({
                 result.push(0);
             }
             that.setState({
-                activityData: result
+                activityData: result,
+                loaded: true
             });
         });
     }
