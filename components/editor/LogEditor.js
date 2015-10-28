@@ -1091,11 +1091,13 @@ var LogEditor = React.createClass({
             beforeSave, onWarn
         ).then(function (cost) {
             if (!notNotify) {NProgress.done();}
-            that._achieveGoal();
-            that.props.onSave(content);
-            that.refs.accomplishment.update();
-            //reset content change status to not change
-            that._hideContentChangeFlag();
+            if (that.isMounted()) {
+                that._achieveGoal();
+                that.props.onSave(content);
+                that.refs.accomplishment.update();
+                //reset content change status to not change
+                that._hideContentChangeFlag();
+            }
         }).catch(function (err) {
             if (err.type !== LOG_NOT_VALID) {
                 var errorMsg = 'error occur when import log ';
