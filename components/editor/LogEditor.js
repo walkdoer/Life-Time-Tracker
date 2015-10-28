@@ -425,9 +425,8 @@ var LogEditor = React.createClass({
     _saveWorkBeforeDestroy: function () {
         var that = this;
         if (this.isContentChange()) {
-            return this._persistCache().then(function () {
-                return that.save(that.editor.getValue());
-            });
+            var val = that.editor.getValue();
+            return that.save(val, true);
         } else {
             return Q();
         }
@@ -770,7 +769,7 @@ var LogEditor = React.createClass({
     },
 
     componentWillUnmount: function () {
-        this._persistCache();
+        this._saveWorkBeforeDestroy();
         this._removeFromLocalStorage();
         this._destroyEditor();
     },
@@ -958,7 +957,7 @@ var LogEditor = React.createClass({
             this.state.highlightUnFinishLog !== nextState.highlightUnFinishLog ||
             this.state.showCalendar !== nextState.showCalendar;
         if (title !== nextProps.title) {
-            this._persistCache();
+            this._saveWorkBeforeDestroy();
             this._removeFromLocalStorage();
             this._destroyEditor();
         }
@@ -1080,10 +1079,10 @@ var LogEditor = React.createClass({
         localStorage.removeItem(key);
     },
 
-    save: function (content) {
+    save: function (content, notNotify) {
         var that = this;
         var beforeSave = function () {
-            NProgress.start();
+            if (!notNotify) {NProgress.start();}
         }, onWarn = function() {
             //Notify.warning('warn from import log');
         };
@@ -1091,7 +1090,7 @@ var LogEditor = React.createClass({
             this.props.title, content,
             beforeSave, onWarn
         ).then(function (cost) {
-            NProgress.done();
+            if (!notNotify) {NProgress.done();}
             that._achieveGoal();
             that.props.onSave(content);
             that.refs.accomplishment.update();
@@ -1105,7 +1104,7 @@ var LogEditor = React.createClass({
                 }
                 Notify.error(errorMsg);
             }
-            NProgress.done();
+            if (!notNotify) {NProgress.done();}
         });
     },
 
