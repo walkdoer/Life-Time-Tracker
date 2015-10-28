@@ -10,7 +10,7 @@ var LogClass = React.createClass({
             name = cls;
         } else if (_.isObject(cls)) {
             if (cls.icon) {
-                iconClass = ['fa', 'fa-' + cls.icon].join(' ');
+                iconClass = ['fa', cls.icon].join(' ');
             } else {
                 iconClass = '';
             }

@@ -63,7 +63,7 @@ var Activity = React.createClass({
             }
         }
         if (!icon && activityCls && activityCls.icon) {
-            icon = <i className={"fa fa-" + activityCls.icon}/>
+            icon = <i className={"fa " + activityCls.icon}/>
         }
         return (
             <li className="ltt_c-VerticleTimeline-Activity">

@@ -404,7 +404,16 @@ var LogClassCard = React.createClass({
             DataAPI.Class.update(extend({}, that.props.data, {color: '#' + val}))
                 .then(updateClassesConfig);
         });
-        $(this.refs.icon.getDOMNode()).find('input').iconpicker();
+        $(this.refs.icon.getDOMNode()).find('input')
+            .iconpicker()
+            .on('iconpickerSelected', function (e) {
+                var val = 'fa-' + e.iconpickerValue;
+                that.setState({
+                    icon: val
+                }, function () {
+                    this.save();
+                });
+            });
     },
 
     onFieldChange: function (e) {
@@ -413,10 +422,12 @@ var LogClassCard = React.createClass({
         var val = target.value;
         var newState = {};
         newState[name] = val;
-        this.setState(newState, function () {
-            DataAPI.Class.update(extend({}, this.props.data, _.pick(this.state, ['name', "icon", "description"])))
+        this.setState(newState, this.save);
+    },
+
+    save: function () {
+        DataAPI.Class.update(extend({}, this.props.data, _.pick(this.state, ['name', "icon", "description"])))
                 .then(updateClassesConfig);
-        });
     }
 });
 
