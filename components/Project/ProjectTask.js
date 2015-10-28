@@ -47,6 +47,8 @@ var Notify = require('../Notify');
 var SlidePanel = require('../SlidePanel');
 var EasyPie = require('../charts/EasyPie');
 var FullDateRangePicker = require('../FullDateRangePicker');
+var Scroller = require('../Scroller');
+
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
 var Bar = require('../charts/Bar');
@@ -118,7 +120,7 @@ module.exports = React.createClass({
         }
         return (
             <div className="ltt_c-projectTask">
-                <main>
+                <main onClick={this.onMainClick}>
                     <div className="ltt_c-projectDetail">
                         <ProjectInfo ref="projectInfo"
                             project={project}
@@ -139,14 +141,14 @@ module.exports = React.createClass({
                     </div>
                     <SlidePanel key={this.props.projectId  + 's1'}
                         ref="treeMapSlider" open={false} openRight={true} onTransitionEnd={this.renderTreeMap}
-                        position="fixed" zIndex={888}>
+                        position="fixed" zIndex={10000}>
                         <h3>Time TreeMap of {(project ? project.name : '') + (version ? '-' + version.name : '')}</h3>
                         <div className="closeBtn" onClick={this.closeTreeMap}><i className="fa fa-close"/></div>
                         <div ref="treeMapContainer"></div>
                     </SlidePanel>
                     <SlidePanel key={this.props.projectId + 's2'}
                         ref="statistics" open={false} openRight={true} onTransitionEnd={this.renderStatistics}
-                        position="fixed" zIndex={888}>
+                        position="fixed" zIndex={10000}>
                         <h3>Statistis of {project ? project.name : null}</h3>
                         <div className="closeBtn" onClick={this.closeStastics}><i className="fa fa-close"/></div>
                         <div ref="statisticsContainer"></div>
@@ -209,6 +211,14 @@ module.exports = React.createClass({
         );
     },
 
+    onMainClick: function () {
+        if (this.state.openTaskDetail) {
+            this.setState({
+                openTaskDetail: false
+            });
+        }
+    },
+
 
     renderStatistics: function () {
         React.render(
@@ -260,22 +270,7 @@ module.exports = React.createClass({
 
     componentDidUpdate: function () {
         this.myScroll.refresh();
-        if (this.state.openTaskDetail) {
-            if (!this.taskDetailScroller && this.refs.taskDetailWrapper) {
-                this.taskDetailScroller = new IScroll(this.refs.taskDetailWrapper.getDOMNode(), {
-                    mouseWheel: true,
-                    scrollbars: true,
-                    interactiveScrollbars: true,
-                    shrinkScrollbars: 'scale',
-                    fadeScrollbars: true
-                });
-            }
-            if (this.taskDetailScroller) {
-                this.taskDetailScroller.refresh();
-            }
-        } else {
-            this.taskDetailScroller = null;
-        }
+        this.refs.taskDetailScroller.refresh();
      },
 
     onDeleteTask: function (e) {
@@ -462,16 +457,16 @@ module.exports = React.createClass({
             this.currentTask = cTask;
         }
         return <SlidePanel ref="taskDetailSlider" key={this.props.projectId + 'task-detail'} open={(!!this.currentTask) && this.state.openTaskDetail} openRight={true}
-                    position="fixed" zIndex={888} className="taskDetailSlider" width={300}>
+                    position="fixed" zIndex={10000} className="taskDetailSlider" width={300}>
             <div className="ltt_c-taskDetail-wrapper" ref="taskDetailWrapper">
-                <div className="ltt_c-taskDetail-wrapper-scroller">
+                <Scroller ref="taskDetailScroller" className="ltt_c-taskDetail-wrapper-scroller">
                     {!!this.currentTask ? <TaskDetail  {... _.pick(this.state, ['projectId', 'versionId'])}
                         key={this.currentTask._id}
                         onHidden={this.closeTaskDetail}
                         onLogsLoaded={this.onTaskLogsLoaded}
                         onChange={this.onTaskChange}
                         task={this.currentTask}/> : null }
-                </div>
+                </Scroller>
             </div>
         </SlidePanel>
     },
@@ -483,9 +478,7 @@ module.exports = React.createClass({
     },
 
     onTaskLogsLoaded: function () {
-        if (this.taskDetailScroller) {
-            this.taskDetailScroller.refresh();
-        }
+        this.refs.taskDetailScroller.refresh();
     },
 
     onTaskChange: function (task) {

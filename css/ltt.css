@@ -23,7 +23,7 @@
     color: #EAEAEA;
     display:flex;
     justify-content: space-between;
-    z-index: 999;
+    z-index: 12000;
 }
 .ltt-footer-left{
     display:flex;

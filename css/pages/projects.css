@@ -281,17 +281,7 @@
   text-size-adjust: none;
 }
 .ltt_c-taskDetail-wrapper-scroller{
-  position: absolute;
-  width: 100%;
-  /* Prevent elements to be highlighted on tap */
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-
-  /* Put the scroller into the HW Compositing layer right from the start */
-  -webkit-transform: translateZ(0);
-  -moz-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  -o-transform: translateZ(0);
-  transform: translateZ(0);
+  height: 100%;
 }
 
 .ltt_c-taskDetail{
