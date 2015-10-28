@@ -363,6 +363,7 @@
 
 .ltt_c-projectTask .ltt_c-SlidePanel.taskDetailSlider .paper{
   padding: 0px;
+  padding-bottom: 30px;
 }
 
 .ltt_c-projectTask .ltt_c-SlidePanel .closeBtn{

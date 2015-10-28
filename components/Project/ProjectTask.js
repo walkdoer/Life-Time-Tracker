@@ -477,7 +477,9 @@ module.exports = React.createClass({
     },
 
     closeTaskDetail: function () {
-        this.refs.taskDetailSlider.close();
+        this.setState({
+            openTaskDetail: false
+        });
     },
 
     onTaskLogsLoaded: function () {
