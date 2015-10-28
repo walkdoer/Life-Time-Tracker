@@ -261,12 +261,10 @@
   overflow-y:scroll;
   border-right: 1px solid #DCDCDC;
 }
-
 .ltt_c-taskDetail-wrapper{
-  width: 310px;
+  width: 100%;
+  height: 100%;
   background: #f6f6f6;
-  position: relative;
-  overflow: hidden;
 
   /* Prevent the callout on tap-hold and text selection */
   -webkit-touch-callout: none;
@@ -362,6 +360,11 @@
 .ltt_c-projectTask .ltt_c-SlidePanel .paper{
   padding:10px 40px 20px 10px;
 }
+
+.ltt_c-projectTask .ltt_c-SlidePanel.taskDetailSlider .paper{
+  padding: 0px;
+}
+
 .ltt_c-projectTask .ltt_c-SlidePanel .closeBtn{
   position: absolute;
   top: 0px;

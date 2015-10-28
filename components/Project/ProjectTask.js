@@ -449,31 +449,35 @@ module.exports = React.createClass({
     },
 
     renderTaskDetail: function () {
-        if (this.state.openTaskDetail) {
-            if (!this.currentTask) {
-                var taskId = this.state.taskId;
-                var cTask;
-                this.state.tasks.some(function (task) {
-                    if (task._id === taskId) {
-                        cTask = task;
-                        return true;
-                    }
-                    return false;
-                });
-                this.currentTask = cTask;
-            }
-            if (!this.currentTask) { return; }
-            return <aside className="ltt_c-taskDetail-wrapper" ref="taskDetailWrapper">
+        if (!this.currentTask) {
+            var taskId = this.state.taskId;
+            var cTask;
+            this.state.tasks.some(function (task) {
+                if (task._id === taskId) {
+                    cTask = task;
+                    return true;
+                }
+                return false;
+            });
+            this.currentTask = cTask;
+        }
+        return <SlidePanel ref="taskDetailSlider" key={this.props.projectId + 'task-detail'} open={(!!this.currentTask) && this.state.openTaskDetail} openRight={true}
+                    position="fixed" zIndex={888} className="taskDetailSlider" width={300}>
+            <div className="ltt_c-taskDetail-wrapper" ref="taskDetailWrapper">
                 <div className="ltt_c-taskDetail-wrapper-scroller">
-                    <TaskDetail  {... _.pick(this.state, ['projectId', 'versionId'])}
+                    {!!this.currentTask ? <TaskDetail  {... _.pick(this.state, ['projectId', 'versionId'])}
                         key={this.currentTask._id}
-                        onHidden={this.onLogListHidden}
+                        onHidden={this.closeTaskDetail}
                         onLogsLoaded={this.onTaskLogsLoaded}
                         onChange={this.onTaskChange}
-                        task={this.currentTask}/>
+                        task={this.currentTask}/> : null }
                 </div>
-            </aside>
-        }
+            </div>
+        </SlidePanel>
+    },
+
+    closeTaskDetail: function () {
+        this.refs.taskDetailSlider.close();
     },
 
     onTaskLogsLoaded: function () {
