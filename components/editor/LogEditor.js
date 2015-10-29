@@ -1179,6 +1179,7 @@ var LogEditor = React.createClass({
             DataAPI.importLogContent(title, content).then(function () {
                 var cost = new Date().getTime() - start;
                 that.__saveing = false;
+                contentCache[title] = null;
                 resolve(cost);
             }).catch(function (err) {
                 that.__saveing = false;
