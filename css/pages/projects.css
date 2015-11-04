@@ -115,6 +115,9 @@
   overflow-x: hidden;
   height: 100%;
 }
+.ltt_c-page-projectsNew-index .ltt_c-SlidePanel .paper{
+  padding-bottom: 30px;
+}
 
 .ltt_c-page-projectsNew-index .list-header{
     display: flex;
