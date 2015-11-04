@@ -60,10 +60,12 @@ module.exports = React.createClass({
             <div className={cx({"ltt_c-GoalCard": true})}>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-title">
                     {goal.name}
-                    <ModalTrigger modal={<GoalEditWindow onSave={this.props.onEdit} goal={goal}/>} ref="modalTrigger">
-                        <span className="ltt_c-GoalCard-editBtn"><i className="fa fa-pencil-square"></i></span>
-                    </ModalTrigger>
-                    <span className="ltt_c-GoalCard-deleteBtn" onClick={this.onDelete}><i className="fa fa-trash"></i></span>
+                    <div className="ltt_c-GoalCard-title-btns">
+                        <ModalTrigger modal={<GoalEditWindow onSave={this.props.onEdit} goal={goal}/>} ref="modalTrigger">
+                            <span className="ltt_c-GoalCard-editBtn"><i className="fa fa-pencil-square"></i></span>
+                        </ModalTrigger>
+                        <span className="ltt_c-GoalCard-deleteBtn" onClick={this.onDelete}><i className="fa fa-trash"></i></span>
+                    </div>
                 </div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity">{goal.granularity}</div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-granularity" style={{width: 200}}>{this.renderCalendar()}</div>

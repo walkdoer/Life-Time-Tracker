@@ -1,5 +1,18 @@
 ### 快捷键
 
+提供了一系列的快捷键用于提高输入的效率
+
+最常见的操作是
+
+- `Command-S` Save Log  保存日志
+- `Command-B` Begin a log 开始一条日志
+- `Command-E` End a log 完成一条日志
+- `Command-[` Go to prev day 打开前一天日志
+- `Command-]` Go to next day 打开下一天日志
+- `Command-\` Go to current day 打开到当前日期(今天)的日志
+
+更多操作查看下面的快捷键列表
+
 #### 打开日志
 
 - `Command-\` Go to current day 打开到当前日期(今天)的日志
@@ -10,8 +23,10 @@
 
 #### 日志操作
 
+- `Command-S` Save Log  保存日志
+- `Ctrl-Space` quick input 输入提示
 - `Command-I` Insert a new log 插入一条新日志，以当前时间为起始时间
-- `Command-B` Begig a log 开始一条日志
+- `Command-B` Begin a log 开始一条日志
 - `Command-Shift-B` Update Begin Time 更新开始时间
 - `Command-E` End a log 完成一条日志
 - `Command-Shift-E` Update End Time 更新结束时间

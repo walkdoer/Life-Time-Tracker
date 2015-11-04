@@ -9,6 +9,7 @@ var RouteHandler = Router.RouteHandler;
 var Link = Router.Link;
 var Q = require('q');
 var _ = require('lodash');
+var Ltt = window.Ltt;
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var Mt = window.Mousetrap;
 var RB = require('react-bootstrap');
@@ -22,7 +23,7 @@ var mui = require('material-ui');
 var ThemeManager = require('material-ui/lib/styles/theme-manager');
 var DefaultRawTheme = require('material-ui/lib/styles/raw-themes/light-raw-theme');
 var IScroll = require('../../libs/iscroll');
-
+var config = require('../../conf/config');
 
 /** mixins */
 var initParams = require('../mixins/initParams');
@@ -46,6 +47,8 @@ var Notify = require('../Notify');
 var SlidePanel = require('../SlidePanel');
 var EasyPie = require('../charts/EasyPie');
 var FullDateRangePicker = require('../FullDateRangePicker');
+var Scroller = require('../Scroller');
+
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
 var Bar = require('../charts/Bar');
@@ -117,7 +120,7 @@ module.exports = React.createClass({
         }
         return (
             <div className="ltt_c-projectTask">
-                <main>
+                <main onClick={this.onMainClick}>
                     <div className="ltt_c-projectDetail">
                         <ProjectInfo ref="projectInfo"
                             project={project}
@@ -126,57 +129,58 @@ module.exports = React.createClass({
                             onFilterTags={this.filterTaskWithTags}/>
                     </div>
                     <div className="ltt_c-projectTask-toolbar">
-                        <div className="btn-group">
                         <FullDateRangePicker
                             bsSize="xsmall"
                             period="week"
                             granularity="week"
                             compare={false}
                             showCompare={false}
+                            onDateRangeInit={this.onDateRangeInit}
                             onDateRangeChange={this.onDateRangeChange}
                             className="ltt_c-projectTask-dateRange"/>
-                        </div>
-                        <div className="btn-group">
-                            {[
-                                {label: 'All', status: 'all'},
-                                {label: 'Doing', status: 'doing'},
-                                {label: 'Done', status: 'done'}
-                            ].map(function (btn) {
-                                var className = "btn btn-xs btn-default";
-                                if (btn.status === taskStatus) {
-                                    className += ' active';
-                                }
-                                return <button className={className}
-                                    onClick={that.onTaskStatusChange.bind(that, btn.status)}>{btn.label}</button>;
-                            })}
-                        </div>
-                        <div className="btn-group">
-                            <button className={"btn btn-xs btn-default " + (this.state.markedFilter ? 'active' : '')}
-                                onClick={that.onTaskMarkedFilter}><i className="fa fa-flag"></i></button>
-                        </div>
-                        <ButtonToolbar style={{float: 'right'}}>
-                            <ButtonGroup>
-                                <Button bsSize='xsmall' onClick={this.openStastics}>statistic</Button>
-                                <Button bsSize='xsmall' onClick={this.openTreeMap}>TreeMap</Button>
-                            </ButtonGroup>
-                        </ButtonToolbar>
                     </div>
                     <SlidePanel key={this.props.projectId  + 's1'}
                         ref="treeMapSlider" open={false} openRight={true} onTransitionEnd={this.renderTreeMap}
-                        position="fixed" zIndex={888}>
+                        position="fixed" zIndex={10000}>
                         <h3>Time TreeMap of {(project ? project.name : '') + (version ? '-' + version.name : '')}</h3>
                         <div className="closeBtn" onClick={this.closeTreeMap}><i className="fa fa-close"/></div>
                         <div ref="treeMapContainer"></div>
                     </SlidePanel>
                     <SlidePanel key={this.props.projectId + 's2'}
                         ref="statistics" open={false} openRight={true} onTransitionEnd={this.renderStatistics}
-                        position="fixed" zIndex={888}>
+                        position="fixed" zIndex={10000}>
                         <h3>Statistis of {project ? project.name : null}</h3>
                         <div className="closeBtn" onClick={this.closeStastics}><i className="fa fa-close"/></div>
                         <div ref="statisticsContainer"></div>
                     </SlidePanel>
                     <div className="ltt_c-projectTask-moreInfo">
                         <span>Count: {this.state.tasks.length}</span>
+                        <div className="btn-container">
+                            <div className="btn-group">
+                                {[
+                                    {label: 'All', status: 'all'},
+                                    {label: 'Doing', status: 'doing'},
+                                    {label: 'Done', status: 'done'}
+                                ].map(function (btn) {
+                                    var className = "btn btn-xs btn-default";
+                                    if (btn.status === taskStatus) {
+                                        className += ' active';
+                                    }
+                                    return <button className={className}
+                                        onClick={that.onTaskStatusChange.bind(that, btn.status)}>{btn.label}</button>;
+                                })}
+                            </div>
+                            <div className="btn-group">
+                                <button className={"btn btn-xs btn-default " + (this.state.markedFilter ? 'active' : '')}
+                                    onClick={that.onTaskMarkedFilter}><i className="fa fa-flag"></i></button>
+                            </div>
+                            <ButtonToolbar style={{float: 'right'}}>
+                                <ButtonGroup>
+                                    <Button bsSize='xsmall' onClick={this.openStastics}>statistic</Button>
+                                    <Button bsSize='xsmall' onClick={this.openTreeMap}>TreeMap</Button>
+                                </ButtonGroup>
+                            </ButtonToolbar>
+                        </div>
                     </div>
                     <div className="ltt_c-projectTask-wrapper" ref="iscrollWrapper">
                         <div className="ltt_c-projectTask-wrapper-scroller">
@@ -205,6 +209,14 @@ module.exports = React.createClass({
                 {this.renderTaskDetail()}
             </div>
         );
+    },
+
+    onMainClick: function () {
+        if (this.state.openTaskDetail) {
+            this.setState({
+                openTaskDetail: false
+            });
+        }
     },
 
 
@@ -258,22 +270,7 @@ module.exports = React.createClass({
 
     componentDidUpdate: function () {
         this.myScroll.refresh();
-        if (this.state.openTaskDetail) {
-            if (!this.taskDetailScroller && this.refs.taskDetailWrapper) {
-                this.taskDetailScroller = new IScroll(this.refs.taskDetailWrapper.getDOMNode(), {
-                    mouseWheel: true,
-                    scrollbars: true,
-                    interactiveScrollbars: true,
-                    shrinkScrollbars: 'scale',
-                    fadeScrollbars: true
-                });
-            }
-            if (this.taskDetailScroller) {
-                this.taskDetailScroller.refresh();
-            }
-        } else {
-            this.taskDetailScroller = null;
-        }
+        this.refs.taskDetailScroller.refresh();
      },
 
     onDeleteTask: function (e) {
@@ -447,37 +444,41 @@ module.exports = React.createClass({
     },
 
     renderTaskDetail: function () {
-        if (this.state.openTaskDetail) {
-            if (!this.currentTask) {
-                var taskId = this.state.taskId;
-                var cTask;
-                this.state.tasks.some(function (task) {
-                    if (task._id === taskId) {
-                        cTask = task;
-                        return true;
-                    }
-                    return false;
-                });
-                this.currentTask = cTask;
-            }
-            if (!this.currentTask) { return; }
-            return <aside className="ltt_c-taskDetail-wrapper" ref="taskDetailWrapper">
-                <div className="ltt_c-taskDetail-wrapper-scroller">
-                    <TaskDetail  {... _.pick(this.state, ['projectId', 'versionId'])}
+        if (!this.currentTask) {
+            var taskId = this.state.taskId;
+            var cTask;
+            this.state.tasks.some(function (task) {
+                if (task._id === taskId) {
+                    cTask = task;
+                    return true;
+                }
+                return false;
+            });
+            this.currentTask = cTask;
+        }
+        return <SlidePanel ref="taskDetailSlider" key={this.props.projectId + 'task-detail'} open={(!!this.currentTask) && this.state.openTaskDetail} openRight={true}
+                    position="fixed" zIndex={10000} className="taskDetailSlider" width={300}>
+            <div className="ltt_c-taskDetail-wrapper" ref="taskDetailWrapper">
+                <Scroller ref="taskDetailScroller" className="ltt_c-taskDetail-wrapper-scroller">
+                    {!!this.currentTask ? <TaskDetail  {... _.pick(this.state, ['projectId', 'versionId'])}
                         key={this.currentTask._id}
-                        onHidden={this.onLogListHidden}
+                        onHidden={this.closeTaskDetail}
                         onLogsLoaded={this.onTaskLogsLoaded}
                         onChange={this.onTaskChange}
-                        task={this.currentTask}/>
-                </div>
-            </aside>
-        }
+                        task={this.currentTask}/> : null }
+                </Scroller>
+            </div>
+        </SlidePanel>
+    },
+
+    closeTaskDetail: function () {
+        this.setState({
+            openTaskDetail: false
+        });
     },
 
     onTaskLogsLoaded: function () {
-        if (this.taskDetailScroller) {
-            this.taskDetailScroller.refresh();
-        }
+        this.refs.taskDetailScroller.refresh();
     },
 
     onTaskChange: function (task) {
@@ -513,6 +514,11 @@ module.exports = React.createClass({
                 }
             });
         });
+    },
+
+    onDateRangeInit: function(start, end) {
+        this._start = start;
+        this._end = end;
     },
 
     onDateRangeChange: function (start, end) {
@@ -793,16 +799,21 @@ var ProjectInfo = React.createClass({
                 }, this);
             }
             if (!_.isEmpty(logClasses)) {
+                classesConfig = config.classes;
                 logClasses = logClasses.map(function(cls) {
-                    return (<LogClass data={cls}/>);
+                    return (<LogClass data={_.find(classesConfig, {'_id': cls})}/>);
                 });
             }
             var mProjectCreateTime = new Moment(project.createdTime);
             var mProjectLastActiveTime = new Moment(project.lastActiveTime);
+            var linkEl, link;
+            if (project.attributes && (link = project.attributes.link)) {
+                linkEl = <span className="external-link ltt-link" onClick={this.openExternalLink.bind(this, link)} title={link}><i className="fa fa-external-link"></i></span>
+            }
             projectBasicInfo = (
                 <section className="ltt_c-projectDetail-projectInfo">
                     <h1>
-                        {project.name}
+                        {project.name}{linkEl}
                         <span className="ltt_c-projectDetail-logClasses">{logClasses}</span>
                         <span className="ltt_c-projectDetail-times">
                             <span className="ltt-M2">
@@ -867,6 +878,10 @@ var ProjectInfo = React.createClass({
                     allTotalTime: total
                 });
             });
+    },
+
+    openExternalLink: function (link) {
+        Ltt.openExternalLink(link);
     }
 });
 

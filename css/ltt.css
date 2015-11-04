@@ -23,7 +23,7 @@
     color: #EAEAEA;
     display:flex;
     justify-content: space-between;
-    z-index: 999;
+    z-index: 12000;
 }
 .ltt-footer-left{
     display:flex;
@@ -45,9 +45,15 @@
     border: 1px solid #434141;
     color: #ccc;
 }
+
 .ltt-footer .ltt_c-appInfo{
     display:flex;
     margin:  0 10px;
+}
+.ltt_c-appInfo-stat,
+.ltt_c-AppProcessInfo{
+    -webkit-animation-duration: 0.2s;
+    animation-duration: 0.2s;
 }
 
 .ltt_c-appInfo-unsyncDate{

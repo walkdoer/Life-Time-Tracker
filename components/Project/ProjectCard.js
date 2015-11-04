@@ -21,14 +21,23 @@ var DataAPI = require('../../utils/DataAPI');
 
 var ProjectCard = React.createClass({
 
+    getDefaultProps: function () {
+        return {
+            autoload: false
+        };
+    },
+
     getInitialState: function () {
         return {
-            activityData: []
+            activityData: [],
+            loaded: false
         };
     },
 
     componentDidMount: function () {
-        this.loadActivity(this.props);
+        if (this.props.autoload) {
+            this._loadActivity(this.props);
+        }
     },
 
     render: function () {
@@ -82,7 +91,7 @@ var ProjectCard = React.createClass({
 
         /* <p className="ltt_c-projectCard-logClasses">{logClasses}</p> */
         return (
-            <div className="ltt_c-projectCard" data-id={projectData._id}>
+            <div className={"ltt_c-projectCard " + (this.props.className || '')} data-id={projectData._id}>
                 <h1>
                     <Link to={'/projects/' + projectData._id}>{projectData.name}</Link>
                     <span className="ltt_c-projectCard-delete" onClick={this.props.onDelete}><i className="fa fa-close" title="delete project"></i></span>
@@ -126,11 +135,19 @@ var ProjectCard = React.createClass({
         return (<p className="ltt_c-projectCard-logClassIndicators">{indicators}</p>);
     },
 
-    componentWillReceiveProps: function (nextProps) {
-        this.loadActivity(nextProps);
+    loadActivity: function () {
+        if (!this.state.loaded) {
+            this._loadActivity(this.props);
+        }
     },
 
-    loadActivity: function (params) {
+    componentWillReceiveProps: function (nextProps) {
+        if (this.props.autoload) {
+            this._loadActivity(nextProps);
+        }
+    },
+
+    _loadActivity: function (params) {
         var that = this;
         DataAPI.Log.load({
             sum: true,
@@ -157,7 +174,8 @@ var ProjectCard = React.createClass({
                 result.push(0);
             }
             that.setState({
-                activityData: result
+                activityData: result,
+                loaded: true
             });
         });
     }

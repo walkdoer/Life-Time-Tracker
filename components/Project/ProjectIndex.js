@@ -12,10 +12,13 @@ var ButtonToolbar = RB.ButtonToolbar;
 var DropdownButton = RB.DropdownButton;
 var MenuItem = RB.MenuItem;
 var _ = require('lodash');
+var Scroller = require('../Scroller');
+var SlidePanel = require('../SlidePanel');
 
 /** Components */
 var Task = require('../Task/Task.js');
 var TaskList = require('../Task/TaskList');
+var TaskDetail = require('../Task/TaskDetail');
 
 /** utils */
 var DataAPI = require('../../utils/DataAPI');
@@ -32,7 +35,8 @@ var ProjectIndex = React.createClass({
             overDueTasks: [],
             notActiveDoingTasks: [],
             showDone: false,
-            notActiveDay: 7
+            notActiveDay: 7,
+            openTaskDetail: false
         };
     },
 
@@ -44,7 +48,7 @@ var ProjectIndex = React.createClass({
         var notActiveDoingTasks = this.state.notActiveDoingTasks;
         var that = this;
         return (
-            <div className="ltt_c-page-projectsNew-index">
+            <div className="ltt_c-page-projectsNew-index" onClick={this.onMainClick}>
                 <div className="due-list">
                     {!_.isEmpty(overDueTasks) ?
                     <div>
@@ -56,6 +60,7 @@ var ProjectIndex = React.createClass({
                                 return <Task data={task}
                                     dueTime={true}
                                     totalTime={true}
+                                    onClick={that.openTask}
                                     onTitleClick={that.gotoTaskInProject.bind(that, task)}
                                     key={'overDue:' + task._id}/>
                             })}
@@ -80,6 +85,7 @@ var ProjectIndex = React.createClass({
                                 return <Task data={task}
                                     dueTime={true}
                                     totalTime={true}
+                                    onClick={that.openTask}
                                     onTitleClick={that.gotoTaskInProject.bind(that, task)}
                                     key={'due:' + task._id}/>
                             })}
@@ -109,6 +115,7 @@ var ProjectIndex = React.createClass({
                                 return <Task data={task}
                                     dueTime={true}
                                     totalTime={true}
+                                    onClick={that.openTask}
                                     onTitleClick={that.gotoTaskInProject.bind(that, task)}
                                     key={'notActive:' + task._id}/>
                             })}
@@ -129,12 +136,14 @@ var ProjectIndex = React.createClass({
                             return <Task data={task}
                                 displayChildren={false}
                                 totalTime={true}
+                                onClick={that.openTask}
                                 onTitleClick={that.gotoTaskInProject.bind(that, task)}
                                 key={'marked:' + task._id}/>
                         })}
                     </TaskList>
                 </div>
                 : null}
+                {this.renderTaskDetail()}
             </div>
         );
     },
@@ -225,6 +234,49 @@ var ProjectIndex = React.createClass({
                 notActiveDoingTasks: tasks
             });
         });
+    },
+
+    openTask: function (task) {
+        this.setState({
+            openTaskDetail: true,
+            currentTask: task
+        });
+    },
+
+    renderTaskDetail: function () {
+        var currentTask = this.state.currentTask;
+        return <SlidePanel ref="taskDetailSlider" open={this.state.openTaskDetail} openRight={true}
+                    position="fixed" zIndex={10000} className="taskDetailSlider" width={300}>
+            <div className="ltt_c-taskDetail-wrapper">
+                <Scroller ref="taskDetailScroller" className="ltt_c-taskDetail-wrapper-scroller">
+                    {!!currentTask ? <TaskDetail {... _.pick(this.state, ['projectId', 'versionId'])}
+                        key={currentTask._id}
+                        onHidden={this.closeTaskDetail}
+                        onLogsLoaded={this.onTaskLogsLoaded}
+                        task={currentTask}/> : null }
+                </Scroller>
+            </div>
+        </SlidePanel>
+    },
+
+    onTaskLogsLoaded: function () {
+        this.refs.taskDetailScroller.refresh();
+    },
+
+    closeTaskDetail: function () {
+        this.setState({
+            openTaskDetail: false,
+            currentTask: null
+        });
+    },
+
+    onMainClick: function () {
+        if (this.state.openTaskDetail) {
+            this.setState({
+                openTaskDetail: false,
+                currentTask: null
+            });
+        }
     }
 });
 

@@ -94,6 +94,11 @@ var Dashboard = React.createClass({
                                 <MonthCountDown height={250} padding={0}
                                     itemPadding={2} lifeYear={70} birthday={Settings.get('birthday')}/>
                             </div>
+                            <div className="Grid-cell u-2of3">
+                                <SleepPeriod title="Last 30 Day's Sleep Period"
+                                    start={new Moment().subtract(31, 'days').toDate()}
+                                    end={new Moment().subtract(1, 'days').toDate()}/>
+                            </div>
                         </div>
                     </div>
                     <ActivityLogs className="Grid-cell u-1of3"/>

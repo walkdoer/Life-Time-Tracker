@@ -5,11 +5,20 @@ var IScroll = require('../libs/iscroll');
 var Scroller = React.createClass({
 
     render: function () {
-        return <div className={"ltt_c-IScroll " + (this.props.className || '')}>
+        var styleObj = this._getStyleObj();
+        return <div className={"ltt_c-IScroll " + (this.props.className || '')} style={styleObj}>
             <div className="ltt_c-IScroll-scroller">
                 {this.props.children}
             </div>
         </div>
+    },
+
+    _getStyleObj: function () {
+        var styleObj = {};
+        if (this.props.height) {
+            styleObj.height = this.props.height;
+        }
+        return styleObj;
     },
 
 
@@ -33,6 +42,14 @@ var Scroller = React.createClass({
             shrinkScrollbars: 'scale',
             fadeScrollbars: true
         });
+
+        if (this.props.onSrcollEnd) {
+            this.__scroller.on('scrollEnd', this.props.onSrcollEnd);
+        }
+    },
+
+    scrollToElement: function () {
+        this.__scroller.scrollToElement.apply(this.__scroller, Array.prototype.slice.call(arguments, 0));
     }
 });
 

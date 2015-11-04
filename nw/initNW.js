@@ -176,9 +176,29 @@
         var menus = [{
             label: 'Data',
             items: [{
-                label: 'Import Data',
-                click: function() {}
-            }, {
+                label: 'Import',
+                items: [{
+                    label: 'this week',
+                    click: function () {
+                        window.__LttBus__.emit(window.EVENT.IMPORT_LOG_BY_DATE, 'week');
+                    }
+                }, {
+                    label: 'this month',
+                    click: function () {
+                        window.__LttBus__.emit(window.EVENT.IMPORT_LOG_BY_DATE, 'month');
+                    }
+                }, {
+                    label: 'this year',
+                    click: function () {
+                        window.__LttBus__.emit(window.EVENT.IMPORT_LOG_BY_DATE, 'year');
+                    }
+                }, {
+                    label: 'custom',
+                    click: function () {
+                        window.__LttBus__.emit(window.EVENT.IMPORT_LOG_BY_DATE, 'custom');
+                    }
+                }]
+            }/*{
                 label: 'Sync From Evernote',
                 click: function () {
                     sdk.syncEvernote()
@@ -186,7 +206,7 @@
                             alert(result);
                         });
                 }
-            }]
+            }*/]
         }, {
             label: 'Server',
             items: [{
@@ -216,34 +236,22 @@
                     getMenu(menubar, ['Server', 'Start Server']).enabled = true;
                 }
             }]
-        }, {
-            label: 'File',
-            items: [{
-                label: 'Import Data',
-                click: function() {
-
-                }
-            }, {
-                label: 'Create Note',
-                click: function() {
-
-                }
-            }]
         }];
-        menus.forEach(function (menu) {
-            var label = menu.label;
-            var submenu = new gui.Menu();
-            var items = menu.items;
-            if (!_.isEmpty(items)) {
-                items.forEach(function (item) {
-                    submenu.append(new gui.MenuItem(item));
-                });
-            }
-            menubar.append(new gui.MenuItem({
-                label: label,
-                submenu: submenu
-            }));
-        });
+
+        function appendMenu(menu, items) {
+            items.forEach(function (item) {
+                var submenu;
+                var menuOption = extend({}, item);
+                if (item.items) {
+                    submenu = new gui.Menu();
+                    appendMenu(submenu, item.items);
+                    menuOption.submenu = submenu;
+                }
+                var menuItem = new gui.MenuItem(menuOption);
+                menu.append(menuItem);
+            });
+        }
+        appendMenu(menubar,  menus);
 
         function getMenu(parentMenu, path) {
             var menuItems = parentMenu.items;

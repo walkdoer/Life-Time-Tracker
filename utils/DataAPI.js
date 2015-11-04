@@ -85,6 +85,10 @@ module.exports = {
         return post(url('/importLogContent'), {date: date, logContent: logContent});
     },
 
+    importByDate: function (date) {
+        return get(url('/importByDate'), {date: date});
+    },
+
     /**
      * get calendar data
      * @param  {String} calType calendar type

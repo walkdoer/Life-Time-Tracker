@@ -94,3 +94,7 @@
     overflow-x: hidden;
     overflow-y: scroll;
 }
+
+.ltt_c-page-dashboard .ltt_c-sleepPeriod{
+    height: 330px;
+}

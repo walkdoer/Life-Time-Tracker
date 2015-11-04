@@ -10,7 +10,7 @@ var Q = require('q');
 var _ = require('lodash');
 var cx = React.addons.classSet;
 var Router = require('react-router');
-
+var Bus = require('../../utils/Bus');
 
 /**components*/
 var Progress = require('../Progress');
@@ -22,6 +22,7 @@ var Util = require('../../utils/Util.js');
 
 /** Constant */
 var EMPTY_FUN = function () {};
+var EventConstant = require('../../constants/EventConstant');
 
 var Task = React.createClass({
 
@@ -111,7 +112,7 @@ var Task = React.createClass({
         }
         var link;
         if (task.attributes && (link = task.attributes.link)) {
-            link = <span onClick={this.openTaskExternalLink.bind(this, link)} title={link}><i className="fa fa-external-link"></i></span>
+            link = <span className="title-btn" onClick={this.openTaskExternalLink.bind(this, link)} title={link} ><i className="fa fa-external-link"></i></span>
         }
 
         var dueTime;
@@ -127,6 +128,7 @@ var Task = React.createClass({
                     <span className="ltt_c-task-title-text" onClick={this.props.onTitleClick}>{task.name}</span>
                     {todayTime ? <span className="ltt_c-task-todayTime">{Util.displayTime(todayTime.totalTime)}</span> : null}
                     {link}
+                    <span className="title-btn" onClick={this.insertLog}><i className="fa fa-pencil-square-o"/></span>
                     <span className={"ltt_c-task-mark " + (this.state.marked ? 'marked': '')} onClick={this.toggleMark}>
                         <i className={this.state.marked ? 'fa fa-flag' : 'fa fa-flag-o'}></i>
                     </span>
@@ -276,7 +278,24 @@ var Task = React.createClass({
     openTaskExternalLink: function (link) {
         console.log('openExternalLink', link);
         Ltt.openExternalLink(link);
-    }
+    },
+
+    insertLog: function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var that = this;
+        var task = this.props.data;
+        DataAPI.Log.load({
+            taskId: task._id,
+            sort: 'start:-1',
+            limit: 1
+        }).then(function (log) {
+            if (!_.isEmpty(log)) {
+                Bus.emit(EventConstant.INSERT_LOG_FROM_TASK, log[0]);
+                that.transitionTo('logEditor', {date: new Moment().format('YYYY-MM-DD')});
+            }
+        });
+    },
 });
 
 module.exports = Task;

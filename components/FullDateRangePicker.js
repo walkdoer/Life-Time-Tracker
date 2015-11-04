@@ -31,9 +31,15 @@ module.exports = React.createClass({
         if (!isPeriodEqualDateRange(period, _.pick(this.props, 'start', 'end'))) {
             period = null;
         }
+        if (period) {
+            dateRange = this._getDateRangeFromPeriod(period);
+        }
         if (this.props.start && this.props.end) {
             dateRange = _.pick(this.props, 'start', 'end');
         }
+
+        this.props.onDateRangeInit(dateRange.start, dateRange.end);
+
         return extend({
             period: period,
             granularity: this.props.granularity
@@ -44,7 +50,8 @@ module.exports = React.createClass({
         return {
             showCompare: true,
             period: 'today',
-            granularity: 'week'
+            granularity: 'week',
+            onDateRangeInit: function () {}
         };
     },
 
@@ -123,9 +130,15 @@ module.exports = React.createClass({
     },
 
     onPeriodChange: function (period) {
-        this.setState({
-            period: period
+        var dateRange = this._getDateRangeFromPeriod(period);
+        this.setState(extend({
+            period: period,
+        }, dateRange), function () {
+            this.props.onDateRangeChange(this.state.start, this.state.end);
         });
+    },
+
+    _getDateRangeFromPeriod: function (period) {
         var mStart, mEnd, mNow = new Moment();
         switch (period) {
             case 'today':
@@ -150,9 +163,12 @@ module.exports = React.createClass({
                 mEnd = Moment(mNow).endOf('year');
                 break;
         }
-        if (mStart && mEnd) {
-            this.props.onDateRangeChange(mStart.toDate(), mEnd.toDate());
-        }
+        var start = mStart.toDate();
+        var end = mEnd.toDate();
+        return {
+            start: start,
+            end: end
+        };
     },
 
     onGranularityChange: function (granularity) {

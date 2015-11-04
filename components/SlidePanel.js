@@ -54,6 +54,12 @@ module.exports = React.createClass({
   componentDidMount: function() {
     this._enableSwipeHandling();
   },
+
+  componentWillReceiveProps: function (nextProps) {
+    this.setState({
+      open: nextProps.open
+    });
+  },
   
   componentDidUpdate: function(prevProps, prevState) {
     this._enableSwipeHandling();
@@ -96,7 +102,9 @@ module.exports = React.createClass({
 
   open: function(options) {
     if (options) {
-      this._width = options.width;
+      if (options.width) {
+        this._width = options.width;
+      }
     }
     this.setState({ open: true }, function () {
       this.afterOpen();
