@@ -29,8 +29,14 @@
     cursor: default;
 }
 
+.ltt_c-task-title .title-btn{
+  cursor: pointer;
+  margin-right: 5px;
+}
+
 .ltt_c-task-title-text{
   cursor:pointer;
+  margin-right: 5px;
 }
 
 .ltt_c-task-todayTime{
@@ -145,8 +151,4 @@
 .example-leave.example-leave-active {
   opacity: 0.01;
   height: 0px;
-}
-
-.ltt_c-task .fa-external-link{
-  margin-left: 5px;
 }
