@@ -40,32 +40,33 @@ module.exports = React.createClass({
         return {
             initialTab: 'task',
             start: new Moment().startOf('day'),
-            end: new Moment().endOf('day')
+            end: new Moment().endOf('day'),
+            tabs: ['tags', 'classes', 'project', 'version', 'task']
         };
     },
 
     render: function () {
+        var map = {
+            tags: {label: 'Tags', id: 'tags'},
+            classes: {label: 'Classes', id: 'classes'},
+            project: {label: 'Project', id: 'project'},
+            version: {label: 'Version', id: 'version'},
+            task: {label: 'task', id: 'task'}
+        };
         return (
             <div className={"ltt_c-TimeConsumeRanking " + (this.props.className || "")}>
                 <TabbedArea defaultActiveKey={this.props.initialTab}
                     activeKey={this.state.currentTab}
                     animation={false}
                     onSelect={this.handleTabSelect}>
-                    <TabPane eventKey="tags" tab="Tags">
-                        {this.renderPane('tags')}
-                    </TabPane>
-                    <TabPane eventKey="classes" tab="Classes">
-                        {this.renderPane('classes')}
-                    </TabPane>
-                    <TabPane eventKey="project" tab="Project">
-                        {this.renderPane('project')}
-                    </TabPane>
-                    <TabPane eventKey="version" tab="Version">
-                        {this.renderPane('version')}
-                    </TabPane>
-                    <TabPane eventKey="task" tab="Task">
-                        {this.renderPane('task')}
-                    </TabPane>
+                    {this.props.tabs.map(function (type) {
+                        var tab = map[type];
+                        return (
+                            <TabPane eventKey={type} tab={tab.label}>
+                                {this.renderPane(tab.id)}
+                            </TabPane>
+                        );
+                    }, this)}
                 <LoadingMask loaded={this.state.loaded}/>
                 </TabbedArea>
             </div>
@@ -92,7 +93,7 @@ module.exports = React.createClass({
 
 
     componentWillReceiveProps: function (nextProps) {
-        this.loadRankingData(this.state.currentTab, nextProps);
+        this.loadRankingData(this.state.currentTab, nextProps.params);
     },
 
     handleTabSelect: function (key) {
@@ -108,20 +109,14 @@ module.exports = React.createClass({
 
     loadRankingData: function (rankType, params) {
         var that = this;
-        var start = this.props.start;
-        var end = this.props.end;
-        if (params) {
-            start = params.start;
-            end = params.end;
-        }
-        start = Moment(start);
-        end = Moment(end);
-        DataAPI.Log.load({
-            start: start.toDate(),
-            end: end.toDate(),
+        var requestParmas = extend({
             sum: true,
             group: rankType
-        }).then(function (list) {
+        }, this.props.params);
+        if (params) {
+            requestParmas = extend({}, requestParmas, params);
+        }
+        DataAPI.Log.load(requestParmas).then(function (list) {
             return list.filter(function (item) {
                 return item._id !== null;
             }).sort(function (a, b){

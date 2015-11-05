@@ -58,8 +58,10 @@ module.exports = React.createClass({
                 <div className="Grid Grid--gutters Grid--stretch">
                     <div className="Grid-cell u-1of2">
                         <TimeConsumeRanking className="chart"
-                            start={Moment(date).startOf('day')}
-                            end={Moment(date).endOf('day')} />
+                            params={{
+                                start: Moment(date).startOf('day').toDate(),
+                                end: Moment(date).endOf('day').toDate()
+                            }}/>
                     </div>
                     <div className="Grid-cell u-1of2">
                         <div className="chart"></div>

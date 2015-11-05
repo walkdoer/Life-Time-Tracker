@@ -48,6 +48,7 @@ var SlidePanel = require('../SlidePanel');
 var EasyPie = require('../charts/EasyPie');
 var FullDateRangePicker = require('../FullDateRangePicker');
 var Scroller = require('../Scroller');
+var TimeConsumeRanking = require('../TimeConsumeRanking');
 
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
@@ -994,6 +995,12 @@ var Statistics = React.createClass({
                 :
                 null
             }
+            <h2>Top 10 List</h2>
+            <TimeConsumeRanking tabs={['tags', 'classes', 'task']}
+                    params={{
+                        projects: this.props.project.name,
+                        limit: 10
+                    }}/>
         </div>
     },
 
