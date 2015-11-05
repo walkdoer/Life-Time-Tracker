@@ -40,6 +40,7 @@ var Projects = React.createClass({
             loading: true,
             startDate: startDate,
             endDate: endDate,
+            loadNum: 0,
             projects: []
         };
     },
@@ -61,6 +62,8 @@ var Projects = React.createClass({
         var projectCardsStyle = {
             display: isIndex ? 'block' : 'none'
         };
+
+        var loadNum = this.state.loadNum;
 
         return (
             <section className="ltt_c-page ltt_c-page-projects">
@@ -84,7 +87,7 @@ var Projects = React.createClass({
                                         className="projectcard"
                                         startDate={that.state.startDate}
                                         endDate={that.state.endDate}
-                                        data={project} key={project._id}
+                                        data={project} key={loadNum + project._id}
                                         ref={project._id}
                                         onDelete={function (project, e) {
                                             if (window.confirm("Are you sure to delete")) {
@@ -197,6 +200,7 @@ var Projects = React.createClass({
             that.allProjects = projects;
             that.setState({
                 loading: false,
+                loadNum: that.state.loadNum + 1,
                 projects: projects
             }, function () {
                 this.initGrid();
