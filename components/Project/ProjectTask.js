@@ -150,9 +150,8 @@ module.exports = React.createClass({
                     <SlidePanel key={this.props.projectId + 's2'}
                         ref="statistics" open={false} openRight={true} onTransitionEnd={this.renderStatistics}
                         position="fixed" zIndex={10000}>
-                        <h3>Statistis of {project ? project.name : null}</h3>
                         <div className="closeBtn" onClick={this.closeStastics}><i className="fa fa-close"/></div>
-                        <div ref="statisticsContainer"></div>
+                        <div className="content" ref="statisticsContainer"></div>
                     </SlidePanel>
                     <div className="ltt_c-projectTask-moreInfo">
                         <span>Count: {this.state.tasks.length}</span>
@@ -991,9 +990,10 @@ var Statistics = React.createClass({
         return <div className="ltt_c-projectTask-statistics">
             {
                 !_.isEmpty(versionData) ?
+                [
+                <h2>Version Bar</h2>,
                 <Bar data={this.convertData(versionData)} exporting={false}  legend={false}/>
-                :
-                null
+                ] : null
             }
             <h2>Top 10 List</h2>
             <TimeConsumeRanking tabs={['tags', 'classes', 'task']}

@@ -34,7 +34,7 @@ var Projects = React.createClass({
     mixins: [Router.State],
 
     getInitialState: function () {
-        var startDate = new Moment().startOf('month').toDate(),
+        var startDate = new Moment().subtract(1, 'month').startOf('day').toDate();
             endDate = new Moment().endOf('day').toDate();
         return {
             loading: true,
