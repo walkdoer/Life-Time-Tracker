@@ -998,12 +998,14 @@ var Statistics = React.createClass({
     getInitialState: function () {
         return {
             versionDataLoaded: false,
+            trendGroupOption: 'day',
             versionData: null
         };
     },
 
     render: function () {
         var versionData = this.state.versionData;
+        var trendGroupOption = this.state.trendGroupOption;
         return <div className="ltt_c-projectTask-statistics">
             {
                 !_.isEmpty(versionData) ?
@@ -1018,7 +1020,14 @@ var Statistics = React.createClass({
                         projects: this.props.project.name,
                         limit: 10
                     }}/>
-            <h2>Task Trend</h2>
+            <h2>
+                Task Trend
+                <ButtonGroup>
+                    {['year', 'month', 'week', 'day'].map(function (type) {
+                        return <Button bsSize='xsmall' active={trendGroupOption === type} onClick={this._onTaskTrendGroupOptionChange.bind(this, type)}>{type}</Button>
+                    }, this)}
+                </ButtonGroup>
+            </h2>
             <Column legend={false} convert={false} data={[{data: this.state.taskTrendData}]}/>
         </div>
     },
@@ -1028,6 +1037,7 @@ var Statistics = React.createClass({
         this.loadVersionData();
         this.loadTaskTrendData();
     },
+
 
     loadVersionData: function () {
         var that = this;
@@ -1067,7 +1077,9 @@ var Statistics = React.createClass({
     loadTaskTrendData: function () {
         var that = this;
         return DataAPI.Task.trend({
-            projectId: this.props.project._id
+            projectId: this.props.project._id,
+            group: this.state.trendGroupOption,
+            list: false
         }).then(function (data) {
             that.setState({
                 taskTrendData: data.map(function (d) {
@@ -1075,5 +1087,13 @@ var Statistics = React.createClass({
                 })
             });
         })
-    }
+    },
+
+    _onTaskTrendGroupOptionChange: function (type) {
+        this.setState({
+            trendGroupOption: type
+        }, function () {
+            this.loadTaskTrendData();
+        });
+    },
 });
