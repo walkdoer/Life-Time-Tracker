@@ -106,8 +106,10 @@ var WeeklyReport = React.createClass({
                 <div className="Grid Grid--gutters Grid--stretch">
                     <div className="Grid-cell u-1of2">
                         <TimeConsumeRanking className="chart"
-                            start={Moment().week(week).startOf('week').toDate()}
-                            end={Moment().week(week).endOf('week').toDate()} />
+                            params={{
+                                start: Moment().week(week).startOf('week').toDate(),
+                                end: Moment().week(week).endOf('week').toDate()
+                            }}/>
                     </div>
                     <div className="Grid-cell u-1of2">
                         

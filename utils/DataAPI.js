@@ -190,6 +190,10 @@ module.exports = {
         delete: function (params) {
             console.log('delete ajax task' + params._id);
             return deleteObj(url('/tasks/' + params._id));
+        },
+
+        trend: function (params) {
+            return get(url('/taskCountTrend'), params);
         }
     },
 

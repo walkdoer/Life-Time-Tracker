@@ -53,6 +53,8 @@ var TimeConsumeRanking = require('../TimeConsumeRanking');
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
 var Bar = require('../charts/Bar');
+var Column = require('../charts/Column');
+var Line = require('../charts/Line');
 
 /** Utils */
 var Util = require('../../utils/Util');
@@ -1001,12 +1003,15 @@ var Statistics = React.createClass({
                         projects: this.props.project.name,
                         limit: 10
                     }}/>
+            <h2>Task Trend</h2>
+            <Line legend={false} convert={false} data={[{data: this.state.taskTrendData}]}/>
         </div>
     },
 
 
     componentDidMount: function () {
         this.loadVersionData();
+        this.loadTaskTrendData();
     },
 
     loadVersionData: function () {
@@ -1042,5 +1047,18 @@ var Statistics = React.createClass({
                 value: item.totalTime
             };
         });
+    },
+
+    loadTaskTrendData: function () {
+        var that = this;
+        return DataAPI.Task.trend({
+            projectId: this.props.project._id
+        }).then(function (data) {
+            that.setState({
+                taskTrendData: data.map(function (d) {
+                    return [d._id, d.count];
+                })
+            });
+        })
     }
-})
+});
