@@ -237,7 +237,7 @@
 }
 
 .ltt_c-projectTask-statistics{
-  padding: 10px;
+  
 }
 
 .ltt_c-projectTask-statistics .ltt_c-TimeConsumeRanking .nav-tabs{
@@ -360,6 +360,7 @@
 .ltt_c-projectTask .ltt_c-SlidePanel .content{
   height: 100%;
   overflow: scroll;
+  padding: 10px;
 }
 
 .ltt_c-projectTask .ltt_c-SlidePanel.taskDetailSlider .paper{

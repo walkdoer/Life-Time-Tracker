@@ -146,9 +146,11 @@ module.exports = React.createClass({
                         stopPropagationClick={true}
                         ref="treeMapSlider" open={false} openRight={true} onTransitionEnd={this.renderTreeMap}
                         position="fixed" zIndex={10000}>
-                        <h3>Time TreeMap of {(project ? project.name : '') + (version ? '-' + version.name : '')}</h3>
-                        <div className="closeBtn" onClick={this.closeTreeMap}><i className="fa fa-close"/></div>
-                        <div ref="treeMapContainer"></div>
+                        <div className="content">
+                            <h3>Time TreeMap of {(project ? project.name : '') + (version ? '-' + version.name : '')}</h3>
+                            <div className="closeBtn" onClick={this.closeTreeMap}><i className="fa fa-close"/></div>
+                            <div ref="treeMapContainer"></div>
+                        </div>
                     </SlidePanel>
                     <SlidePanel key={this.props.projectId + 's2'}
                     stopPropagationClick={true}
@@ -998,14 +1000,12 @@ var Statistics = React.createClass({
     getInitialState: function () {
         return {
             versionDataLoaded: false,
-            trendGroupOption: 'day',
             versionData: null
         };
     },
 
     render: function () {
         var versionData = this.state.versionData;
-        var trendGroupOption = this.state.trendGroupOption;
         return <div className="ltt_c-projectTask-statistics">
             {
                 !_.isEmpty(versionData) ?
@@ -1020,22 +1020,13 @@ var Statistics = React.createClass({
                         projects: this.props.project.name,
                         limit: 10
                     }}/>
-            <h2>
-                Task Trend
-                <ButtonGroup>
-                    {['year', 'month', 'week', 'day'].map(function (type) {
-                        return <Button bsSize='xsmall' active={trendGroupOption === type} onClick={this._onTaskTrendGroupOptionChange.bind(this, type)}>{type}</Button>
-                    }, this)}
-                </ButtonGroup>
-            </h2>
-            <Column legend={false} convert={false} data={[{data: this.state.taskTrendData}]}/>
+            <TaskTrend project={this.props.project}/>
         </div>
     },
 
 
     componentDidMount: function () {
         this.loadVersionData();
-        this.loadTaskTrendData();
     },
 
 
@@ -1072,6 +1063,43 @@ var Statistics = React.createClass({
                 value: item.totalTime
             };
         });
+    }
+});
+
+
+var TaskTrend = React.createClass({
+
+    getInitialState: function () {
+        return {
+            taskTrendData: null,
+            trendGroupOption: 'day'
+        };
+    },
+
+    componentDidMount: function () {
+        this.loadTaskTrendData();
+    },
+
+    render: function () {
+        var trendGroupOption = this.state.trendGroupOption;
+        return (
+        <div>
+            <h2> Task Trend <ButtonGroup>
+                {['year', 'month', 'week', 'day'].map(function (type) {
+                    return <Button bsSize='xsmall' active={trendGroupOption === type} onClick={this._onTaskTrendGroupOptionChange.bind(this, type)}>{type}</Button>
+                }, this)}</ButtonGroup>
+            </h2>
+            <Column legend={false} convert={false} data={[{data: this.state.taskTrendData}]}/>
+        </div>
+        );
+    },
+
+    _onTaskTrendGroupOptionChange: function (type) {
+        this.setState({
+            trendGroupOption: type
+        }, function () {
+            this.loadTaskTrendData();
+        });
     },
 
     loadTaskTrendData: function () {
@@ -1087,13 +1115,5 @@ var Statistics = React.createClass({
                 })
             });
         })
-    },
-
-    _onTaskTrendGroupOptionChange: function (type) {
-        this.setState({
-            trendGroupOption: type
-        }, function () {
-            this.loadTaskTrendData();
-        });
-    },
-});
+    }
+})
