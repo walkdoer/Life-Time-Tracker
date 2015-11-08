@@ -143,6 +143,7 @@ module.exports = React.createClass({
                             className="ltt_c-projectTask-dateRange"/>
                     </div>
                     <SlidePanel key={this.props.projectId  + 's1'}
+                        stopPropagationClick={true}
                         ref="treeMapSlider" open={false} openRight={true} onTransitionEnd={this.renderTreeMap}
                         position="fixed" zIndex={10000}>
                         <h3>Time TreeMap of {(project ? project.name : '') + (version ? '-' + version.name : '')}</h3>
@@ -150,6 +151,7 @@ module.exports = React.createClass({
                         <div ref="treeMapContainer"></div>
                     </SlidePanel>
                     <SlidePanel key={this.props.projectId + 's2'}
+                    stopPropagationClick={true}
                         ref="statistics" open={false} openRight={true} onTransitionEnd={this.renderStatistics}
                         position="fixed" zIndex={10000}>
                         <div className="closeBtn" onClick={this.closeStastics}><i className="fa fa-close"/></div>
@@ -220,10 +222,10 @@ module.exports = React.createClass({
             });
         }
         if (this.__openStastics) {
-            this.refs.statistics.close();
+            this.closeStastics();
         }
         if (this.__treeMapOpened) {
-            this.refs.treeMapSlider.close();
+            this.closeTreeMap();
         }
     },
 
@@ -465,6 +467,7 @@ module.exports = React.createClass({
             this.currentTask = cTask;
         }
         return <SlidePanel ref="taskDetailSlider" key={this.props.projectId + 'task-detail'} open={(!!this.currentTask) && this.state.openTaskDetail} openRight={true}
+                    stopPropagationClick={true}
                     position="fixed" zIndex={10000} className="taskDetailSlider" width={300}>
             <div className="ltt_c-taskDetail-wrapper" ref="taskDetailWrapper">
                 <Scroller ref="taskDetailScroller" className="ltt_c-taskDetail-wrapper-scroller">
