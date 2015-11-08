@@ -1004,7 +1004,7 @@ var Statistics = React.createClass({
                         limit: 10
                     }}/>
             <h2>Task Trend</h2>
-            <Line legend={false} convert={false} data={[{data: this.state.taskTrendData}]}/>
+            <Column legend={false} convert={false} data={[{data: this.state.taskTrendData}]}/>
         </div>
     },
 

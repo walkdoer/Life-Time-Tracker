@@ -23,6 +23,14 @@ var Line = React.createClass({
         return R.div({className: className});
     },
 
+    componentDidMount: function () {
+        this.setData(this.props.data);
+    },
+
+    componentWillReceiveProps: function (nextProps) {
+        this.setData(nextProps.data);
+    },
+
     setData: function (data) {
         this.props.data = data;
         var visibleCount = this.props.visibleCount;
