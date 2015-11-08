@@ -76,7 +76,7 @@ module.exports = React.createClass({
             projectLoaded: false,
             taskLoaded: false,
             openTaskDetail: false,
-            openStastics: false,
+            openTreeMap: false,
             markedFilter: false,
             taskStatus: 'doing',
             project: null,
@@ -218,6 +218,12 @@ module.exports = React.createClass({
             this.setState({
                 openTaskDetail: false
             });
+        }
+        if (this.__openStastics) {
+            this.refs.statistics.close();
+        }
+        if (this.__treeMapOpened) {
+            this.refs.treeMapSlider.close();
         }
     },
 
@@ -655,7 +661,9 @@ module.exports = React.createClass({
         this._treeMap.plot(root);
     },
 
-    openTreeMap: function () {
+    openTreeMap: function (e) {
+        e.preventDefault();
+        e.stopPropagation();
         this.__treeMapOpened = true;
         this.refs.treeMapSlider.open({
             width: $(this.getDOMNode()).width() - 150
@@ -668,7 +676,10 @@ module.exports = React.createClass({
         this.refs.treeMapSlider.close();
     },
 
-    openStastics: function () {
+    openStastics: function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.__openStastics = true;
         this.refs.statistics.open({
             width: $(this.getDOMNode()).width() - 150
         });
@@ -677,6 +688,7 @@ module.exports = React.createClass({
 
     closeStastics: function () {
         this.refs.statistics.close();
+        this.__openStastics = false;
     },
 
     selectTask: function (task) {
