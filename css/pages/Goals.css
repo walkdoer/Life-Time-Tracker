@@ -165,3 +165,23 @@
     top: 0;
     left: 0;
 }
+
+
+.ltt_c-CreateAddGoalModal-helpTip{
+    width: 380px;
+    max-width: 380px;
+}
+
+.ltt_c-CreateAddGoalModal .filter-help{
+    cursor: pointer;
+}
+
+
+.ltt_c-CreateAddGoalModal-helpTip .popover-content{
+    padding: 0px;
+}
+
+
+.ltt_c-CreateAddGoalModal-helpTip .ltt_c-HelpDocument .markdown-body{
+    margin:10px 0;
+}

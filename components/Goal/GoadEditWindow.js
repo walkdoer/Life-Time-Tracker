@@ -55,8 +55,8 @@ module.exports = React.createClass({
                     <div className="form-group">
                         <label className="control-label">
                             Filter Config
-                            <OverlayTrigger trigger="click" placement="bottom" overlay={this.renderHelp()}>
-                                <i className="fa fa-question-circle" style={{marginLeft: 10}}/>
+                            <OverlayTrigger trigger="hover" placement="right" overlay={this.renderHelp()} bsStyle="info">
+                                <i className="filter-help fa fa-question-circle" style={{marginLeft: 10}}/>
                             </OverlayTrigger>
                         </label>
                         <pre id="ltt_c-CreateAddGoalModal-filterEditor" className="ltt_c-CreateAddGoalModal-filterEditor"/>
@@ -75,9 +75,11 @@ module.exports = React.createClass({
 
     renderHelp: function () {
         return (
-            <Popover title="Filter Help">
-                <Scroller height={200}>
-                <HelpDocument src="./help/goal.filter.md"/>
+            <Popover title="Filter Help" className="ltt_c-CreateAddGoalModal-helpTip">
+                <Scroller height={200} ref="scroller">
+                    <HelpDocument src="./help/goal.filter.md" onLoaded={function () {
+                        this.refs.scroller.refresh();
+                    }.bind(this)}/>
                 </Scroller>
             </Popover>
         );

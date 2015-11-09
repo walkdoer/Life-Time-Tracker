@@ -4,6 +4,7 @@ var Moment = require('moment');
 var _ = require('lodash');
 var marked = require('marked');
 var loadFile = window.loadFile;
+var noop = function () {};
 
 
 module.exports = React.createClass({
@@ -11,7 +12,14 @@ module.exports = React.createClass({
     propTypes: {
         className: React.PropTypes.string,
         title: React.PropTypes.string,
-        src: React.PropTypes.string.isRequired
+        src: React.PropTypes.string.isRequired,
+        onLoaded: React.PropTypes.func
+    },
+
+    getDefaultProps: function () {
+        return {
+            onLoaded: noop
+        };
     },
 
     getInitialState: function () {
@@ -58,17 +66,21 @@ module.exports = React.createClass({
 
     componentWillMount: function () {
         var that = this;
-        loadFile(this.props.src, {
-            onComplete: function (docContent) {
-                that.setState({
-                    docContent: docContent
-                });
-            },
-            onError: function () {
-                that.setState({
-                    error: 'load help document failed!'
-                });
-            }
-        });
+        if (this.props.src) {
+            loadFile(this.props.src, {
+                onComplete: function (docContent) {
+                    that.setState({
+                        docContent: docContent
+                    }, function () {
+                        this.props.onLoaded();
+                    });
+                },
+                onError: function () {
+                    that.setState({
+                        error: 'load help document failed!'
+                    });
+                }
+            });
+        }
     }
 });
