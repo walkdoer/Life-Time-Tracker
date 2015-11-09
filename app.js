@@ -37,6 +37,9 @@ var Tag = require('./components/Tag');
 var NAV_OPEN = 'ltt__navOpen';
 var EVENT = require('./constants/EventConstant');
 window.EVENT = EVENT;
+var GlobalConstants = require('./constants/GlobalConstants');
+/** Store */
+var MemStore = require('./stores/MemStore');
 
 /** Utils */
 var Util =require('./utils/Util');
@@ -485,6 +488,7 @@ var Footer = React.createClass({
         DataAPI.Task.load({name: task.name})
             .then(function (tasks) {
                 var task = tasks[0];
+                MemStore.set(GlobalConstants.STORE_PROJECT_INDEX_TASK_ID, task);
                 that.transitionTo(Util.getTaskUrl(task));
             });
     },

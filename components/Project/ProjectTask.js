@@ -56,6 +56,13 @@ var Bar = require('../charts/Bar');
 var Column = require('../charts/Column');
 var Line = require('../charts/Line');
 
+/** Store */
+var MemStore = require('../../stores/MemStore');
+
+/** Constants */
+var GlobalConstants = require('../../constants/GlobalConstants');
+
+
 /** Utils */
 var Util = require('../../utils/Util');
 var DataAPI = require('../../utils/DataAPI');
@@ -87,9 +94,20 @@ module.exports = React.createClass({
 
     componentWillMount: function () {
         if (this.state.taskId) {
-            this.setState({
+            var task = MemStore.get(GlobalConstants.STORE_PROJECT_INDEX_TASK_ID);
+            var state = {
                 openTaskDetail: true
-            });
+            };
+            if (task && this.state.taskId === task._id) {
+                if (task.lastActiveTime) {
+                    this._end = new Moment(task.lastActiveTime).endOf('day').toDate();
+                    this._start = new Moment(task.lastActiveTime).subtract(1, 'week').startOf('day').toDate();
+                }
+                if (task.progress === 100) {
+                    state.taskStatus = 'done';
+                }
+            }
+            this.setState(state);
         }
     },
 
@@ -136,6 +154,8 @@ module.exports = React.createClass({
                             bsSize="xsmall"
                             period="week"
                             granularity="week"
+                            start={this._start}
+                            end={this._end}
                             compare={false}
                             showCompare={false}
                             onDateRangeInit={this.onDateRangeInit}

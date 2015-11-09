@@ -58,6 +58,7 @@ Bus.on(EventConstant.INSERT_LOG_FROM_TASK, function (log) {
     _insertLog = log;
 });
 
+
 /** cache */
 var contentCache = {};
 var __starLines = {};

@@ -20,9 +20,15 @@ var Task = require('../Task/Task.js');
 var TaskList = require('../Task/TaskList');
 var TaskDetail = require('../Task/TaskDetail');
 
+/** Store */
+var MemStore = require('../../stores/MemStore');
+
 /** utils */
 var DataAPI = require('../../utils/DataAPI');
 var Util = require('../../utils/Util');
+
+/** Constants */
+var GlobalConstants = require('../../constants/GlobalConstants');
 
 var ProjectIndex = React.createClass({
 
@@ -206,8 +212,10 @@ var ProjectIndex = React.createClass({
         }.bind(this))
     },
 
-    gotoTaskInProject: function (task) {
+    gotoTaskInProject: function (task, e) {
+        e.stopPropagation();
         var url = Util.getUrlFromTask(task);
+        MemStore.set(GlobalConstants.STORE_PROJECT_INDEX_TASK_ID, task);
         if (url) {
             this.transitionTo(url);
         }
