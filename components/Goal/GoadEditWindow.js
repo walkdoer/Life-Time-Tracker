@@ -55,7 +55,7 @@ module.exports = React.createClass({
                     <div className="form-group">
                         <label className="control-label">
                             Filter Config
-                            <OverlayTrigger trigger="hover" placement="right" overlay={this.renderHelp()} bsStyle="info">
+                            <OverlayTrigger trigger="click" placement="right" overlay={this.renderHelp()} bsStyle="info">
                                 <i className="filter-help fa fa-question-circle" style={{marginLeft: 10}}/>
                             </OverlayTrigger>
                         </label>
