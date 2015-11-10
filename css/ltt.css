@@ -6,6 +6,14 @@
     height: 100%;
     flex-direction: column;
 }
+/* latin */
+@font-face {
+  font-family: 'Share Tech';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Share Tech'), local('ShareTech-Regular'), url(tech.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
 .ltt a:hover{
     text-decoration:none;
 }
@@ -47,6 +55,7 @@
 }
 
 .ltt-footer .ltt_c-appInfo{
+    font-family: 'Share Tech', sans-serif;
     display:flex;
     margin:  0 10px;
 }

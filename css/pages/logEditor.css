@@ -66,7 +66,23 @@
     height: 100%;
     overflow: hidden;
     border-left: 1px solid #ECECEC;
+    /* background-image: url(../../images/snow-mountain.jpg); */
+    /* background-size: cover; */
 }
+
+/*.ltt_c-page-logEditor aside::before{
+  display: block;
+  position: absolute;
+  content: ' ';
+  background-image: url(../../images/test.jpg);
+  -webkit-filter: blur(3px);
+  filter: blur(5px);
+  background-size: cover;
+  opacity: 0.4;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}*/
 
 .ltt_c-page-logEditor-datepicker{
   border-bottom: 1px solid #E8E8E8;
