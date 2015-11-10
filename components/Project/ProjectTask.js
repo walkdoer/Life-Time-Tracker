@@ -16,6 +16,8 @@ var RB = require('react-bootstrap');
 var ButtonToolbar = RB.ButtonToolbar;
 var Button = RB.Button;
 var ButtonGroup = RB.ButtonGroup;
+var OverlayTrigger = RB.OverlayTrigger;
+var Tooltip = RB.Tooltip;
 var Well = RB.Well;
 var extend = require('extend');
 var swal = require('sweetalert');
@@ -941,6 +943,12 @@ var VersionInfo = React.createClass({
     render: function () {
         var version = this.state.version;
         var projectTotalTime = this.props.projectTotalTime;
+        var mCreateTime, mLastActiveTime, tooltip;
+        if (version) {
+            mCreateTime = new Moment(version.createTime);
+            mLastActiveTime = new Moment(version.lastActiveTime);
+            tooltip = <Tooltip> {mCreateTime.format('YYYY-MM-DD') + ' ~ ' + mLastActiveTime.format('YYYY-MM-DD')}</Tooltip>
+        }
         return version ? (
             <div className="ltt_p-projectDetail-versionInfo">
                 <div className="ltt_p-projectDetail-versionInfo-content">
@@ -949,17 +957,18 @@ var VersionInfo = React.createClass({
                         <i className="fa fa-tasks" title="Task count"></i>
                         {version.taskCount}
                     </span>
-                    <span title={'create at ' + new Moment(version.createTime).format('YYYY-MM-DD HH:mm:ss')}>
-                        <i className="fa fa-plus" title="create time"></i>
-                        {new Moment(version.createTime).fromNow()}
+                    <span title={'create at ' + mCreateTime.format('YYYY-MM-DD HH:mm:ss')}>
+                        <i className="fa fa-plus" title="create time"></i>{mCreateTime.fromNow()}
                     </span>
-                    <span title={'last active at ' + new Moment(version.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
-                        <i className="fa fa-user" title="last active"></i>
-                        {new Moment(version.lastActiveTime).fromNow()}
+                    <span title={'last active at ' + mLastActiveTime.format('YYYY-MM-DD HH:mm:ss')}>
+                        <i className="fa fa-user" title="last active"></i> {mLastActiveTime.fromNow()}
                     </span>
                     <span className="ltt-M2">
                         <i className="fa fa-clock-o" title="Total time"></i>
-                        {Moment.duration(version.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {new Moment(version.createTime).from(version.lastActiveTime, true)}
+                        {Moment.duration(version.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across
+                        <OverlayTrigger placement="bottom" overlay={tooltip} delay={10}>
+                            <span> {new Moment(version.createTime).from(version.lastActiveTime, true)}</span>
+                        </OverlayTrigger>
                         <span className="percent">
                             <span className="num">{(version.totalTime / projectTotalTime * 100).toFixed(1)}%</span> of {this.props.project.name}
                         </span>
