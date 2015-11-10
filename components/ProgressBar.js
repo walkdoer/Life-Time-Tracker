@@ -36,6 +36,11 @@ var ProgressBar = React.createClass({
         );
     },
 
+    shouldComponentUpdate: function (nextProps) {
+        var curProps = this.props;
+        return curProps.value !== nextProps.value || curProps.max !== nextProps.max || curProps.expect !== nextProps.expect;
+    },
+
     componentDidMount: function () {
         this._updateProgress();
     },
@@ -44,21 +49,10 @@ var ProgressBar = React.createClass({
         var $el = $(this.getDOMNode());
         var $percentage = $el.find('.bar-percentage');
         var $bar = $el.find('.bar');
-        $({
-            realPg: 0,
-            expectPg: 0
-        }).animate({
-            realPg: this._realPg,
-            expectPg: this._expectPg
-        }, {
-            duration: 2000,
-            easing:'linear',
-            step: function() {
-                var pct = (++this.realPg).toFixed(0) + '%';
-                $percentage.text(pct);
-                $bar.css('width', pct);
-            }
-        })
+        if (this._realPg === 0) {return;}
+        var pct = (this._realPg).toFixed(1) + '%';
+        $percentage.text(pct);
+        $bar.css('width', pct);
     },
 
     componentDidUpdate: function () {

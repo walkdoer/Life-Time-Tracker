@@ -7,6 +7,8 @@
   font-weight: normal;
   font-size: 0.8em;
   color: #FFF;
+  transition: 0.4s linear;
+  transition-property: background-color;
 }
 .ltt_c-ProgressBar .bar-percentage {
   background: rgba(0,0,0,0.13);
@@ -22,15 +24,18 @@
   flex: 1;
   background: rgba(0,0,0,0.13);
   overflow: hidden;
-  margin: 12px;
+  margin: 20px 12px 20px 0px;
   display: flex;
 }
 
 .ltt_c-ProgressBar .bar {
-  background: #FFF;
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 10px 0px 0px 10px;
   filter: alpha(opacity=100);
   opacity: 1;
+  width: 0%;
+  transition: 0.4s linear;
+  transition-property: width;
 }
 
 /* COLORS */
