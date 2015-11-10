@@ -31,6 +31,7 @@ var ProgressBar = React.createClass({
                 <div className="bar-percentage" data-realpg={this._realPg} data-expectpg={this._expectPg}></div>
                 <div className="bar-container">
                     <div className="bar"></div>
+                    <div className="expect" title={this._expectPg.toFixed(1) + '%'}></div>
                 </div>
             </div>
         );
@@ -49,8 +50,14 @@ var ProgressBar = React.createClass({
         var $el = $(this.getDOMNode());
         var $percentage = $el.find('.bar-percentage');
         var $bar = $el.find('.bar');
-        if (this._realPg === 0) {return;}
+        var $expectFlag = $el.find('.expect');
         var pct = (this._realPg).toFixed(1) + '%';
+        if (this._expectPg > 0) {
+            $expectFlag.show();
+            $expectFlag.css('left', this._expectPg + '%');
+        } else {
+            $expectFlag.hide();
+        }
         $percentage.text(pct);
         $bar.css('width', pct);
     },

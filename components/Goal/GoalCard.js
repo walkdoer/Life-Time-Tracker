@@ -50,7 +50,11 @@ module.exports = React.createClass({
 
     render: function () {
         var goal = this.props.goal;
-        console.log('render goal card', goal);
+        var dateInfo = Util.toDate(goal.granularity);
+        var estimatedTime = goal.estimatedTime;
+        var oneDayTime = estimatedTime / dateInfo.diff;
+        var durationDays = new Moment().diff(new Moment().startOf(goal.granularity), 'day') + 1;
+        var expectTime = oneDayTime * durationDays;
         var innerDropdown = <DropdownButton title='Granularity'>
             <MenuItem key='year'>year</MenuItem>
             <MenuItem key='month'>month</MenuItem>
@@ -84,7 +88,7 @@ module.exports = React.createClass({
                 </div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-totalTime" style={{width: 100}}>{Util.displayTime(this.state.totalTime)}</div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-progress" style={{width: 200}}>
-                    <ProgressBar className="ltt_c-GoalCard-progress" max={goal.estimatedTime || 0} value={this.state.totalTime || 0}/>
+                    <ProgressBar className="ltt_c-GoalCard-progress" max={goal.estimatedTime || 0} expect={expectTime} value={this.state.totalTime || 0}/>
                 </div>
             </div>
         )
@@ -122,11 +126,13 @@ module.exports = React.createClass({
                 data.sort(function (a, b) {
                     return new Date(a._id).getTime() - new Date(b._id).getTime();
                 });
+                var totalTime = data ? data.reduce(function (total, item) {
+                    return total + (item.totalTime || 0);
+                }, 0) : 0;
                 that.setState({
                     activitiesLoaded: true,
+                    totalTime: totalTime,
                     activities: data
-                }, function () {
-                    this.calculateProgress();
                 });
             }).fail(function (err) {
                 console.error(err.stack);
@@ -137,15 +143,6 @@ module.exports = React.createClass({
             });
     },
 
-    calculateProgress: function () {
-        var totalTime;
-        totalTime = this.state.activities.reduce(function (total, item) {
-            return total + (item.totalTime || 0);
-        }, 0);
-        this.setState({
-            totalTime: totalTime
-        });
-    },
 
     getGroupOption: function (granularity) {
         return {
