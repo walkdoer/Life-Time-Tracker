@@ -18,7 +18,8 @@ var MenuItem = RB.MenuItem;
 
 
 /**components*/
-var Progress = require('../Progress');
+//var Progress = require('../Progress');
+var ProgressBar = require('../ProgressBar');
 var DataAPI = require('../../utils/DataAPI');
 var LogLine = require('../charts/LogLine');
 var LoadingMask = require('../LoadingMask');
@@ -49,7 +50,7 @@ module.exports = React.createClass({
 
     render: function () {
         var goal = this.props.goal;
-        console.log('render goal card');
+        console.log('render goal card', goal);
         var innerDropdown = <DropdownButton title='Granularity'>
             <MenuItem key='year'>year</MenuItem>
             <MenuItem key='month'>month</MenuItem>
@@ -83,7 +84,7 @@ module.exports = React.createClass({
                 </div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-totalTime" style={{width: 100}}>{Util.displayTime(this.state.totalTime)}</div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-progress" style={{width: 200}}>
-                    <Progress className="ltt_c-GoalCard-progress" max={goal.estimatedTime || 0} value={this.state.totalTime || 0}/>
+                    <ProgressBar className="ltt_c-GoalCard-progress" max={goal.estimatedTime || 0} value={this.state.totalTime || 0}/>
                 </div>
             </div>
         )
