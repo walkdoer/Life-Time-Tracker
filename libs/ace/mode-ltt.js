@@ -75,6 +75,11 @@ ace.define("ace/mode/ltt_highlight_rules",["require","exports","module","ace/lib
                     {
                         token: 'ltt_estimatedTime',
                         regex: "!\\((.*?)\\)"
+                    },
+
+                    {
+                        token: 'ltt_estimated',
+                        regex: "!\\[(.*?)\\]"
                     }
                 ],
                 tags: [

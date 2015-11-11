@@ -44,6 +44,13 @@
     border-bottom: 2px solid #F04BB6;
 }
 
+.ace_ltt_estimated{
+    color: #EA5DC5 !important;
+    background-color: rgba(255, 151, 233, 0.38);
+    font-weight: bold;
+    border-bottom: 1px solid #F04BB6;
+}
+
 .ace-github .ace_marker-layer .log-unfinish{
     background: rgb(255, 236, 201) !important;
 }
