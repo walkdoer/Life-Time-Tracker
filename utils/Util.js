@@ -207,7 +207,6 @@ exports.DATE_FORMAT = 'YYYY-MM-DD';
 exports.TIME_FORMAT = 'HH:mm:ss';
 exports.DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
-var noty = window.noty;
 var layout = 'bottomRight';
 var animation = {
     open: 'animated flipInX',
@@ -241,7 +240,7 @@ exports.notify = function (cfg) {
             layout: layout,
             animation: animation
         };
-        noty(options);
+        window.noty(options);
     }
 };
 

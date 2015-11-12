@@ -1,3 +1,4 @@
+'use strict';
 var React = require('react');
 var cx = React.addons.classSet;
 var Router = require('react-router');
@@ -93,6 +94,39 @@ var LogEditor = React.createClass({
         };
     },
 
+    componentWillMount: function () {
+        this.__lastNotifyTime = null;
+        function notify (log) {
+            Util.notify({
+                title: 'will start' + new Moment(log.estimateStart).format('HH:mm'),
+                subtitle: log.content,
+                message: ' test '
+            });
+        }
+        this.__timeCheckerInterval = setInterval(function () {
+            var mNow = new Moment();
+            var logs = this.getAllLogs(true);
+            var NOTIFY_THRESHOLD = 10,
+                NOTIFY_INTERVAL = 5;
+            logs.forEach(function (log) {
+                var mEstimateStart, mEstimateEnd, estimatedTime;
+                if (log.estimateStart) {
+                    mEstimateStart = new Moment(log.estimateStart);
+                    if (mEstimateStart.diff(mNow, 'minute') <= NOTIFY_THRESHOLD) {
+                        if (!this.__lastNotifyTime) {
+                            notify(log);
+                            this.__lastNotifyTime = mNow;
+                        } else if (mNow.diff(this.__lastNotifyTime, 'minute') >= NOTIFY_INTERVAL){
+                            notify(log);
+                            this.__lastNotifyTime = mNow;
+                        }
+                        //notify
+                    }
+                }
+            }.bind(this));
+        }.bind(this), 3000);
+    },
+
     render: function () {
         var start = new Date().getTime();
         var syncIcon = 'fa ';
@@ -148,7 +182,7 @@ var LogEditor = React.createClass({
                 </div>
                 <div className="ltt_c-logEditor-content">
                     {this.state.showCalendar ? <Calendar date={this.props.title} onEventClick={this.onCalendarEventClick} ref="calendar"/> : null }
-                    <Editor ref="editor"/>
+                    <pre id="ltt-logEditor" ref="editor"></pre>
                     <SlidePanel className="todayReport" ref="todayReport" open={false} onTransitionEnd={this.renderTodayReport}>
                         <div ref="reportContainer" style={{height: "100%"}}>
                         </div>
@@ -223,7 +257,9 @@ var LogEditor = React.createClass({
             this.gotoLine(row + 1, 0);
             var range = new Range(row, 0, row, Infinity);
             var marker = session.addMarker(range, "ace_step", "fullLine");
-            setTimeout(function () {
+            var timer = setTimeout(function () {
+                clearTimeout(timer);
+                timer = null;
                 session.removeMarker(marker);
             }, time || 10000);
         }
@@ -770,6 +806,8 @@ var LogEditor = React.createClass({
     },
 
     componentWillUnmount: function () {
+        clearInterval(this.__timeCheckerInterval);
+        this.__timeCheckerInterval = null;
         this._saveWorkBeforeDestroy();
         this._removeFromLocalStorage();
         this._destroyEditor();
@@ -1561,15 +1599,7 @@ var LogEditor = React.createClass({
 
 });
 
-var Editor = React.createClass({
-    render: function () {
-        return <pre id="ltt-logEditor"></pre>;
-    },
 
-    shouldComponentUpdate: function () {
-        return false;
-    }
-});
 var Calendar = React.createClass({
     getDefaultProps: function () {
         return {
