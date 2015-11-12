@@ -152,6 +152,7 @@
     padding-left: 3px;
     background-color: #F8E3C4;
     border-radius: 4px;
+    font-family: 'Share Tech', sans-serif;
 }
 
 .ltt_c-ProjectNav .timeAmount .peity{
@@ -315,6 +316,7 @@
 }
 .ltt_c-taskDetail-dateInfo-item-input{
   padding-right: 50px;
+  font-family: 'Share Tech', sans-serif;
 }
 .ltt_c-taskDetail-dateInfo-item-input input[type=text]{
   text-indent:10px;
