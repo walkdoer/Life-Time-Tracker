@@ -118,7 +118,7 @@ var LogEditor = React.createClass({
                 var mEstimateStart, mEstimateEnd, estimatedTime;
                 if (log.estimateStart && !log.start) {
                     mEstimateStart = new Moment(log.estimateStart);
-                    var diff = mEstimateStart.diff(mNow, 'minute');
+                    var diff = mEstimateStart.diff(mNow, 'minute') + 1;
                     if (diff <= NOTIFY_THRESHOLD && diff > 0) {
                         if (!this.__lastNotifyTime) {
                             notify(log);
@@ -466,6 +466,7 @@ var LogEditor = React.createClass({
             this.editor.destroy();
             this._highlightMaker = {};
             this._highlightUnFinishLogIndex = null;
+            this.__beginSoonHighlight = null;
             this._currentRow = null;
             this.refs.editor.getDOMNode().innerHTML = '';
             this.editor = null;
@@ -1466,18 +1467,23 @@ var LogEditor = React.createClass({
         var allLines = this.getAllLines();
         var NOTIFY_THRESHOLD = 10;
         var mNow = new Moment();
+        (this.__beginSoonHighlight || []).forEach(function (index) {
+            this.unhighlightLine(index, 'log-beginsoon');
+        }, this);
+        this.__beginSoonHighlight = [];
         logs.forEach(function (log) {
             var mEstimateStart, mEstimateEnd, estimatedTime;
             if (log.estimateStart && !log.start) {
                 mEstimateStart = new Moment(log.estimateStart);
                 var index = allLines.indexOf(log.origin);
-                var diff = mEstimateStart.diff(mNow, 'minute');
+                var diff = mEstimateStart.diff(mNow, 'minute') + 1;
                 if (index >= 0) {
                     this.unhighlightLine(index, 'log-beginsoon');
                 }
                 if (diff <= NOTIFY_THRESHOLD && diff > 0) {
                     if (index >= 0) {
                         this.highlightLine(index, 'log-beginsoon');
+                        this.__beginSoonHighlight.push(index);
                     }
                 } else if (diff < 0){
                     if (index >= 0) {
@@ -1487,6 +1493,7 @@ var LogEditor = React.createClass({
             }
         }.bind(this));
     },
+
 
     getAllLines: function () {
         var editor = this.editor;
