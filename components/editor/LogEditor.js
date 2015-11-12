@@ -100,13 +100,13 @@ var LogEditor = React.createClass({
             return;
         }
         this.__lastNotifyTime = null;
-        var start = new Moment(log.estimateStart);
-        var end = new Moment(log.estimateEnd);
         function notify (log) {
+            var start = new Moment(log.estimateStart);
+            var end = new Moment(log.estimateEnd);
             Util.notify({
-                title: 'next activity will start in ' + start.fromNow() + ' at' + start.format('HH:mm'),
+                title: 'next activity will start in ' + start.fromNow() + ' at ' + start.format('HH:mm'),
                 subtitle: 'time: ' + Moment.duration(end.diff(start, 'minute'), 'minutes').format("M[m],d[d],h[h],mm[min]") + ' end at:' + end.format('HH:mm'),
-                message: log.origin
+                message: ''
             });
         }
         this.__timeCheckerInterval = setInterval(function () {
@@ -116,17 +116,17 @@ var LogEditor = React.createClass({
                 NOTIFY_INTERVAL = 5;
             logs.forEach(function (log) {
                 var mEstimateStart, mEstimateEnd, estimatedTime;
-                if (log.estimateStart) {
+                if (log.estimateStart && !log.start) {
                     mEstimateStart = new Moment(log.estimateStart);
-                    if (mEstimateStart.diff(mNow, 'minute') <= NOTIFY_THRESHOLD) {
+                    var diff = mEstimateStart.diff(mNow, 'minute');
+                    if (diff <= NOTIFY_THRESHOLD && diff > 0) {
                         if (!this.__lastNotifyTime) {
-                            notify(log);
-                            this.__lastNotifyTime = mNow;
-                        } else if (mNow.diff(this.__lastNotifyTime, 'minute') >= NOTIFY_INTERVAL){
                             notify(log);
                             this.__lastNotifyTime = mNow;
                         }
                         //notify
+                    } else if (diff < 0){
+                        this.__lastNotifyTime = null;
                     }
                 }
             }.bind(this));
@@ -238,6 +238,7 @@ var LogEditor = React.createClass({
             }
             that.setValue(content);
             that._highLightDoingLine(content);
+            that._updateLogThatShouldBeginSoon();
             that.gotoDoingLogLine(content);
             that._gotoLocate(that.props.locate, content);
             that._starCacheLines();
@@ -445,7 +446,7 @@ var LogEditor = React.createClass({
         var editor = this.editor;
         var session = editor.getSession()
         var allLines = session.getDocument().getAllLines();
-        var index = 1;
+        var index = 1, log;
         for (var i = 0; i < allLines.length; i++) {
             if (Util.isValidLog(allLines[i])) {
                 index = i + 1;
@@ -569,6 +570,7 @@ var LogEditor = React.createClass({
                 var timeStr = new Moment().format('HH:mm') + '~';
                 var pos = editor.getCursorPosition();
                 var line = session.getLine(pos.row);
+                var row;
                 if (!line || Util.isValidLog(line)) {
                     line = that.getFirstPlanLog();
                     row = that.getLineIndex(line);
@@ -838,6 +840,7 @@ var LogEditor = React.createClass({
             //persist to localstorage, if app exit accidently, can recovery from localstorage
             that._persistToLocalStorage(title, content);
             that._highLightDoingLine(content);
+            that._updateLogThatShouldBeginSoon();
             that._annotationOverTimeLog(logs, content);
             that._showContentChangeFlag();
             if (that.state.highlightUnFinishLog) {
@@ -1456,6 +1459,33 @@ var LogEditor = React.createClass({
             });
             that._highlightUnFinishLogIndex = null;
         }
+    },
+
+    _updateLogThatShouldBeginSoon: function () {
+        var logs = this.getAllLogs(true);
+        var allLines = this.getAllLines();
+        var NOTIFY_THRESHOLD = 10;
+        var mNow = new Moment();
+        logs.forEach(function (log) {
+            var mEstimateStart, mEstimateEnd, estimatedTime;
+            if (log.estimateStart && !log.start) {
+                mEstimateStart = new Moment(log.estimateStart);
+                var index = allLines.indexOf(log.origin);
+                var diff = mEstimateStart.diff(mNow, 'minute');
+                if (index >= 0) {
+                    this.unhighlightLine(index, 'log-beginsoon');
+                }
+                if (diff <= NOTIFY_THRESHOLD && diff > 0) {
+                    if (index >= 0) {
+                        this.highlightLine(index, 'log-beginsoon');
+                    }
+                } else if (diff < 0){
+                    if (index >= 0) {
+                        this.unhighlightLine(index, 'log-beginsoon');
+                    }
+                }
+            }
+        }.bind(this));
     },
 
     getAllLines: function () {

@@ -45,14 +45,17 @@
 }
 
 .ace_ltt_estimated{
-    color: #EA5DC5 !important;
-    background-color: rgba(255, 151, 233, 0.38);
+    color: #FFFFFF !important;
+    background-color: rgb(255, 128, 69);
     font-weight: bold;
-    border-bottom: 1px solid #F04BB6;
 }
 
 .ace-github .ace_marker-layer .log-unfinish{
     background: rgb(255, 236, 201) !important;
+}
+
+.ace-github .ace_marker-layer .log-beginsoon{
+    background: rgb(158, 255, 123) !important;
 }
 
 .ace-github .ace_marker-layer .log-star{
