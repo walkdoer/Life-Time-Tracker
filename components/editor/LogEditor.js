@@ -94,13 +94,19 @@ var LogEditor = React.createClass({
         };
     },
 
-    componentWillMount: function () {
+    _trackActicity: function () {
+        var todayDate = new Moment().format('YYYY-MM-DD');
+        if (this.props.title !== todayDate) {
+            return;
+        }
         this.__lastNotifyTime = null;
+        var start = new Moment(log.estimateStart);
+        var end = new Moment(log.estimateEnd);
         function notify (log) {
             Util.notify({
-                title: 'will start' + new Moment(log.estimateStart).format('HH:mm'),
-                subtitle: log.content,
-                message: ' test '
+                title: 'next activity will start in ' + start.fromNow() + ' at' + start.format('HH:mm'),
+                subtitle: 'time: ' + Moment.duration(end.diff(start, 'minute'), 'minutes').format("M[m],d[d],h[h],mm[min]") + ' end at:' + end.format('HH:mm'),
+                message: log.origin
             });
         }
         this.__timeCheckerInterval = setInterval(function () {
@@ -125,6 +131,12 @@ var LogEditor = React.createClass({
                 }
             }.bind(this));
         }.bind(this), 3000);
+    },
+
+    _unTrackActivity: function () {
+        clearInterval(this.__timeCheckerInterval);
+        this.__timeCheckerInterval = null;
+        this.__lastNotifyTime = null;
     },
 
     render: function () {
@@ -323,6 +335,7 @@ var LogEditor = React.createClass({
         //content = editorStore(SK_CONTENT);
         //this._initProjectTypeahead();
         this._initEditorCommand();
+        this._trackActicity();
         return editor;
     },
 
@@ -457,6 +470,7 @@ var LogEditor = React.createClass({
             this.editor = null;
             console.info('Destroy editor end');
         }
+        this._unTrackActivity();
     },
 
     _saveWorkBeforeDestroy: function () {
@@ -806,8 +820,6 @@ var LogEditor = React.createClass({
     },
 
     componentWillUnmount: function () {
-        clearInterval(this.__timeCheckerInterval);
-        this.__timeCheckerInterval = null;
         this._saveWorkBeforeDestroy();
         this._removeFromLocalStorage();
         this._destroyEditor();
