@@ -25,7 +25,6 @@ var LogLine = require('../charts/LogLine');
 var LoadingMask = require('../LoadingMask');
 var GoalEditWindow = require('../../components/Goal/GoadEditWindow');
 var Notify = require('../../components/Notify');
-var CalendarHeatMap = require('../../components/charts/CalendarHeatMap');
 var GoalChart = require('../../components/charts/GoalChart');
 
 /** Utils */
@@ -78,7 +77,7 @@ module.exports = React.createClass({
                     {this.state.activitiesLoadFailed ?
                         'Load Activity Failed' :
                         (goal.filter ? <LogLine
-                            logs={goal.granularity !== 'day' ? this.state.activities.map(getDateData) : this.state.activities}
+                            logs={this.state.activities}
                             grouped={goal.granularity !== 'day'}
                             granularity={goal.granularity}
                             title={false}
@@ -123,12 +122,10 @@ module.exports = React.createClass({
         }, dateInfo, filter);
         DataAPI.Log.load(params)
             .then(function (data) {
-                data.sort(function (a, b) {
-                    return new Date(a._id).getTime() - new Date(b._id).getTime();
-                });
                 var totalTime = data ? data.reduce(function (total, item) {
                     return total + (item.totalTime || 0);
                 }, 0) : 0;
+                data = Util.fillDataGap(data || [], dateInfo.start, dateInfo.end);
                 that.setState({
                     activitiesLoaded: true,
                     totalTime: totalTime,
@@ -183,10 +180,3 @@ module.exports = React.createClass({
         height={80}/>
     }
 });
-
-function getDateData (item) {
-    return {
-        date: item._id,
-        count: item.totalTime
-    };
-}

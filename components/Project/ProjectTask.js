@@ -926,6 +926,10 @@ var ProjectInfo = React.createClass({
 
     openExternalLink: function (link) {
         Ltt.openExternalLink(link);
+    },
+
+    getTotalTime: function () {
+        return this.state.allTotalTime || null;
     }
 });
 
@@ -1004,6 +1008,7 @@ var VersionInfo = React.createClass({
             });
         });
     }
+
 });
 
 

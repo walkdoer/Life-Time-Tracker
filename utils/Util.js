@@ -261,3 +261,36 @@ exports.isElementInViewport = function isElementInViewport (el) {
         rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
     );
 };
+
+
+exports.fillDataGap = function (data, start, end, transformFun) {
+    var dataLen = Moment(end).diff(start, 'day') + 1;
+    var result = [];
+    transformFun = transformFun || function (a) {return a;};
+    data.sort(function (a,b) {
+        return (new Date(a._id).getTime() - new Date(b._id).getTime());
+    }).forEach(function (d) {
+        var diffStart = Moment(d._id).diff(start, 'day');
+        var index = result.length;
+        while(index < diffStart) {
+            result.push(transformFun({
+                date: new Moment(start).add(index, 'day').format('YYYY-MM-DD'),
+                count: 0
+            }));
+            index++;
+        }
+        result.push(transformFun({
+            date: d._id,
+            count: d.totalTime
+        }));
+    });
+    var index = result.length;
+    while(index < dataLen) {
+        result.push(transformFun({
+            date: new Moment(start).add(index, 'day').format('YYYY-MM-DD'),
+            count: 0
+        }));
+        index++;
+    }
+    return result;
+};

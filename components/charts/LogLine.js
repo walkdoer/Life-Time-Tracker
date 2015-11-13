@@ -134,7 +134,7 @@ module.exports = React.createClass({
                 },
                 series: {
                     showInLegend: false,
-                    pointWidth: 10,
+                    //pointWidth: 10,
                     pointInterval: tickInterval
                 }
             },

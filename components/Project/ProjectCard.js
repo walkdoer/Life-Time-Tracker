@@ -14,6 +14,7 @@ var _ = require('lodash');
 var Router = require('react-router');
 var Link = Router.Link;
 var D3SimpleColumn = require('../charts/D3SimpleColumn.js');
+var Util = require('../../utils/Util');
 
 
 var config = require('../../conf/config');
@@ -156,23 +157,9 @@ var ProjectCard = React.createClass({
             projects: params.data.name,
             group: 'date'
         }).then(function (data) {
-            var dataLen = Moment(params.endDate).diff(params.startDate, 'day') + 1;
-            var result = [];
-            data.sort(function (a,b) {
-                return (new Date(a._id).getTime() - new Date(b._id).getTime());
-            }).forEach(function (d, index) {
-                var diffStart = Moment(d._id).diff(params.startDate, 'day');
-                var gap = diffStart - result.length;
-                while(gap--) {
-                    result.push(0);
-                }
-                result.push(d.totalTime);
-                return d.totalTime;
+            var result = Util.fillDataGap(data, params.startDate, params.endDate, function (d) {
+                return d.count
             });
-            var gap = dataLen - result.length;
-            while(gap--) {
-                result.push(0);
-            }
             that.setState({
                 activityData: result,
                 loaded: true
