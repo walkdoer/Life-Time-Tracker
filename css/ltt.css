@@ -242,3 +242,7 @@
 .ltt-link {
     cursor: pointer;
 }
+
+.ltt-time, .ltt-number{
+    font-family: 'Share Tech', sans-serif;
+}

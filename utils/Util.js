@@ -195,11 +195,11 @@ exports.getClassName = function (clsId) {
         return null;
     }
 };
-function displayTime(timeAmount) {
+function displayTime(timeAmount, type) {
     if (timeAmount === undefined || timeAmount === null) {
         return null;
     }
-    return Moment.duration(timeAmount, "minutes").format("M[m],d[d],h[h],mm[min]")
+    return Moment.duration(timeAmount, type || "minutes").format("M[m],d[d],h[h],mm[min]");
 }
 
 exports.displayTime = displayTime;

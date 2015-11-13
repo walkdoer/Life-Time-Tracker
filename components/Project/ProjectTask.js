@@ -182,7 +182,10 @@ module.exports = React.createClass({
                         <div className="content" ref="statisticsContainer"></div>
                     </SlidePanel>
                     <div className="ltt_c-projectTask-moreInfo">
-                        <span>Count: {this.state.tasks.length}</span>
+                        <div>
+                            <span className="ltt-number">Count: {this.state.tasks.length}, </span>
+                            <span className="ltt-time">Time: {Util.displayTime(this.state.tasks.reduce(function (s, t) { return t.totalTime + s;}, 0))}</span>
+                        </div>
                         <div className="btn-container">
                             <div className="btn-group">
                                 {[
