@@ -164,19 +164,14 @@ module.exports = React.createClass({
         if (granularity === 'day' ) { return null;}
         var dateInfo = Util.toDate(granularity);
         var max = estimatedTime / dateInfo.diff;
-        return <GoalChart data={this.state.activities.map(function (item, index) {
-            return {
-                date: item._id,
-                count: item.totalTime
-            };
-        })}
-        start={dateInfo.start}
-        end={dateInfo.end}
-        type={granularity}
-        threshold={max}
-        rowItemCount={12}
-        itemPadding={2}
-        width={180}
-        height={80}/>
+        return <GoalChart data={this.state.activities}
+            start={dateInfo.start}
+            end={dateInfo.end}
+            type={granularity}
+            threshold={max}
+            rowItemCount={12}
+            itemPadding={2}
+            width={180}
+            height={80}/>
     }
 });

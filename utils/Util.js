@@ -275,7 +275,8 @@ exports.fillDataGap = function (data, start, end, transformFun) {
         while(index < diffStart) {
             result.push(transformFun({
                 date: new Moment(start).add(index, 'day').format('YYYY-MM-DD'),
-                count: 0
+                count: 0,
+                empty: true
             }));
             index++;
         }
@@ -288,7 +289,8 @@ exports.fillDataGap = function (data, start, end, transformFun) {
     while(index < dataLen) {
         result.push(transformFun({
             date: new Moment(start).add(index, 'day').format('YYYY-MM-DD'),
-            count: 0
+            count: 0,
+            empty: true
         }));
         index++;
     }

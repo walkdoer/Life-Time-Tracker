@@ -35,29 +35,29 @@ module.exports = React.createClass({
         //if (!hasData) return;
         var start = this.props.start;
         var type = this.props.type;
-        var dateMethod = function () { return false};
-        if (type === 'month') {
-            dateMethod = function (date, i) {
-                return (new Moment(date).date() - 1)  === i;
-            };
-        } else if (type === 'week') {
-            dateMethod = function (date, i) {
-                return new Moment(date).day() === i;
-            };
-        }
-        data = _.range(0, new Moment(this.props.end).diff(start, 'day') + 1).map(function (i) {
-            var target = data.filter(function (d) {
-                return dateMethod(d.date, i);
-            })[0];
-            if (target) {
-                return target;
-            } else {
-                return {
-                    date: new Moment(start).add(i, 'day').toDate(),
-                    count: -1
-                };
-            }
-        });
+        // var dateMethod = function () { return false};
+        // if (type === 'month') {
+        //     dateMethod = function (date, i) {
+        //         return (new Moment(date).date() - 1)  === i;
+        //     };
+        // } else if (type === 'week') {
+        //     dateMethod = function (date, i) {
+        //         return new Moment(date).day() === i;
+        //     };
+        // }
+        // data = _.range(0, new Moment(this.props.end).diff(start, 'day') + 1).map(function (i) {
+        //     var target = data.filter(function (d) {
+        //         return dateMethod(d.date, i);
+        //     })[0];
+        //     if (target) {
+        //         return target;
+        //     } else {
+        //         return {
+        //             date: new Moment(start).add(i, 'day').toDate(),
+        //             count: -1
+        //         };
+        //     }
+        // });
         var dataLen = data.length;
         var width = this.props.width;
         var height = this.props.height;
@@ -89,7 +89,7 @@ module.exports = React.createClass({
             .append("circle")
             .attr("class", function (d) {
                  var cls;
-                 if (d.count === -1 ) {
+                 if (d.empty === true ) {
                     cls = 'circle';
                  } else if (d.count > threshold) {
                     cls = 'circle over';
