@@ -1496,6 +1496,7 @@ var LogEditor = React.createClass({
                     if (logFounded) {
                         this.unhighlightLine(index, 'log-beginsoon');
                         this.highlightLine(index, 'log-overdue');
+                        this.__beginSoonHighlight.push(index);
                     }
                 }
             }
