@@ -21,6 +21,7 @@ var SlidePanel = require('../SlidePanel');
 var Scroller = require('../Scroller');
 var mui = require('material-ui');
 var DefaultRawTheme = require('material-ui/lib/styles/raw-themes/light-raw-theme');
+var md5 = require('blueimp-md5').md5;
 
 
 
@@ -99,14 +100,14 @@ var LogEditor = React.createClass({
         if (this.props.title !== todayDate) {
             return;
         }
-        this.__lastNotifyTime = null;
+        this.__lastNotifyTime = {};
         function notify (log) {
             var start = new Moment(log.estimateStart);
             var end = new Moment(log.estimateEnd);
             Util.notify({
                 title: 'next activity will start in ' + start.fromNow() + ' at ' + start.format('HH:mm'),
                 subtitle: 'time: ' + Moment.duration(end.diff(start, 'minute'), 'minutes').format("M[m],d[d],h[h],mm[min]") + ' end at:' + end.format('HH:mm'),
-                message: ''
+                message: 'good job!'
             });
         }
         this.__timeCheckerInterval = setInterval(function () {
@@ -114,23 +115,25 @@ var LogEditor = React.createClass({
             var logs = this.getAllLogs(true);
             var NOTIFY_THRESHOLD = 10,
                 NOTIFY_INTERVAL = 5;
+            this._updateLogThatShouldBeginSoon(logs);
             logs.forEach(function (log) {
                 var mEstimateStart, mEstimateEnd, estimatedTime;
                 if (log.estimateStart && !log.start) {
                     mEstimateStart = new Moment(log.estimateStart);
-                    var diff = mEstimateStart.diff(mNow, 'minute') + 1;
-                    if (diff <= NOTIFY_THRESHOLD && diff > 0) {
-                        if (!this.__lastNotifyTime) {
+                    var diff = mEstimateStart.diff(mNow, 'minute');
+                    var md5Id = md5(log.origin);
+                    if (diff <= NOTIFY_THRESHOLD && diff >= 0) {
+                        if (!this.__lastNotifyTime[md5Id]) {
                             notify(log);
-                            this.__lastNotifyTime = mNow;
+                            this.__lastNotifyTime[md5Id] = true;
                         }
                         //notify
                     } else if (diff < 0){
-                        this.__lastNotifyTime = null;
+                        delete this.__lastNotifyTime[md5Id];
                     }
                 }
             }.bind(this));
-        }.bind(this), 3000);
+        }.bind(this), 5000);
     },
 
     _unTrackActivity: function () {
@@ -1462,13 +1465,14 @@ var LogEditor = React.createClass({
         }
     },
 
-    _updateLogThatShouldBeginSoon: function () {
-        var logs = this.getAllLogs(true);
+    _updateLogThatShouldBeginSoon: function (logs) {
+        logs = logs || this.getAllLogs(true);
         var allLines = this.getAllLines();
         var NOTIFY_THRESHOLD = 10;
         var mNow = new Moment();
         (this.__beginSoonHighlight || []).forEach(function (index) {
             this.unhighlightLine(index, 'log-beginsoon');
+            this.unhighlightLine(index, 'log-overdue');
         }, this);
         this.__beginSoonHighlight = [];
         logs.forEach(function (log) {
@@ -1476,18 +1480,22 @@ var LogEditor = React.createClass({
             if (log.estimateStart && !log.start) {
                 mEstimateStart = new Moment(log.estimateStart);
                 var index = allLines.indexOf(log.origin);
-                var diff = mEstimateStart.diff(mNow, 'minute') + 1;
-                if (index >= 0) {
+                var logFounded = index >= 0;
+                var diff = mEstimateStart.diff(mNow, 'minute');
+                if (logFounded) {
                     this.unhighlightLine(index, 'log-beginsoon');
+                    this.unhighlightLine(index, 'log-overdue');
                 }
-                if (diff <= NOTIFY_THRESHOLD && diff > 0) {
-                    if (index >= 0) {
+                if (diff <= NOTIFY_THRESHOLD && diff >= 0) {
+                    if (logFounded) {
+                        this.unhighlightLine(index, 'log-overdue');
                         this.highlightLine(index, 'log-beginsoon');
                         this.__beginSoonHighlight.push(index);
                     }
                 } else if (diff < 0){
-                    if (index >= 0) {
+                    if (logFounded) {
                         this.unhighlightLine(index, 'log-beginsoon');
+                        this.highlightLine(index, 'log-overdue');
                     }
                 }
             }

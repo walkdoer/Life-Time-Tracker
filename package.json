@@ -17,6 +17,7 @@
     "min_height": 700
   },
   "dependencies": {
+    "blueimp-md5": "^1.1.1",
     "body-parser": "~1.10.0",
     "chart.js": "^1.0.2",
     "cli-table": "~0.3.0",
