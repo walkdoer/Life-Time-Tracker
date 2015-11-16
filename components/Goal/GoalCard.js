@@ -54,6 +54,14 @@ module.exports = React.createClass({
         var oneDayTime = estimatedTime / dateInfo.diff;
         var durationDays = new Moment().diff(new Moment().startOf(goal.granularity), 'day') + 1;
         var expectTime = oneDayTime * durationDays;
+        var restTime = 0;
+        var totalTime = this.state.totalTime;
+        var todayTime = this.state.todayTime;
+        if (totalTime) {
+            restTime = totalTime - todayTime;
+        }
+
+
         var innerDropdown = <DropdownButton title='Granularity'>
             <MenuItem key='year'>year</MenuItem>
             <MenuItem key='month'>month</MenuItem>
@@ -85,9 +93,12 @@ module.exports = React.createClass({
                             yAxisLabel={false}/> : null)
                     }
                 </div>
-                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-totalTime" style={{width: 100}}>{Util.displayTime(this.state.totalTime)}</div>
+                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-totalTime" style={{width: 100}}>{Util.displayTime(totalTime)}</div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-progress" style={{width: 200}}>
-                    <ProgressBar className="ltt_c-GoalCard-progress" max={goal.estimatedTime || 0} expect={expectTime} value={this.state.totalTime || 0}/>
+                    <ProgressBar className="ltt_c-GoalCard-progress"
+                        max={goal.estimatedTime || 0}
+                        expect={expectTime}
+                        value={[restTime, todayTime]}/>
                 </div>
             </div>
         )
@@ -122,13 +133,19 @@ module.exports = React.createClass({
         }, dateInfo, filter);
         DataAPI.Log.load(params)
             .then(function (data) {
+                var today = new Moment().format(Util.DATE_FORMAT);
+                var todayTime = 0;
                 var totalTime = data ? data.reduce(function (total, item) {
+                    if (today === item._id) {
+                        todayTime += item.totalTime;
+                    }
                     return total + (item.totalTime || 0);
                 }, 0) : 0;
                 data = Util.fillDataGap(data || [], dateInfo.start, dateInfo.end);
                 that.setState({
                     activitiesLoaded: true,
                     totalTime: totalTime,
+                    todayTime: todayTime,
                     activities: data
                 });
             }).fail(function (err) {

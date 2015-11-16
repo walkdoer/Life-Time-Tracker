@@ -20,6 +20,7 @@
     "blueimp-md5": "^1.1.1",
     "body-parser": "~1.10.0",
     "chart.js": "^1.0.2",
+    "chroma-js": "^1.1.1",
     "cli-table": "~0.3.0",
     "color": "^0.8.0",
     "colors": "~0.6.2",
