@@ -29,6 +29,8 @@ var BindStore = require('../mixins/BindStore');
 var LogClassPie = require('../components/LogClassPie');
 var OneDayGoal =  require('../components/OneDayGoal');
 var IScroll = require('../libs/iscroll');
+var Swiper = require('../components/Swiper');
+var SwiperSlide = require('../components/SwiperSlide');
 
 /** Store */
 var ProjectStore = require('../stores/ProjectStore');
@@ -104,7 +106,14 @@ var Page = React.createClass({
                             onDateChange={this.onDateChange}
                             ref="datePicker"/>
                         <ModalTrigger modal={<DateGoToWindow onGoto={this.gotoDate}/>} ref="dateGoToWindow"><span></span></ModalTrigger>
-                        <LogClassPie key={date} date={date}  backgroundColor="rgba(255, 255, 255, 0.1)" ref="logClassPie" legend={true} compare={false}/>
+                        <Swiper>
+                            <SwiperSlide>
+                                <LogClassPie type="classes" key={'classes' + date} date={date}  backgroundColor="rgba(255, 255, 255, 0.1)" ref="logClassPie" legend={true} compare={false}/>
+                            </SwiperSlide>
+                            <SwiperSlide>
+                                <LogClassPie type="project" key={'project' + date} date={date}  backgroundColor="rgba(255, 255, 255, 0.1)" ref="projectPie" legend={true} compare={false}/>
+                            </SwiperSlide>
+                        </Swiper>
                         <ButtonToolbar>
                             <Button bsSize='xsmall'><Link to={"/reports/today?date=" + date}>More Detail</Link></Button>
                         </ButtonToolbar>
@@ -240,6 +249,7 @@ var Page = React.createClass({
     onSave: function (content) {
         var that = this;
         this.refs.logClassPie.update();
+        this.refs.projectPie.update();
         this.refs.oneDayGoal.update();
         this.refs.logEditor.getUnfinishLog(
             new Moment().startOf('day').toDate(),

@@ -38,6 +38,7 @@ module.exports = React.createClass({
         var currentData = this.state.currentData;
         var compareData = this.state.compareData;
         var logClasses = config.classes;
+        var type = this.props.type;
         var highchartOptions = {
             title: false,
             plotOptions: {
@@ -73,10 +74,18 @@ module.exports = React.createClass({
             };
         }
         currentData = currentData && currentData.map(function (item) {
-            var cls = _.find(logClasses, {'_id': item._id});
+            var label = item._id;
+            if (type === "classes") {
+                label = _.find(logClasses, {'_id': item._id});
+            }
+            if (!label) {
+                label = {
+                    name: 'unknow'
+                };
+            }
             return {
                 value: item.totalTime,
-                label: (cls && cls.name) || item._id
+                label: label.name || label
             };
         });
         return (
@@ -118,7 +127,7 @@ module.exports = React.createClass({
         } else {
             props = nextProps;
         }
-        var type = 'classes',
+        var type =  props.type,
             date = props.date,
             start = props.start,
             end = props.end;

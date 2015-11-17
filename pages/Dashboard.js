@@ -65,7 +65,7 @@ var Dashboard = React.createClass({
                                 </div>
                             </div>
                             <div className="Grid-cell u-1of3" ref="logClassPieContainer">
-                                <LogClassPie title="All Time's Class distribution" start={new Moment(Settings.get('startDate'))} end={new Moment()} compare={false} legend={true}/>
+                                <LogClassPie type="classes" title="All Time's Class distribution" start={new Moment(Settings.get('startDate'))} end={new Moment()} compare={false} legend={true}/>
                             </div>
                         </div>
                         <div className="ltt_c-page-com">

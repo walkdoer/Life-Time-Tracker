@@ -104,7 +104,8 @@
     "fullcalendar": "./bower_components/fullcalendar/dist/fullcalendar.js",
     "tinyColor": "./bower_components/tinycolor/dist/tinycolor-min.js",
     "colorPicker": "./bower_components/pick-a-color/build/1.2.3/js/pick-a-color-1.2.3.min.js",
-    "easyPieChart": "./bower_components/jquery.easy-pie-chart/dist/easypiechart.js"
+    "easyPieChart": "./bower_components/jquery.easy-pie-chart/dist/easypiechart.js",
+    "swiper": "./libs/swiper/swiper.js"
   },
   "browserify-shim": {
     "noty": "noty",
