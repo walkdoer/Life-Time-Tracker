@@ -7,9 +7,17 @@ var Menu = require('./Menu');
 var Logo = require('./Logo');
 var _ = require('lodash');
 var Moment = require('moment');
+var setIntervalMinxin = require('../components/mixins/setInterval');
 
 var Nav = React.createClass({
 
+    mixins: [setIntervalMinxin],
+
+    getInitialState: function () {
+        return {
+            img: this.getImgDependOnHour()
+        };
+    },
 
     /**
      * @return {object}
@@ -66,11 +74,10 @@ var Nav = React.createClass({
             path: 'routine',
             icon: 'fa fa-bullseye'
         }];
-        var img = this.getImgDependOnHour();
 
         //var isActive = this.isActive(this.props.to, this.props.params, this.props.query);
         return (
-            <nav className="ltt_c-nav" style={{backgroundImage: 'url(./images/' + img + ')', backgroundSize: "cover"}}>
+            <nav className="ltt_c-nav" style={{backgroundImage: 'url(./images/' + this.state.img + ')', backgroundSize: "cover"}}>
                 <Menu
                     items={items}
                     activeKey={this.props.initialMenuItem}
@@ -80,6 +87,16 @@ var Nav = React.createClass({
             </nav>
         );
     },
+
+    componentDidMount: function () {
+        var that = this;
+        this.setInterval(function () {
+            that.setState({
+                img: that.getImgDependOnHour()
+            });
+        }, 600000);
+    },
+
 
     onMenuClick: function (menuItem) {
         if (_.isFunction(this.props.onMenuClick)) {
