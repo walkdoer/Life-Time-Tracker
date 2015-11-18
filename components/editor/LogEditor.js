@@ -105,9 +105,9 @@ var LogEditor = React.createClass({
             var start = new Moment(log.estimateStart);
             var end = new Moment(log.estimateEnd);
             Util.notify({
-                title: 'next activity will start in ' + start.fromNow() + ' at ' + start.format('HH:mm'),
+                title: 'will start in ' + start.fromNow() + ' at ' + start.format('HH:mm'),
                 subtitle: 'time: ' + Moment.duration(end.diff(start, 'minute'), 'minutes').format("M[m],d[d],h[h],mm[min]") + ' end at:' + end.format('HH:mm'),
-                message: 'good job!'
+                message: Util.getLogDesc(log)
             });
         }
         function notifyEndSoon(log, useTime, remainTime) {
@@ -127,6 +127,11 @@ var LogEditor = React.createClass({
             logs.forEach(function (log) {
                 var mEstimateStart, mEstimateEnd;
                 var estimatedTime = log.estimatedTime;
+                if (!estimatedTime) {
+                    if (log.estimateStart && log.estimateEnd) {
+                        estimatedTime = new Moment(log.estimateEnd).diff(log.estimateStart, 'minute');
+                    }
+                }
                 if (estimatedTime > 0 && Util.isDoingLog(log)) {
                     md5Id = md5(log.origin) + '-end';
                     var fromStart = mNow.diff(log.start, 'minute');
