@@ -87,7 +87,7 @@
     width: 65px;
     display: none;
     background-color: #383d40;
-    color: #e3e4e6;
+    /* color: #e3e4e6; */
 }
 .ltt_c-nav .ltt_c-menu-item{
     height: 60px;
@@ -117,7 +117,6 @@
     display: block;
 }
 
-
 /**menu**/
 
 .ltt_c-menu{
@@ -141,11 +140,12 @@
 }
 
 .ltt_c-menu-item.active{
-    background: #2c3031;
-    border-color: #73CEDA;
+    background: rgba(255, 255, 255, 0.35);
+    /* border-color: #000000; */
+    color: #585858;
 }
 .ltt_c-menu-item.active .fa{
-    color: #72c0ca;
+    color: #FFF;
 }
 
 .ltt_c-menu-item .fa{

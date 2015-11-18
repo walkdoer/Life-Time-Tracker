@@ -66,9 +66,11 @@ var Nav = React.createClass({
             path: 'routine',
             icon: 'fa fa-bullseye'
         }];
+        var img = this.getImgDependOnHour();
+
         //var isActive = this.isActive(this.props.to, this.props.params, this.props.query);
         return (
-            <nav className="ltt_c-nav">
+            <nav className="ltt_c-nav" style={{backgroundImage: 'url(./images/' + img + ')', backgroundSize: "cover"}}>
                 <Menu
                     items={items}
                     activeKey={this.props.initialMenuItem}
@@ -83,6 +85,35 @@ var Nav = React.createClass({
         if (_.isFunction(this.props.onMenuClick)) {
             this.props.onMenuClick(menuItem);
         };
+    },
+
+    getImgDependOnHour: function () {
+        var hour = new Moment().hour();
+        var hour = new Moment().hour();
+        var prefix = 'n';
+        var ext = '.png';
+        if (hour >= 0 && hour < 5){
+            img = prefix + 9 + ext;
+        } else if (hour >= 5 && hour < 8) {
+            img = prefix + 1 + ext;
+        } else if(hour >= 8 && hour < 10) {
+            img = prefix + 2 + ext;
+        } else if (hour >= 10 && hour < 12) {
+            img = prefix + 3 + ext;
+        } else if (hour >= 12 && hour < 14) {
+            img = prefix + 4 + ext;
+        } else if (hour >= 14 && hour < 17) {
+            img = prefix + 5 + ext;
+        } else if (hour >= 17 && hour < 19) {
+            img = prefix + 6 + ext;
+        } else if (hour >= 19 && hour < 20) {
+            img = prefix + 7 + ext;
+        } else if (hour >= 20 && hour < 22) {
+            img = prefix + 8 + ext;
+        } else if (hour >= 22 && hour <= 23) {
+            img = prefix + 9 + ext;
+        }
+        return img
     }
 
 });
