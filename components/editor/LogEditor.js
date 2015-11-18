@@ -110,18 +110,36 @@ var LogEditor = React.createClass({
                 message: 'good job!'
             });
         }
+        function notifyEndSoon(log, useTime, remainTime) {
+            Util.notify({
+                title: 'Will End in ' + Util.displayTime(remainTime),
+                subtitle: 'already use ' + Util.displayTime(useTime),
+                message: Util.getLogDesc(log)
+            });
+        }
         this.__timeCheckerInterval = setInterval(function () {
             var mNow = new Moment();
             var logs = this.getAllLogs(true);
             var NOTIFY_THRESHOLD = 10,
                 NOTIFY_INTERVAL = 5;
+            var md5Id;
             this._updateLogThatShouldBeginSoon(logs);
             logs.forEach(function (log) {
-                var mEstimateStart, mEstimateEnd, estimatedTime;
+                var mEstimateStart, mEstimateEnd;
+                var estimatedTime = log.estimatedTime;
+                if (estimatedTime > 0 && Util.isDoingLog(log)) {
+                    md5Id = md5(log.origin) + '-end';
+                    var fromStart = mNow.diff(log.start, 'minute');
+                    var threshold = Math.ceil(estimatedTime * 0.7);
+                    if (fromStart > threshold && !this.__lastNotifyTime[md5Id]) {
+                        notifyEndSoon(log, fromStart, estimatedTime - fromStart);
+                        this.__lastNotifyTime[md5Id] = true;
+                    }
+                }
                 if (log.estimateStart && !log.start) {
+                    md5Id = md5(log.origin);
                     mEstimateStart = new Moment(log.estimateStart);
                     var diff = mEstimateStart.diff(mNow, 'minute');
-                    var md5Id = md5(log.origin);
                     if (diff <= NOTIFY_THRESHOLD && diff >= 0) {
                         if (!this.__lastNotifyTime[md5Id]) {
                             notify(log);

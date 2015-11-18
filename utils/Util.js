@@ -120,6 +120,12 @@ exports.getDoingLog = function (date, logContent) {
 };
 
 
+exports.isDoingLog = function isDoingLog(log) {
+    var time = TrackerHelper.getTimeSpan(log.origin, {date: log.date, patchEnd: false});
+    return time.start && !time.end;
+};
+
+
 var isInDateRange = function (type) {
     return function (date) {
         date = new Moment(date);
@@ -295,4 +301,22 @@ exports.fillDataGap = function (data, start, end, transformFun) {
         index++;
     }
     return result;
+};
+
+
+exports.getLogDesc = function (log) {
+    var desc = [];
+    if (log.subTask) {
+        desc.push(log.subTask.name);
+    }
+    if (log.task) {
+        desc.push(log.task.name);
+    }
+    if (log.version) {
+        desc.push(log.version.name);
+    }
+    if (!_.isEmpty(log.projects)) {
+        desc.push(log.projects[0].name);
+    }
+    return !_.isEmpty(desc) ? desc.join(',') : '';
 };
