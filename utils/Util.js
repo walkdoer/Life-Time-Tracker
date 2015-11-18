@@ -121,7 +121,12 @@ exports.getDoingLog = function (date, logContent) {
 
 
 exports.isDoingLog = function isDoingLog(log) {
-    var time = TrackerHelper.getTimeSpan(log.origin, {date: log.date, patchEnd: false});
+    var time;
+    if (log.start) {
+        time = TrackerHelper.getTimeSpan(log.origin, {date: log.date, patchEnd: false});
+    } else {
+        return false;
+    }
     return time.start && !time.end;
 };
 
