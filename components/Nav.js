@@ -8,6 +8,7 @@ var Logo = require('./Logo');
 var _ = require('lodash');
 var Moment = require('moment');
 var setIntervalMinxin = require('../components/mixins/setInterval');
+var Logo = require('./Logo');
 
 var Nav = React.createClass({
 
@@ -78,6 +79,7 @@ var Nav = React.createClass({
         //var isActive = this.isActive(this.props.to, this.props.params, this.props.query);
         return (
             <nav className="ltt_c-nav" style={{backgroundImage: 'url(./images/' + this.state.img + ')', backgroundSize: "cover"}}>
+                <Logo title="LTT"/>
                 <Menu
                     items={items}
                     activeKey={this.props.initialMenuItem}

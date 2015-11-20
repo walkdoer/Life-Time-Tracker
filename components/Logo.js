@@ -6,6 +6,7 @@ var React = require('react');
 var Moment = require('moment');
 var _ = require('lodash');
 var setIntervalMinxin = require('../components/mixins/setInterval');
+var chroma = require('chroma-js');
 
 var Logo = React.createClass({
 
@@ -22,7 +23,7 @@ var Logo = React.createClass({
             fontColor = "#494849";
         }
         return {
-            backgroundColor: backgroundColor,
+            backgroundColor: chroma(backgroundColor).alpha(0.3).css(),
             fontColor: fontColor
         };
     },

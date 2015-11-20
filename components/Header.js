@@ -5,7 +5,6 @@
 var React = require('react');
 var nwGui = global.nwGui;
 var Ltt = global.Ltt;
-var Logo = require('./Logo');
 var RB = require('react-bootstrap');
 var Button = RB.Button;
 var ButtonToolbar = RB.ButtonToolbar;
@@ -66,40 +65,34 @@ var Header = React.createClass({
 
         return (
             <header className="ltt_c-header" style={style}>
-                <Logo title="LTT"/>
                 <div className="ltt_c-header-controls">
-                    <div className="btn-group">
-                        <button
-                            className="btn ltt_c-header-barBtn js-open-sidebar"
-                            onClick={this.handleConfigBtnClick}
-                        ><i className="fa fa-bars"></i></button>
-                    </div>
-                        <ButtonToolbar>
-                            <ButtonGroup className="history-btn-group">
-                                <Button className="ltt_c-header-backBtn" disabled={this.state.disabledBackButton} onClick={this.back}>
-                                    <i className="fa fa-angle-left"></i>
-                                </Button>
-                                <Button className="ltt_c-header-forwardBtn" disabled={this.state.disabledForwardButton} onClick={this.forward}>
-                                    <i className="fa fa-angle-right"></i>
-                                </Button>
+                    <div style={{width: 10}}></div>
+                    <ButtonToolbar>
+                        <ButtonGroup className="history-btn-group">
+                            <Button className="ltt_c-header-backBtn" disabled={this.state.disabledBackButton} onClick={this.back}>
+                                <i className="fa fa-angle-left"></i>
+                            </Button>
+                            <Button className="ltt_c-header-forwardBtn" disabled={this.state.disabledForwardButton} onClick={this.forward}>
+                                <i className="fa fa-angle-right"></i>
+                            </Button>
 
-                            </ButtonGroup>
-                            <ButtonGroup>
-                                <Button onClick={this.openLogCheck}>
-                                    <i className="fa fa-file-text" title="check log file"></i>
-                                </Button>
-                                <Button onClick={this.openConfigs}>
-                                    <i className="fa fa-cogs" title="applicaton configs"></i>
-                                </Button>
-                                <Button className="ltt_c-header-debugBtn js-debugApplication" onClick={this.debugApplication}>
-                                    <i className="fa fa-gear"></i>
-                                </Button>
-                                {screenBtn}
-                                <Button className="ltt_c-header-closeBtn js-closeWindow" onClick={this.closeWindow}>
-                                    <i className="fa fa-close"></i>
-                                </Button>
-                            </ButtonGroup>
-                        </ButtonToolbar>
+                        </ButtonGroup>
+                        <ButtonGroup>
+                            <Button onClick={this.openLogCheck}>
+                                <i className="fa fa-file-text" title="check log file"></i>
+                            </Button>
+                            <Button onClick={this.openConfigs}>
+                                <i className="fa fa-cogs" title="applicaton configs"></i>
+                            </Button>
+                            <Button className="ltt_c-header-debugBtn js-debugApplication" onClick={this.debugApplication}>
+                                <i className="fa fa-gear"></i>
+                            </Button>
+                            {screenBtn}
+                            <Button className="ltt_c-header-closeBtn js-closeWindow" onClick={this.closeWindow}>
+                                <i className="fa fa-close"></i>
+                            </Button>
+                        </ButtonGroup>
+                    </ButtonToolbar>
                 </div>
             </header>
         );
@@ -121,9 +114,6 @@ var Header = React.createClass({
         history.forward();
     },
 
-    handleConfigBtnClick: function () {
-        this.props.onConfigBtnClick();
-    },
 
     closeWindow: function () {
         Ltt.close();

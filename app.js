@@ -64,13 +64,11 @@ var App = React.createClass({
 
     render: function () {
         var clsObj = {ltt: true};
-        clsObj[NAV_OPEN] = this.state.openNav;
         var className = cx(clsObj);
         return (
             <div className={className}>
                 <Header
                     isFullscreen={this.state.isFullscreen}
-                    onConfigBtnClick={this.toggleNav}
                     onEnterFullscreen={this.enterFullscreen}
                     onLeaveFullscreen={this.leaveFullscreen}/>
                 <div className="ltt_c-outerContainer">
@@ -91,12 +89,6 @@ var App = React.createClass({
     getCurrentPage: function () {
         var path = this.getPath();
         return path.split('/')[1];
-    },
-
-    toggleNav: function () {
-        this.setState({
-            openNav: !this.state.openNav
-        });
     },
 
 

@@ -85,9 +85,12 @@
 /** nav **/
 .ltt_c-nav{
     width: 65px;
-    display: none;
     background-color: #383d40;
-    /* color: #e3e4e6; */
+    display: block;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 9999;
 }
 .ltt_c-nav .ltt_c-menu-item{
     height: 60px;
@@ -113,9 +116,6 @@
     /*overflow: overlay;*/
 }
 
-.ltt__navOpen .ltt_c-nav{
-    display: block;
-}
 
 /**menu**/
 
@@ -200,6 +200,7 @@
     position: relative;
     height: 100%;
     padding-bottom: 30px;
+    margin-left: 65px;
 }
 
 .scrollable {
