@@ -66,17 +66,16 @@ var Header = React.createClass({
         return (
             <header className="ltt_c-header" style={style}>
                 <div className="ltt_c-header-controls">
-                    <div style={{width: 10}}></div>
-                    <ButtonToolbar>
-                        <ButtonGroup className="history-btn-group">
-                            <Button className="ltt_c-header-backBtn" disabled={this.state.disabledBackButton} onClick={this.back}>
-                                <i className="fa fa-angle-left"></i>
-                            </Button>
-                            <Button className="ltt_c-header-forwardBtn" disabled={this.state.disabledForwardButton} onClick={this.forward}>
-                                <i className="fa fa-angle-right"></i>
-                            </Button>
+                    <ButtonGroup className="history-btn-group">
+                        <Button className="ltt_c-header-backBtn" disabled={this.state.disabledBackButton} onClick={this.back}>
+                            <i className="fa fa-angle-left"></i>
+                        </Button>
+                        <Button className="ltt_c-header-forwardBtn" disabled={this.state.disabledForwardButton} onClick={this.forward}>
+                            <i className="fa fa-angle-right"></i>
+                        </Button>
 
-                        </ButtonGroup>
+                    </ButtonGroup>
+                    <ButtonToolbar>
                         <ButtonGroup>
                             <Button onClick={this.openLogCheck}>
                                 <i className="fa fa-file-text" title="check log file"></i>
