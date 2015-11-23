@@ -163,6 +163,10 @@ var Task = React.createClass({
                                 <i className="fa fa-user" title="last active"></i>
                                 {new Moment(task.lastActiveTime).fromNow()}
                             </span>
+                            <span  className="ltt_c-task-timeInfo-item" title={new Moment(task.completeTime).format('YYYY-MM-DD HH:mm:ss')}>
+                                <i className="fa fa-check-circle" title="completed time"></i>
+                                {new Moment(task.completeTime).fromNow()}
+                            </span>
                         </div>
                     </div>
                     {progress}
