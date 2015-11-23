@@ -232,9 +232,10 @@
   position: relative;
 }
 
-.ltt_c-projectDetail-projectInfo .external-link{
+.ltt_c-projectDetail-projectInfo .icon-btn{
   font-size: 0.5em;
   margin-left: 5px;
+  margin-right: 5px;
 }
 
 .ltt_c-projectTask-statistics{

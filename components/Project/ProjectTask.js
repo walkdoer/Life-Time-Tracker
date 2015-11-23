@@ -808,6 +808,8 @@ module.exports = React.createClass({
 
 var ProjectInfo = React.createClass({
 
+    mixins: [PureRenderMixin, Router.State, Router.Navigation],
+
     propTypes: {
         onFilterTags: React.PropTypes.func
     },
@@ -852,12 +854,13 @@ var ProjectInfo = React.createClass({
             var mProjectLastActiveTime = new Moment(project.lastActiveTime);
             var linkEl, link;
             if (project.attributes && (link = project.attributes.link)) {
-                linkEl = <span className="external-link ltt-link" onClick={this.openExternalLink.bind(this, link)} title={link}><i className="fa fa-external-link"></i></span>
+                linkEl = <span className="icon-btn external-link ltt-link" onClick={this.openExternalLink.bind(this, link)} title={link}><i className="fa fa-external-link"></i></span>
             }
             projectBasicInfo = (
                 <section className="ltt_c-projectDetail-projectInfo">
                     <h1>
                         {project.name}{linkEl}
+                        <span className="ltt-link icon-btn" onClick={this.insertLog}><i className="fa fa-pencil-square-o"/></span>
                         <span className="ltt_c-projectDetail-logClasses">{logClasses}</span>
                         <span className="ltt_c-projectDetail-times">
                             <span className="ltt-M2">
@@ -896,6 +899,23 @@ var ProjectInfo = React.createClass({
             projectBasicInfo = <div></div>
         }
         return projectBasicInfo;
+    },
+
+    insertLog: function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var project = this.props.project;
+        var that = this;
+        DataAPI.Log.load({
+            projectId: project._id,
+            sort: 'start:-1',
+            limit: 1
+        }).then(function (log) {
+            if (!_.isEmpty(log)) {
+                Bus.emit(EventConstant.INSERT_LOG_FROM_TASK, log[0]);
+                that.transitionTo('logEditor', {date: new Moment().format('YYYY-MM-DD')});
+            }
+        });
     },
 
 
