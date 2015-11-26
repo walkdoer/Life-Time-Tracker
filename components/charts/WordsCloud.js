@@ -21,8 +21,8 @@ module.exports = React.createClass({
 
     plot: function (words) {
         var $el = $(this.getDOMNode());
-        this.width = $el.width();
-        this.height = this.width * 0.5;
+        this.width = this.props.width || $el.width();
+        this.height = this.props.height || this.width * 0.5;
         words.sort(function (a, b) {
             return a.size - b.size;
         });

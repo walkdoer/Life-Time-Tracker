@@ -20,6 +20,14 @@
     overflow-y: auto !important;
 }
 
+.ltt_c-page-logEditor .ltt_c-chart-TagCloud{
+  height: 240px;
+}
+.ltt_c-page-logEditor .ltt_c-chart-TagCloud .ltt_c-chart-wordsCloud{
+  height: 240px;
+  min-height: 240px;
+}
+
 .ltt_c-logEditor-header{
     background:#FFF;
     position: absolute;

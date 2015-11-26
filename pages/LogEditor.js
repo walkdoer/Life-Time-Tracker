@@ -6,6 +6,7 @@ var React = require('react');
 var $ = require('jquery');
 var numeral = require('numeral');
 var Router = require('react-router');
+var Moment = require('moment');
 var Mt = window.Mousetrap;
 var _ = require('lodash');
 require('../libs/bootstrap-datepicker');
@@ -18,10 +19,8 @@ var Button = ReactBootStrap.Button;
 var Link = Router.Link;
 
 /* Components */
-var Moment = require('moment');
 var LogEditor = require('../components/editor/LogEditor');
 var SearchBox = require('../components/SearchBox');
-var Moment = require('moment');
 var Notify = require('../components/Notify');
 var Progress = require('../components/Progress');
 var DataAPI = require('../utils/DataAPI');
@@ -31,6 +30,7 @@ var OneDayGoal =  require('../components/OneDayGoal');
 var IScroll = require('../libs/iscroll');
 var Swiper = require('../components/Swiper');
 var SwiperSlide = require('../components/SwiperSlide');
+var TagCloud = require('../components/charts/TagCloud');
 
 /** Store */
 var ProjectStore = require('../stores/ProjectStore');
@@ -41,6 +41,7 @@ var EVENT = require('../constants/EventConstant');
 /** Utils */
 var Bus = require('../utils/Bus');
 var DataAPI = require('../utils/DataAPI');
+
 
 
 var Ltt = global.Ltt;
@@ -112,6 +113,9 @@ var Page = React.createClass({
                             </SwiperSlide>
                             <SwiperSlide>
                                 <LogClassPie type="project" key={'project' + date} date={date}  backgroundColor="rgba(255, 255, 255, 0.1)" ref="projectPie" legend={true} compare={false}/>
+                            </SwiperSlide>
+                            <SwiperSlide>
+                                <TagCloud style={{marginTop: 20}} height={220} start={new Moment().startOf('day')} end={new Moment().endOf('day')}/>
                             </SwiperSlide>
                         </Swiper>
                         <ButtonToolbar>
