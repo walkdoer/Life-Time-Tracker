@@ -4,11 +4,16 @@ var React = require('react');
 var d3 = require('d3');
 var $ = require('jquery');
 var cloud = require('../../libs/d3.layout.cloud');
+var Immutable = require('immutable');
 
 module.exports = React.createClass({
 
     render: function() {
         return <div className="ltt_c-chart ltt_c-chart-wordsCloud"></div>;
+    },
+
+    shouldComponentUpdate: function (nextProps) {
+        return this.props.words !== nextProps.words;
     },
 
     componentDidUpdate: function () {
