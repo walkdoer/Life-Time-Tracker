@@ -193,6 +193,9 @@ module.exports = React.createClass({
                 type: 'spline',
                 name: 'progress',
                 yAxis: 1,
+                tooltip: {
+                    valueSuffix: ' %'
+                },
                 data: this.getProgressData()
             });
         }
