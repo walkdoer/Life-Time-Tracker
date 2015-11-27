@@ -79,8 +79,8 @@ var Projects = React.createClass({
                             }.bind(this)}/>
                     </div>
                     <Scroller className="ltt_scroller" style={this.props.style} ref="scroller" onSrcollEnd={this.lazyLoadData}>
-                        <div ref="projectCards">
-                            <LoadingMask loaded={!this.state.loading}/>
+                        <div ref="projectCards" style={{minHeight: 500}}>
+                            <LoadingMask loaded={!this.state.loading} opacity={1}/>
                             {this.state.projects.map(function (project) {
                                 return (
                                     <ProjectCard
