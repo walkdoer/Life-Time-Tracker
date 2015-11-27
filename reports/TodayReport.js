@@ -71,7 +71,7 @@ module.exports = React.createClass({
                             }}/>
                     </div>
                     <div className="Grid-cell u-1of2">
-                        <ClassStackChart title="Today and Yesterday Class Time Compare" date1={today} date2={yesterday} style={{height: 300}}/>
+                        <ClassStackChart title="Today and Yesterday Class Time Compare" date1={today} date2={yesterday} style={{height: 362}}/>
                     </div>
                 </div>
             </div>
@@ -104,6 +104,19 @@ var ClassStackChart = React.createClass({
                 that.plot(series);
             });
     },
+
+    shouldComponentUpdate: function (nextProps) {
+        return this.props.date1 !== nextProps.date1 || this.props.date2 !== nextProps.date2;
+    },
+
+    componentDidUpdate: function () {
+        var that = this;
+        this.getData()
+            .then(function (series) {
+                that.plot(series);
+            });
+    },
+
 
     plot: function (series) {
         var categories = this.getCategories();
