@@ -44,8 +44,22 @@
     border-bottom: 2px solid #F04BB6;
 }
 
+.ace_ltt_estimated{
+    color: #FFFFFF !important;
+    background-color: rgb(255, 128, 69);
+    font-weight: bold;
+}
+
 .ace-github .ace_marker-layer .log-unfinish{
     background: rgb(255, 236, 201) !important;
+}
+
+.ace-github .ace_marker-layer .log-beginsoon{
+    background: rgb(158, 255, 123) !important;
+}
+
+.ace-github .ace_marker-layer .log-overdue{
+    background: rgba(255, 128, 110, 0.5) !important;
 }
 
 .ace-github .ace_marker-layer .log-star{

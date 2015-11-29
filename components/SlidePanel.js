@@ -150,7 +150,7 @@ module.exports = React.createClass({
 
 
     return (
-      <div className={"ltt_c-SlidePanel " + (this.props.className || '')}>
+      <div className={"ltt_c-SlidePanel " + (this.props.className || '')} onClick={this.onMainClick}>
         {overlay}
         <Paper
           className="paper"
@@ -182,7 +182,14 @@ module.exports = React.createClass({
       this.close();
     }
   },
-  
+
+  onMainClick: function (e) {
+    if (this.props.stopPropagationClick) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  },
+
   _onWindowResize: function(e) {
 
   },

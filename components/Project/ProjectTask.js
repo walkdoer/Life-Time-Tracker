@@ -16,6 +16,8 @@ var RB = require('react-bootstrap');
 var ButtonToolbar = RB.ButtonToolbar;
 var Button = RB.Button;
 var ButtonGroup = RB.ButtonGroup;
+var OverlayTrigger = RB.OverlayTrigger;
+var Tooltip = RB.Tooltip;
 var Well = RB.Well;
 var extend = require('extend');
 var swal = require('sweetalert');
@@ -48,10 +50,20 @@ var SlidePanel = require('../SlidePanel');
 var EasyPie = require('../charts/EasyPie');
 var FullDateRangePicker = require('../FullDateRangePicker');
 var Scroller = require('../Scroller');
+var TimeConsumeRanking = require('../TimeConsumeRanking');
 
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
 var Bar = require('../charts/Bar');
+var Column = require('../charts/Column');
+var Line = require('../charts/Line');
+
+/** Store */
+var MemStore = require('../../stores/MemStore');
+
+/** Constants */
+var GlobalConstants = require('../../constants/GlobalConstants');
+
 
 /** Utils */
 var Util = require('../../utils/Util');
@@ -73,7 +85,7 @@ module.exports = React.createClass({
             projectLoaded: false,
             taskLoaded: false,
             openTaskDetail: false,
-            openStastics: false,
+            openTreeMap: false,
             markedFilter: false,
             taskStatus: 'doing',
             project: null,
@@ -84,9 +96,20 @@ module.exports = React.createClass({
 
     componentWillMount: function () {
         if (this.state.taskId) {
-            this.setState({
+            var task = MemStore.get(GlobalConstants.STORE_PROJECT_INDEX_TASK_ID);
+            var state = {
                 openTaskDetail: true
-            });
+            };
+            if (task && this.state.taskId === task._id) {
+                if (task.lastActiveTime) {
+                    this._end = new Moment(task.lastActiveTime).endOf('day').toDate();
+                    this._start = new Moment(task.lastActiveTime).subtract(1, 'week').startOf('day').toDate();
+                }
+                if (task.progress === 100) {
+                    state.taskStatus = 'done';
+                }
+            }
+            this.setState(state);
         }
     },
 
@@ -133,6 +156,8 @@ module.exports = React.createClass({
                             bsSize="xsmall"
                             period="week"
                             granularity="week"
+                            start={this._start}
+                            end={this._end}
                             compare={false}
                             showCompare={false}
                             onDateRangeInit={this.onDateRangeInit}
@@ -140,21 +165,27 @@ module.exports = React.createClass({
                             className="ltt_c-projectTask-dateRange"/>
                     </div>
                     <SlidePanel key={this.props.projectId  + 's1'}
+                        stopPropagationClick={true}
                         ref="treeMapSlider" open={false} openRight={true} onTransitionEnd={this.renderTreeMap}
                         position="fixed" zIndex={10000}>
-                        <h3>Time TreeMap of {(project ? project.name : '') + (version ? '-' + version.name : '')}</h3>
-                        <div className="closeBtn" onClick={this.closeTreeMap}><i className="fa fa-close"/></div>
-                        <div ref="treeMapContainer"></div>
+                        <div className="content">
+                            <h3>Time TreeMap of {(project ? project.name : '') + (version ? '-' + version.name : '')}</h3>
+                            <div className="closeBtn" onClick={this.closeTreeMap}><i className="fa fa-close"/></div>
+                            <div ref="treeMapContainer"></div>
+                        </div>
                     </SlidePanel>
                     <SlidePanel key={this.props.projectId + 's2'}
+                    stopPropagationClick={true}
                         ref="statistics" open={false} openRight={true} onTransitionEnd={this.renderStatistics}
                         position="fixed" zIndex={10000}>
-                        <h3>Statistis of {project ? project.name : null}</h3>
                         <div className="closeBtn" onClick={this.closeStastics}><i className="fa fa-close"/></div>
-                        <div ref="statisticsContainer"></div>
+                        <div className="content" ref="statisticsContainer"></div>
                     </SlidePanel>
                     <div className="ltt_c-projectTask-moreInfo">
-                        <span>Count: {this.state.tasks.length}</span>
+                        <div>
+                            <span className="ltt-number">Count: {this.state.tasks.length}, </span>
+                            <span className="ltt-time">Time: {Util.displayTime(this.state.tasks.reduce(function (s, t) { return t.totalTime + s;}, 0))}</span>
+                        </div>
                         <div className="btn-container">
                             <div className="btn-group">
                                 {[
@@ -216,6 +247,12 @@ module.exports = React.createClass({
             this.setState({
                 openTaskDetail: false
             });
+        }
+        if (this.__openStastics) {
+            this.closeStastics();
+        }
+        if (this.__treeMapOpened) {
+            this.closeTreeMap();
         }
     },
 
@@ -457,6 +494,7 @@ module.exports = React.createClass({
             this.currentTask = cTask;
         }
         return <SlidePanel ref="taskDetailSlider" key={this.props.projectId + 'task-detail'} open={(!!this.currentTask) && this.state.openTaskDetail} openRight={true}
+                    stopPropagationClick={true}
                     position="fixed" zIndex={10000} className="taskDetailSlider" width={300}>
             <div className="ltt_c-taskDetail-wrapper" ref="taskDetailWrapper">
                 <Scroller ref="taskDetailScroller" className="ltt_c-taskDetail-wrapper-scroller">
@@ -653,7 +691,9 @@ module.exports = React.createClass({
         this._treeMap.plot(root);
     },
 
-    openTreeMap: function () {
+    openTreeMap: function (e) {
+        e.preventDefault();
+        e.stopPropagation();
         this.__treeMapOpened = true;
         this.refs.treeMapSlider.open({
             width: $(this.getDOMNode()).width() - 150
@@ -666,7 +706,10 @@ module.exports = React.createClass({
         this.refs.treeMapSlider.close();
     },
 
-    openStastics: function () {
+    openStastics: function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.__openStastics = true;
         this.refs.statistics.open({
             width: $(this.getDOMNode()).width() - 150
         });
@@ -675,6 +718,7 @@ module.exports = React.createClass({
 
     closeStastics: function () {
         this.refs.statistics.close();
+        this.__openStastics = false;
     },
 
     selectTask: function (task) {
@@ -764,6 +808,8 @@ module.exports = React.createClass({
 
 var ProjectInfo = React.createClass({
 
+    mixins: [PureRenderMixin, Router.State, Router.Navigation],
+
     propTypes: {
         onFilterTags: React.PropTypes.func
     },
@@ -808,12 +854,13 @@ var ProjectInfo = React.createClass({
             var mProjectLastActiveTime = new Moment(project.lastActiveTime);
             var linkEl, link;
             if (project.attributes && (link = project.attributes.link)) {
-                linkEl = <span className="external-link ltt-link" onClick={this.openExternalLink.bind(this, link)} title={link}><i className="fa fa-external-link"></i></span>
+                linkEl = <span className="icon-btn external-link ltt-link" onClick={this.openExternalLink.bind(this, link)} title={link}><i className="fa fa-external-link"></i></span>
             }
             projectBasicInfo = (
                 <section className="ltt_c-projectDetail-projectInfo">
                     <h1>
                         {project.name}{linkEl}
+                        <span className="ltt-link icon-btn" onClick={this.insertLog}><i className="fa fa-pencil-square-o"/></span>
                         <span className="ltt_c-projectDetail-logClasses">{logClasses}</span>
                         <span className="ltt_c-projectDetail-times">
                             <span className="ltt-M2">
@@ -854,6 +901,23 @@ var ProjectInfo = React.createClass({
         return projectBasicInfo;
     },
 
+    insertLog: function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var project = this.props.project;
+        var that = this;
+        DataAPI.Log.load({
+            projectId: project._id,
+            sort: 'start:-1',
+            limit: 1
+        }).then(function (log) {
+            if (!_.isEmpty(log)) {
+                Bus.emit(EventConstant.INSERT_LOG_FROM_TASK, log[0]);
+                that.transitionTo('logEditor', {date: new Moment().format('YYYY-MM-DD')});
+            }
+        });
+    },
+
 
     onTagClick: function (tag, select) {
         var selectTags = this.state.selectTags;
@@ -882,6 +946,10 @@ var ProjectInfo = React.createClass({
 
     openExternalLink: function (link) {
         Ltt.openExternalLink(link);
+    },
+
+    getTotalTime: function () {
+        return this.state.allTotalTime || null;
     }
 });
 
@@ -902,6 +970,12 @@ var VersionInfo = React.createClass({
     render: function () {
         var version = this.state.version;
         var projectTotalTime = this.props.projectTotalTime;
+        var mCreateTime, mLastActiveTime, tooltip;
+        if (version) {
+            mCreateTime = new Moment(version.createTime);
+            mLastActiveTime = new Moment(version.lastActiveTime);
+            tooltip = <Tooltip> {mCreateTime.format('YYYY-MM-DD') + ' ~ ' + mLastActiveTime.format('YYYY-MM-DD')}</Tooltip>
+        }
         return version ? (
             <div className="ltt_p-projectDetail-versionInfo">
                 <div className="ltt_p-projectDetail-versionInfo-content">
@@ -910,17 +984,18 @@ var VersionInfo = React.createClass({
                         <i className="fa fa-tasks" title="Task count"></i>
                         {version.taskCount}
                     </span>
-                    <span title={'create at ' + new Moment(version.createTime).format('YYYY-MM-DD HH:mm:ss')}>
-                        <i className="fa fa-plus" title="create time"></i>
-                        {new Moment(version.createTime).fromNow()}
+                    <span title={'create at ' + mCreateTime.format('YYYY-MM-DD HH:mm:ss')}>
+                        <i className="fa fa-plus" title="create time"></i>{mCreateTime.fromNow()}
                     </span>
-                    <span title={'last active at ' + new Moment(version.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
-                        <i className="fa fa-user" title="last active"></i>
-                        {new Moment(version.lastActiveTime).fromNow()}
+                    <span title={'last active at ' + mLastActiveTime.format('YYYY-MM-DD HH:mm:ss')}>
+                        <i className="fa fa-user" title="last active"></i> {mLastActiveTime.fromNow()}
                     </span>
                     <span className="ltt-M2">
                         <i className="fa fa-clock-o" title="Total time"></i>
-                        {Moment.duration(version.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {new Moment(version.createTime).from(version.lastActiveTime, true)}
+                        {Moment.duration(version.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across
+                        <OverlayTrigger placement="bottom" overlay={tooltip} delay={10}>
+                            <span> {new Moment(version.createTime).from(version.lastActiveTime, true)}</span>
+                        </OverlayTrigger>
                         <span className="percent">
                             <span className="num">{(version.totalTime / projectTotalTime * 100).toFixed(1)}%</span> of {this.props.project.name}
                         </span>
@@ -953,6 +1028,7 @@ var VersionInfo = React.createClass({
             });
         });
     }
+
 });
 
 
@@ -990,10 +1066,18 @@ var Statistics = React.createClass({
         return <div className="ltt_c-projectTask-statistics">
             {
                 !_.isEmpty(versionData) ?
+                [
+                <h2>Version Bar</h2>,
                 <Bar data={this.convertData(versionData)} exporting={false}  legend={false}/>
-                :
-                null
+                ] : null
             }
+            <h2>Top 10 List</h2>
+            <TimeConsumeRanking tabs={['tags', 'classes', 'task']}
+                    params={{
+                        projects: this.props.project.name,
+                        limit: 10
+                    }}/>
+            <TaskTrend project={this.props.project}/>
         </div>
     },
 
@@ -1001,6 +1085,7 @@ var Statistics = React.createClass({
     componentDidMount: function () {
         this.loadVersionData();
     },
+
 
     loadVersionData: function () {
         var that = this;
@@ -1035,5 +1120,57 @@ var Statistics = React.createClass({
                 value: item.totalTime
             };
         });
+    }
+});
+
+
+var TaskTrend = React.createClass({
+
+    getInitialState: function () {
+        return {
+            taskTrendData: null,
+            trendGroupOption: 'day'
+        };
+    },
+
+    componentDidMount: function () {
+        this.loadTaskTrendData();
+    },
+
+    render: function () {
+        var trendGroupOption = this.state.trendGroupOption;
+        return (
+        <div>
+            <h2> Task Trend <ButtonGroup>
+                {['year', 'month', 'week', 'day'].map(function (type) {
+                    return <Button bsSize='xsmall' active={trendGroupOption === type} onClick={this._onTaskTrendGroupOptionChange.bind(this, type)}>{type}</Button>
+                }, this)}</ButtonGroup>
+            </h2>
+            <Column legend={false} convert={false} data={[{data: this.state.taskTrendData}]}/>
+        </div>
+        );
+    },
+
+    _onTaskTrendGroupOptionChange: function (type) {
+        this.setState({
+            trendGroupOption: type
+        }, function () {
+            this.loadTaskTrendData();
+        });
+    },
+
+    loadTaskTrendData: function () {
+        var that = this;
+        return DataAPI.Task.trend({
+            projectId: this.props.project._id,
+            group: this.state.trendGroupOption,
+            list: false
+        }).then(function (data) {
+            that.setState({
+                taskTrendData: data.map(function (d) {
+                    return [d._id, d.count];
+                })
+            });
+        })
     }
 })

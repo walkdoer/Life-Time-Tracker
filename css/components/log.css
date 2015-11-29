@@ -57,6 +57,7 @@
     padding: 4px 6px;
     margin-right: 4px;
     color: #C22F2F;
+    font-family: 'Share Tech', sans-serif;
 }
 
 .ltt_c-log-origin {
@@ -71,6 +72,7 @@
     color: #6A6A6A;
     background: #EFF7FF;
     border-radius: 4px;
+    font-family: 'Share Tech', sans-serif;
 }
 
 
@@ -146,5 +148,6 @@
     bottom: 2px;
     left: 14px;
     width: 50%;
+    font-family: 'Share Tech', sans-serif;
     color: #989898;
 }

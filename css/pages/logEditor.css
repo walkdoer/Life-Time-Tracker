@@ -20,6 +20,17 @@
     overflow-y: auto !important;
 }
 
+.ltt_c-page-logEditor .ltt_c-chart-TagCloud{
+  height: 240px;
+}
+.ltt_c-page-logEditor .ltt_c-chart-TagCloud .loadingMask{
+  background:transparent;
+}
+.ltt_c-page-logEditor .ltt_c-chart-TagCloud .ltt_c-chart-wordsCloud{
+  height: 240px;
+  min-height: 240px;
+}
+
 .ltt_c-logEditor-header{
     background:#FFF;
     position: absolute;
@@ -66,7 +77,23 @@
     height: 100%;
     overflow: hidden;
     border-left: 1px solid #ECECEC;
+    /* background-image: url(../../images/snow-mountain.jpg); */
+    /* background-size: cover; */
 }
+
+/*.ltt_c-page-logEditor aside::before{
+  display: block;
+  position: absolute;
+  content: ' ';
+  background-image: url(../../images/test.jpg);
+  -webkit-filter: blur(3px);
+  filter: blur(5px);
+  background-size: cover;
+  opacity: 0.4;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}*/
 
 .ltt_c-page-logEditor-datepicker{
   border-bottom: 1px solid #E8E8E8;
@@ -151,6 +178,7 @@
 }
 .ltt_c-lastTime-time {
   color: #FEF8D8;
+  font-family: 'Share Tech', sans-serif;
 }
 /*.ltt_c-lastTime-name:after{
   content: ":";

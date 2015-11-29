@@ -34,6 +34,8 @@
 }
 .ltt_c-projectCard-lastActiveTime{
     margin-right: 5px;
+    margin-left: 4px;
+    font-family: 'Share Tech', sans-serif;
 }
 
 .ltt_c-projectCard .ltt_c-tag{
@@ -70,6 +72,7 @@
 .ltt_c-projectCard-footer-item {
     border-right: 1px solid #EEEDED;
     padding: 10px;
+    font-family: 'Share Tech', sans-serif;
 }
 .ltt_c-projectCard-footer-item:last-child{
     border: none;

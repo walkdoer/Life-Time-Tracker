@@ -34,12 +34,13 @@ var Projects = React.createClass({
     mixins: [Router.State],
 
     getInitialState: function () {
-        var startDate = new Moment().startOf('month').toDate(),
+        var startDate = new Moment().subtract(1, 'month').startOf('day').toDate();
             endDate = new Moment().endOf('day').toDate();
         return {
             loading: true,
             startDate: startDate,
             endDate: endDate,
+            loadNum: 0,
             projects: []
         };
     },
@@ -62,6 +63,8 @@ var Projects = React.createClass({
             display: isIndex ? 'block' : 'none'
         };
 
+        var loadNum = this.state.loadNum;
+
         return (
             <section className="ltt_c-page ltt_c-page-projects">
                 <div className="ltt_c-page-projects-projectCards" style={projectCardsStyle}>
@@ -76,15 +79,15 @@ var Projects = React.createClass({
                             }.bind(this)}/>
                     </div>
                     <Scroller className="ltt_scroller" style={this.props.style} ref="scroller" onSrcollEnd={this.lazyLoadData}>
-                        <div ref="projectCards">
-                            <LoadingMask loaded={!this.state.loading}/>
+                        <div ref="projectCards" style={{minHeight: 500}}>
+                            <LoadingMask loaded={!this.state.loading} opacity={1}/>
                             {this.state.projects.map(function (project) {
                                 return (
                                     <ProjectCard
                                         className="projectcard"
                                         startDate={that.state.startDate}
                                         endDate={that.state.endDate}
-                                        data={project} key={project._id}
+                                        data={project} key={loadNum + project._id}
                                         ref={project._id}
                                         onDelete={function (project, e) {
                                             if (window.confirm("Are you sure to delete")) {
@@ -197,6 +200,7 @@ var Projects = React.createClass({
             that.allProjects = projects;
             that.setState({
                 loading: false,
+                loadNum: that.state.loadNum + 1,
                 projects: projects
             }, function () {
                 this.initGrid();

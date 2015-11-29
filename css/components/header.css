@@ -34,9 +34,11 @@
     flex: 1;
     display: flex;
     justify-content: space-between;
+    margin-left: 65px;
 }
 
 .btn-group.history-btn-group{
+    margin-left:10px;
     margin-right: 10px;
 }
 

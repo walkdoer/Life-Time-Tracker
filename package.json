@@ -17,14 +17,15 @@
     "min_height": 700
   },
   "dependencies": {
+    "blueimp-md5": "^1.1.1",
     "body-parser": "~1.10.0",
     "chart.js": "^1.0.2",
+    "chroma-js": "^1.1.1",
     "cli-table": "~0.3.0",
     "color": "^0.8.0",
     "colors": "~0.6.2",
     "commander": "^2.8.1",
     "d3": "^3.5.5",
-    "evernote": "^1.25.5",
     "express": "~4.8.8",
     "extend": "~2.0.0",
     "fixed-data-table": "^0.4.6",
@@ -64,7 +65,6 @@
     "browserify": "~6.2.0",
     "browserify-shim": "~3.8.0",
     "envify": "~3.0.0",
-    "express": "~4.8.8",
     "glob": "^5.0.5",
     "gulp": "~3.9.0",
     "gulp-clean": "~0.3.1",
@@ -102,7 +102,8 @@
     "fullcalendar": "./bower_components/fullcalendar/dist/fullcalendar.js",
     "tinyColor": "./bower_components/tinycolor/dist/tinycolor-min.js",
     "colorPicker": "./bower_components/pick-a-color/build/1.2.3/js/pick-a-color-1.2.3.min.js",
-    "easyPieChart": "./bower_components/jquery.easy-pie-chart/dist/easypiechart.js"
+    "easyPieChart": "./bower_components/jquery.easy-pie-chart/dist/easypiechart.js",
+    "swiper": "./libs/swiper/swiper.js"
   },
   "browserify-shim": {
     "noty": "noty",

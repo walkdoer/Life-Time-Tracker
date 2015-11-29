@@ -18,13 +18,13 @@ var MenuItem = RB.MenuItem;
 
 
 /**components*/
-var Progress = require('../Progress');
+//var Progress = require('../Progress');
+var ProgressBar = require('../ProgressBar');
 var DataAPI = require('../../utils/DataAPI');
 var LogLine = require('../charts/LogLine');
 var LoadingMask = require('../LoadingMask');
 var GoalEditWindow = require('../../components/Goal/GoadEditWindow');
 var Notify = require('../../components/Notify');
-var CalendarHeatMap = require('../../components/charts/CalendarHeatMap');
 var GoalChart = require('../../components/charts/GoalChart');
 
 /** Utils */
@@ -49,7 +49,19 @@ module.exports = React.createClass({
 
     render: function () {
         var goal = this.props.goal;
-        console.log('render goal card');
+        var dateInfo = Util.toDate(goal.granularity);
+        var estimatedTime = goal.estimatedTime;
+        var oneDayTime = estimatedTime / dateInfo.diff;
+        var durationDays = new Moment().diff(new Moment().startOf(goal.granularity), 'day') + 1;
+        var expectTime = oneDayTime * durationDays;
+        var restTime = 0;
+        var totalTime = this.state.totalTime;
+        var todayTime = this.state.todayTime;
+        if (totalTime) {
+            restTime = totalTime - todayTime;
+        }
+
+
         var innerDropdown = <DropdownButton title='Granularity'>
             <MenuItem key='year'>year</MenuItem>
             <MenuItem key='month'>month</MenuItem>
@@ -73,7 +85,7 @@ module.exports = React.createClass({
                     {this.state.activitiesLoadFailed ?
                         'Load Activity Failed' :
                         (goal.filter ? <LogLine
-                            logs={goal.granularity !== 'day' ? this.state.activities.map(getDateData) : this.state.activities}
+                            logs={this.state.activities}
                             grouped={goal.granularity !== 'day'}
                             granularity={goal.granularity}
                             title={false}
@@ -81,9 +93,12 @@ module.exports = React.createClass({
                             yAxisLabel={false}/> : null)
                     }
                 </div>
-                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-totalTime" style={{width: 100}}>{Util.displayTime(this.state.totalTime)}</div>
+                <div className="ltt_c-GoalCard-item ltt_c-GoalCard-totalTime" style={{width: 100}}>{Util.displayTime(totalTime)}</div>
                 <div className="ltt_c-GoalCard-item ltt_c-GoalCard-progress" style={{width: 200}}>
-                    <Progress className="ltt_c-GoalCard-progress" max={goal.estimatedTime || 0} value={this.state.totalTime || 0}/>
+                    <ProgressBar className="ltt_c-GoalCard-progress"
+                        max={goal.estimatedTime || 0}
+                        expect={expectTime}
+                        value={[restTime, todayTime]}/>
                 </div>
             </div>
         )
@@ -118,14 +133,20 @@ module.exports = React.createClass({
         }, dateInfo, filter);
         DataAPI.Log.load(params)
             .then(function (data) {
-                data.sort(function (a, b) {
-                    return new Date(a._id).getTime() - new Date(b._id).getTime();
-                });
+                var today = new Moment().format(Util.DATE_FORMAT);
+                var todayTime = 0;
+                var totalTime = data ? data.reduce(function (total, item) {
+                    if (today === item._id) {
+                        todayTime += item.totalTime;
+                    }
+                    return total + (item.totalTime || 0);
+                }, 0) : 0;
+                data = Util.fillDataGap(data || [], dateInfo.start, dateInfo.end);
                 that.setState({
                     activitiesLoaded: true,
+                    totalTime: totalTime,
+                    todayTime: todayTime,
                     activities: data
-                }, function () {
-                    this.calculateProgress();
                 });
             }).fail(function (err) {
                 console.error(err.stack);
@@ -136,15 +157,6 @@ module.exports = React.createClass({
             });
     },
 
-    calculateProgress: function () {
-        var totalTime;
-        totalTime = this.state.activities.reduce(function (total, item) {
-            return total + (item.totalTime || 0);
-        }, 0);
-        this.setState({
-            totalTime: totalTime
-        });
-    },
 
     getGroupOption: function (granularity) {
         return {
@@ -169,26 +181,14 @@ module.exports = React.createClass({
         if (granularity === 'day' ) { return null;}
         var dateInfo = Util.toDate(granularity);
         var max = estimatedTime / dateInfo.diff;
-        return <GoalChart data={this.state.activities.map(function (item, index) {
-            return {
-                date: item._id,
-                count: item.totalTime
-            };
-        })}
-        start={dateInfo.start}
-        end={dateInfo.end}
-        type={granularity}
-        threshold={max}
-        rowItemCount={12}
-        itemPadding={2}
-        width={180}
-        height={80}/>
+        return <GoalChart data={this.state.activities}
+            start={dateInfo.start}
+            end={dateInfo.end}
+            type={granularity}
+            threshold={max}
+            rowItemCount={12}
+            itemPadding={2}
+            width={180}
+            height={80}/>
     }
 });
-
-function getDateData (item) {
-    return {
-        date: item._id,
-        count: item.totalTime
-    };
-}

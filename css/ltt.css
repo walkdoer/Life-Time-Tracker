@@ -6,6 +6,14 @@
     height: 100%;
     flex-direction: column;
 }
+/* latin */
+@font-face {
+  font-family: 'Share Tech';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Share Tech'), local('ShareTech-Regular'), url(../fonts/tech.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
 .ltt a:hover{
     text-decoration:none;
 }
@@ -47,6 +55,7 @@
 }
 
 .ltt-footer .ltt_c-appInfo{
+    font-family: 'Share Tech', sans-serif;
     display:flex;
     margin:  0 10px;
 }
@@ -76,9 +85,12 @@
 /** nav **/
 .ltt_c-nav{
     width: 65px;
-    display: none;
     background-color: #383d40;
-    color: #e3e4e6;
+    display: block;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 9999;
 }
 .ltt_c-nav .ltt_c-menu-item{
     height: 60px;
@@ -102,10 +114,6 @@
     /*-webkit-transition: -webkit-transform 150ms cubic-bezier(.2, .3, .25, .9);
     transition: transform 150ms cubic-bezier(.2, .3, .25, .9);*/
     /*overflow: overlay;*/
-}
-
-.ltt__navOpen .ltt_c-nav{
-    display: block;
 }
 
 
@@ -132,11 +140,12 @@
 }
 
 .ltt_c-menu-item.active{
-    background: #2c3031;
-    border-color: #73CEDA;
+    background: rgba(255, 255, 255, 0.35);
+    /* border-color: #000000; */
+    color: #585858;
 }
 .ltt_c-menu-item.active .fa{
-    color: #72c0ca;
+    color: #FFF;
 }
 
 .ltt_c-menu-item .fa{
@@ -191,6 +200,7 @@
     position: relative;
     height: 100%;
     padding-bottom: 30px;
+    margin-left: 65px;
 }
 
 .scrollable {
@@ -232,4 +242,8 @@
 
 .ltt-link {
     cursor: pointer;
+}
+
+.ltt-time, .ltt-number{
+    font-family: 'Share Tech', sans-serif;
 }

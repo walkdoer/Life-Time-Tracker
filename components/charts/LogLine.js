@@ -134,7 +134,7 @@ module.exports = React.createClass({
                 },
                 series: {
                     showInLegend: false,
-                    pointWidth: 10,
+                    //pointWidth: 10,
                     pointInterval: tickInterval
                 }
             },
@@ -193,6 +193,9 @@ module.exports = React.createClass({
                 type: 'spline',
                 name: 'progress',
                 yAxis: 1,
+                tooltip: {
+                    valueSuffix: ' %'
+                },
                 data: this.getProgressData()
             });
         }

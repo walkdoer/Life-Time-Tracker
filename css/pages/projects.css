@@ -152,6 +152,7 @@
     padding-left: 3px;
     background-color: #F8E3C4;
     border-radius: 4px;
+    font-family: 'Share Tech', sans-serif;
 }
 
 .ltt_c-ProjectNav .timeAmount .peity{
@@ -231,13 +232,18 @@
   position: relative;
 }
 
-.ltt_c-projectDetail-projectInfo .external-link{
+.ltt_c-projectDetail-projectInfo .icon-btn{
   font-size: 0.5em;
   margin-left: 5px;
+  margin-right: 5px;
 }
 
 .ltt_c-projectTask-statistics{
-  padding: 10px;
+  
+}
+
+.ltt_c-projectTask-statistics .ltt_c-TimeConsumeRanking .nav-tabs{
+  border-top:1px solid #ddd;
 }
 
 
@@ -311,6 +317,7 @@
 }
 .ltt_c-taskDetail-dateInfo-item-input{
   padding-right: 50px;
+  font-family: 'Share Tech', sans-serif;
 }
 .ltt_c-taskDetail-dateInfo-item-input input[type=text]{
   text-indent:10px;
@@ -351,7 +358,12 @@
 }
 
 .ltt_c-projectTask .ltt_c-SlidePanel .paper{
-  padding:10px 40px 20px 10px;
+  padding-bottom: 30px;
+}
+.ltt_c-projectTask .ltt_c-SlidePanel .content{
+  height: 100%;
+  overflow: scroll;
+  padding: 10px;
 }
 
 .ltt_c-projectTask .ltt_c-SlidePanel.taskDetailSlider .paper{

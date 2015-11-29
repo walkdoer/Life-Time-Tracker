@@ -120,6 +120,17 @@ exports.getDoingLog = function (date, logContent) {
 };
 
 
+exports.isDoingLog = function isDoingLog(log) {
+    var time;
+    if (log.start) {
+        time = TrackerHelper.getTimeSpan(log.origin, {date: log.date, patchEnd: false});
+    } else {
+        return false;
+    }
+    return time.start && !time.end;
+};
+
+
 var isInDateRange = function (type) {
     return function (date) {
         date = new Moment(date);
@@ -195,11 +206,11 @@ exports.getClassName = function (clsId) {
         return null;
     }
 };
-function displayTime(timeAmount) {
+function displayTime(timeAmount, type) {
     if (timeAmount === undefined || timeAmount === null) {
         return null;
     }
-    return Moment.duration(timeAmount, "minutes").format("M[m],d[d],h[h],mm[min]")
+    return Moment.duration(timeAmount, type || "minutes").format("M[m],d[d],h[h],mm[min]");
 }
 
 exports.displayTime = displayTime;
@@ -207,7 +218,6 @@ exports.DATE_FORMAT = 'YYYY-MM-DD';
 exports.TIME_FORMAT = 'HH:mm:ss';
 exports.DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
-var noty = window.noty;
 var layout = 'bottomRight';
 var animation = {
     open: 'animated flipInX',
@@ -241,7 +251,7 @@ exports.notify = function (cfg) {
             layout: layout,
             animation: animation
         };
-        noty(options);
+        window.noty(options);
     }
 };
 
@@ -261,4 +271,57 @@ exports.isElementInViewport = function isElementInViewport (el) {
         rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
         rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
     );
+};
+
+
+exports.fillDataGap = function (data, start, end, transformFun) {
+    var dataLen = Moment(end).diff(start, 'day') + 1;
+    var result = [];
+    transformFun = transformFun || function (a) {return a;};
+    data.sort(function (a,b) {
+        return (new Date(a._id).getTime() - new Date(b._id).getTime());
+    }).forEach(function (d) {
+        var diffStart = Moment(d._id).diff(start, 'day');
+        var index = result.length;
+        while(index < diffStart) {
+            result.push(transformFun({
+                date: new Moment(start).add(index, 'day').format('YYYY-MM-DD'),
+                count: 0,
+                empty: true
+            }));
+            index++;
+        }
+        result.push(transformFun({
+            date: d._id,
+            count: d.totalTime
+        }));
+    });
+    var index = result.length;
+    while(index < dataLen) {
+        result.push(transformFun({
+            date: new Moment(start).add(index, 'day').format('YYYY-MM-DD'),
+            count: 0,
+            empty: true
+        }));
+        index++;
+    }
+    return result;
+};
+
+
+exports.getLogDesc = function (log) {
+    var desc = [];
+    if (log.subTask) {
+        desc.push(log.subTask.name);
+    }
+    if (log.task) {
+        desc.push(log.task.name);
+    }
+    if (log.version) {
+        desc.push(log.version.name);
+    }
+    if (!_.isEmpty(log.projects)) {
+        desc.push(log.projects[0].name);
+    }
+    return !_.isEmpty(desc) ? desc.join(',') : '';
 };

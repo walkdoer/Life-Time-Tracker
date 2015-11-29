@@ -1,0 +1,7 @@
+.ltt_c-Swiper {}
+
+
+.ltt_c-Swiper > .ltt_c-Swiper-pagination {
+    top: 0px;
+    bottom: auto; /*overrwrite bottom*/
+}

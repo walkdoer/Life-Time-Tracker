@@ -34,7 +34,7 @@
 
 .ltt_c-GoalCard-progress{
     flex: 4;
-    padding: 25px 10px 25px 10px;
+    padding: 14.5px;
 }
 .ltt_c-GoalCard-progress .ltt_c-progress{
     height:30px;
@@ -70,7 +70,6 @@
 
 .ltt_c-CreateAddGoalModal-filterEditor{
     height: 115px;
-    margin: 10px 0;
 }
 
 .ltt_c-GoalCard-title-btns{
@@ -165,4 +164,24 @@
     position: absolute;
     top: 0;
     left: 0;
+}
+
+
+.ltt_c-CreateAddGoalModal-helpTip{
+    width: 380px;
+    max-width: 380px;
+}
+
+.ltt_c-CreateAddGoalModal .filter-help{
+    cursor: pointer;
+}
+
+
+.ltt_c-CreateAddGoalModal-helpTip .popover-content{
+    padding: 0px;
+}
+
+
+.ltt_c-CreateAddGoalModal-helpTip .ltt_c-HelpDocument .markdown-body{
+    margin:10px 0;
 }

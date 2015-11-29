@@ -37,6 +37,9 @@ var Tag = require('./components/Tag');
 var NAV_OPEN = 'ltt__navOpen';
 var EVENT = require('./constants/EventConstant');
 window.EVENT = EVENT;
+var GlobalConstants = require('./constants/GlobalConstants');
+/** Store */
+var MemStore = require('./stores/MemStore');
 
 /** Utils */
 var Util =require('./utils/Util');
@@ -61,13 +64,11 @@ var App = React.createClass({
 
     render: function () {
         var clsObj = {ltt: true};
-        clsObj[NAV_OPEN] = this.state.openNav;
         var className = cx(clsObj);
         return (
             <div className={className}>
                 <Header
                     isFullscreen={this.state.isFullscreen}
-                    onConfigBtnClick={this.toggleNav}
                     onEnterFullscreen={this.enterFullscreen}
                     onLeaveFullscreen={this.leaveFullscreen}/>
                 <div className="ltt_c-outerContainer">
@@ -88,12 +89,6 @@ var App = React.createClass({
     getCurrentPage: function () {
         var path = this.getPath();
         return path.split('/')[1];
-    },
-
-    toggleNav: function () {
-        this.setState({
-            openNav: !this.state.openNav
-        });
     },
 
 
@@ -485,6 +480,7 @@ var Footer = React.createClass({
         DataAPI.Task.load({name: task.name})
             .then(function (tasks) {
                 var task = tasks[0];
+                MemStore.set(GlobalConstants.STORE_PROJECT_INDEX_TASK_ID, task);
                 that.transitionTo(Util.getTaskUrl(task));
             });
     },

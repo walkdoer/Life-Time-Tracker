@@ -8,6 +8,8 @@ var Moment = require('moment');
 var ReactBootStrap = require('react-bootstrap');
 var Button = ReactBootStrap.Button;
 var Modal = ReactBootStrap.Modal;
+var OverlayTrigger = ReactBootStrap.OverlayTrigger;
+var Popover = ReactBootStrap.Popover;
 var ModalTrigger = ReactBootStrap.ModalTrigger;
 var Input = ReactBootStrap.Input;
 var ReactPropTypes = React.PropTypes;
@@ -18,6 +20,8 @@ var extend = require('extend');
 
 /** Components */
 var TimeInput = require('../../components/TimeInput');
+var HelpDocument = require('../../components/HelpDocument');
+var Scroller = require('../../components/Scroller');
 
 /** Constant */
 var EMPTY_FUN = function () {};
@@ -48,15 +52,17 @@ module.exports = React.createClass({
                         value={this.state.estimatedTime}
                         onChange={this.onEstimatedTimeChange}/>
                     {this.renderGranularity()}
-                    <pre id="ltt_c-CreateAddGoalModal-filterEditor" className="ltt_c-CreateAddGoalModal-filterEditor"/>
-                    <div className="help-block">
-                        Use filter to filter the log for the goal
-                        <pre>
-                                "classes": "SPR",
-                                "tags": 'running,jogging',
-                                "projects": "...",
-                                "tasks": "..."
-                        </pre>
+                    <div className="form-group">
+                        <label className="control-label">
+                            Filter Config
+                            <OverlayTrigger trigger="click" placement="right" overlay={this.renderHelp()} bsStyle="info">
+                                <i className="filter-help fa fa-question-circle" style={{marginLeft: 10}}/>
+                            </OverlayTrigger>
+                        </label>
+                        <pre id="ltt_c-CreateAddGoalModal-filterEditor" className="ltt_c-CreateAddGoalModal-filterEditor"/>
+                        <div className="help-block">
+                            Use filter to filter the log for the goal
+                        </div>
                     </div>
                 </div>
                 <div className="modal-footer">
@@ -67,11 +73,25 @@ module.exports = React.createClass({
         );
     },
 
+    renderHelp: function () {
+        return (
+            <Popover title="Filter Help" className="ltt_c-CreateAddGoalModal-helpTip">
+                <Scroller height={200} ref="scroller">
+                    <HelpDocument src="./help/goal.filter.md" onLoaded={function () {
+                        this.refs.scroller.refresh();
+                    }.bind(this)}/>
+                </Scroller>
+            </Popover>
+        );
+    },
+
     renderGranularity: function () {
         var that = this;
         var granularity = this.state.granularity;
         return (
-            <div className="btn-group">
+            <div className="form-group">
+                <label className="control-label" style={{display: 'block'}}>Display Type</label>
+                <div className="btn-group">
                 {[
                     {label: 'Day', value: 'day'},
                     {label: 'Week', value: 'week'},
@@ -85,6 +105,7 @@ module.exports = React.createClass({
                     return <button className={className}
                         onClick={that.onGranularityChange.bind(that, btn.value)}>{btn.label}</button>;
                 })}
+                </div>
             </div>
         );
     },

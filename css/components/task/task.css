@@ -49,6 +49,7 @@
     padding-left: 3px;
     background-color: #F8E3C4;
     border-radius: 4px;
+    font-family: 'Share Tech', sans-serif;
 }
 
 .ltt_c-task.done .ltt_c-task-title-text{
@@ -106,6 +107,7 @@
 }
 .ltt_c-task-timeInfo-item{
   margin-right:5px;
+  font-family: 'Share Tech', sans-serif;
 }
 .ltt_c-task-timeInfo-item .willDue,
 .ltt_c-task-timeInfo-item .overDue{
