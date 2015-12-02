@@ -437,6 +437,8 @@ function updateClassesConfig(cls) {
     });
     if (index >= 0) {
         config.classes.splice(index, 1, cls);
+    } else {
+        config.classes.push(cls);
     }
 }
 
