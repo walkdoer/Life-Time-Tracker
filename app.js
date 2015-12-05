@@ -26,6 +26,8 @@ var Badge = ReactBootStrap.Badge;
 var Q = require('q');
 var config = require('./conf/config');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
+var d3 = require('d3');
+window.d3 = d3;
 
 /** Components */
 var Header = require('./components/Header');

@@ -25,7 +25,7 @@
     "color": "^0.8.0",
     "colors": "~0.6.2",
     "commander": "^2.8.1",
-    "d3": "^3.5.5",
+    "d3": "^3.5.9",
     "express": "~4.8.8",
     "extend": "~2.0.0",
     "fixed-data-table": "^0.4.6",
@@ -107,12 +107,6 @@
   "browserify-shim": {
     "noty": "noty",
     "datetimepicker": "datetimepicker",
-    "d3": {
-      "exports": "d3",
-      "depends": [
-        "jquery:$"
-      ]
-    },
     "bootstrap": {
       "exports": "bootstrap",
       "depends": {
