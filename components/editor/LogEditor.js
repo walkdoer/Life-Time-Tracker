@@ -28,6 +28,7 @@ var md5 = require('blueimp-md5').md5;
 /**Components*/
 var TodayReport = require('../../reports/TodayReport');
 var HelpDocument= require('../HelpDocument');
+var Progress = require('../Progress');
 
 //store key
 var SK_CONTENT = 'content';
@@ -218,6 +219,7 @@ var LogEditor = React.createClass({
                         </ButtonToolbar>
                     </div>
                 </div>
+                <LogProgress ref="logProgress"/>
                 <div className="ltt_c-logEditor-content">
                     {this.state.showCalendar ? <Calendar date={this.props.title} onEventClick={this.onCalendarEventClick} ref="calendar"/> : null }
                     <pre id="ltt-logEditor" ref="editor"></pre>
@@ -269,6 +271,7 @@ var LogEditor = React.createClass({
             that._gotoLocate(that.props.locate, content);
             that._starCacheLines();
             that._checkLogValid(content);
+            that._updateLogProgress();
             that.props.onLoad(content, that.getDoingLog(content));
             editor.focus();
             if (_insertLog) {
@@ -867,6 +870,7 @@ var LogEditor = React.createClass({
             //persist to localstorage, if app exit accidently, can recovery from localstorage
             that._persistToLocalStorage(title, content);
             that._highLightDoingLine(content);
+            that._updateLogProgress();
             that._updateLogThatShouldBeginSoon();
             that._annotationOverTimeLog(logs, content);
             that._showContentChangeFlag();
@@ -1676,6 +1680,23 @@ var LogEditor = React.createClass({
 
     onCalendarEventClick: function (calEvent) {
         this._gotoLocate(calEvent.origin, this.getContent(), 1000);
+    },
+
+    _updateLogProgress: function () {
+        var logs = this.getAllLogs(true);
+        var done = 0, plan = 0, total = 0;
+        logs.forEach(function (log) {
+            if (log.start && log.end && log.len > 0) {
+                done++;
+            } else if (log.start && !log.end) {
+                plan++;
+            } else if (!log.start && !log.end) {
+                plan++;
+            }
+        });
+
+        total = done + plan;
+        this.refs.logProgress.update(total, done);
     }
 
 });
@@ -2026,6 +2047,33 @@ function getEventTitle(log) {
 function displayTime(timeAmount) {
     return Moment.duration(timeAmount, "minutes").format("M[m],d[d],h[h],mm[min]")
 }
+
+/**
+ * LogProgress
+ * show the log progress
+ */
+var LogProgress = React.createClass({
+
+    getInitialState: function () {
+        return {
+            done: this.props.done,
+            total: this.props.total
+        }
+    },
+
+    render: function () {
+        return <div className="ltt_c-LogProgress">
+            <Progress value={this.state.done} max={this.state.total}/>
+        </div>
+    },
+
+    update: function (total, done) {
+        this.setState({
+            done: done,
+            total: total
+        });
+    }
+})
 
 
 

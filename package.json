@@ -61,7 +61,6 @@
     "underscore": "^1.8.3"
   },
   "devDependencies": {
-    "babelify": "^6.0.2",
     "browserify": "~6.2.0",
     "browserify-shim": "~3.8.0",
     "envify": "~3.0.0",

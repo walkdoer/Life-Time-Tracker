@@ -168,3 +168,26 @@
 .ltt_c-logEditor .ltt_c-report-TodayReport .chart{
     box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.30);
 }
+
+.ltt_c-LogProgress{
+    position: absolute;
+    width: 100px;
+    padding: 10px;
+    bottom: 0px;
+    right: 0px;
+    z-index: 999;
+    background: rgba(255, 255, 255, 0.81);
+    border-left: 1px solid #E8E8E8;
+    border-top: 1px solid #E8E8E8;
+    border-left: 1px solid #E8E8E8;
+    border-radius: 5px 0 0 0;
+    box-shadow: 0 0 5px #E6E6E6;
+}
+
+.ltt_c-LogProgress .ltt_c-progress{
+    height: 11px;
+    border-radius: 3px;
+}
+.ltt_c-LogProgress .ltt_c-progress-bar{
+    border-radius: 3px;
+}
