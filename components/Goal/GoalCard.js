@@ -88,6 +88,7 @@ module.exports = React.createClass({
                             logs={this.state.activities}
                             grouped={goal.granularity !== 'day'}
                             granularity={goal.granularity}
+                            expect={oneDayTime}
                             title={false}
                             xAxisLabel={false}
                             yAxisLabel={false}/> : null)

@@ -233,3 +233,15 @@
 .ltt_c-VerticleTimeline-Activity .cbp_content{
     word-break:break-all;
 }
+
+.cbp_cls {
+    position: absolute;
+    width: 20%;
+    right: 0px;
+    font-size: 16px;
+    z-index: 1;
+    color: #FFF;
+    text-align: center;
+    font-weight: bold;
+    padding: 3px 0px;
+}

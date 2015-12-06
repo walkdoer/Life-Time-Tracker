@@ -67,6 +67,7 @@ var Activity = React.createClass({
         }
         return (
             <li className="ltt_c-VerticleTimeline-Activity">
+                <div className="cbp_cls" style={{backgroundColor: activityCls.color}}>{activityCls.name}</div>
                 <time className="cbp_tmtime" datetime={activity.start}>
                     <span className="cbp_date">{mStart.format('YYYY-MM-DD')}</span>
                     <span className="cbp_time">{mStart.format('HH:mm')}</span>
