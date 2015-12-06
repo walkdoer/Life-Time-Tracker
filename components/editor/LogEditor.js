@@ -475,7 +475,8 @@ var LogEditor = React.createClass({
         var editor = this.editor;
         var session = editor.getSession()
         var allLines = session.getDocument().getAllLines();
-        var index = 1, log;
+        var index = null;
+        var log = null;
         for (var i = 0; i < allLines.length; i++) {
             if (Util.isValidLog(allLines[i])) {
                 index = i + 1;
@@ -609,6 +610,9 @@ var LogEditor = React.createClass({
                 }
                 if (!line) { return; }
                 var newIndex = validLog.index;
+                if (newIndex === null) {
+                    newIndex = 0;
+                }
                 that.finishCurrentActivity();
                 //move line
                 var range = new Range(row, 0, row, Infinity);
