@@ -1076,6 +1076,7 @@ var LogEditor = React.createClass({
                 that._checkLogValid(content);
                 that._listenToEditor();
                 that._activeCurrentLine();
+                that._updateLogProgress();
                 that.props.onLoad(content, that.getDoingLog(content));
                 var timer = setTimeout(function() {
                     if (that.__reportOpened) {
