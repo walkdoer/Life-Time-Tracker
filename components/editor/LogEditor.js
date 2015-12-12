@@ -454,7 +454,7 @@ var LogEditor = React.createClass({
         var editor = this.editor;
         var session = editor.getSession()
         var allLines = session.getDocument().getAllLines();
-        var index = 1;
+        var index = 0;
         for (var i = 0; i < allLines.length; i++) {
             if (Util.isValidLog(allLines[i])) {
                 index = i + 1;
