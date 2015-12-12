@@ -129,12 +129,7 @@ var LogEditor = React.createClass({
             this._updateOverdueLogs(logs, lines);
             logs.forEach(function (log) {
                 var mEstimateStart, mEstimateEnd;
-                var estimatedTime = log.estimatedTime;
-                if (!estimatedTime) {
-                    if (log.estimateStart && log.estimateEnd) {
-                        estimatedTime = new Moment(log.estimateEnd).diff(log.estimateStart, 'minute');
-                    }
-                }
+                var estimatedTime = getEstimateTime(log);
                 if (estimatedTime > 0 && Util.isDoingLog(log)) {
                     md5Id = md5(log.origin) + '-end';
                     var fromStart = mNow.diff(log.start, 'minute');
@@ -300,6 +295,7 @@ var LogEditor = React.createClass({
             that._starCacheLines();
             that._checkLogValid(content);
             that._updateLogProgress();
+            that._annotationOverTimeLog(that.getAllLogs(), content);
             that.props.onLoad(content, that.getDoingLog(content));
             editor.focus();
             if (_insertLog) {
@@ -1010,7 +1006,7 @@ var LogEditor = React.createClass({
         var overtimeLogs = this._getOverTimeLog(logs);
         var annotations = overtimeLogs.map(function (log) {
             var realTime = log.len;
-            var estimatedTime = log.estimatedTime;
+            var estimatedTime = getEstimateTime(log);
             var overRate = ((realTime - estimatedTime) / estimatedTime) * 100;
             return {
                 row: this.getLineIndex(log.origin, content), // must be 0 based
@@ -1026,7 +1022,8 @@ var LogEditor = React.createClass({
     _getOverTimeLog: function (logs) {
         if (!logs) {return [];}
         return logs.filter(function (log) {
-            return  log.estimatedTime && log.len > log.estimatedTime;
+            var estimateTime = getEstimateTime(log);
+            return  estimateTime && log.len > estimateTime;
         });
     },
 
@@ -1110,6 +1107,7 @@ var LogEditor = React.createClass({
                 that._listenToEditor();
                 that._activeCurrentLine();
                 that._updateLogProgress();
+                that._annotationOverTimeLog(that.getAllLogs(), content);
                 that.props.onLoad(content, that.getDoingLog(content));
                 var timer = setTimeout(function() {
                     if (that.__reportOpened) {
@@ -2110,7 +2108,18 @@ var LogProgress = React.createClass({
             total: total
         });
     }
-})
+});
+
+
+function getEstimateTime(log) {
+    var estimatedTime = log.estimatedTime;
+    if (!estimatedTime) {
+        if (log.estimateStart && log.estimateEnd) {
+            estimatedTime = new Moment(log.estimateEnd).diff(log.estimateStart, 'minute');
+        }
+    }
+    return estimatedTime;
+}
 
 
 
