@@ -121,10 +121,12 @@ var LogEditor = React.createClass({
         this.__timeCheckerInterval = setInterval(function () {
             var mNow = new Moment();
             var logs = this.getAllLogs(true);
+            var lines = this.getAllLines();
             var NOTIFY_THRESHOLD = 10,
                 NOTIFY_INTERVAL = 5;
             var md5Id;
             this._updateLogThatShouldBeginSoon(logs);
+            this._updateOverdueLogs(logs, lines);
             logs.forEach(function (log) {
                 var mEstimateStart, mEstimateEnd;
                 var estimatedTime = log.estimatedTime;
@@ -137,8 +139,9 @@ var LogEditor = React.createClass({
                     md5Id = md5(log.origin) + '-end';
                     var fromStart = mNow.diff(log.start, 'minute');
                     var threshold = Math.ceil(estimatedTime * 0.7);
-                    if (fromStart > threshold && !this.__lastNotifyTime[md5Id]) {
-                        notifyEndSoon(log, fromStart, estimatedTime - fromStart);
+                    var remainTime = estimatedTime - fromStart
+                    if (fromStart > threshold && remainTime > 0 && !this.__lastNotifyTime[md5Id]) {
+                        notifyEndSoon(log, fromStart, remainTime);
                         this.__lastNotifyTime[md5Id] = true;
                     }
                 }
@@ -158,6 +161,31 @@ var LogEditor = React.createClass({
                 }
             }.bind(this));
         }.bind(this), 5000);
+    },
+
+    _updateOverdueLogs: function (logs, lines) {
+        var mNow = new Moment();
+        if (!lines) {
+            lines = this.getAllLines();
+        }
+        logs.forEach(function (log) {
+            var mEstimateStart, mEstimateEnd;
+            var estimatedTime = log.estimatedTime;
+            if (!estimatedTime) {
+                if (log.estimateStart && log.estimateEnd) {
+                    estimatedTime = new Moment(log.estimateEnd).diff(log.estimateStart, 'minute');
+                }
+            }
+            var index = lines.indexOf(log.origin);
+            this.unhighlightLine(index, 'log-overdue');
+            if (estimatedTime > 0 && Util.isDoingLog(log)) {
+                var fromStart = mNow.diff(log.start, 'minute');
+                var overdue = fromStart > estimatedTime;
+                if (overdue) {
+                    this.highlightLine(index, 'log-overdue');
+                }
+            }
+        }, this);
     },
 
     _unTrackActivity: function () {
@@ -875,6 +903,7 @@ var LogEditor = React.createClass({
             that._persistToLocalStorage(title, content);
             that._highLightDoingLine(content);
             that._updateLogProgress();
+            that._updateOverdueLogs(logs);
             that._updateLogThatShouldBeginSoon();
             that._annotationOverTimeLog(logs, content);
             that._showContentChangeFlag();
@@ -884,7 +913,7 @@ var LogEditor = React.createClass({
             }
             that._updateHighlightStarLine();
             that.props.onChange(content, editor);
-        }, 50));
+        }, 150));
 
         selection.on('changeCursor', _.debounce(function (e, selection) {
             var row = selection.getCursor().row;
@@ -1002,6 +1031,9 @@ var LogEditor = React.createClass({
     },
 
     getDoingLogIndex: function (doingLog, content) {
+        if (!content) {
+            content = this.editor.getValue();
+        }
         if (!doingLog) {
             doingLog = this.getDoingLog(content);
         }
@@ -1073,6 +1105,7 @@ var LogEditor = React.createClass({
                 that._starCacheLines();
                 that.gotoDoingLogLine(content);
                 that._highLightDoingLine(content);
+                that._updateLogThatShouldBeginSoon();
                 that._checkLogValid(content);
                 that._listenToEditor();
                 that._activeCurrentLine();
@@ -1100,7 +1133,6 @@ var LogEditor = React.createClass({
         var doingLog = this.getDoingLog(content);
         if (!doingLog) { return; }
         var index = this.getDoingLogIndex(doingLog, content);
-        var editor = this.editor;
         var columnPosition = doingLog.origin.indexOf('~') + 1;
         if (_.isNumber(index)) {
             this.gotoLine(index + 1, columnPosition);
