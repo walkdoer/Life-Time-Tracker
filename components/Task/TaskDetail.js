@@ -38,7 +38,8 @@ module.exports = React.createClass({
     getDefaultProps: function () {
         return {
             onHidden: noop,
-            onLogsLoaded: noop
+            onLogsLoaded: noop,
+            onChange: noop
         };
     },
 
@@ -46,7 +47,7 @@ module.exports = React.createClass({
         var task = this.props.task;
 
         return (
-            <div className="ltt_c-projectTask-logs ltt_c-taskDetail">
+            <div className="ltt_c-projectTask-logs ltt_c-taskDetail" onClick={function (e) {e.stopPropagation();}}>
                 <div className="ltt_c-LogList" key={task._id}>
                     <div className="ltt_c-LogList-header">
                         <span className="searchInput">{task.name}</span>
