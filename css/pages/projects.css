@@ -296,6 +296,9 @@
 .ltt_c-taskDetail{
 }
 
+.tooltip{
+  z-index: 10000;
+}
 
 
 .ltt_c-taskDetail-dateInfo-item{

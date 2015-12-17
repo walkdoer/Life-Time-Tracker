@@ -11,6 +11,8 @@ require("datetimepicker");
 var RB = require('react-bootstrap');
 var Row = RB.Row;
 var Col = RB.Col;
+var OverlayTrigger = RB.OverlayTrigger;
+var Tooltip = RB.Tooltip;
 
 /**components*/
 var Log = require('../Log');
@@ -45,7 +47,10 @@ module.exports = React.createClass({
 
     render: function () {
         var task = this.props.task;
-
+        var lastActiveTimeToolTip;
+        if (task.lastActiveTime) {
+            lastActiveTimeToolTip = <Tooltip>{new Moment(task.lastActiveTime).format(DATE_TIME_FORMAT)}</Tooltip>;
+        }
         return (
             <div className="ltt_c-projectTask-logs ltt_c-taskDetail" onClick={function (e) {e.stopPropagation();}}>
                 <div className="ltt_c-LogList" key={task._id}>
@@ -86,15 +91,27 @@ module.exports = React.createClass({
                         <Row className="ltt_c-taskDetail-dateInfo-item">
                             <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Created</Col>
                             <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
-                                {new Moment(task.createTime).format(DATE_TIME_FORMAT)}
+                                <OverlayTrigger placement="bottom"
+                                        overlay={<Tooltip>{new Moment(task.createTime).format(DATE_TIME_FORMAT)}</Tooltip>}
+                                        delay={10}
+                                        delayHide={60000}
+                                    >
+                                        <span>{new Moment(task.createTime).fromNow()}</span>
+                                    </OverlayTrigger>
                             </Col>
                         </Row>
                         {
-                            task.updateTime ?
+                            task.lastActiveTime ?
                             <Row className="ltt_c-taskDetail-dateInfo-item">
                                 <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Update</Col>
                                 <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
-                                    {new Moment(task.updateTime).format(DATE_TIME_FORMAT)}
+                                    <OverlayTrigger placement="bottom"
+                                        overlay={lastActiveTimeToolTip}
+                                        delay={10}
+                                        delayHide={60000}
+                                    >
+                                        <span>{new Moment(task.lastActiveTime).fromNow()}</span>
+                                    </OverlayTrigger>
                                 </Col>
                             </Row> : null
                         }
