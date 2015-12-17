@@ -11,6 +11,7 @@ require("datetimepicker");
 var RB = require('react-bootstrap');
 var Row = RB.Row;
 var Col = RB.Col;
+var Button = RB.Button;
 var OverlayTrigger = RB.OverlayTrigger;
 var Tooltip = RB.Tooltip;
 
@@ -33,7 +34,8 @@ module.exports = React.createClass({
         return {
             loaded: false,
             estimatedTime: task ? task.estimatedTime : null,
-            logs: []
+            logs: [],
+            task: task
         };
     },
 
@@ -46,7 +48,7 @@ module.exports = React.createClass({
     },
 
     render: function () {
-        var task = this.props.task;
+        var task = this.state.task;
         var lastActiveTimeToolTip;
         if (task.lastActiveTime) {
             lastActiveTimeToolTip = <Tooltip>{new Moment(task.lastActiveTime).format(DATE_TIME_FORMAT)}</Tooltip>;
@@ -94,7 +96,7 @@ module.exports = React.createClass({
                                 <OverlayTrigger placement="bottom"
                                         overlay={<Tooltip>{new Moment(task.createTime).format(DATE_TIME_FORMAT)}</Tooltip>}
                                         delay={10}
-                                        delayHide={60000}
+                                        delayHide={300}
                                     >
                                         <span>{new Moment(task.createTime).fromNow()}</span>
                                     </OverlayTrigger>
@@ -108,10 +110,10 @@ module.exports = React.createClass({
                                     <OverlayTrigger placement="bottom"
                                         overlay={lastActiveTimeToolTip}
                                         delay={10}
-                                        delayHide={60000}
-                                    >
-                                        <span>{new Moment(task.lastActiveTime).fromNow()}</span>
+                                        delayHide={300}>
+                                    <span>{new Moment(task.lastActiveTime).fromNow()}</span>
                                     </OverlayTrigger>
+                                    <Button bsStyle="warning" bsSize="xsmall" style={{marginLeft: 10}} onClick={this.correctLastActiveTime}>correct</Button>
                                 </Col>
                             </Row> : null
                         }
@@ -239,6 +241,30 @@ module.exports = React.createClass({
 
     hide: function () {
         this.props.onHidden();
+    },
+
+    correctLastActiveTime: function () {
+        var task = this.state.task;
+        DataAPI.Log.load({
+            tasks: task.name,
+            populate: false,
+            sort: "start:-1",
+            limit:1
+        }).then(function (log) {
+            if (_.isEmpty(log)) {return;}
+            log = log[0];
+            return DataAPI.Task.update({
+                id: task._id,
+                lastActiveTime: log.end
+            }).then(function(result) {
+                that.setState({
+                    task: result
+                });
+                that.props.onChange(result);
+            }, function () {
+                Notify.error('fail to correct last activetime of' + task.name);
+            });
+        })
     }
 });
 
