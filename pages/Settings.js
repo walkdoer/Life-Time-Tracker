@@ -352,6 +352,7 @@ var ClassesSettings = React.createClass({
             that.setState({
                 logClasses: logClasses
             });
+            removeClassFromConfig(logClass);
         }).catch(function(err) {
             console.error(err.stack);
             Notify.error('delete log class failed! ' + err.message);
@@ -442,4 +443,13 @@ function updateClassesConfig(cls) {
     }
 }
 
+
+function removeClassFromConfig(cls) {
+    var index = _.findIndex(config.classes, function(clsItem) {
+        return clsItem._id === cls._id;
+    });
+    if (index >= 0) {
+        config.classes.splice(index, 1);
+    }
+}
 
