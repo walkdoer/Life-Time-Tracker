@@ -847,7 +847,8 @@ var ProjectInfo = React.createClass({
             if (!_.isEmpty(logClasses)) {
                 classesConfig = config.classes;
                 logClasses = logClasses.map(function(cls) {
-                    return (<LogClass data={_.find(classesConfig, {'_id': cls})}/>);
+                    var cls = _.find(classesConfig, {'_id': cls});
+                    return cls ? <LogClass data={cls}/> : null;
                 });
             }
             var mProjectCreateTime = new Moment(project.createdTime);
