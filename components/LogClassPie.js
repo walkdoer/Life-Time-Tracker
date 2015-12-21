@@ -80,7 +80,7 @@ module.exports = React.createClass({
             }
             if (!label) {
                 label = {
-                    name: 'unknow'
+                    name: item._id
                 };
             }
             return {
