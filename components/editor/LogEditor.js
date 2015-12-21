@@ -1936,7 +1936,7 @@ var Calendar = React.createClass({
     },
 
     unHighlightEventEl: function (eventEl) {
-        if (!event) {
+        if (!eventEl) {
             this.getAllEvents().forEach(function (event) {
                 event.el.removeClass(EVENT_HIGHLIGHT_CLASS);
             });
