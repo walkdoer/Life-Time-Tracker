@@ -229,7 +229,48 @@
 }
 
 .ltt_c-projectDetail-projectInfo{
-  position: relative;
+    position: relative;
+    margin-top: -10px;
+    margin-left: -10px;
+    margin-right: -10px;
+    padding: 10px;
+    background-color: #FFF;
+    box-shadow: 0 0 5px #ccc;
+    margin-bottom: 15px;
+}
+}
+
+.ltt_c-projectDetail-projectInfo .projectInfo-container{
+  display: flex;
+  flex-direction: row;
+}
+
+.projectInfo-container .basicInfo{
+    display: flex;
+    flex-direction: column;
+    flex: 3;
+}
+
+.projectInfo-container .basicInfo .title{
+    color: rgba(75, 75, 75, 0.8);
+    text-shadow: 1px 4px 6px #f6f6f6, 0 0 0 #000, 1px 4px 6px #f6f6f6;
+    margin: 0 0px 10px;
+    font-weight: bold;
+}
+
+.projectInfo-container .basicInfo .timeinfos{
+   flex:1;
+}
+.projectInfo-container .basicInfo .timeinfos .timeinfo-item{
+  padding: 3px 5px;
+}
+
+.timeinfo-item .fa {
+  margin-right: 5px;
+}
+
+.projectInfo-container .chartsInfo{
+   flex: 5;
 }
 
 .ltt_c-projectDetail-projectInfo .icon-btn{

@@ -832,6 +832,10 @@ var ProjectInfo = React.createClass({
         this.loadTotalTime();
     },
 
+    componentWillReceiveProps: function (nextProps) {
+        this.loadTaskInfo(nextProps.project);
+    },
+
     render: function () {
         var projectBasicInfo;
         var project = this.props.project;
@@ -859,36 +863,21 @@ var ProjectInfo = React.createClass({
             }
             projectBasicInfo = (
                 <section className="ltt_c-projectDetail-projectInfo">
-                    <h1>
-                        {project.name}{linkEl}
-                        <span className="ltt-link icon-btn" onClick={this.insertLog}><i className="fa fa-pencil-square-o"/></span>
-                        <span className="ltt_c-projectDetail-logClasses">{logClasses}</span>
-                        <span className="ltt_c-projectDetail-times">
-                            <span className="ltt-M2">
-                                <i className="fa fa-tasks" title="Task count"></i>
-                                {project.taskCount}
-                            </span>
-                            <span className="ltt-M2" title={mProjectCreateTime.format(TIME_FORMAT)}>
-                                <i className="fa fa-plus" title="create time"></i>{mProjectCreateTime.fromNow()}
-                            </span>
-                            <span className="ltt-M2" title={mProjectLastActiveTime.format(TIME_FORMAT)}>
-                                <i className="fa fa-child" title="last active"></i>{mProjectLastActiveTime.fromNow()}
-                            </span>
-                            <span className="ltt-M2">
-                                <i className="fa fa-clock-o" title="Total time"></i>
-                                {Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {mProjectLastActiveTime.from(mProjectCreateTime, true)}
-                                {this.state.allTotalTime ? <span className="percent">
-                                    <span className="num">{(project.totalTime / this.state.allTotalTime * 100).toFixed(1)}%</span> of total time
-                                </span> : null}
-                            </span>
-                        </span>
-                    </h1>
-                    <span className="openDetail" onClick={this.toggleProjectDetail}>
-                        <i className={this.state.showProjectDetail ? "fa fa-chevron-circle-down" : "fa fa-chevron-circle-right"}></i>
-                    </span>
-                    {this.state.showProjectDetail ? <div className="ltt_c-projectDetail-projectInfo-detail">
-                        <p className="ltt_c-projectDetail-tags">{tags}</p>
-                    </div> : null}
+                    <div className="projectInfo-container">
+                        <div className="basicInfo">
+                            <h1 className="title">{project.name}{linkEl}<span className="ltt-link icon-btn" onClick={this.insertLog}><i className="fa fa-pencil-square-o"/></span></h1>
+                            <div className="timeinfos">
+                                <div className="timeinfo-item" title={mProjectCreateTime.format(TIME_FORMAT)}>
+                                    <i className="fa fa-plus" title="create time"></i>{mProjectCreateTime.fromNow()}
+                                </div>
+                                <div className="timeinfo-item" title={mProjectLastActiveTime.format(TIME_FORMAT)}>
+                                    <i className="fa fa-child" title="last active"></i>{mProjectLastActiveTime.fromNow()}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="chartsInfo">
+                        </div>
+                    </div>
                     {this.props.versionId ?
                         <VersionInfo id={this.props.versionId}
                             project={this.props.project}
@@ -951,6 +940,20 @@ var ProjectInfo = React.createClass({
 
     getTotalTime: function () {
         return this.state.allTotalTime || null;
+    },
+
+    loadTaskInfo: function (project) {
+        var that = this;
+        if (!project) {return;}
+        Q.allSettled([
+            DataAPI.Task.count({projectId: project._id, status: 'doing'}),
+            DataAPI.Task.count({projectId: project._id, status: 'done'})
+        ]).spread(function (doingResult, doneResult) {
+            that.setState({
+                doingTaskCount: doingResult.value,
+                doneTaskCount: doneResult.value
+            });
+        })
     }
 });
 

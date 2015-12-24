@@ -1,11 +1,3 @@
-.ltt_c-projectDetail h1{
-    color: rgba(75, 75, 75, 0.8);
-    text-shadow: 1px 4px 6px #f6f6f6, 0 0 0 #000, 1px 4px 6px #f6f6f6;
-    background: #f6f6f6;
-    margin: 0 0px 10px;
-    font-weight: bold;
-}
-
 .ltt_c-projectDetail-times,
 .ltt_c-projectDetail-logClasses{
     font-size: 13px;
