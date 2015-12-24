@@ -235,7 +235,7 @@
     margin-right: -10px;
     padding: 10px;
     background-color: #FFF;
-    box-shadow: 0 0 5px #ccc;
+    border-bottom: 1px solid #E2E2E2;
     margin-bottom: 15px;
 }
 
@@ -281,6 +281,26 @@
    flex: 5;
    display: flex;
    z-index: 2;
+}
+.projectInfo-container .chartsInfo .moreinfo{
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+}
+
+.moreinfo .moreinfo-item{
+  border-bottom: 1px solid #E2E2E2;
+  flex: 1;
+  padding-top: 10px;
+  text-indent: 15px;
+}
+
+.moreinfo .moreinfo-item .ltt-num{
+  font-size:20px;
+  font-weight: 600;
+}
+.moreinfo .moreinfo-item:last-child{
+  border-bottom:none;
 }
 
 .projectInfo-container .chartsInfo .chart-item{

@@ -829,17 +829,14 @@ var ProjectInfo = React.createClass({
         });
     },
 
-    componentWillReceiveProps: function (nextProps) {
-        this.loadTaskInfo(nextProps.project);
-    },
-
     render: function () {
         var projectBasicInfo;
         var project = this.props.project;
         var currentVersionId = this.props.versionId;
         if (project) {
             var tags = project.tags,
-                logClasses = project.classes;
+                logClasses = project.classes,
+                versoins = project.versions;
             if (!_.isEmpty(tags)) {
                 tags = tags.map(function (tag) {
                     return (<Tag selectable={true} onClick={this.onTagClick} value={tag}>{tag}</Tag>);
@@ -874,8 +871,13 @@ var ProjectInfo = React.createClass({
                             </div>
                         </div>
                         <div className="chartsInfo">
-                            <ProjectTimeChart key={"projecttimechart1" + project._id} project={project} width={70}/>
-                            <div className="chart-item"></div>
+                            <ProjectTimeChart key={"projecttimechart" + project._id} project={project} width={70}/>
+                            <TaskCountChart key={"taskcountchart" + project._id} project={project} width={70}/>
+                            <div className="moreinfo" style={{width: 150}}>
+                                <div className="moreinfo-item"><span className="ltt-num">{versoins.length}</span> Versions</div>
+                                <div className="moreinfo-item"><span className="ltt-num">{tags.length}</span> Tags</div>
+                                <div className="moreinfo-item"><span className="ltt-num">{logClasses.length}</span> Classes</div>
+                            </div>
                         </div>
                         <ActivityChart project={project} start={Moment(mProjectLastActiveTime).subtract(3, 'month').toDate()} end={mProjectLastActiveTime.toDate()}/>
                     </div>
@@ -929,20 +931,6 @@ var ProjectInfo = React.createClass({
 
     openExternalLink: function (link) {
         Ltt.openExternalLink(link);
-    },
-
-    loadTaskInfo: function (project) {
-        var that = this;
-        if (!project) {return;}
-        Q.allSettled([
-            DataAPI.Task.count({projectId: project._id, status: 'doing'}),
-            DataAPI.Task.count({projectId: project._id, status: 'done'})
-        ]).spread(function (doingResult, doneResult) {
-            that.setState({
-                doingTaskCount: doingResult.value,
-                doneTaskCount: doneResult.value
-            });
-        })
     }
 });
 
@@ -978,12 +966,61 @@ var ProjectTimeChart = React.createClass({
                 that.setState({
                     allTotalTime: total
                 }, function () {
-                    new EasyPieChart(this.refs.projectTimePercent.getDOMNode(), {size: this.props.width, barColor: "green"});
+                    new EasyPieChart(this.refs.projectTimePercent.getDOMNode(), {size: this.props.width, barColor: "#86e01e"});
                 });
             });
     },
     componentDidMount: function () {
         this.loadTotalTime();
+    }
+});
+
+
+var TaskCountChart = React.createClass({
+
+    getInitialState: function () {
+        return {
+            doingTaskCount: 0,
+            doneTaskCount: 0
+        };
+    },
+
+    render: function () {
+        var doing = this.state.doingTaskCount;
+        var done = this.state.doneTaskCount;
+        var total = doing + done;
+        var percent = done / total * 100;
+        return <div className="chart-item" style={{width: this.props.width}}>
+            {total > 0 ?
+            <div className="pieChart" ref="easychart" data-percent={percent}>{percent.toFixed(1) + '%'}</div>
+            : null}
+            <div className="desc">
+                doing: {doing}, done: {done}
+                <br/>
+                total: {total}
+            </div>
+        </div>
+    },
+
+    loadTaskInfo: function () {
+        var that = this;
+        var project = this.props.project;
+        if (!project) {return;}
+        Q.allSettled([
+            DataAPI.Task.count({projectId: project._id, status: 'doing'}),
+            DataAPI.Task.count({projectId: project._id, status: 'done'})
+        ]).spread(function (doingResult, doneResult) {
+            that.setState({
+                doingTaskCount: doingResult.value,
+                doneTaskCount: doneResult.value
+            }, function () {
+                new EasyPieChart(this.refs.easychart.getDOMNode(), {size: this.props.width, barColor: "#86e01e"});
+            });
+        })
+    },
+
+    componentDidMount: function () {
+        this.loadTaskInfo();
     }
 });
 
