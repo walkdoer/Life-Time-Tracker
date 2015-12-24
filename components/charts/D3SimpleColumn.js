@@ -20,13 +20,19 @@ module.exports = React.createClass({
 
     mixins: [ CommonFunction, PureRenderMixin ],
 
+    getDefaultProps: function () {
+      return {
+        height: 30
+      };
+    },
+
     render: function() {
         var className = 'ltt_c-chart ltt_c-chart-D3SimpleColumn';
         if (this.props.className) {
             className  = [className, this.props.className].join(' ');
         }
         return(
-            <div className={className}></div>
+            <div className={className} style={{height: this.props.height}}></div>
         );
     },
 

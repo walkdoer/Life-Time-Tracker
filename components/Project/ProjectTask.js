@@ -26,6 +26,7 @@ var ThemeManager = require('material-ui/lib/styles/theme-manager');
 var DefaultRawTheme = require('material-ui/lib/styles/raw-themes/light-raw-theme');
 var IScroll = require('../../libs/iscroll');
 var config = require('../../conf/config');
+var EasyPieChart = require('easyPieChart');
 
 /** mixins */
 var initParams = require('../mixins/initParams');
@@ -51,6 +52,7 @@ var EasyPie = require('../charts/EasyPie');
 var FullDateRangePicker = require('../FullDateRangePicker');
 var Scroller = require('../Scroller');
 var TimeConsumeRanking = require('../TimeConsumeRanking');
+var D3SimpleColumn = require('../charts/D3SimpleColumn.js');
 
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
@@ -817,7 +819,6 @@ var ProjectInfo = React.createClass({
     getInitialState: function () {
         return {
             showProjectDetail: false,
-            allTotalTime: null,
             selectTags: []
         };
     },
@@ -826,10 +827,6 @@ var ProjectInfo = React.createClass({
         this.setState({
             showProjectDetail: !this.state.showProjectDetail
         });
-    },
-
-    componentWillMount: function () {
-        this.loadTotalTime();
     },
 
     componentWillReceiveProps: function (nextProps) {
@@ -863,10 +860,11 @@ var ProjectInfo = React.createClass({
             }
             projectBasicInfo = (
                 <section className="ltt_c-projectDetail-projectInfo">
-                    <div className="projectInfo-container">
+                    <div className="projectInfo-container"  style={{display: "flex"}}>
                         <div className="basicInfo">
                             <h1 className="title">{project.name}{linkEl}<span className="ltt-link icon-btn" onClick={this.insertLog}><i className="fa fa-pencil-square-o"/></span></h1>
                             <div className="timeinfos">
+                                <div className="ltt_c-projectDetail-logClasses">{logClasses}</div>
                                 <div className="timeinfo-item" title={mProjectCreateTime.format(TIME_FORMAT)}>
                                     <i className="fa fa-plus" title="create time"></i>{mProjectCreateTime.fromNow()}
                                 </div>
@@ -876,7 +874,10 @@ var ProjectInfo = React.createClass({
                             </div>
                         </div>
                         <div className="chartsInfo">
+                            <ProjectTimeChart key={"projecttimechart1" + project._id} project={project} width={70}/>
+                            <div className="chart-item"></div>
                         </div>
+                        <ActivityChart project={project} start={Moment(mProjectLastActiveTime).subtract(3, 'month').toDate()} end={mProjectLastActiveTime.toDate()}/>
                     </div>
                     {this.props.versionId ?
                         <VersionInfo id={this.props.versionId}
@@ -924,22 +925,10 @@ var ProjectInfo = React.createClass({
         });
     },
 
-    loadTotalTime: function () {
-        var that = this;
-        DataAPI.Log.totalTime()
-            .then(function (total) {
-                that.setState({
-                    allTotalTime: total
-                });
-            });
-    },
+    
 
     openExternalLink: function (link) {
         Ltt.openExternalLink(link);
-    },
-
-    getTotalTime: function () {
-        return this.state.allTotalTime || null;
     },
 
     loadTaskInfo: function (project) {
@@ -954,6 +943,88 @@ var ProjectInfo = React.createClass({
                 doneTaskCount: doneResult.value
             });
         })
+    }
+});
+
+var ProjectTimeChart = React.createClass({
+
+    getInitialState: function () {
+        return {
+            allTotalTime: 0
+        }
+    },
+
+    render: function () {
+        var project = this.props.project;
+        var mProjectLastActiveTime = new Moment(project.lastActiveTime);
+        var mProjectCreateTime = new Moment(project.createdTime);
+        if (this.state.allTotalTime) {
+            var projectTimePercent = (project.totalTime / this.state.allTotalTime * 100).toFixed(1);
+        }
+        return <div className="chart-item" style={{width: this.props.width}}>
+            {this.state.allTotalTime ?
+            <div className="pieChart" ref="projectTimePercent" data-percent={projectTimePercent}>{projectTimePercent + '%'}</div>
+            : null}
+            <div className="desc">
+                {Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
+                <br/>across {mProjectLastActiveTime.from(mProjectCreateTime, true)}
+            </div>
+        </div>
+    },
+    loadTotalTime: function () {
+        var that = this;
+        DataAPI.Log.totalTime()
+            .then(function (total) {
+                that.setState({
+                    allTotalTime: total
+                }, function () {
+                    new EasyPieChart(this.refs.projectTimePercent.getDOMNode(), {size: this.props.width, barColor: "green"});
+                });
+            });
+    },
+    componentDidMount: function () {
+        this.loadTotalTime();
+    }
+});
+
+
+var ActivityChart = React.createClass({
+
+    getInitialState: function () {
+        return {
+            activityData: []
+        };
+    },
+
+    render: function () {
+        return <div className="ActivityChart">
+            <D3SimpleColumn data={this.state.activityData} height={50}/>
+        </div>
+    },
+
+    componentDidMount: function () {
+        this.loadActivity();
+    },
+
+
+    loadActivity: function () {
+        var that = this;
+        var start = this.props.start;
+        var end = this.props.end;
+        DataAPI.Log.load({
+            sum: true,
+            start: start,
+            end: end,
+            projects: this.props.project.name,
+            group: 'date'
+        }).then(function (data) {
+            var result = Util.fillDataGap(data, start, end, function (d) {
+                return d.count;
+            });
+            that.setState({
+                activityData: result
+            });
+        });
     }
 });
 

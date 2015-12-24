@@ -238,11 +238,18 @@
     box-shadow: 0 0 5px #ccc;
     margin-bottom: 15px;
 }
+
+.projectInfo-container{
+  display: flex;
+  position: relative;
 }
 
-.ltt_c-projectDetail-projectInfo .projectInfo-container{
-  display: flex;
-  flex-direction: row;
+.projectInfo-container .ActivityChart{
+  position: absolute;
+  height: 50px;
+  right: 0;
+  bottom: -10px;
+  width: 80%;
 }
 
 .projectInfo-container .basicInfo{
@@ -265,13 +272,40 @@
   padding: 3px 5px;
 }
 
+
 .timeinfo-item .fa {
   margin-right: 5px;
 }
 
 .projectInfo-container .chartsInfo{
    flex: 5;
+   display: flex;
+   z-index: 2;
 }
+
+.projectInfo-container .chartsInfo .chart-item{
+    flex: 1;
+}
+.projectInfo-container .chartsInfo .chart-item .desc{
+  text-align: center;
+}
+
+.projectInfo-container .chartsInfo .chart-item .pieChart{
+    position: relative;
+    text-align: center;
+    font-size: 0.63rem;
+    color: #646464;
+    line-height: 70px;
+    width: 70px;
+    margin:auto;
+}
+.projectInfo-container .chartsInfo .chart-item .pieChart canvas{
+    position: absolute;
+    width: 70px;
+    top: 0;
+    left: 0;
+}
+
 
 .ltt_c-projectDetail-projectInfo .icon-btn{
   font-size: 0.5em;
