@@ -379,7 +379,8 @@ var LogEditor = React.createClass({
                     that.getTaskCompletions(line, callback);
                 } else if (tokenType === 'ltt_subTask') {
                     that.getTaskCompletions(line, callback);
-                } else if (tokenType === 'ltt_tag') {
+                } else if (['ltt_tag', 'ltt_tag_start', 'ltt_tag_end', 'ltt_tag_split'].indexOf(tokenType) >= 0) {
+                    console.log(prefix);
                     that.getTagCompletions(prefix, callback);
                 }
             }
@@ -810,7 +811,7 @@ var LogEditor = React.createClass({
                 return cb(null, []);
             }
             var completions = tags.map(function (tag) {
-                return {name: tag.name, value: tag.name, meta: 'tag'};
+                return {name: tag.name, value: tag.name, meta: 'tag', score: 1000};
             });
             cb(null, completions);
         });
