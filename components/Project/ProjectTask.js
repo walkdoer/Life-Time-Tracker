@@ -28,6 +28,7 @@ var IScroll = require('../../libs/iscroll');
 var config = require('../../conf/config');
 var EasyPieChart = require('easyPieChart');
 
+
 /** mixins */
 var initParams = require('../mixins/initParams');
 
@@ -53,6 +54,7 @@ var FullDateRangePicker = require('../FullDateRangePicker');
 var Scroller = require('../Scroller');
 var TimeConsumeRanking = require('../TimeConsumeRanking');
 var D3SimpleColumn = require('../charts/D3SimpleColumn.js');
+var TinyBar = require('../charts/TinyBar.js');
 
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
@@ -871,6 +873,7 @@ var ProjectInfo = React.createClass({
                             </div>
                         </div>
                         <div className="chartsInfo">
+                            <RecentTaskTrend project={project}/>
                             <ProjectTimeChart key={"projecttimechart" + project._id} project={project} width={70}/>
                             <TaskCountChart key={"taskcountchart" + project._id} project={project} width={70}/>
                             <div className="moreinfo" style={{width: 150}}>
@@ -1023,6 +1026,36 @@ var TaskCountChart = React.createClass({
         this.loadTaskInfo();
     }
 });
+
+
+var RecentTaskTrend = React.createClass({
+    render: function () {
+        var project = this.props.project;
+        return <div className="chart-item">
+            <div className="chart-item-content" style={{marginTop:30}}>
+                <TinyBar value={function () {
+                var today = new Moment();
+                var end = today.format(Util.DATE_FORMAT);
+                var start = today.subtract(20, 'day').format(Util.DATE_FORMAT);
+                var that = this;
+                return DataAPI.Task.trend({
+                    projectId: project._id,
+                    group: 'day',
+                    list: false,
+                    start: start,
+                    end: end
+                }).then(function (data) {
+                    return Util.fillDataGap(data, start, end, function (d) {
+                        return d.count;
+                    }).join(',');
+                });
+            }} width={100} height={25}/></div>
+            <div className="desc">
+                Task trend
+            </div>
+        </div>
+    }
+})
 
 
 var ActivityChart = React.createClass({

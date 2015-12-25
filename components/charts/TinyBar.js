@@ -2,13 +2,11 @@ require('../../libs/jquery.peity.js');
 var React = require('react');
 var _ = require('lodash');
 
-var TinyLine = React.createClass({
+var TinyBar = React.createClass({
 
     getDefaultProps: function () {
         return {
-            value: 0,
-            height: 20,
-            width: 60
+            value: 0
         };
     },
 
@@ -24,7 +22,7 @@ var TinyLine = React.createClass({
     },
 
     render: function () {
-        return <span className="ltt_c-chart-TinyLine line">{this.state.displayValue}</span>
+        return <span className="ltt_c-chart-TinyBar bar">{this.state.displayValue}</span>
     },
 
     componentDidMount: function () {
@@ -43,9 +41,9 @@ var TinyLine = React.createClass({
     },
 
     plot: function () {
-        $(this.getDOMNode()).peity("line", _.omit(this.props, 'value'));
+        $(this.getDOMNode()).peity("bar", _.omit(this.props, 'value'));
     }
 })
 
 
-module.exports = TinyLine;
+module.exports = TinyBar;

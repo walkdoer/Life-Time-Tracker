@@ -293,7 +293,7 @@ exports.fillDataGap = function (data, start, end, transformFun) {
         }
         result.push(transformFun({
             date: d._id,
-            count: d.totalTime
+            count: d.totalTime || d.count
         }));
     });
     var index = result.length;

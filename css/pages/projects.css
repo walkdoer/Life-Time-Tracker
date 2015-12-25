@@ -306,6 +306,11 @@
 .projectInfo-container .chartsInfo .chart-item{
     flex: 1;
 }
+
+.projectInfo-container .chartsInfo .chart-item-content{
+  margin: auto;
+  width: 100px;
+}
 .projectInfo-container .chartsInfo .chart-item .desc{
   text-align: center;
 }
