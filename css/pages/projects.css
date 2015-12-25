@@ -13,6 +13,8 @@
   border: 1px solid #DDDDDD;
 }
 
+
+
 .ltt_c-page-projects input[type=text]:focus,
 .ltt_c-page-projects textarea:focus {
   box-shadow: 0 0 5px rgba(81, 203, 238, 1);
@@ -301,6 +303,36 @@
 }
 .moreinfo .moreinfo-item:last-child{
   border-bottom:none;
+}
+
+
+.projectInfo-container .chartsInfo .chart-item.TaskCountChart{
+    display: flex;
+    flex: none;
+    width: 170px;
+    margin-right: 12px;
+}
+
+.projectInfo-container .chartsInfo .chart-item.TaskCountChart .desc{
+  display: flex;
+  flex-direction: column;
+    flex-direction: column;
+    margin-bottom: 15px;
+    margin-top: 15px;
+    text-align: left;
+}
+
+.projectInfo-container .chartsInfo .chart-item.TaskCountChart .desc .item{
+   flex: 1;
+   font-size: 11px;
+    font-weight: 200;
+    margin-bottom: 0px;
+
+}
+.projectInfo-container .chartsInfo .chart-item.TaskCountChart .desc .item .ltt-num{
+  font-size:15px;
+  font-weight: 400;
+  margin-right: 0px;
 }
 
 .projectInfo-container .chartsInfo .chart-item{

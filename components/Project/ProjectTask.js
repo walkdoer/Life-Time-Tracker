@@ -993,14 +993,14 @@ var TaskCountChart = React.createClass({
         var done = this.state.doneTaskCount;
         var total = doing + done;
         var percent = done / total * 100;
-        return <div className="chart-item" style={{width: this.props.width}}>
+        return <div className="chart-item TaskCountChart">
             {total > 0 ?
             <div className="pieChart" ref="easychart" data-percent={percent}>{percent.toFixed(1) + '%'}</div>
             : null}
             <div className="desc">
-                doing: {doing}, done: {done}
-                <br/>
-                total: {total}
+                <p className="item"> <span className="ltt-num">{total}</span> Total</p>
+                <p className="item"> <span className="ltt-num">{doing}</span> Doing</p>
+                <p className="item"><span className="ltt-num">{done}</span>  Done</p>
             </div>
         </div>
     },
