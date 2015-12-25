@@ -11,8 +11,7 @@
     background: #F2F2F2;
     padding: 10px;
     border-top: 1px solid #E4E3E3;
-    border-bottom: 1px solid #E2E2E2;
-    margin: 0 -10px 10px;
+    margin: 0 -10px 0px;
     display:flex;
     justify-content: space-between;
 }

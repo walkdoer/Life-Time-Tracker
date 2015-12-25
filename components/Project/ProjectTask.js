@@ -55,6 +55,7 @@ var Scroller = require('../Scroller');
 var TimeConsumeRanking = require('../TimeConsumeRanking');
 var D3SimpleColumn = require('../charts/D3SimpleColumn.js');
 var TinyBar = require('../charts/TinyBar.js');
+var TinyPie = require('../charts/TinyPie.js');
 
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
@@ -870,11 +871,13 @@ var ProjectInfo = React.createClass({
                                 <div className="timeinfo-item" title={mProjectLastActiveTime.format(TIME_FORMAT)}>
                                     <i className="fa fa-child" title="last active"></i>{mProjectLastActiveTime.fromNow()}
                                 </div>
+                                <div className="timeinfo-item">
+                                    <ProjectTimeChart key={"projecttimechart" + project._id} project={project}/>
+                                </div>
                             </div>
                         </div>
                         <div className="chartsInfo">
                             <RecentTaskTrend project={project}/>
-                            <ProjectTimeChart key={"projecttimechart" + project._id} project={project} width={70}/>
                             <TaskCountChart key={"taskcountchart" + project._id} project={project} width={70}/>
                             <div className="moreinfo" style={{width: 150}}>
                                 <div className="moreinfo-item"><span className="ltt-num">{versoins.length}</span> Versions</div>
@@ -952,14 +955,12 @@ var ProjectTimeChart = React.createClass({
         if (this.state.allTotalTime) {
             var projectTimePercent = (project.totalTime / this.state.allTotalTime * 100).toFixed(1);
         }
-        return <div className="chart-item" style={{width: this.props.width}}>
-            {this.state.allTotalTime ?
-            <div className="pieChart" ref="projectTimePercent" data-percent={projectTimePercent}>{projectTimePercent + '%'}</div>
+        return <div className="ProjectTimeChart">
+            {this.state.allTotalTime ? <TinyPie value={[project.totalTime, this.state.allTotalTime].join('/')} height={20} width={20}/>
             : null}
-            <div className="desc">
-                {Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")}
-                <br/>across {mProjectLastActiveTime.from(mProjectCreateTime, true)}
-            </div>
+            <span className="desc">
+                {projectTimePercent + '%'} {Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {mProjectLastActiveTime.from(mProjectCreateTime, true)}
+            </span>
         </div>
     },
     loadTotalTime: function () {
@@ -969,7 +970,7 @@ var ProjectTimeChart = React.createClass({
                 that.setState({
                     allTotalTime: total
                 }, function () {
-                    new EasyPieChart(this.refs.projectTimePercent.getDOMNode(), {size: this.props.width, barColor: "#86e01e"});
+                    //new EasyPieChart(this.refs.projectTimePercent.getDOMNode(), {size: 15, barColor: "#86e01e"});
                 });
             });
     },
@@ -993,6 +994,7 @@ var TaskCountChart = React.createClass({
         var done = this.state.doneTaskCount;
         var total = doing + done;
         var percent = done / total * 100;
+        if (total === 0) {return null;}
         return <div className="chart-item TaskCountChart">
             {total > 0 ?
             <div className="pieChart" ref="easychart" data-percent={percent}>{percent.toFixed(1) + '%'}</div>
@@ -1031,8 +1033,8 @@ var TaskCountChart = React.createClass({
 var RecentTaskTrend = React.createClass({
     render: function () {
         var project = this.props.project;
-        return <div className="chart-item">
-            <div className="chart-item-content" style={{marginTop:30}}>
+        return <div className="chart-item" style={{width: 100}}>
+            <div className="chart-item-content" style={{marginTop:50}}>
                 <TinyBar value={function () {
                 var today = new Moment();
                 var end = today.format(Util.DATE_FORMAT);

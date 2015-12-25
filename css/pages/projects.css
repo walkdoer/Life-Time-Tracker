@@ -235,7 +235,7 @@
     margin-top: -10px;
     margin-left: -10px;
     margin-right: -10px;
-    padding: 10px;
+    padding: 10px 10px 0px;
     background-color: #FFF;
     border-bottom: 1px solid #E2E2E2;
     margin-bottom: 15px;
@@ -258,13 +258,19 @@
     display: flex;
     flex-direction: column;
     flex: 3;
+    z-index: 99;
 }
 
 .projectInfo-container .basicInfo .title{
     color: rgba(75, 75, 75, 0.8);
     text-shadow: 1px 4px 6px #f6f6f6, 0 0 0 #000, 1px 4px 6px #f6f6f6;
     margin: 0 0px 10px;
-    font-weight: bold;
+    font-weight: 500;
+    font-size: 25px;
+    width: 280px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .projectInfo-container .basicInfo .timeinfos{
@@ -283,12 +289,24 @@
    flex: 5;
    display: flex;
    z-index: 2;
+  justify-content: flex-end;
 }
 .projectInfo-container .chartsInfo .moreinfo{
   width: 150px;
   display: flex;
   flex-direction: column;
 }
+
+.ProjectTimeChart {
+  position: relative;
+  text-indent: 24px;
+}
+
+.ProjectTimeChart .peity{
+  position: absolute;
+  left:0px;
+}
+
 
 .moreinfo .moreinfo-item{
   border-bottom: 1px solid #E2E2E2;
@@ -336,7 +354,6 @@
 }
 
 .projectInfo-container .chartsInfo .chart-item{
-    flex: 1;
 }
 
 .projectInfo-container .chartsInfo .chart-item-content{
