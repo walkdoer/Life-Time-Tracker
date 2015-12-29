@@ -224,7 +224,7 @@ var animation = {
     close: 'animated flipOutX'
 };
 
-exports.notify = function (cfg) {
+exports.notify = function (cfg, options) {
     if (Ltt.sdk &&  Ltt.sdk.notify) {
         Ltt.sdk.notify({
             title: cfg.title,
@@ -233,11 +233,7 @@ exports.notify = function (cfg) {
             sound: true,
             wait: false,
             message: cfg.message
-        }, {
-            click: function () {
-                console.log("test");
-            }
-        });
+        }, options || {});
     } else {
         var options = {
             type: "success",

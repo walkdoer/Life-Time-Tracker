@@ -144,12 +144,12 @@ var LogEditor = React.createClass({
                     var fromStart = mNow.diff(log.start, 'minute');
                     var threshold = Math.ceil(estimatedTime * 0.7);
                     var remainTime = estimatedTime - fromStart;
-                    if (this.__lastNotifyTime[md5Id]) { return;}
                     if (remainTime === 0) {
+                        if (this.__endLastNotifyTime[md5Id]) {return;}
                         notifyEnd(log, estimatedTime);
                         this.__endLastNotifyTime[md5Id] = true;
                     } else {
-                        if (fromStart > threshold && remainTime > 0) {
+                        if (fromStart > threshold && remainTime > 0 && !this.__lastNotifyTime[md5Id]) {
                             notifyEndSoon(log, fromStart, remainTime);
                             this.__lastNotifyTime[md5Id] = true;
                         }
