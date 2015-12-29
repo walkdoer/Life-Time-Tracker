@@ -405,10 +405,10 @@ var Footer = React.createClass({
         var lastMinutes = new Moment().diff(start, 'minute');
         var needNotify = true;
         //remind again after first remind
-        if (notifyInfo && notifyInfo.count < 2) {
+        if (notifyInfo) {
             if (notifyInfo.count < 2) {
                 var prevNotifyMoment = notifyInfo.time;
-                needNotify = prevNotifyMoment ? new Moment().diff(prevNotifyMoment, 'minute') > 2 : true;
+                needNotify = prevNotifyMoment ? new Moment().diff(prevNotifyMoment, 'minute') >= 15 : true;
             } else {
                 needNotify = false;
             }
