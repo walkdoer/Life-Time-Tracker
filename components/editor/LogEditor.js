@@ -102,6 +102,7 @@ var LogEditor = React.createClass({
             return;
         }
         this.__lastNotifyTime = {};
+        this.__endLastNotifyTime = {};
         function notify (log) {
             var start = new Moment(log.estimateStart);
             var end = new Moment(log.estimateEnd);
@@ -115,6 +116,14 @@ var LogEditor = React.createClass({
             Util.notify({
                 title: 'Will End in ' + Util.displayTime(remainTime),
                 subtitle: 'already use ' + Util.displayTime(useTime),
+                message: Util.getLogDesc(log)
+            });
+        }
+
+        function notifyEnd(log, useTime) {
+            Util.notify({
+                title: 'Acticity should End if follow plan, move to next?',
+                subtitle: 'time use: ' + Util.displayTime(useTime),
                 message: Util.getLogDesc(log)
             });
         }
@@ -134,10 +143,16 @@ var LogEditor = React.createClass({
                     md5Id = md5(log.origin) + '-end';
                     var fromStart = mNow.diff(log.start, 'minute');
                     var threshold = Math.ceil(estimatedTime * 0.7);
-                    var remainTime = estimatedTime - fromStart
-                    if (fromStart > threshold && remainTime > 0 && !this.__lastNotifyTime[md5Id]) {
-                        notifyEndSoon(log, fromStart, remainTime);
-                        this.__lastNotifyTime[md5Id] = true;
+                    var remainTime = estimatedTime - fromStart;
+                    if (this.__lastNotifyTime[md5Id]) { return;}
+                    if (remainTime === 0) {
+                        notifyEnd(log, estimatedTime);
+                        this.__endLastNotifyTime[md5Id] = true;
+                    } else {
+                        if (fromStart > threshold && remainTime > 0) {
+                            notifyEndSoon(log, fromStart, remainTime);
+                            this.__lastNotifyTime[md5Id] = true;
+                        }
                     }
                 }
                 if (log.estimateStart && !log.start) {
