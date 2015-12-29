@@ -172,7 +172,9 @@ var LogEditor = React.createClass({
                 }
             }
             var index = lines.indexOf(log.origin);
-            this.unhighlightLine(index, 'log-overdue');
+            if (log.start && log.end) {
+                this.unhighlightLine(index, 'log-overdue');
+            }
             if (estimatedTime > 0 && Util.isDoingLog(log)) {
                 var fromStart = mNow.diff(log.start, 'minute');
                 var overdue = fromStart > estimatedTime;
