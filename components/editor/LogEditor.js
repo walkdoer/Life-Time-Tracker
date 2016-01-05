@@ -387,8 +387,12 @@ var LogEditor = React.createClass({
                         that.getTaskCompletions(line, callback);
                     } else if (tokenValue === '$') {
                         that.getTaskCompletions(line, callback);
+                    } else if (tokenType === '{') {
+                        that.getLogClassCompletions(line, callback);
                     }
-                } else if (tokenType === 'ltt_version'){
+                } else if (tokenType === 'ltt_logClass') {
+                    that.getLogClassCompletions(line, callback);
+                }else if (tokenType === 'ltt_version'){
                     that.getVersionCompletions(line, callback);
                 } else if (tokenType === 'ltt_project') {
                     that.getProjectCompletions(line, callback);
@@ -829,6 +833,19 @@ var LogEditor = React.createClass({
             }
             var completions = tags.map(function (tag) {
                 return {name: tag.name, value: tag.name, meta: 'tag', score: 1000};
+            });
+            cb(null, completions);
+        });
+    },
+
+    getLogClassCompletions: function (line, cb) {
+        //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
+        var that = this;
+        DataAPI.Class.load().then(function(classes) {
+            //if not projects, then no need to create typeahead
+            if (_.isEmpty(classes)) {return cb(null, [])}
+            var completions = classes.map(function(cls) {
+                return {name: cls._id, value: cls._id, score: 1000, meta: cls.name};
             });
             cb(null, completions);
         });
