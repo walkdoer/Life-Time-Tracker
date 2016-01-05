@@ -1620,10 +1620,19 @@ var LogEditor = React.createClass({
         }
     },
 
-    gotoLine: function (row, column) {
+    gotoLine: function (row, column, animate) {
         if (this.editor) {
-            this.editor.gotoLine(row, column);
+            this.editor.gotoLine(row, column, animate === undefined ? true : animate);
             this._currentRow = row - 1;
+            this.scrollToLine(row, true, animate);
+        }
+    },
+
+    scrollToLine: function (line, center, animate) {
+        if (this.editor) {
+            this.editor.scrollToLine(line,
+                center === undefined ? true : center,
+                animate === undefined ? true : animate);
         }
     },
 
