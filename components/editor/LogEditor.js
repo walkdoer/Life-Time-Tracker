@@ -103,7 +103,8 @@ var LogEditor = React.createClass({
         }
         this.__lastNotifyTime = {};
         this.__endLastNotifyTime = {};
-        function notify (log) {
+        this.__soonNotifyTime = {};
+        function notifyStartSoon(log) {
             var start = new Moment(log.estimateStart);
             var end = new Moment(log.estimateEnd);
             Util.notify({
@@ -160,13 +161,13 @@ var LogEditor = React.createClass({
                     mEstimateStart = new Moment(log.estimateStart);
                     var diff = mEstimateStart.diff(mNow, 'minute');
                     if (diff <= NOTIFY_THRESHOLD && diff >= 0) {
-                        if (!this.__lastNotifyTime[md5Id]) {
-                            notify(log);
-                            this.__lastNotifyTime[md5Id] = true;
+                        if (!this.__soonNotifyTime[md5Id]) {
+                            notifyStartSoon(log);
+                            this.__soonNotifyTime[md5Id] = true;
                         }
                         //notify
                     } else if (diff < 0){
-                        delete this.__lastNotifyTime[md5Id];
+                        delete this.__soonNotifyTime[md5Id];
                     }
                 }
             }.bind(this));
