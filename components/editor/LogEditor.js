@@ -28,6 +28,7 @@ var md5 = require('blueimp-md5').md5;
 /**Components*/
 var TodayReport = require('../../reports/TodayReport');
 var HelpDocument= require('../HelpDocument');
+var Progress = require('../Progress');
 
 //store key
 var SK_CONTENT = 'content';
@@ -97,18 +98,22 @@ var LogEditor = React.createClass({
 
     _trackActicity: function () {
         var todayDate = new Moment().format('YYYY-MM-DD');
-        if (this.props.title !== todayDate) {
+        var date = this.props.title;
+        if (date !== todayDate) {
             return;
         }
         this.__lastNotifyTime = {};
-        function notify (log) {
+        this.__endLastNotifyTime = {};
+        this.__soonNotifyTime = {};
+        function notifyStartSoon(log) {
             var start = new Moment(log.estimateStart);
             var end = new Moment(log.estimateEnd);
-            Util.notify({
+            var options = {
                 title: 'will start in ' + start.fromNow() + ' at ' + start.format('HH:mm'),
                 subtitle: 'time: ' + Moment.duration(end.diff(start, 'minute'), 'minutes').format("M[m],d[d],h[h],mm[min]") + ' end at:' + end.format('HH:mm'),
-                message: Util.getLogDesc(log)
-            });
+                message: Util.getLogDesc(log) || "go"
+            };
+            Util.notify(options);
         }
         function notifyEndSoon(log, useTime, remainTime) {
             Util.notify({
@@ -117,46 +122,85 @@ var LogEditor = React.createClass({
                 message: Util.getLogDesc(log)
             });
         }
+
+        function notifyEnd(log, useTime) {
+            Util.notify({
+                title: 'Acticity should End if follow plan, move to next?',
+                subtitle: 'time use: ' + Util.displayTime(useTime),
+                message: Util.getLogDesc(log)
+            });
+        }
         this.__timeCheckerInterval = setInterval(function () {
             var mNow = new Moment();
             var logs = this.getAllLogs(true);
+            var lines = this.getAllLines();
             var NOTIFY_THRESHOLD = 10,
                 NOTIFY_INTERVAL = 5;
             var md5Id;
             this._updateLogThatShouldBeginSoon(logs);
+            this._updateOverdueLogs(logs, lines);
             logs.forEach(function (log) {
                 var mEstimateStart, mEstimateEnd;
-                var estimatedTime = log.estimatedTime;
-                if (!estimatedTime) {
-                    if (log.estimateStart && log.estimateEnd) {
-                        estimatedTime = new Moment(log.estimateEnd).diff(log.estimateStart, 'minute');
-                    }
-                }
+                var estimatedTime = getEstimateTime(log);
                 if (estimatedTime > 0 && Util.isDoingLog(log)) {
-                    md5Id = md5(log.origin) + '-end';
+                    md5Id = md5(date + log.origin);
                     var fromStart = mNow.diff(log.start, 'minute');
                     var threshold = Math.ceil(estimatedTime * 0.7);
-                    if (fromStart > threshold && !this.__lastNotifyTime[md5Id]) {
-                        notifyEndSoon(log, fromStart, estimatedTime - fromStart);
-                        this.__lastNotifyTime[md5Id] = true;
+                    var remainTime = estimatedTime - fromStart;
+                    if (remainTime === 0) {
+                        if (this.__endLastNotifyTime[md5Id]) {return;}
+                        notifyEnd(log, estimatedTime);
+                        this.__endLastNotifyTime[md5Id] = true;
+                    } else {
+                        if (fromStart > threshold && remainTime > 0 && !this.__lastNotifyTime[md5Id]) {
+                            notifyEndSoon(log, fromStart, remainTime);
+                            this.__lastNotifyTime[md5Id] = true;
+                        }
                     }
                 }
                 if (log.estimateStart && !log.start) {
-                    md5Id = md5(log.origin);
+                    md5Id = md5(date + log.origin);
                     mEstimateStart = new Moment(log.estimateStart);
                     var diff = mEstimateStart.diff(mNow, 'minute');
                     if (diff <= NOTIFY_THRESHOLD && diff >= 0) {
-                        if (!this.__lastNotifyTime[md5Id]) {
-                            notify(log);
-                            this.__lastNotifyTime[md5Id] = true;
+                        if (!this.__soonNotifyTime[md5Id]) {
+                            notifyStartSoon(log);
+                            this.__soonNotifyTime[md5Id] = true;
                         }
                         //notify
                     } else if (diff < 0){
-                        delete this.__lastNotifyTime[md5Id];
+                        delete this.__soonNotifyTime[md5Id];
                     }
                 }
             }.bind(this));
         }.bind(this), 5000);
+    },
+
+    _updateOverdueLogs: function (logs, lines) {
+        var mNow = new Moment();
+        if (!lines) {
+            lines = this.getAllLines();
+        }
+        logs.forEach(function (log) {
+            var mEstimateStart, mEstimateEnd;
+            var estimatedTime = log.estimatedTime;
+            if (!estimatedTime) {
+                if (log.estimateStart && log.estimateEnd) {
+                    estimatedTime = new Moment(log.estimateEnd).diff(log.estimateStart, 'minute');
+                }
+            }
+            var index = lines.indexOf(log.origin);
+            if (log.start) {
+                this.unhighlightLine(index, 'log-overdue');
+            }
+            if (estimatedTime > 0 && Util.isDoingLog(log)) {
+                var fromStart = mNow.diff(log.start, 'minute');
+                var overdue = fromStart > estimatedTime;
+                if (overdue) {
+                    this.highlightLine(index, 'log-overdue');
+                }
+            }
+        }, this);
     },
 
     _unTrackActivity: function () {
@@ -218,6 +262,7 @@ var LogEditor = React.createClass({
                         </ButtonToolbar>
                     </div>
                 </div>
+                <LogProgress ref="logProgress"/>
                 <div className="ltt_c-logEditor-content">
                     {this.state.showCalendar ? <Calendar date={this.props.title} onEventClick={this.onCalendarEventClick} ref="calendar"/> : null }
                     <pre id="ltt-logEditor" ref="editor"></pre>
@@ -269,6 +314,8 @@ var LogEditor = React.createClass({
             that._gotoLocate(that.props.locate, content);
             that._starCacheLines();
             that._checkLogValid(content);
+            that._updateLogProgress();
+            that._annotationOverTimeLog(that.getAllLogs(), content);
             that.props.onLoad(content, that.getDoingLog(content));
             editor.focus();
             if (_insertLog) {
@@ -343,8 +390,12 @@ var LogEditor = React.createClass({
                         that.getTaskCompletions(line, callback);
                     } else if (tokenValue === '$') {
                         that.getTaskCompletions(line, callback);
+                    } else if (tokenType === '{') {
+                        that.getLogClassCompletions(line, callback);
                     }
-                } else if (tokenType === 'ltt_version'){
+                } else if (tokenType === 'ltt_logClass') {
+                    that.getLogClassCompletions(line, callback);
+                }else if (tokenType === 'ltt_version'){
                     that.getVersionCompletions(line, callback);
                 } else if (tokenType === 'ltt_project') {
                     that.getProjectCompletions(line, callback);
@@ -352,7 +403,8 @@ var LogEditor = React.createClass({
                     that.getTaskCompletions(line, callback);
                 } else if (tokenType === 'ltt_subTask') {
                     that.getTaskCompletions(line, callback);
-                } else if (tokenType === 'ltt_tag') {
+                } else if (['ltt_tag', 'ltt_tag_start', 'ltt_tag_end', 'ltt_tag_split'].indexOf(tokenType) >= 0) {
+                    console.log(prefix);
                     that.getTagCompletions(prefix, callback);
                 }
             }
@@ -451,7 +503,7 @@ var LogEditor = React.createClass({
         var editor = this.editor;
         var session = editor.getSession()
         var allLines = session.getDocument().getAllLines();
-        var index = 1;
+        var index = 0;
         for (var i = 0; i < allLines.length; i++) {
             if (Util.isValidLog(allLines[i])) {
                 index = i + 1;
@@ -472,7 +524,8 @@ var LogEditor = React.createClass({
         var editor = this.editor;
         var session = editor.getSession()
         var allLines = session.getDocument().getAllLines();
-        var index = 1, log;
+        var index = null;
+        var log = null;
         for (var i = 0; i < allLines.length; i++) {
             if (Util.isValidLog(allLines[i])) {
                 index = i + 1;
@@ -606,6 +659,9 @@ var LogEditor = React.createClass({
                 }
                 if (!line) { return; }
                 var newIndex = validLog.index;
+                if (newIndex === null) {
+                    newIndex = 0;
+                }
                 that.finishCurrentActivity();
                 //move line
                 var range = new Range(row, 0, row, Infinity);
@@ -779,7 +835,20 @@ var LogEditor = React.createClass({
                 return cb(null, []);
             }
             var completions = tags.map(function (tag) {
-                return {name: tag.name, value: tag.name, meta: 'tag'};
+                return {name: tag.name, value: tag.name, meta: 'tag', score: 1000};
+            });
+            cb(null, completions);
+        });
+    },
+
+    getLogClassCompletions: function (line, cb) {
+        //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
+        var that = this;
+        DataAPI.Class.load().then(function(classes) {
+            //if not projects, then no need to create typeahead
+            if (_.isEmpty(classes)) {return cb(null, [])}
+            var completions = classes.map(function(cls) {
+                return {name: cls._id, value: cls._id, score: 1000, meta: cls.name};
             });
             cb(null, completions);
         });
@@ -867,6 +936,8 @@ var LogEditor = React.createClass({
             //persist to localstorage, if app exit accidently, can recovery from localstorage
             that._persistToLocalStorage(title, content);
             that._highLightDoingLine(content);
+            that._updateLogProgress();
+            that._updateOverdueLogs(logs);
             that._updateLogThatShouldBeginSoon();
             that._annotationOverTimeLog(logs, content);
             that._showContentChangeFlag();
@@ -876,7 +947,7 @@ var LogEditor = React.createClass({
             }
             that._updateHighlightStarLine();
             that.props.onChange(content, editor);
-        }, 50));
+        }, 150));
 
         selection.on('changeCursor', _.debounce(function (e, selection) {
             var row = selection.getCursor().row;
@@ -973,7 +1044,7 @@ var LogEditor = React.createClass({
         var overtimeLogs = this._getOverTimeLog(logs);
         var annotations = overtimeLogs.map(function (log) {
             var realTime = log.len;
-            var estimatedTime = log.estimatedTime;
+            var estimatedTime = getEstimateTime(log);
             var overRate = ((realTime - estimatedTime) / estimatedTime) * 100;
             return {
                 row: this.getLineIndex(log.origin, content), // must be 0 based
@@ -989,11 +1060,15 @@ var LogEditor = React.createClass({
     _getOverTimeLog: function (logs) {
         if (!logs) {return [];}
         return logs.filter(function (log) {
-            return  log.estimatedTime && log.len > log.estimatedTime;
+            var estimateTime = getEstimateTime(log);
+            return  estimateTime && log.len > estimateTime;
         });
     },
 
     getDoingLogIndex: function (doingLog, content) {
+        if (!content) {
+            content = this.editor.getValue();
+        }
         if (!doingLog) {
             doingLog = this.getDoingLog(content);
         }
@@ -1065,9 +1140,12 @@ var LogEditor = React.createClass({
                 that._starCacheLines();
                 that.gotoDoingLogLine(content);
                 that._highLightDoingLine(content);
+                that._updateLogThatShouldBeginSoon();
                 that._checkLogValid(content);
                 that._listenToEditor();
                 that._activeCurrentLine();
+                that._updateLogProgress();
+                that._annotationOverTimeLog(that.getAllLogs(), content);
                 that.props.onLoad(content, that.getDoingLog(content));
                 var timer = setTimeout(function() {
                     if (that.__reportOpened) {
@@ -1091,7 +1169,6 @@ var LogEditor = React.createClass({
         var doingLog = this.getDoingLog(content);
         if (!doingLog) { return; }
         var index = this.getDoingLogIndex(doingLog, content);
-        var editor = this.editor;
         var columnPosition = doingLog.origin.indexOf('~') + 1;
         if (_.isNumber(index)) {
             this.gotoLine(index + 1, columnPosition);
@@ -1563,10 +1640,19 @@ var LogEditor = React.createClass({
         }
     },
 
-    gotoLine: function (row, column) {
+    gotoLine: function (row, column, animate) {
         if (this.editor) {
-            this.editor.gotoLine(row, column);
+            this.editor.gotoLine(row, column, animate === undefined ? true : animate);
             this._currentRow = row - 1;
+            this.scrollToLine(row, true, animate);
+        }
+    },
+
+    scrollToLine: function (line, center, animate) {
+        if (this.editor) {
+            this.editor.scrollToLine(line,
+                center === undefined ? true : center,
+                animate === undefined ? true : animate);
         }
     },
 
@@ -1676,6 +1762,23 @@ var LogEditor = React.createClass({
 
     onCalendarEventClick: function (calEvent) {
         this._gotoLocate(calEvent.origin, this.getContent(), 1000);
+    },
+
+    _updateLogProgress: function () {
+        var logs = this.getAllLogs(true);
+        var done = 0, plan = 0, total = 0;
+        logs.forEach(function (log) {
+            if (log.start && log.end && log.len > 0) {
+                done++;
+            } else if (log.start && !log.end) {
+                plan++;
+            } else if (!log.start && !log.end) {
+                plan++;
+            }
+        });
+
+        total = done + plan;
+        this.refs.logProgress.update(total, done);
     }
 
 });
@@ -1880,7 +1983,7 @@ var Calendar = React.createClass({
     },
 
     unHighlightEventEl: function (eventEl) {
-        if (!event) {
+        if (!eventEl) {
             this.getAllEvents().forEach(function (event) {
                 event.el.removeClass(EVENT_HIGHLIGHT_CLASS);
             });
@@ -2025,6 +2128,44 @@ function getEventTitle(log) {
 
 function displayTime(timeAmount) {
     return Moment.duration(timeAmount, "minutes").format("M[m],d[d],h[h],mm[min]")
+}
+
+/**
+ * LogProgress
+ * show the log progress
+ */
+var LogProgress = React.createClass({
+
+    getInitialState: function () {
+        return {
+            done: this.props.done,
+            total: this.props.total
+        }
+    },
+
+    render: function () {
+        return <div className="ltt_c-LogProgress">
+            <Progress value={this.state.done} max={this.state.total}/>
+        </div>
+    },
+
+    update: function (total, done) {
+        this.setState({
+            done: done,
+            total: total
+        });
+    }
+});
+
+
+function getEstimateTime(log) {
+    var estimatedTime = log.estimatedTime;
+    if (!estimatedTime) {
+        if (log.estimateStart && log.estimateEnd) {
+            estimatedTime = new Moment(log.estimateEnd).diff(log.estimateStart, 'minute');
+        }
+    }
+    return estimatedTime;
 }
 
 

@@ -26,6 +26,8 @@ var ThemeManager = require('material-ui/lib/styles/theme-manager');
 var DefaultRawTheme = require('material-ui/lib/styles/raw-themes/light-raw-theme');
 var IScroll = require('../../libs/iscroll');
 var config = require('../../conf/config');
+var EasyPieChart = require('easyPieChart');
+
 
 /** mixins */
 var initParams = require('../mixins/initParams');
@@ -51,6 +53,9 @@ var EasyPie = require('../charts/EasyPie');
 var FullDateRangePicker = require('../FullDateRangePicker');
 var Scroller = require('../Scroller');
 var TimeConsumeRanking = require('../TimeConsumeRanking');
+var D3SimpleColumn = require('../charts/D3SimpleColumn.js');
+var TinyBar = require('../charts/TinyBar.js');
+var TinyPie = require('../charts/TinyPie.js');
 
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
@@ -817,7 +822,6 @@ var ProjectInfo = React.createClass({
     getInitialState: function () {
         return {
             showProjectDetail: false,
-            allTotalTime: null,
             selectTags: []
         };
     },
@@ -828,17 +832,14 @@ var ProjectInfo = React.createClass({
         });
     },
 
-    componentWillMount: function () {
-        this.loadTotalTime();
-    },
-
     render: function () {
         var projectBasicInfo;
         var project = this.props.project;
         var currentVersionId = this.props.versionId;
         if (project) {
             var tags = project.tags,
-                logClasses = project.classes;
+                logClasses = project.classes,
+                versoins = project.versions;
             if (!_.isEmpty(tags)) {
                 tags = tags.map(function (tag) {
                     return (<Tag selectable={true} onClick={this.onTagClick} value={tag}>{tag}</Tag>);
@@ -847,7 +848,8 @@ var ProjectInfo = React.createClass({
             if (!_.isEmpty(logClasses)) {
                 classesConfig = config.classes;
                 logClasses = logClasses.map(function(cls) {
-                    return (<LogClass data={_.find(classesConfig, {'_id': cls})}/>);
+                    var cls = _.find(classesConfig, {'_id': cls});
+                    return cls ? <LogClass data={cls}/> : null;
                 });
             }
             var mProjectCreateTime = new Moment(project.createdTime);
@@ -858,36 +860,33 @@ var ProjectInfo = React.createClass({
             }
             projectBasicInfo = (
                 <section className="ltt_c-projectDetail-projectInfo">
-                    <h1>
-                        {project.name}{linkEl}
-                        <span className="ltt-link icon-btn" onClick={this.insertLog}><i className="fa fa-pencil-square-o"/></span>
-                        <span className="ltt_c-projectDetail-logClasses">{logClasses}</span>
-                        <span className="ltt_c-projectDetail-times">
-                            <span className="ltt-M2">
-                                <i className="fa fa-tasks" title="Task count"></i>
-                                {project.taskCount}
-                            </span>
-                            <span className="ltt-M2" title={mProjectCreateTime.format(TIME_FORMAT)}>
-                                <i className="fa fa-plus" title="create time"></i>{mProjectCreateTime.fromNow()}
-                            </span>
-                            <span className="ltt-M2" title={mProjectLastActiveTime.format(TIME_FORMAT)}>
-                                <i className="fa fa-child" title="last active"></i>{mProjectLastActiveTime.fromNow()}
-                            </span>
-                            <span className="ltt-M2">
-                                <i className="fa fa-clock-o" title="Total time"></i>
-                                {Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {mProjectLastActiveTime.from(mProjectCreateTime, true)}
-                                {this.state.allTotalTime ? <span className="percent">
-                                    <span className="num">{(project.totalTime / this.state.allTotalTime * 100).toFixed(1)}%</span> of total time
-                                </span> : null}
-                            </span>
-                        </span>
-                    </h1>
-                    <span className="openDetail" onClick={this.toggleProjectDetail}>
-                        <i className={this.state.showProjectDetail ? "fa fa-chevron-circle-down" : "fa fa-chevron-circle-right"}></i>
-                    </span>
-                    {this.state.showProjectDetail ? <div className="ltt_c-projectDetail-projectInfo-detail">
-                        <p className="ltt_c-projectDetail-tags">{tags}</p>
-                    </div> : null}
+                    <div className="projectInfo-container"  style={{display: "flex"}}>
+                        <div className="basicInfo">
+                            <h1 className="title">{project.name}{linkEl}<span className="ltt-link icon-btn" onClick={this.insertLog}><i className="fa fa-pencil-square-o"/></span></h1>
+                            <div className="timeinfos">
+                                <div className="ltt_c-projectDetail-logClasses">{logClasses}</div>
+                                <div className="timeinfo-item" title={mProjectCreateTime.format(TIME_FORMAT)}>
+                                    <i className="fa fa-plus" title="create time"></i>{mProjectCreateTime.fromNow()}
+                                </div>
+                                <div className="timeinfo-item" title={mProjectLastActiveTime.format(TIME_FORMAT)}>
+                                    <i className="fa fa-child" title="last active"></i>{mProjectLastActiveTime.fromNow()}
+                                </div>
+                                <div className="timeinfo-item">
+                                    <ProjectTimeChart key={"projecttimechart" + project._id} project={project}/>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="chartsInfo">
+                            <RecentTaskTrend project={project}/>
+                            <TaskCountChart key={"taskcountchart" + project._id} project={project} width={70}/>
+                            <div className="moreinfo" style={{width: 150}}>
+                                <div className="moreinfo-item"><span className="ltt-num">{versoins.length}</span> Versions</div>
+                                <div className="moreinfo-item"><span className="ltt-num">{tags.length}</span> Tags</div>
+                                <div className="moreinfo-item"><span className="ltt-num">{logClasses.length}</span> Classes</div>
+                            </div>
+                        </div>
+                        <ActivityChart project={project} start={Moment(mProjectLastActiveTime).subtract(3, 'month').toDate()} end={mProjectLastActiveTime.toDate()}/>
+                    </div>
                     {this.props.versionId ?
                         <VersionInfo id={this.props.versionId}
                             project={this.props.project}
@@ -934,22 +933,170 @@ var ProjectInfo = React.createClass({
         });
     },
 
+    
+
+    openExternalLink: function (link) {
+        Ltt.openExternalLink(link);
+    }
+});
+
+var ProjectTimeChart = React.createClass({
+
+    getInitialState: function () {
+        return {
+            allTotalTime: 0
+        }
+    },
+
+    render: function () {
+        var project = this.props.project;
+        var mProjectLastActiveTime = new Moment(project.lastActiveTime);
+        var mProjectCreateTime = new Moment(project.createdTime);
+        if (this.state.allTotalTime) {
+            var projectTimePercent = (project.totalTime / this.state.allTotalTime * 100).toFixed(1);
+        }
+        return <div className="ProjectTimeChart">
+            {this.state.allTotalTime ? <TinyPie value={[project.totalTime, this.state.allTotalTime].join('/')} height={20} width={20}/>
+            : null}
+            <span className="desc">
+                {projectTimePercent + '%'} {Moment.duration(project.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {mProjectLastActiveTime.from(mProjectCreateTime, true)}
+            </span>
+        </div>
+    },
     loadTotalTime: function () {
         var that = this;
         DataAPI.Log.totalTime()
             .then(function (total) {
                 that.setState({
                     allTotalTime: total
+                }, function () {
+                    //new EasyPieChart(this.refs.projectTimePercent.getDOMNode(), {size: 15, barColor: "#86e01e"});
                 });
             });
     },
+    componentDidMount: function () {
+        this.loadTotalTime();
+    }
+});
 
-    openExternalLink: function (link) {
-        Ltt.openExternalLink(link);
+
+var TaskCountChart = React.createClass({
+
+    getInitialState: function () {
+        return {
+            doingTaskCount: 0,
+            doneTaskCount: 0
+        };
     },
 
-    getTotalTime: function () {
-        return this.state.allTotalTime || null;
+    render: function () {
+        var doing = this.state.doingTaskCount;
+        var done = this.state.doneTaskCount;
+        var total = doing + done;
+        var percent = done / total * 100;
+        if (total === 0) {return null;}
+        return <div className="chart-item TaskCountChart">
+            {total > 0 ?
+            <div className="pieChart" ref="easychart" data-percent={percent}>{percent.toFixed(1) + '%'}</div>
+            : null}
+            <div className="desc">
+                <p className="item"> <span className="ltt-num">{total}</span> Total</p>
+                <p className="item"> <span className="ltt-num">{doing}</span> Doing</p>
+                <p className="item"><span className="ltt-num">{done}</span>  Done</p>
+            </div>
+        </div>
+    },
+
+    loadTaskInfo: function () {
+        var that = this;
+        var project = this.props.project;
+        if (!project) {return;}
+        Q.allSettled([
+            DataAPI.Task.count({projectId: project._id, status: 'doing'}),
+            DataAPI.Task.count({projectId: project._id, status: 'done'})
+        ]).spread(function (doingResult, doneResult) {
+            that.setState({
+                doingTaskCount: doingResult.value,
+                doneTaskCount: doneResult.value
+            }, function () {
+                new EasyPieChart(this.refs.easychart.getDOMNode(), {size: this.props.width, barColor: "#86e01e"});
+            });
+        })
+    },
+
+    componentDidMount: function () {
+        this.loadTaskInfo();
+    }
+});
+
+
+var RecentTaskTrend = React.createClass({
+    render: function () {
+        var project = this.props.project;
+        return <div className="chart-item" style={{width: 100}}>
+            <div className="chart-item-content" style={{marginTop:50}}>
+                <TinyBar value={function () {
+                var today = new Moment();
+                var end = today.format(Util.DATE_FORMAT);
+                var start = today.subtract(20, 'day').format(Util.DATE_FORMAT);
+                var that = this;
+                return DataAPI.Task.trend({
+                    projectId: project._id,
+                    group: 'day',
+                    list: false,
+                    start: start,
+                    end: end
+                }).then(function (data) {
+                    return Util.fillDataGap(data, start, end, function (d) {
+                        return d.count;
+                    }).join(',');
+                });
+            }} width={100} height={25}/></div>
+            <div className="desc">
+                Task trend
+            </div>
+        </div>
+    }
+})
+
+
+var ActivityChart = React.createClass({
+
+    getInitialState: function () {
+        return {
+            activityData: []
+        };
+    },
+
+    render: function () {
+        return <div className="ActivityChart">
+            <D3SimpleColumn data={this.state.activityData} height={50}/>
+        </div>
+    },
+
+    componentDidMount: function () {
+        this.loadActivity();
+    },
+
+
+    loadActivity: function () {
+        var that = this;
+        var start = this.props.start;
+        var end = this.props.end;
+        DataAPI.Log.load({
+            sum: true,
+            start: start,
+            end: end,
+            projects: this.props.project.name,
+            group: 'date'
+        }).then(function (data) {
+            var result = Util.fillDataGap(data, start, end, function (d) {
+                return d.count;
+            });
+            that.setState({
+                activityData: result
+            });
+        });
     }
 });
 

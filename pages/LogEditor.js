@@ -115,7 +115,7 @@ var Page = React.createClass({
                                 <LogClassPie type="project" key={'project' + date} date={date}  backgroundColor="rgba(255, 255, 255, 0.1)" ref="projectPie" legend={true} compare={false}/>
                             </SwiperSlide>
                             <SwiperSlide>
-                                <TagCloud key={"tagCloud-" + date} style={{marginTop: 20}} height={220} start={new Moment(date).startOf('day')} end={new Moment(date).endOf('day')}/>
+                                <TagCloud key={"tagCloud-" + date} ref="tagCloud" style={{marginTop: 20}} height={220} start={new Moment(date).startOf('day')} end={new Moment(date).endOf('day')}/>
                             </SwiperSlide>
                         </Swiper>
                         <ButtonToolbar>
@@ -255,6 +255,7 @@ var Page = React.createClass({
         this.refs.logClassPie.update();
         this.refs.projectPie.update();
         this.refs.oneDayGoal.update();
+        this.refs.tagCloud.update();
         this.refs.logEditor.getUnfinishLog(
             new Moment().startOf('day').toDate(),
             new Moment().endOf('day').toDate()

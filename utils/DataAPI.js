@@ -194,6 +194,10 @@ module.exports = {
 
         trend: function (params) {
             return get(url('/taskCountTrend'), params);
+        },
+
+        count: function (params) {
+            return get(url('/countTasks'), params).then(function (result) { return result.count; });
         }
     },
 

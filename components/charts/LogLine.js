@@ -36,6 +36,7 @@ module.exports = React.createClass({
         var $el = $(this.getDOMNode());
         var data = this._getData();
         var average = this._getAverage();
+        var expect = this.props.expect;
         var title = this._getTitle();
         var tickInterval;
         var mStart, mEnd;
@@ -77,19 +78,28 @@ module.exports = React.createClass({
                 title: false
             };
         }
+        var plotLines = [];
 
         if (average !== null) {
-            var plotLines = [{
+            plotLines.push({
                 color: 'red',
                 value: average,
                 dashStyle: 'longdashdot',
                 width: '1'
-            }];
-            if (this.props.withProgress) {
-                yAxis[0].plotLines = plotLines;
-            } else {
-                yAxis.plotLines = plotLines;
-            }
+            });
+        }
+        if (_.isNumber(expect)) {
+            plotLines.push({
+                color: 'green',
+                value: expect,
+                dashStyle: 'longdashdot',
+                width: '1'
+            });
+        }
+        if (this.props.withProgress) {
+            yAxis[0].plotLines = plotLines;
+        } else {
+            yAxis.plotLines = plotLines;
         }
         var options = {
             exporting: { enabled: false },

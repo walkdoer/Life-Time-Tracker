@@ -69,6 +69,10 @@ var TagCloud = React.createClass({
         .catch(function (err) {
             console.error(err.stack);
         });
+    },
+
+    update: function  () {
+        this.loadTags();
     }
 });
 

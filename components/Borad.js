@@ -10,9 +10,11 @@ var config = require('../conf/config');
 
 /** components */
 var LoadingMask = require('../components/LoadingMask');
+var TinyLine = require('../components/charts/TinyLine.js');
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
+var Util = require('../utils/Util');
 
 /** constants */
 var DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
@@ -50,7 +52,7 @@ module.exports = React.createClass({
             className += ' ' + this.props.className;
         }
         return (
-            <div className={className}>
+            <div className={className} style={{height:137}}>
                 {logClasses.map(function (logClass) {
                     var time = 0, prevPeriodTime;
                     var classId = logClass._id;
@@ -87,6 +89,24 @@ module.exports = React.createClass({
                         <div className="ltt_c-Board-item">
                             <p className="ltt_c-Board-item-number">{time}</p>
                             <p className="ltt_c-Board-item-name">{logClass.name}</p>
+                            <p className="past-seven-day-activity">
+                                <TinyLine value={function () {
+                                    var today = new Moment();
+                                    var end = today.format(Util.DATE_FORMAT);
+                                    var start = today.subtract(7, 'day').format(Util.DATE_FORMAT);
+                                    return DataAPI.Log.load({
+                                        sum: true,
+                                        classes:logClass._id,
+                                        group: 'date',
+                                        start: start,
+                                        end: end
+                                    }).then(function(data) {
+                                        return Util.fillDataGap(data, start, end, function (item) {
+                                            return item.count;
+                                        }).join(',');
+                                    });
+                                }}/>
+                            </p>
                             <p className="ltt_c-Board-item-change">{progress}</p>
                         </div>
                     );

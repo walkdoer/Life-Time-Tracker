@@ -278,8 +278,8 @@ var ProjectIndex = React.createClass({
         });
     },
 
-    onMainClick: function () {
-        if (this.state.openTaskDetail) {
+    onMainClick: function (e) {
+        if (this.state.openTaskDetail && !e.target.classList.contains("iScrollIndicator")) {
             this.setState({
                 openTaskDetail: false,
                 currentTask: null

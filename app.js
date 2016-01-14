@@ -26,6 +26,8 @@ var Badge = ReactBootStrap.Badge;
 var Q = require('q');
 var config = require('./conf/config');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
+var d3 = require('d3');
+window.d3 = d3;
 
 /** Components */
 var Header = require('./components/Header');
@@ -319,7 +321,8 @@ var Footer = React.createClass({
                         {version ? <span className="item version" onClick={this.openVersion.bind(this, version)}>{version.name}{this.renderLink(version)}</span> : null}
                         {task ? <span className="item task" onClick={this.openTask.bind(this, task)}>{task.name}{this.renderLink(task)}</span> : null}
                         {subTask ? <span className="item task" onClick={this.openTask.bind(this, task)}>{subTask.name}{this.renderLink(subTask)}</span> : null}
-                        {log.len ? Moment.duration(log.len, "minutes").format("M[m],d[d],h[h],mm[min]") : null}
+                        {log.len ? <span title="estimate time cost" className="item realcost">{Moment.duration(log.len, "minutes").format("M[m],d[d],h[h],mm[min]")} </span>: null}
+                        {log.estimatedTime ? <span title="real time cost" className="item estimatedTime">{Moment.duration(log.estimatedTime, "minutes").format("M[m],d[d],h[h],mm[min]")}</span>: null}
                     </span>
                 </div>
             );
@@ -399,10 +402,18 @@ var Footer = React.createClass({
         if (notifyInfo && notifyInfo.id !== notifyId) {
             that.notifyInfo = notifyInfo = null;
         }
-        var prevNotifyMoment = notifyInfo ? notifyInfo.time : null;
+
         var lastMinutes = new Moment().diff(start, 'minute');
+        var needNotify = true;
         //remind again after first remind
-        var needNotify = prevNotifyMoment ? new Moment().diff(prevNotifyMoment, 'minute') > 15 : true;
+        if (notifyInfo) {
+            if (notifyInfo.count < 2) {
+                var prevNotifyMoment = notifyInfo.time;
+                needNotify = prevNotifyMoment ? new Moment().diff(prevNotifyMoment, 'minute') >= 15 : true;
+            } else {
+                needNotify = false;
+            }
+        }
         if (lastMinutes > 45 && needNotify) {
             var message = '',
                 task = doingLog.task,
@@ -421,21 +432,18 @@ var Footer = React.createClass({
             if (subTask) {
                 message += ' ' + subTask.name;
             }
-            var subtitle = '要休息一下啦';
+            var subtitle = 'Break for a while?';
             if (notifyInfo) {
                 var count = notifyInfo.count;
                 if (count === 1) {
-                    subtitle = '╮(╯_╰)╭累了效率不高的，休息一下吧';
-                }
-                if (count > 1) {
-                    subtitle = '🐴上休息啦，喝口水，运动下再战';
+                    subtitle = 'come on! stop work!';
                 }
             }
             var logClass = doingLog.classes[0];
             var logClassConfig = logClasses.filter(function (cls) { return cls._id === logClass; })[0];
-            var logClassLabel = logClassConfig ? logClassConfig.name : "unknow";
-            Ltt.sdk &&  Ltt.sdk.notify && Ltt.sdk.notify({
-                title: '😁' + '你在' + logClassLabel +'上投入了' + Util.displayTime(lastMinutes),
+            var logClassLabel = logClassConfig ? logClassConfig.name : logClass || "unknow";
+            Util.notify({
+                title: 'spent' + Util.displayTime(lastMinutes) + ' in ' + logClassLabel,
                 subtitle: subtitle,
                 icon: path.join(__dirname, './images/me.jpg'),
                 sound: true,
@@ -443,7 +451,7 @@ var Footer = React.createClass({
                 message: message
             }, {
                 click: function () {
-                    //todo
+                    console.log('click');
                 }
             });
             if (!notifyInfo) {

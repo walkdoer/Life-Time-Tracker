@@ -224,7 +224,7 @@ var animation = {
     close: 'animated flipOutX'
 };
 
-exports.notify = function (cfg) {
+exports.notify = function (cfg, options) {
     if (Ltt.sdk &&  Ltt.sdk.notify) {
         Ltt.sdk.notify({
             title: cfg.title,
@@ -233,11 +233,7 @@ exports.notify = function (cfg) {
             sound: true,
             wait: false,
             message: cfg.message
-        }, {
-            click: function () {
-                console.log("test");
-            }
-        });
+        }, options || {});
     } else {
         var options = {
             type: "success",
@@ -293,7 +289,7 @@ exports.fillDataGap = function (data, start, end, transformFun) {
         }
         result.push(transformFun({
             date: d._id,
-            count: d.totalTime
+            count: d.totalTime || d.count
         }));
     });
     var index = result.length;
@@ -322,6 +318,12 @@ exports.getLogDesc = function (log) {
     }
     if (!_.isEmpty(log.projects)) {
         desc.push(log.projects[0].name);
+    }
+    if (!_.isEmpty(log.tags)) {
+        desc.push(log.tags);
+    }
+    if (!_.isEmpty(log.peoples)) {
+        desc.push(log.peoples);
     }
     return !_.isEmpty(desc) ? desc.join(',') : '';
 };

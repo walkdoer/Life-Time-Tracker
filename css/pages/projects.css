@@ -13,6 +13,8 @@
   border: 1px solid #DDDDDD;
 }
 
+
+
 .ltt_c-page-projects input[type=text]:focus,
 .ltt_c-page-projects textarea:focus {
   box-shadow: 0 0 5px rgba(81, 203, 238, 1);
@@ -229,8 +231,155 @@
 }
 
 .ltt_c-projectDetail-projectInfo{
+    position: relative;
+    margin-top: -10px;
+    margin-left: -10px;
+    margin-right: -10px;
+    padding: 10px 10px 10px;
+    background-color: #FFF;
+    border-bottom: 1px solid #E2E2E2;
+    margin-bottom: 15px;
+}
+
+.projectInfo-container{
+  display: flex;
   position: relative;
 }
+
+.projectInfo-container .ActivityChart{
+  position: absolute;
+  height: 50px;
+  right: 0;
+  bottom: -10px;
+  width: 80%;
+}
+
+.projectInfo-container .basicInfo{
+    display: flex;
+    flex-direction: column;
+    flex: 3;
+    z-index: 99;
+}
+
+.projectInfo-container .basicInfo .title{
+    color: rgba(75, 75, 75, 0.8);
+    text-shadow: 1px 4px 6px #f6f6f6, 0 0 0 #000, 1px 4px 6px #f6f6f6;
+    margin: 0 0px 10px;
+    font-weight: 500;
+    font-size: 25px;
+    width: 280px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.projectInfo-container .basicInfo .timeinfos{
+   flex:1;
+}
+.projectInfo-container .basicInfo .timeinfos .timeinfo-item{
+  padding: 3px 5px;
+}
+
+
+.timeinfo-item .fa {
+  margin-right: 5px;
+}
+
+.projectInfo-container .chartsInfo{
+   flex: 5;
+   display: flex;
+   z-index: 2;
+  justify-content: flex-end;
+}
+.projectInfo-container .chartsInfo .moreinfo{
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ProjectTimeChart {
+  position: relative;
+  text-indent: 24px;
+}
+
+.ProjectTimeChart .peity{
+  position: absolute;
+  left:0px;
+}
+
+
+.moreinfo .moreinfo-item{
+  border-bottom: 1px solid #E2E2E2;
+  flex: 1;
+  padding-top: 10px;
+  text-indent: 15px;
+}
+
+.moreinfo .moreinfo-item .ltt-num{
+  font-size:20px;
+  font-weight: 600;
+}
+.moreinfo .moreinfo-item:last-child{
+  border-bottom:none;
+}
+
+
+.projectInfo-container .chartsInfo .chart-item.TaskCountChart{
+    display: flex;
+    flex: none;
+    width: 170px;
+    margin-right: 12px;
+}
+
+.projectInfo-container .chartsInfo .chart-item.TaskCountChart .desc{
+  display: flex;
+  flex-direction: column;
+    flex-direction: column;
+    margin-bottom: 15px;
+    margin-top: 15px;
+    text-align: left;
+}
+
+.projectInfo-container .chartsInfo .chart-item.TaskCountChart .desc .item{
+   flex: 1;
+   font-size: 11px;
+    font-weight: 200;
+    margin-bottom: 0px;
+
+}
+.projectInfo-container .chartsInfo .chart-item.TaskCountChart .desc .item .ltt-num{
+  font-size:15px;
+  font-weight: 400;
+  margin-right: 0px;
+}
+
+.projectInfo-container .chartsInfo .chart-item{
+}
+
+.projectInfo-container .chartsInfo .chart-item-content{
+  margin: auto;
+  width: 100px;
+}
+.projectInfo-container .chartsInfo .chart-item .desc{
+  text-align: center;
+}
+
+.projectInfo-container .chartsInfo .chart-item .pieChart{
+    position: relative;
+    text-align: center;
+    font-size: 0.63rem;
+    color: #646464;
+    line-height: 70px;
+    width: 70px;
+    margin:auto;
+}
+.projectInfo-container .chartsInfo .chart-item .pieChart canvas{
+    position: absolute;
+    width: 70px;
+    top: 0;
+    left: 0;
+}
+
 
 .ltt_c-projectDetail-projectInfo .icon-btn{
   font-size: 0.5em;
@@ -296,6 +445,9 @@
 .ltt_c-taskDetail{
 }
 
+.tooltip{
+  z-index: 10000;
+}
 
 
 .ltt_c-taskDetail-dateInfo-item{

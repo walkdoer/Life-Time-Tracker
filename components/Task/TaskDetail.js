@@ -11,6 +11,9 @@ require("datetimepicker");
 var RB = require('react-bootstrap');
 var Row = RB.Row;
 var Col = RB.Col;
+var Button = RB.Button;
+var OverlayTrigger = RB.OverlayTrigger;
+var Tooltip = RB.Tooltip;
 
 /**components*/
 var Log = require('../Log');
@@ -31,22 +34,27 @@ module.exports = React.createClass({
         return {
             loaded: false,
             estimatedTime: task ? task.estimatedTime : null,
-            logs: []
+            logs: [],
+            task: task
         };
     },
 
     getDefaultProps: function () {
         return {
             onHidden: noop,
-            onLogsLoaded: noop
+            onLogsLoaded: noop,
+            onChange: noop
         };
     },
 
     render: function () {
-        var task = this.props.task;
-
+        var task = this.state.task;
+        var lastActiveTimeToolTip;
+        if (task.lastActiveTime) {
+            lastActiveTimeToolTip = <Tooltip>{new Moment(task.lastActiveTime).format(DATE_TIME_FORMAT)}</Tooltip>;
+        }
         return (
-            <div className="ltt_c-projectTask-logs ltt_c-taskDetail">
+            <div className="ltt_c-projectTask-logs ltt_c-taskDetail" onClick={function (e) {e.stopPropagation();}}>
                 <div className="ltt_c-LogList" key={task._id}>
                     <div className="ltt_c-LogList-header">
                         <span className="searchInput">{task.name}</span>
@@ -85,15 +93,27 @@ module.exports = React.createClass({
                         <Row className="ltt_c-taskDetail-dateInfo-item">
                             <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Created</Col>
                             <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
-                                {new Moment(task.createTime).format(DATE_TIME_FORMAT)}
+                                <OverlayTrigger placement="bottom"
+                                        overlay={<Tooltip>{new Moment(task.createTime).format(DATE_TIME_FORMAT)}</Tooltip>}
+                                        delay={10}
+                                        delayHide={300}
+                                    >
+                                        <span>{new Moment(task.createTime).fromNow()}</span>
+                                    </OverlayTrigger>
                             </Col>
                         </Row>
                         {
-                            task.updateTime ?
+                            task.lastActiveTime ?
                             <Row className="ltt_c-taskDetail-dateInfo-item">
                                 <Col xs={6} className="ltt_c-taskDetail-dateInfo-item-label" md={4}>Update</Col>
                                 <Col xs={12} className="ltt_c-taskDetail-dateInfo-item-input" md={8}>
-                                    {new Moment(task.updateTime).format(DATE_TIME_FORMAT)}
+                                    <OverlayTrigger placement="bottom"
+                                        overlay={lastActiveTimeToolTip}
+                                        delay={10}
+                                        delayHide={300}>
+                                    <span>{new Moment(task.lastActiveTime).fromNow()}</span>
+                                    </OverlayTrigger>
+                                    <Button bsStyle="warning" bsSize="xsmall" style={{marginLeft: 10}} onClick={this.correctLastActiveTime}>correct</Button>
                                 </Col>
                             </Row> : null
                         }
@@ -221,6 +241,30 @@ module.exports = React.createClass({
 
     hide: function () {
         this.props.onHidden();
+    },
+
+    correctLastActiveTime: function () {
+        var task = this.state.task;
+        DataAPI.Log.load({
+            tasks: task.name,
+            populate: false,
+            sort: "start:-1",
+            limit:1
+        }).then(function (log) {
+            if (_.isEmpty(log)) {return;}
+            log = log[0];
+            return DataAPI.Task.update({
+                id: task._id,
+                lastActiveTime: log.end
+            }).then(function(result) {
+                that.setState({
+                    task: result
+                });
+                that.props.onChange(result);
+            }, function () {
+                Notify.error('fail to correct last activetime of' + task.name);
+            });
+        })
     }
 });
 

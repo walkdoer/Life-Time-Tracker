@@ -21,7 +21,6 @@ var inject = require("gulp-inject");
 var rename = require('gulp-rename');
 var watch = require('gulp-watch');
 var buildDir = './';
-var babelify = require("babelify");
 var argv = require('yargs').argv;
 var NwBuilder = require('nw-builder');
 
