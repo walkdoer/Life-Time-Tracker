@@ -226,6 +226,12 @@ module.exports = {
         }
     },
 
+    People: {
+        load: function (params) {
+            return get(url('/peoples'), params);
+        }
+    },
+
     Version: {
         load: function (params) {
             return get(url('/versions'), params);
