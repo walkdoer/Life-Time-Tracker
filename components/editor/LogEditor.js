@@ -98,7 +98,8 @@ var LogEditor = React.createClass({
 
     _trackActicity: function () {
         var todayDate = new Moment().format('YYYY-MM-DD');
-        if (this.props.title !== todayDate) {
+        var date = this.props.title;
+        if (date !== todayDate) {
             return;
         }
         this.__lastNotifyTime = {};
@@ -107,11 +108,12 @@ var LogEditor = React.createClass({
         function notifyStartSoon(log) {
             var start = new Moment(log.estimateStart);
             var end = new Moment(log.estimateEnd);
-            Util.notify({
+            var options = {
                 title: 'will start in ' + start.fromNow() + ' at ' + start.format('HH:mm'),
                 subtitle: 'time: ' + Moment.duration(end.diff(start, 'minute'), 'minutes').format("M[m],d[d],h[h],mm[min]") + ' end at:' + end.format('HH:mm'),
-                message: Util.getLogDesc(log)
-            });
+                message: Util.getLogDesc(log) || "go"
+            };
+            Util.notify(options);
         }
         function notifyEndSoon(log, useTime, remainTime) {
             Util.notify({
@@ -141,7 +143,7 @@ var LogEditor = React.createClass({
                 var mEstimateStart, mEstimateEnd;
                 var estimatedTime = getEstimateTime(log);
                 if (estimatedTime > 0 && Util.isDoingLog(log)) {
-                    md5Id = md5(log.origin) + '-end';
+                    md5Id = md5(date + log.origin);
                     var fromStart = mNow.diff(log.start, 'minute');
                     var threshold = Math.ceil(estimatedTime * 0.7);
                     var remainTime = estimatedTime - fromStart;
@@ -157,7 +159,7 @@ var LogEditor = React.createClass({
                     }
                 }
                 if (log.estimateStart && !log.start) {
-                    md5Id = md5(log.origin);
+                    md5Id = md5(date + log.origin);
                     mEstimateStart = new Moment(log.estimateStart);
                     var diff = mEstimateStart.diff(mNow, 'minute');
                     if (diff <= NOTIFY_THRESHOLD && diff >= 0) {

@@ -319,5 +319,11 @@ exports.getLogDesc = function (log) {
     if (!_.isEmpty(log.projects)) {
         desc.push(log.projects[0].name);
     }
+    if (!_.isEmpty(log.tags)) {
+        desc.push(log.tags);
+    }
+    if (!_.isEmpty(log.peoples)) {
+        desc.push(log.peoples);
+    }
     return !_.isEmpty(desc) ? desc.join(',') : '';
 };
