@@ -404,15 +404,13 @@ var LogEditor = React.createClass({
                 } else if (tokenType === 'ltt_subTask') {
                     that.getTaskCompletions(line, callback);
                 } else if (['ltt_tag', 'ltt_tag_start', 'ltt_tag_end', 'ltt_tag_split'].indexOf(tokenType) >= 0) {
-                    console.log(prefix);
                     that.getTagCompletions(prefix, callback);
+                } else if (tokenType === 'ltt_people') {
+                    that.getPeopleCompletions(prefix, callback);
                 }
             }
         }
         langTools.addCompleter(logCompleter);
-        //editor.setBehavioursEnabled(true);
-        //content = editorStore(SK_CONTENT);
-        //this._initProjectTypeahead();
         this._initEditorCommand();
         this._trackActicity();
         return editor;
@@ -840,6 +838,21 @@ var LogEditor = React.createClass({
             cb(null, completions);
         });
     },
+
+    getPeopleCompletions: function (prefix, cb) {
+        var that = this;
+        DataAPI.People.load({name: prefix}).then(function (peoples) {
+            if (_.isEmpty(peoples)) {
+                return cb(null, []);
+            }
+            var completions = peoples.map(function (people) {
+                var score = new Date(people.lastActiveTime).getTime()
+                return {name: people._id, value: people._id, meta: 'people', score: score};
+            });
+            cb(null, completions);
+        });
+    },
+
 
     getLogClassCompletions: function (line, cb) {
         //var projects = [{name: 'life-time-tracker'}, {name: 'wa'}];
