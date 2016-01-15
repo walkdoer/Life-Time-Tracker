@@ -50,7 +50,8 @@ var OverviewReport = require('./reports/Overview'),
     TagsReport = require('./reports/TagsReport'),
     TodayReport = require('./reports/todayReport'),
     ProjectReport = require('./reports/ProjectReport'),
-    WeeklyReport = require('./reports/WeeklyReport');
+    WeeklyReport = require('./reports/WeeklyReport'),
+    YearReport = require('./reports/YearReport');
 
 /** Utils */
 var DataAPI = require('./utils/DataAPI');
@@ -71,6 +72,7 @@ var routes = (
             <Route name="todayReport" path="/reports/today" handler={TodayReport}/>
             <Route name="weeklyReport" path="/reports/weekly" handler={WeeklyReport}/>
             <Route name="projectReport" path="/reports/projects" handler={ProjectReport}/>
+            <Route name="yearReport" path="/reports/annual" handler={YearReport}/>
             <DefaultRoute handler={OverviewReport}/>
         </Route>
         <Route name="dashboard" path="/dashboard" handler={Dashboard}/>

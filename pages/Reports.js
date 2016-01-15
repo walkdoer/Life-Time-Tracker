@@ -48,6 +48,11 @@ var Reports = React.createClass({
             key: 'classes',
             path: '/reports/classes',
             icon: 'fa fa-th-large'
+        }, {
+            text: 'Annual',
+            key: 'annual',
+            path: '/reports/annual',
+            icon: 'fa fa-newspaper-o'
         }];
 
         var pathname = this.getPath();
