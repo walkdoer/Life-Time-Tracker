@@ -72,6 +72,6 @@ module.exports = {
                 }
             });
         }
-        return options;
+        return extend(true, options, this.props.highchartOptions || {});
     }
 };
