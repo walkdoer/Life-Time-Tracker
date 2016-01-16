@@ -33,13 +33,13 @@ module.exports = React.createClass({
     getDefaultProps: function () {
         return {
             start: new Moment().startOf('day'),
-            end: new Moment().endOf('day'),
-            tabs: ['tags', 'classes', 'project', 'version', 'task']
+            end: new Moment().endOf('day')
         };
     },
 
     render: function () {
         var data = this.state.rankingData;
+        var barHeight = data.length * 20;
         var highchartOptions = {};
         if (this.props.backgroundColor) {
             highchartOptions.chart = {
@@ -47,7 +47,7 @@ module.exports = React.createClass({
             };
         }
         return (
-            <div className={"ltt_c-RankBar " + (this.props.className || "")}>
+            <div className={"ltt_c-RankBar " + (this.props.className || "")} style={{height: barHeight}}>
                 <Bar data={this.props.type === 'classes' ? this.convertClassesData(data) : this.convertData(data)}
                     exporting={false}
                     highchartOptions={highchartOptions}

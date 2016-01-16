@@ -10,7 +10,7 @@ var _ = require('lodash');
 var Router = require('react-router');
 var RouteHandler = Router.RouteHandler;
 var Sidebar = require('../components/Sidebar');
-var FilterableMenu = require('../components/FilterableMenu');
+var Menu = require('../components/Menu');
 /** const **/
 var DATE_FORMAT = 'YYYY-MM-DD';
 
@@ -44,6 +44,11 @@ var Reports = React.createClass({
             path: '/reports/projects',
             icon: 'fa fa-rocket'
         }, {
+            text: 'Relationship',
+            key: 'relation',
+            path: '/reports/relationship',
+            icon: 'fa fa-users'
+        }, {
             text: 'Classes',
             key: 'classes',
             path: '/reports/classes',
@@ -68,10 +73,7 @@ var Reports = React.createClass({
         return (
             <section className="ltt_c-page ltt_c-page-reports">
                 <Sidebar ref="sidebar">
-                    <FilterableMenu items={menuItems}
-                        activeKey={initialMenuItem.key}
-                        onMenuClick={this.onMenuClick}
-                    />
+                    <Menu items={menuItems} activeKey={initialMenuItem.key}/>
                 </Sidebar>
                 <RouteHandler className="ltt_c-page-reports-report"/>
             </section>

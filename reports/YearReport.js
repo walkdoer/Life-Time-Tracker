@@ -34,7 +34,7 @@ var YearReport = React.createClass({
             endOfYear = new Moment().year(this.state.year).endOf('year');
         return (
             <div className="ltt_c-report ltt_c-report-YearReport">
-                <h1>{this.state.year}年度报告</h1>
+                <h1 className="title">{this.state.year}年度报告</h1>
                 <h2> 基本生活数据 </h2>
                 <p> 平均睡眠时间：8：00</p>
                 <p> 平均起床时间：9：00</p>
