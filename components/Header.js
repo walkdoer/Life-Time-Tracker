@@ -77,6 +77,9 @@ var Header = React.createClass({
                     </ButtonGroup>
                     <ButtonToolbar>
                         <ButtonGroup>
+                            <Button onClick={this.openLab}>
+                                <i className="fa fa-flask" title="lab"></i>
+                            </Button>
                             <Button onClick={this.openLogCheck}>
                                 <i className="fa fa-file-text" title="check log file"></i>
                             </Button>
@@ -215,6 +218,10 @@ var Header = React.createClass({
 
     openConfigs: function () {
         this.transitionTo('settings');
+    },
+
+    openLab: function () {
+        this.transitionTo('lab');
     }
 
 });

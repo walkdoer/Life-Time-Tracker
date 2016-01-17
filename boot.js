@@ -36,7 +36,8 @@ var Dashboard = require('./pages/Dashboard'),
     LogCheck = require('./pages/LogCheck'),
     Settings = require('./pages/Settings'),
     Calendar = require('./pages/Calendar'),
-    Routine = require('./pages/Routine');
+    Routine = require('./pages/Routine'),
+    Lab = require('./pages/Lab');
 
 /** Components */
 var ProjectDetail = require('./components/ProjectDetail'),
@@ -53,6 +54,9 @@ var OverviewReport = require('./reports/Overview'),
     WeeklyReport = require('./reports/WeeklyReport'),
     YearReport = require('./reports/YearReport')
     RelationReport = require('./reports/RelationReport');
+
+/** LAB */
+var LabPieReport = require('./reports/lab/pie');
 
 /** Utils */
 var DataAPI = require('./utils/DataAPI');
@@ -97,6 +101,9 @@ var routes = (
         <Route name="settings" path="settings" handler={Settings}/>
         <Route name="calendar" path="calendar" handler={Calendar}/>
         <Route name="routine" path="routine" handler={Routine}/>
+        <Route name="lab" path="/lab" handler={Lab}/>
+            <Route name="labpie" path="/lab/report/pie"  handler={LabPieReport}>
+        </Route>
         <NotFoundRoute handler={Page404}/>
         <DefaultRoute handler={Dashboard}/>
     </Route>
