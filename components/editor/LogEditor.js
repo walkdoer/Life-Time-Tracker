@@ -941,6 +941,7 @@ var LogEditor = React.createClass({
         var editor = this.editor;
         var session = editor.getSession();
         var selection = editor.getSelection();
+        var date = this.props.title;
         session.on('change', _.debounce(function (e) {
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = session.getValue();
@@ -974,6 +975,16 @@ var LogEditor = React.createClass({
                 that._currentRow = row;
             }
         }, 200));
+
+        selection.on('changeSelection', _.debounce(function (e, sel) {
+            var range = selection.getRange();
+            var startRow = range.start.row;
+            var endRow = range.end.row;
+            var doc = session.getDocument();
+            var lines = doc.getLines(startRow, endRow);
+            var logs = TrackerHelper.getLogs(lines.join('\n'), date, true);
+            that._updateLogSumInfo(logs);
+        }, 1000));
     },
 
     getCurrentLineIndex: function () {
@@ -1777,7 +1788,7 @@ var LogEditor = React.createClass({
         this._gotoLocate(calEvent.origin, this.getContent(), 1000);
     },
 
-    _updateLogProgress: function () {
+    _updateLogProgress: function (selectLogs) {
         var logs = this.getAllLogs(true);
         var done = 0, plan = 0, total = 0;
         logs.forEach(function (log) {
@@ -1792,6 +1803,10 @@ var LogEditor = React.createClass({
 
         total = done + plan;
         this.refs.logProgress.update(total, done);
+    },
+
+    _updateLogSumInfo: function(selectLogs) {
+        this.refs.logProgress.updateSelection(selectLogs);
     }
 
 });
@@ -2152,13 +2167,16 @@ var LogProgress = React.createClass({
     getInitialState: function () {
         return {
             done: this.props.done,
-            total: this.props.total
+            total: this.props.total,
+            selectionLogCount: 0
         }
     },
 
     render: function () {
+        var state = this.state;
         return <div className="ltt_c-LogProgress">
-            <Progress value={this.state.done} max={this.state.total}/>
+            {this.renderSelectionInfo()}
+            <Progress value={state.done} max={state.total}/>
         </div>
     },
 
@@ -2167,6 +2185,29 @@ var LogProgress = React.createClass({
             done: done,
             total: total
         });
+    },
+
+    updateSelection: function (logs){
+        var t = 0;
+        logs.forEach(function (l) {
+            t += (l.len || 0);
+        });
+        this.setState({
+            selectionTotal: t,
+            selectionLogCount: logs.length,
+        });
+    },
+
+
+    renderSelectionInfo: function () {
+        var state = this.state;
+        if (state.selectionLogCount > 0) {
+            return <div className="selection-info">
+                {state.selectionLogCount} logs, total {Util.displayTime(state.selectionTotal)}
+                </div>
+        } else {
+            return null;
+        }
     }
 });
 
