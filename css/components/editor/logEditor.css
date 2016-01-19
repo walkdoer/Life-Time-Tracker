@@ -168,14 +168,13 @@
 .ltt_c-logEditor .ltt_c-report-TodayReport .chart{
     box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.30);
 }
-
 .ltt_c-LogProgress{
     position: absolute;
-    width: 100px;
     padding: 10px;
     bottom: 0px;
     right: 0px;
     z-index: 999;
+    width: auto;
     background: rgba(255, 255, 255, 0.81);
     border-left: 1px solid #E8E8E8;
     border-top: 1px solid #E8E8E8;
@@ -184,7 +183,19 @@
     box-shadow: 0 0 5px #E6E6E6;
 }
 
+.ltt_c-LogProgress .selection-info,
 .ltt_c-LogProgress .ltt_c-progress{
+    display:  inline-block;
+}
+
+.ltt_c-LogProgress .selection-info{
+    margin-right: 10px;
+    font-family: 'Share Tech', sans-serif;
+}
+
+
+.ltt_c-LogProgress .ltt_c-progress{
+    width: 80px;
     height: 11px;
     border-radius: 3px;
 }
