@@ -16,7 +16,8 @@ var history = window.history;
 var Mt = window.Mousetrap;
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin
 var Router = require('react-router');
-var urls = [location.href];
+var historyBackwardUrls = [location.href];
+var historyForwardUrls = [];
 var FORWARD = 1;
 var BACKWARD = -1;
 var Bus = require('../utils/Bus');
@@ -104,15 +105,29 @@ var Header = React.createClass({
     back: function (e) {
         e.preventDefault();
         this.direction = BACKWARD;
+        var url = historyBackwardUrls.pop();
+        if (url) {
+            historyForwardUrls.push(url);
+        }
+        this.setState({
+            disabledForwardButton : historyForwardUrls.length === 0,
+            disabledBackButton: historyBackwardUrls.length === 0
+        });
         history.back();
     },
 
     forward: function (e) {
         e.preventDefault();
-        this.direction = FORWARD;
+        var url = historyForwardUrls.pop();
+        if (url) {
+            historyBackwardUrls.push(url);
+        }
+        this.setState({
+            disabledForwardButton : historyForwardUrls.length === 0,
+            disabledBackButton: historyBackwardUrls.length === 0
+        });
         history.forward();
     },
-
 
     closeWindow: function () {
         Ltt.close();
@@ -128,43 +143,11 @@ var Header = React.createClass({
 
         window.addEventListener('hashchange', function (e) {
             var newURL = e.newURL;
-            if (this.direction === FORWARD) {
-                this.setState({
-                    disabledBackButton: false
-                });
-            } else if (this.direction === BACKWARD){
-                this.setState({
-                    disabledForwardButton: false
-                });
-
-            } else {
-
-            }
-            var urlIndex;
-            var alreadyInUrls = urls.some(function (url, index) {
-                if (url === newURL) {
-                    urlIndex = index;
-                    return true;
-                }
-                return false;
+            historyBackwardUrls.push(newURL);
+            this.setState({
+                disabledForwardButton : historyForwardUrls.length === 0,
+                disabledBackButton: historyBackwardUrls.length === 0
             });
-            if (urlIndex === urls.length - 1) {
-                this.setState({
-                    disabledForwardButton : true
-                });
-            }
-            if (urlIndex === 0) {
-                this.setState({
-                    disabledBackButton : true
-                });
-            }
-            if (!alreadyInUrls) {
-                urls.push(newURL);
-                this.setState({
-                    disabledForwardButton : true,
-                    disabledBackButton : false
-                });
-            }
         }.bind(this));
     },
 
