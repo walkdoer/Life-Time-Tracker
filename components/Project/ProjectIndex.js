@@ -30,6 +30,8 @@ var Util = require('../../utils/Util');
 /** Constants */
 var GlobalConstants = require('../../constants/GlobalConstants');
 
+
+
 var ProjectIndex = React.createClass({
 
     mixins: [PureRenderMixin, Router.State, Router.Navigation],
@@ -98,7 +100,7 @@ var ProjectIndex = React.createClass({
                         </TaskList>
                     </div>
                     : null}
-
+                    <DoingTask/>
                     {!_.isEmpty(notActiveDoingTasks) ?
                     <div>
                         <div className="list-header">
@@ -287,6 +289,76 @@ var ProjectIndex = React.createClass({
         }
     }
 });
+
+var DoingTask = React.createClass({
+
+    getInitialState: function () {
+        return {
+            type: 'weekly',
+            tasks: []
+        };
+    },
+
+    render: function () {
+        var data = this.state.tasks;
+        return <div className="doing-tasks">
+            <div className="list-header">
+                <h3>Doing tasks of <select className="select" onChange={function (e) {
+                    var val = e.target.value;
+                    this.setState({type: val});
+                    this.loadDoingTask(val);
+                }.bind(this)} value={this.state.type}>
+                    {[
+                        {value: 'weekly', label: 'this week'},
+                        {value: 'monthly', label: 'this month'}
+                    ].map(function (option) {
+                        return <option value={option.value}>{option.label}</option>
+                    })}
+                </select></h3>
+            </div>
+            <TaskList>
+                {!_.isEmpty(data) ? data.map(function (task) {
+                    return <Task data={task}
+                        onTitleClick={this.gotoTaskInProject.bind(this, task)}
+                        key={task._id}/>
+                }, this) : null}
+            </TaskList>
+        </div>
+    },
+
+    gotoTaskInProject: function (task, e) {
+        e.stopPropagation();
+        var url = Util.getUrlFromTask(task);
+        MemStore.set(GlobalConstants.STORE_PROJECT_INDEX_TASK_ID, task);
+        if (url) {
+            this.transitionTo(url);
+        }
+    },
+
+    componentDidMount: function () {
+        this.loadDoingTask(this.state.type);
+    },
+
+    loadDoingTask: function (type) {
+        this.loadTask(type, {status: 'doing'});
+    },
+
+    loadTask: function (type, params) {
+        var that = this;
+        params = _.extend({
+            status: 'doing',
+            calculateTimeConsume: true,
+            parent: 'null',
+            populate: true},
+        params);
+        _.extend(params, Util.toDate(type));
+        DataAPI.Task.load(params).then(function (tasks) {
+            that.setState({
+                tasks: tasks
+            });
+        });
+    }
+})
 
 
 module.exports = ProjectIndex;

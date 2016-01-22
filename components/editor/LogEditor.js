@@ -984,7 +984,7 @@ var LogEditor = React.createClass({
             var lines = doc.getLines(startRow, endRow);
             var logs = TrackerHelper.getLogs(lines.join('\n'), date, true);
             that._updateLogSumInfo(logs);
-        }, 1000));
+        }, 100));
     },
 
     getCurrentLineIndex: function () {
