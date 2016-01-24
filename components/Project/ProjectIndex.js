@@ -8,6 +8,7 @@ var Router = require('react-router');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var RB = require('react-bootstrap');
 var Button = RB.Button;
+var Well = RB.Well;
 var ButtonToolbar = RB.ButtonToolbar;
 var DropdownButton = RB.DropdownButton;
 var MenuItem = RB.MenuItem;
@@ -100,7 +101,7 @@ var ProjectIndex = React.createClass({
                         </TaskList>
                     </div>
                     : null}
-                    <DoingTask/>
+                    <DoingTask openTask={this.openTask}/>
                     {!_.isEmpty(notActiveDoingTasks) ?
                     <div>
                         <div className="list-header">
@@ -292,6 +293,8 @@ var ProjectIndex = React.createClass({
 
 var DoingTask = React.createClass({
 
+    mixins: [PureRenderMixin, Router.Navigation],
+
     getInitialState: function () {
         return {
             type: 'weekly',
@@ -310,7 +313,9 @@ var DoingTask = React.createClass({
                 }.bind(this)} value={this.state.type}>
                     {[
                         {value: 'weekly', label: 'this week'},
-                        {value: 'monthly', label: 'this month'}
+                        {value: 'monthly', label: 'this month'},
+                        {value: 'last_seven_days', label: 'last 7 days'},
+                        {value: 'last_three_days', label: 'last 3 days'}
                     ].map(function (option) {
                         return <option value={option.value}>{option.label}</option>
                     })}
@@ -319,9 +324,10 @@ var DoingTask = React.createClass({
             <TaskList>
                 {!_.isEmpty(data) ? data.map(function (task) {
                     return <Task data={task}
+                        onClick={this.props.openTask}
                         onTitleClick={this.gotoTaskInProject.bind(this, task)}
                         key={task._id}/>
-                }, this) : null}
+                }, this) : <Well>No Doing Task.</Well>}
             </TaskList>
         </div>
     },
@@ -348,7 +354,7 @@ var DoingTask = React.createClass({
         params = _.extend({
             status: 'doing',
             calculateTimeConsume: true,
-            parent: 'null',
+            populateFields:  'version,project',
             populate: true},
         params);
         _.extend(params, Util.toDate(type));
