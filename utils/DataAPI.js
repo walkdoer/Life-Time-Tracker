@@ -263,6 +263,10 @@ module.exports = {
 
         wakeAndSleep: function (params) {
             return get(url('/wakeAndSleep'), params);
+        },
+
+        sleepLength: function (params) {
+            return get(url('/sleepLength'), params);
         }
     },
 

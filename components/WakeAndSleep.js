@@ -10,6 +10,7 @@ var ReactBootStrap = require('react-bootstrap');
 var numeral = require('numeral');
 var DataAPI = require('../utils/DataAPI');
 var Util = require('../utils/Util');
+var Q = require('q');
 
 
 var WakeAndSleep = React.createClass({
@@ -17,16 +18,19 @@ var WakeAndSleep = React.createClass({
     getInitialState: function () {
         return {
             meanSleep: null,
-            meanWake: null
+            meanWake: null,
+            meanSleepLength: null
         };
     },
 
     render: function () {
         var meanWake = this.state.meanWake;
         var meanSleep = this.state.meanSleep;
+        var meanSleepLength = this.state.meanSleepLength;
         return <div class="wake-sleep">
                 <p> 平均起床时间：{meanWake ? Moment(meanWake).format('HH:mm') : null}</p>
-                <p> 平均睡眠时间：{meanSleep ? Moment(meanSleep).format('HH:mm') : null}</p>
+                <p> 平均睡觉时间：{meanSleep ? Moment(meanSleep).format('HH:mm') : null}</p>
+                <p> 平均睡眠时长：{meanSleepLength ? Util.displayTime(meanSleepLength) : null}</p>
         </div>
     },
 
@@ -38,11 +42,20 @@ var WakeAndSleep = React.createClass({
         var that = this;
         var mStart = new Moment(this.props.start);
             mEnd = new Moment(this.props.end);
-        DataAPI.Stat.wakeAndSleep({
-            start: mStart.format(Util.DATE_FORMAT),
-            end: mEnd.format(Util.DATE_FORMAT),
-            group: 'type'
-        }).then(function (res) {
+        Q.allSettled([
+            DataAPI.Stat.wakeAndSleep({
+                start: mStart.format(Util.DATE_FORMAT),
+                end: mEnd.format(Util.DATE_FORMAT),
+                group: 'type'
+            }),
+            DataAPI.Stat.sleepLength({
+                start: mStart.format(Util.DATE_FORMAT),
+                end: mEnd.format(Util.DATE_FORMAT),
+                mean: true
+            })
+        ]).spread(function (wakeAndSleepResult, meanResult) {
+            var res = wakeAndSleepResult.value;
+            var meanSleepLength = meanResult.value.mean;
             var wakeData = res.wake || [];
             var sleepData = res.sleep || [];
             var wakeLen = wakeData.length;
@@ -63,7 +76,8 @@ var WakeAndSleep = React.createClass({
                 wakeData: wakeData,
                 sleepData: sleepData,
                 meanWake: meanWake.toDate(),
-                meanSleep: meanSleep.toDate()
+                meanSleep: meanSleep.toDate(),
+                meanSleepLength: meanSleepLength
             });
         });
     }
