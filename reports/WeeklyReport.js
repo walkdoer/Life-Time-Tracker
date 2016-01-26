@@ -16,6 +16,7 @@ var LoadingMask = require('../components/LoadingMask');
 var PieDetail = require('../components/PieDetail');
 var TimeConsumeRanking = require('../components/TimeConsumeRanking');
 var Board = require('../components/Borad');
+var WakeAndSleep = require('../components/WakeAndSleep');
 
 
 /** Utils */
@@ -88,6 +89,8 @@ var WeeklyReport = React.createClass({
 
     render: function () {
         var week = this.state.week;
+        var start = Moment().week(week).startOf('week').toDate();
+        var end = Moment().week(week).endOf('week').toDate();
         return (
             <div className="ltt_c-report ltt_c-report-WeeklyReport">
                 {this.props.showWeekPicker ?
@@ -103,12 +106,15 @@ var WeeklyReport = React.createClass({
                         <Board key={week} className="ltt-box-shadow" type="week" week={week}/>
                     </div>
                 </div>
+                <div>
+                    <WakeAndSleep start={start} end={end} key={"ltt-week" + week}/>
+                </div>
                 <div className="Grid Grid--gutters Grid--stretch">
                     <div className="Grid-cell u-1of2">
                         <TimeConsumeRanking className="chart"
                             params={{
-                                start: Moment().week(week).startOf('week').toDate(),
-                                end: Moment().week(week).endOf('week').toDate()
+                                start: start,
+                                end: end
                             }}/>
                     </div>
                     <div className="Grid-cell u-1of2">
