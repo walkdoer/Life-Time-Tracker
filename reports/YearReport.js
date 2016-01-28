@@ -63,6 +63,15 @@ var YearReport = React.createClass({
                 </div>
                 <h4>Tag标签图</h4>
                 <YearTag year={this.state.year}/>
+                <h5>Top 30 Tags</h5>
+                <RankBar className="chart"
+                    type="tags"
+                    backgroundColor="rgba(255, 255, 255, 0.1)"
+                    params={{
+                        start: startOfYear.toDate(),
+                        end: endOfYear.toDate(),
+                        limit: 30
+                    }}/>
             </div>
         );
     }
@@ -80,7 +89,7 @@ var YearTag = React.createClass({
 
     render: function () {
         return <div className="tag-cloud">
-            <WordsCloud words={this.adaptData(this.state.tags)}/> : null }
+            <WordsCloud words={this.adaptData(this.state.tags)}/>
             <LoadingMask loaded={this.state.loaded}/>
         </div>
     },
