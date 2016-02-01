@@ -7,8 +7,8 @@
     position: relative;
 }
 
-.ltt_c-logEditor-content .todayReport{
-    
+.ltt_c-logEditor-content .recent-activities{
+    border-left: 1px solid #EAEAEA;
 }
 .ltt_c-logEditor-Calendar{
     width: 150px;
