@@ -5,6 +5,7 @@
     height: 100%;
     display: flex;
     position: relative;
+    overflow: hidden;
 }
 
 .ltt_c-logEditor-content .recent-activities .paper{

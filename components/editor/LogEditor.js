@@ -282,7 +282,7 @@ var LogEditor = React.createClass({
                         </TabbedArea>
                     </SlidePanel>
                      <SlidePanel className="recent-activities" ref="recentActivitiesSlidePanel"
-                        open={false} openRight={true} onTransitionEnd={this.renderRecentActivities}>
+                        open={false} openRight={true} onTransitionEnd={this.renderRecentActivities} afterClose={this.emptyRecentActivities}>
                         <div ref="recentActivitiesContainer" style={{height: "100%"}}></div>
                     </SlidePanel>
                 </div>
@@ -1754,6 +1754,9 @@ var LogEditor = React.createClass({
         });
     },
 
+    emptyRecentActivities: function() {
+        this.refs.recentActivitiesContainer.getDOMNode().innerHTML = '';
+    },
 
     renderRecentActivities: function () {
         var currentLog = this.getCurrentLog();

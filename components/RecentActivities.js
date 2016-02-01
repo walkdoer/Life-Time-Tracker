@@ -2,12 +2,14 @@ var React = require('react');
 var _ = require('lodash');
 var Log = require('./Log');
 var DataAPI = require('../utils/DataAPI');
+var LoadingMask = require('./LoadingMask');
 
 
 module.exports = React.createClass({
     getInitialState: function  () {
         return {
             error: false,
+            loaded: false,
             activies: []
         };
     },
@@ -18,7 +20,8 @@ module.exports = React.createClass({
             error = <div className="error" style={{padding: 10}}>load activities failed</div>;
         }
         return (
-        <div>
+        <div style={{height: '100%'}}>
+            <LoadingMask loaded={this.state.loaded}/>
             {error}
             {this.state.activies.map(function (log) {
                 return <Log {... log}/>
@@ -45,7 +48,7 @@ module.exports = React.createClass({
         var version = log.version;
         var classes = log.classes;
         if (task && task.name) {
-            params.task = task.name
+            params.tasks = task.name
         }
         if (!_.isEmpty(tags)) {
             params.tags = tags.join(',');
