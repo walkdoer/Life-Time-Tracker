@@ -7,7 +7,7 @@
     position: relative;
 }
 
-.ltt_c-logEditor-content .recent-activities{
+.ltt_c-logEditor-content .recent-activities .paper{
     border-left: 1px solid #EAEAEA;
 }
 .ltt_c-logEditor-Calendar{
@@ -173,7 +173,7 @@
     padding: 10px;
     bottom: 0px;
     right: 0px;
-    z-index: 999;
+    z-index: 9;
     width: auto;
     background: rgba(255, 255, 255, 0.81);
     border-left: 1px solid #E8E8E8;

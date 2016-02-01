@@ -281,9 +281,9 @@ var LogEditor = React.createClass({
                             </TabPane>
                         </TabbedArea>
                     </SlidePanel>
-                     <SlidePanel className="recent-activities" ref="recentActivitiesSlidePanel" open={false} openRight={true} onTransitionEnd={this.renderRecentActivities}>
-                        Recent Logs
-                        <div ref="recentActivitiesContainer"></div>
+                     <SlidePanel className="recent-activities" ref="recentActivitiesSlidePanel"
+                        open={false} openRight={true} onTransitionEnd={this.renderRecentActivities}>
+                        <div ref="recentActivitiesContainer" style={{height: "100%"}}></div>
                     </SlidePanel>
                 </div>
             </div>
@@ -987,6 +987,9 @@ var LogEditor = React.createClass({
                 that.allocateLogInCalendar(log);
                 that.props.onLineChange(line, log);
                 that._currentRow = row;
+                if (that.__recentActivitiesOpend) {
+                    that.renderRecentActivities();
+                }
             }
         }, 200));
 
@@ -1753,9 +1756,10 @@ var LogEditor = React.createClass({
 
 
     renderRecentActivities: function () {
-        /*var currentLog = this._getCurrentLogInformation();*/
+        var currentLog = this.getCurrentLog();
+        var logIndex = this.getCurrentLineIndex();
         React.render(
-            <RecentActivities/>,
+            <RecentActivities key={currentLog.origin + logIndex} log={currentLog}/>,
             this.refs.recentActivitiesContainer.getDOMNode()
         );
     },
