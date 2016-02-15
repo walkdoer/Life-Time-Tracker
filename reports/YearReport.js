@@ -33,11 +33,12 @@ var YearReport = React.createClass({
     },
 
     render: function () {
-        var startOfYear = new Moment().year(this.state.year).startOf('year'),
-            endOfYear = new Moment().year(this.state.year).endOf('year');
+        var year = this.state.year;
+        var startOfYear = new Moment().year(year).startOf('year'),
+            endOfYear = new Moment().year(year).endOf('year');
         return (
             <div className="ltt_c-report ltt_c-report-YearReport">
-                <h1 className="title">{this.state.year}年度报告</h1>
+                <h1 className="title">{year}年度报告</h1>
                 <h2> 基本生活数据 </h2>
                 <WakeAndSleep start={startOfYear} end={endOfYear}/>
                 <h4>各个类别的时间比例</h4>
@@ -62,7 +63,7 @@ var YearReport = React.createClass({
                     </div>
                 </div>
                 <h4>Tag标签图</h4>
-                <YearTag year={this.state.year}/>
+                <YearTag year={year}/>
                 <h5>Tag 前30强</h5>
                 <RankBar className="chart"
                     type="tags"
@@ -80,6 +81,16 @@ var YearReport = React.createClass({
                         start: startOfYear.toDate(),
                         end: endOfYear.toDate(),
                         limit: 20
+                    }}/>
+
+                <h2> 人际关系 </h2>
+                <pre>通过时间的维度来展示{year}这一年我与其他人的关系</pre>
+                <RankBar className="chart"
+                    type="peoples"
+                    backgroundColor="rgba(255, 255, 255, 0.1)"
+                    params={{
+                        start: startOfYear.toDate(),
+                        end: endOfYear.toDate(),
                     }}/>
             </div>
         );
