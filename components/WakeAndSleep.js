@@ -27,11 +27,13 @@ var WakeAndSleep = React.createClass({
         var meanWake = this.state.meanWake;
         var meanSleep = this.state.meanSleep;
         var meanSleepLength = this.state.meanSleepLength;
-        return <div class="wake-sleep">
-                <p> 平均起床时间：{meanWake ? Moment(meanWake).format('HH:mm') : null}</p>
-                <p> 平均睡觉时间：{meanSleep ? Moment(meanSleep).format('HH:mm') : null}</p>
-                <p> 平均睡眠时长：{meanSleepLength ? Util.displayTime(meanSleepLength) : null}</p>
-        </div>
+        return <p className="ltt_c-WakeSleep wake-sleep">
+            <span className="wake">{meanWake ? Moment(meanWake).format('HH:mm') : null}</span>
+            <span className="gap">~</span>
+            <span className="sleep">{meanSleep ? Moment(meanSleep).format('HH:mm') : null}</span>
+            <span className="gap"> = </span>
+            <span className="sleepLen">{meanSleepLength ? Util.displayTime(meanSleepLength) : null}</span>
+        </p>
     },
 
     componentWillMount: function () {

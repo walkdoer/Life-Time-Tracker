@@ -63,7 +63,7 @@ var YearReport = React.createClass({
                 </div>
                 <h4>Tag标签图</h4>
                 <YearTag year={this.state.year}/>
-                <h5>Top 30 Tags</h5>
+                <h5>Tag 前30强</h5>
                 <RankBar className="chart"
                     type="tags"
                     backgroundColor="rgba(255, 255, 255, 0.1)"
@@ -71,6 +71,15 @@ var YearReport = React.createClass({
                         start: startOfYear.toDate(),
                         end: endOfYear.toDate(),
                         limit: 30
+                    }}/>
+                <h4>投入时间最多的20个项目</h4>
+                <RankBar className="chart"
+                    type="project"
+                    backgroundColor="rgba(255, 255, 255, 0.1)"
+                    params={{
+                        start: startOfYear.toDate(),
+                        end: endOfYear.toDate(),
+                        limit: 20
                     }}/>
             </div>
         );

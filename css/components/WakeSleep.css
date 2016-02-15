@@ -1,0 +1,45 @@
+.ltt_c-WakeSleep{
+    font-size: 2.5rem;
+    padding: 10px 5px;
+    font-family: 'Share Tech', sans-serif;
+    font-variant: small-caps;
+}
+
+.ltt_c-WakeSleep .wake{
+    position: relative;
+}
+
+.ltt_c-WakeSleep .sleep{
+    position: relative;
+}
+
+
+.ltt_c-WakeSleep .wake:after{
+    content:"起床";
+    font-size: 1.3rem;
+    margin-left:5px;
+}
+
+.ltt_c-WakeSleep .sleep:after{
+    content:"睡觉";
+    font-size: 1.3rem;
+    margin-left:5px;
+}
+
+
+.ltt_c-WakeSleep .gap {
+    margin-left: 15px;
+    margin-right: 15px;
+    font-size: 4rem;
+    vertical-align: sub;
+}
+
+.ltt_c-WakeSleep  .sleepLen{
+    font-weight: bold;
+}
+
+.ltt_c-WakeSleep  .sleepLen:after{
+    content:"睡眠时长";
+    font-size: 1.3rem;
+    margin-left:5px;
+}
