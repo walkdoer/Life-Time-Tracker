@@ -29,6 +29,7 @@ var md5 = require('blueimp-md5').md5;
 var TodayReport = require('../../reports/TodayReport');
 var HelpDocument= require('../HelpDocument');
 var Progress = require('../Progress');
+var RecentActivities = require('../RecentActivities');
 
 //store key
 var SK_CONTENT = 'content';
@@ -279,6 +280,10 @@ var LogEditor = React.createClass({
                                 <HelpDocument src="./help/editor.logExample.md"/>
                             </TabPane>
                         </TabbedArea>
+                    </SlidePanel>
+                     <SlidePanel className="recent-activities" ref="recentActivitiesSlidePanel"
+                        open={false} openRight={true} onTransitionEnd={this.renderRecentActivities} afterClose={this.emptyRecentActivities}>
+                        <div ref="recentActivitiesContainer" style={{height: "100%"}}></div>
                     </SlidePanel>
                 </div>
             </div>
@@ -566,6 +571,15 @@ var LogEditor = React.createClass({
         var that = this;
         var editor = this.editor;
         var commands = editor.commands;
+
+        commands.addCommand({
+            name: "recentactivities",
+            bindKey: {win: "Ctrl-Shift-H", mac: "Command-Shift-H"},
+            exec: function(editor) {
+                that.openRecentActivities();
+            }
+        });
+
         commands.addCommand({
             name: "import",
             bindKey: {win: "Ctrl-S", mac: "Command-S"},
@@ -973,6 +987,9 @@ var LogEditor = React.createClass({
                 that.allocateLogInCalendar(log);
                 that.props.onLineChange(line, log);
                 that._currentRow = row;
+                if (that.__recentActivitiesOpend) {
+                    that.renderRecentActivities();
+                }
             }
         }, 200));
 
@@ -1728,6 +1745,26 @@ var LogEditor = React.createClass({
         this.refs.todayReport.toggle({
             width: $(this.getDOMNode()).width()
         });
+    },
+
+    openRecentActivities: function () {
+        this.__recentActivitiesOpend = !this.__recentActivitiesOpend;
+        this.refs.recentActivitiesSlidePanel.toggle({
+            width: $(this.getDOMNode()).width() * 0.3
+        });
+    },
+
+    emptyRecentActivities: function() {
+        this.refs.recentActivitiesContainer.getDOMNode().innerHTML = '';
+    },
+
+    renderRecentActivities: function () {
+        var currentLog = this.getCurrentLog();
+        var logIndex = this.getCurrentLineIndex();
+        React.render(
+            <RecentActivities key={currentLog.origin + logIndex} log={currentLog}/>,
+            this.refs.recentActivitiesContainer.getDOMNode()
+        );
     },
 
     renderTodayReport: function () {
