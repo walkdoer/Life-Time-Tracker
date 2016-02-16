@@ -92,6 +92,20 @@ var YearReport = React.createClass({
                         start: startOfYear.toDate(),
                         end: endOfYear.toDate(),
                     }}/>
+                <div className="achievement">
+                <h2> 成就 </h2>
+                    <div>一共得到了N次启发，点击查看那些启发</div>
+                    <div>读了 7 本书， 一共花了 100个小时</div>
+                    <div></div>
+                    <div>看了N个TED视频，花了 100个小时</div>
+                    <div>运动花了多少时间，其中健身，跑步花了多少，热力图，还有其他那些类型的运动</div>
+                    <div>花了多少时间编程，bugfix时间占比</div>
+                    <div>创建了 1000 个task， 完成了800个</div>
+                </div>
+                <h2> 娱乐 </h2>
+                <pre> 看电视花了，看美剧用了看了100部电影, 其中有 4部是纪录片，认为是好电影的有10部, 一共花了100个小时。</pre>
+                <h2> 情感生活 </h2>
+                <pre> 花了多少时间在家人上 ， 时间的热力图, 花了多少时间在恋爱, 时间的热力图 花了多少时间在朋友聚会</pre>
             </div>
         );
     }
