@@ -21,7 +21,7 @@ var RankBar = require('../components/RankBar');
 
 
 var WakeAndSleep = require('../components/WakeAndSleep');
-
+var Calculator = require('../components/Calculator');
 
 
 var YearReport = React.createClass({
@@ -95,9 +95,15 @@ var YearReport = React.createClass({
                 <div className="achievement">
                 <h2> 成就 </h2>
                     <div>一共得到了N次启发，点击查看那些启发</div>
-                    <div>读了 7 本书， 一共花了 100个小时</div>
+                    <div>读了 <Calculator type="task.count"
+                        params={{tags: 'rb', status: 'done', start: startOfYear, end: endOfYear, populate: false}}/>本书， 一共花了
+                        <Calculator type="log.time"
+                            params={{tags: 'rb', start: startOfYear, end: endOfYear}}/>
+                        个小时</div>
                     <div></div>
-                    <div>看了N个TED视频，花了 100个小时</div>
+                    <div>看了<Calculator type="task.count"
+                            params={{start: startOfYear, end: endOfYear, projects: "OTD"}}/>个TED视频，花了 <Calculator type="log.time"
+                            params={{projects: "OTD", start: startOfYear, end: endOfYear}}/>个小时</div>
                     <div>运动花了多少时间，其中健身，跑步花了多少，热力图，还有其他那些类型的运动</div>
                     <div>花了多少时间编程，bugfix时间占比</div>
                     <div>创建了 1000 个task， 完成了800个</div>
