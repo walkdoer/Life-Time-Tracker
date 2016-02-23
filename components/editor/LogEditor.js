@@ -1187,6 +1187,7 @@ var LogEditor = React.createClass({
                 that._activeCurrentLine();
                 that._updateLogProgress();
                 that._annotationOverTimeLog(that.getAllLogs(), content);
+                that._gotoLocate(that.props.locate, content);
                 that.props.onLoad(content, that.getDoingLog(content));
                 var timer = setTimeout(function() {
                     if (that.__reportOpened) {

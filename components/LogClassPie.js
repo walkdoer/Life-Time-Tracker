@@ -83,6 +83,9 @@ module.exports = React.createClass({
                     name: item._id
                 };
             }
+            if (!item._id) {
+                label = 'unknow';
+            }
             return {
                 value: item.totalTime,
                 label: label.name || label

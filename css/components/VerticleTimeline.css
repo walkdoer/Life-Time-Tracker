@@ -245,3 +245,9 @@
     font-weight: bold;
     padding: 3px 0px;
 }
+
+.ltt_c-VerticleTimeline-Activity .cbp_date,
+.ltt_c-VerticleTimeline-Activity .cbp_time,
+{
+    cursor: pointer;
+}

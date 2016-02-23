@@ -177,7 +177,8 @@ var Log = React.createClass({
     gotoEditor: function (e) {
         var date = this.props.date;
         console.log('goto editor');
-        this.transitionTo('logEditor', {date: date}, {logOrigin: this.props.origin});
+        location.hash = '/logEditor/' + date + '?logOrigin=' +  encodeURIComponent(this.props.origin);
+        //this.transitionTo('logEditor', {date: date}, {logOrigin: this.props.origin});
     }
 
 });

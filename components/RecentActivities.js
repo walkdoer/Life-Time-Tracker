@@ -3,6 +3,8 @@ var _ = require('lodash');
 var Log = require('./Log');
 var DataAPI = require('../utils/DataAPI');
 var LoadingMask = require('./LoadingMask');
+var Util = require('../utils/Util');
+var LogLine = require('./charts/LogLine');
 
 
 module.exports = React.createClass({
@@ -19,10 +21,18 @@ module.exports = React.createClass({
         if (this.state.error) {
             error = <div className="error" style={{padding: 10}}>load activities failed</div>;
         }
+        var totalTime = this.state.activies.reduce(function (sum, log) {
+            return sum + log.len;
+        }, 0);
         return (
-        <div style={{height: '100%'}}>
+        <div style={{height: '100%'}} className="ltt_c-RecentActivities">
             <LoadingMask loaded={this.state.loaded}/>
+            <div className="ltt-time">{Util.displayTime(totalTime)}</div>
             {error}
+            {!_.isEmpty(this.state.activies) ?
+                <LogLine logs={this.state.activies} isSubTask={false} withProgress={true} name={"Progress trend line"}/>
+                : null
+            }
             {this.state.activies.map(function (log) {
                 return <Log {... log}/>
             })}
