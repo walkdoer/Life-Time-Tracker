@@ -94,7 +94,8 @@ var YearReport = React.createClass({
                     }}/>
                 <div className="achievement">
                 <h2> 成就 </h2>
-                    <div>一共得到了N次启发，点击查看那些启发</div>
+                    <div>一共得到了<Calculator type="log.count"
+                            params={{tags: '启发', start: startOfYear, end: endOfYear}}/>次启发，点击查看那些启发</div>
                     <div>读了 <Calculator type="task.count"
                         params={{tags: 'rb', status: 'done', start: startOfYear, end: endOfYear, populate: false}}/>本书， 一共花了
                         <Calculator type="log.time"

@@ -36,16 +36,29 @@ module.exports = React.createClass({
                     num: tasks.length
                 });
             }.bind(this));
-        } else if (type === 'log.time') {
-            params.sum = true;
-            DataAPI.Log.load(params).then(function (result) {
-                result = result[0];
-                if (result) {
-                    this.setState({
-                        num: result.totalTime
-                    });
-                }
-            }.bind(this));
+        } else if (type.indexOf('log.') === 0) {
+            var handler;
+            if (type === 'log.time') {
+                params.sum = true;
+                handler = function (result) {
+                    result = result[0];
+                    if (result) {
+                        this.setState({
+                            num: result.totalTime || result.count
+                        });
+                    }
+                }.bind(this);
+            } else if (type === 'log.count'){
+                params.count = true;
+                handler = function (result) {
+                    if (result) {
+                        this.setState({
+                            num: result.count
+                        });
+                    }
+                }.bind(this);
+            }
+            DataAPI.Log.load(params).then(handler);
         }
     }
 });
