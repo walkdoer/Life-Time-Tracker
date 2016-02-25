@@ -931,9 +931,14 @@ var LogEditor = React.createClass({
                     if (_.isEmpty(tasks)) { return cb(null, []); }
                     var completions = tasks.map(function(task) {
                         var score = new Date(task.lastActiveTime).getTime();
+                        var inputValue = task.name;
+                        if (task.progress >= 0 && progress < 100) {
+                            inputValue += ':pg=' + task.progress;
+                        }
                         return {
                             name: task.name,
-                            value: task.name,
+                            caption: task.name,
+                            value: inputValue
                             score: score,
                             meta: progressTpl(task),
                             identifierRegex:/[a-zA-Z_0-9\u00A2-\uFFFF]/
