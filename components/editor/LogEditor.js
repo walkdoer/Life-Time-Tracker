@@ -889,7 +889,13 @@ var LogEditor = React.createClass({
             if (_.isEmpty(projects)) {return cb(null, [])}
             var completions = projects.map(function(proj) {
                 var score = new Date(proj.lastActiveTime).getTime()
-                return {name: proj.name, value: proj.name, score: score, meta: progressTpl(proj)};
+                return {
+                    name:proj.name,
+                    caption: proj.name,
+                    value: that._getCompletetionsWithProgress(proj),
+                    score: score,
+                    meta: progressTpl(proj)
+                };
             });
             cb(null, completions);
         });
@@ -911,7 +917,8 @@ var LogEditor = React.createClass({
                     var score = new Date(ver.lastActiveTime).getTime();
                     return {
                         name: ver.name,
-                        value: ver.name,
+                        caption: ver.name,
+                        value: that._getCompletetionsWithProgress(ver),
                         score: score,
                         meta: 'version'
                     };
@@ -919,6 +926,15 @@ var LogEditor = React.createClass({
                 cb(null, completions);
             });
         })
+    },
+
+    _getCompletetionsWithProgress: function (item) {
+        var inputValue = item.name;
+        var progress = item.progress;
+        if (progress > 0 && progress < 100) {
+            inputValue += ':pg=' + progress;
+        }
+        return inputValue;
     },
 
     getTaskCompletions: function (line, cb) {
@@ -931,14 +947,10 @@ var LogEditor = React.createClass({
                     if (_.isEmpty(tasks)) { return cb(null, []); }
                     var completions = tasks.map(function(task) {
                         var score = new Date(task.lastActiveTime).getTime();
-                        var inputValue = task.name;
-                        if (task.progress >= 0 && progress < 100) {
-                            inputValue += ':pg=' + task.progress;
-                        }
                         return {
                             name: task.name,
                             caption: task.name,
-                            value: inputValue
+                            value: that._getCompletetionsWithProgress(task),
                             score: score,
                             meta: progressTpl(task),
                             identifierRegex:/[a-zA-Z_0-9\u00A2-\uFFFF]/
