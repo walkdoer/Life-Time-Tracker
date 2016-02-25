@@ -847,7 +847,8 @@ var LogEditor = React.createClass({
                 return cb(null, []);
             }
             var completions = tags.map(function (tag) {
-                return {name: tag.name, value: tag.name, meta: 'tag', score: 1000};
+                var score = new Date(tag.lastActiveTime).getTime();
+                return {name: tag.name, value: tag.name, meta: 'tag', score: score};
             });
             cb(null, completions);
         });
@@ -860,7 +861,7 @@ var LogEditor = React.createClass({
                 return cb(null, []);
             }
             var completions = peoples.map(function (people) {
-                var score = new Date(people.lastActiveTime).getTime()
+                var score = new Date(people.lastActiveTime).getTime();
                 return {name: people._id, value: people._id, meta: 'people', score: score};
             });
             cb(null, completions);
