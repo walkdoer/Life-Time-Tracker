@@ -189,18 +189,19 @@
 
 .ltt_c-LogProgress .selection-info,
 .ltt_c-LogProgress .ltt_c-progress{
-    display:  inline-block;
+    display: block;
 }
 
 .ltt_c-LogProgress .selection-info{
     margin-right: 10px;
     font-family: 'Share Tech', sans-serif;
+    min-width: 130px;
 }
 
 
 .ltt_c-LogProgress .ltt_c-progress{
-    width: 80px;
     height: 11px;
+    margin-bottom: 5px;
     border-radius: 3px;
 }
 .ltt_c-LogProgress .ltt_c-progress-bar{

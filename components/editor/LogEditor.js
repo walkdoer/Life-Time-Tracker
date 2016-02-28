@@ -1847,7 +1847,11 @@ var LogEditor = React.createClass({
     _updateLogProgress: function (selectLogs) {
         var logs = this.getAllLogs(true);
         var done = 0, plan = 0, total = 0;
+        var totalEstimatedTime = 0;
+        var consumeTime = 0;
         logs.forEach(function (log) {
+            totalEstimatedTime += (log.estimatedTime || 0);
+            consumeTime += (log.len || 0);
             if (log.start && log.end && log.len > 0) {
                 done++;
             } else if (log.start && !log.end) {
@@ -1858,7 +1862,7 @@ var LogEditor = React.createClass({
         });
 
         total = done + plan;
-        this.refs.logProgress.update(total, done);
+        this.refs.logProgress.update(total, done, totalEstimatedTime, consumeTime);
     },
 
     _updateLogSumInfo: function(selectLogs) {
@@ -2224,33 +2228,51 @@ var LogProgress = React.createClass({
         return {
             done: this.props.done,
             total: this.props.total,
-            selectionLogCount: 0
+            selectionLogCount: 0,
+            estimatedTime: 0,
+            totalTime: 0
         }
     },
 
     render: function () {
         var state = this.state;
         return <div className="ltt_c-LogProgress">
-            {this.renderSelectionInfo()}
             <Progress value={state.done} max={state.total}/>
+            {this.renderSelectionInfo()}
+            <div className="ltt-time">Total time: {Util.displayTime(this.state.totalTime)}</div>
+            <div className="ltt-time">Estimated Time: {Util.displayTime(this.state.estimatedTime)}</div>
         </div>
     },
 
-    update: function (total, done) {
+    updateTimeInfo: function (estimatedTime, totalTime) {
         this.setState({
             done: done,
-            total: total
+            total: total,
+            estimatedTime: estimatedTime,
+            totalTime: totalTime
+        });
+    },
+
+    update: function (total, done, estimatedTime, totalTime) {
+        this.setState({
+            done: done,
+            total: total,
+            estimatedTime: estimatedTime || 0,
+            totalTime: totalTime || 0
         });
     },
 
     updateSelection: function (logs){
         var t = 0;
+        var et = 0;
         logs.forEach(function (l) {
             t += (l.len || 0);
+            et += (l.estimatedTime || 0);
         });
         this.setState({
             selectionTotal: t,
             selectionLogCount: logs.length,
+            selectionEstimatedTime: et
         });
     },
 
@@ -2259,7 +2281,7 @@ var LogProgress = React.createClass({
         var state = this.state;
         if (state.selectionLogCount > 0) {
             return <div className="selection-info">
-                {state.selectionLogCount} logs, total {Util.displayTime(state.selectionTotal)}
+                {state.selectionLogCount} logs, total <span class="ltt-time">{Util.displayTime(state.selectionTotal)}</span> estimate <span class="ltt-time">{Util.displayTime(state.selectionEstimatedTime)}</span>
                 </div>
         } else {
             return null;
