@@ -5,10 +5,14 @@
     height: 100%;
     display: flex;
     position: relative;
+    overflow: hidden;
 }
 
-.ltt_c-logEditor-content .todayReport{
-    
+.ltt_c-logEditor-content .recent-activities .ltt_c-log {
+    border-bottom: 1px dotted #E4E4E4;
+}
+.ltt_c-logEditor-content .recent-activities .paper{
+    border-left: 1px solid #EAEAEA;
 }
 .ltt_c-logEditor-Calendar{
     width: 150px;
@@ -173,7 +177,7 @@
     padding: 10px;
     bottom: 0px;
     right: 0px;
-    z-index: 999;
+    z-index: 9;
     width: auto;
     background: rgba(255, 255, 255, 0.81);
     border-left: 1px solid #E8E8E8;
@@ -185,18 +189,20 @@
 
 .ltt_c-LogProgress .selection-info,
 .ltt_c-LogProgress .ltt_c-progress{
-    display:  inline-block;
+    display: block;
 }
 
 .ltt_c-LogProgress .selection-info{
     margin-right: 10px;
     font-family: 'Share Tech', sans-serif;
+    min-width: 130px;
 }
 
 
 .ltt_c-LogProgress .ltt_c-progress{
     width: 80px;
     height: 11px;
+    margin-bottom: 5px;
     border-radius: 3px;
 }
 .ltt_c-LogProgress .ltt_c-progress-bar{

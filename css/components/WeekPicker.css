@@ -4,7 +4,12 @@
     border-radius: 2px;
 }
 
-.ltt_c-WeekPicker .input-week {
+.ltt_c-WeekPicker .picker-content{
+    min-width: 200px;
+    flex: 2;
+    display: flex;
+}
+.ltt_c-WeekPicker .picker-content .input-week {
     width: 185px;
     border: 1px solid #ccc;
     text-indent:10px;
@@ -16,7 +21,7 @@
     flex: 1;
 }
 
-.ltt_c-WeekPicker  button[type="button"]{
+.ltt_c-WeekPicker .picker-content  button[type="button"]{
     border: 1px solid #ccc;
     text-indent:3px;
     outline:none;
@@ -24,11 +29,19 @@
     display:inline-block;
     height: 34px;
 }
-.ltt_c-WeekPicker button[type="button"].prev{
+
+.ltt_c-WeekPicker .picker-content  button[type="button"].prev{
     border-right: none;
     border-radius: 2px 0 0 2px;
 }
-.ltt_c-WeekPicker button[type="button"].next {
+.ltt_c-WeekPicker .picker-content button[type="button"].next {
     border-left: none;
     border-radius: 0 2px 2px 0;
+}
+
+.ltt_c-WeekPicker .display-range{
+    margin-left: 10px;
+    color: #222;
+    line-height: 34px;
+    height: 34px;
 }

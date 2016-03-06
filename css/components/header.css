@@ -50,6 +50,10 @@
     padding-bottom: 2px;
     margin-top: 12px;
 }
+.btn-group.history-btn-group .btn[disabled=true]{
+    opacity: 0.4;
+    color: #ccc;
+}
 
 .btn-group.history-btn-group .btn:hover{
     background: #EAEAEA;
