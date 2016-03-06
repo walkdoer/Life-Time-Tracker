@@ -34,3 +34,22 @@
     overflow: scroll;
     height: 100%;
 }
+
+
+.ltt_c-report-LifeClass .indicators {
+    display: flex;
+}
+
+.ltt_c-report-LifeClass .indicator-item {
+    flex: 1;
+    display: flex;
+}
+
+.ltt_c-report-LifeClass .indicator-text {
+    flex: 1;
+}
+
+.ltt_c-report-LifeClass .indicator-color {
+    width: 20px;
+    margin-right: 5px;
+}

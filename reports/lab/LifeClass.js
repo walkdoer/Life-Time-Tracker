@@ -25,10 +25,30 @@ var LifeClass = React.createClass({
         };
     },
 
+    getDefaultProps: function () {
+        return {
+            minRectHeight: 30,
+            maxRectHeight: 40
+        };
+    },
+
     render: function () {
         return <div className="lab-report ltt_c-report-LifeClass">
             <FullDateRangePicker start={this.state.start} end={this.state.end} onDateRangeChange={this.onDateRangeChange}  period='year' granularity='year'/>
+            {this.renderIndicators()}
             <svg></svg>
+        </div>
+    },
+
+    renderIndicators: function () {
+        var classConfigs = config.classes;
+        return <div className="indicators">
+            {classConfigs.map(function (cls) {
+                return <div className="indicator-item" data-id={cls._id}>
+                    <div className="indicator-color" style={{backgroundColor: cls.color, border: '1px solid #555'}}></div>
+                    <div className="indicator-text">{cls.name}</div>
+                </div>
+            })}
         </div>
     },
 
@@ -83,11 +103,12 @@ var LifeClass = React.createClass({
             var arr = data.map(function (d) {
                 var max, maxValue = 0;
                 d.result.classTime.forEach(function (item) {
-                    if (item.count > maxValue) {
+                    var itemValue = item.count;
+                    if (itemValue > maxValue) {
                         max = item;
+                        maxValue = itemValue;
                     }
                 });
-                
                 if (max) {
                     classConfigs.some(function (cls) {
                         if (cls._id === max.id) {
@@ -163,6 +184,23 @@ var LifeClass = React.createClass({
 
         var rectWidth = (width - padding * 2 - strokeWidth * 2- itemHoriPadding * (columnNum - 1)) / columnNum;
         var rectHeight = (height - padding * 2 - strokeWidth * 2 - itemVertPadding * (rowNum - 1)) / rowNum;
+        var minRectHeight =  options.minRectHeight;
+        var minRectWidth =  options.minRectWidth;
+        var maxRectHeight =  options.maxRectHeight;
+        var maxRectWidth =  options.maxRectWidth;
+        if ( minRectWidth && rectWidth < minRectWidth) {
+            rectWidth = minRectWidth;
+        }
+        if ( minRectHeight && rectHeight < minRectHeight) {
+            rectHeight = minRectHeight;
+        }
+
+        if ( maxRectWidth && rectWidth > maxRectWidth) {
+            rectWidth = maxRectWidth;
+        }
+        if ( maxRectHeight && rectHeight > maxRectHeight) {
+            rectHeight = maxRectHeight;
+        }
 
         var  days = chart.selectAll("g")
                 .data(chartData, function (d) {
