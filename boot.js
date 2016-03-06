@@ -57,6 +57,7 @@ var OverviewReport = require('./reports/Overview'),
 
 /** LAB */
 var LabPieReport = require('./reports/lab/pie');
+var LabLifeClassReport = require('./reports/lab/LifeClass');
 
 /** Utils */
 var DataAPI = require('./utils/DataAPI');
@@ -101,8 +102,9 @@ var routes = (
         <Route name="settings" path="settings" handler={Settings}/>
         <Route name="calendar" path="calendar" handler={Calendar}/>
         <Route name="routine" path="routine" handler={Routine}/>
-        <Route name="lab" path="/lab" handler={Lab}/>
-            <Route name="labpie" path="/lab/report/pie"  handler={LabPieReport}>
+        <Route name="lab" path="/lab" handler={Lab}>
+            <Route name="labpie" path="report/pie" handler={LabPieReport}/>
+            <Route name="lablifeClass" path="report/lifeClass" handler={LabLifeClassReport}/>
         </Route>
         <NotFoundRoute handler={Page404}/>
         <DefaultRoute handler={Dashboard}/>

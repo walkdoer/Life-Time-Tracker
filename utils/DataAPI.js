@@ -261,6 +261,10 @@ module.exports = {
             return get(url('/stats'), params);
         },
 
+        loadv1: function (params) {
+            return get(url('/stat'), params);
+        },
+
         wakeAndSleep: function (params) {
             return get(url('/wakeAndSleep'), params);
         },
