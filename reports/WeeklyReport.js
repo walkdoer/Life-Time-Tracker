@@ -16,10 +16,12 @@ var LoadingMask = require('../components/LoadingMask');
 var PieDetail = require('../components/PieDetail');
 var TimeConsumeRanking = require('../components/TimeConsumeRanking');
 var Board = require('../components/Borad');
+var WakeAndSleep = require('../components/WakeAndSleep');
 
 
 /** Utils */
 var DataAPI = require('../utils/DataAPI');
+var Util = require('../utils/Util');
 
 var noop = function () {};
 
@@ -27,7 +29,8 @@ var WeekPicker = React.createClass({
 
     getInitialState: function () {
         return {
-            week: this.props.value
+            week: this.props.week,
+            year: this.props.year
         };
     },
 
@@ -43,30 +46,51 @@ var WeekPicker = React.createClass({
         if (this.props.className) {
             className += ' ' + this.props.className;
         }
+        var m = Moment().year(this.state.year).week(this.state.week);
         return <div className={className}>
-            <button className="prev" type="button" onClick={this.prevWeek} title="prev"><i className="fa fa-angle-double-left"></i></button>
-            <input ref="weekInput" className="input-week" value={this._getDisplayValue()}/>
-            <button className="next" type="button" onClick={this.nextWeek} title="next"><i className="fa fa-angle-double-right"></i></button>
+            <div className="picker-content">
+                <button className="prev" type="button" onClick={this.prevWeek} title="prev"><i className="fa fa-angle-double-left"></i></button>
+                <input ref="weekInput" className="input-week" value={this._getDisplayValue()}/>
+                <button className="next" type="button" onClick={this.nextWeek} title="next"><i className="fa fa-angle-double-right"></i></button>
+            </div>
+            <div className="display-range">
+                <span>{m.startOf('week').format(Util.DATE_FORMAT)}</span>~<span>{m.endOf('week').format(Util.DATE_FORMAT)}</span>
+            </div>
         </div>
     },
 
     _getDisplayValue: function() {
-        return Moment().year() + '-' + this.state.week;
+        return this.state.year + '-' + this.state.week;
     },
 
     prevWeek: function () {
+        var prevWeek = this.state.week - 1;
+        var year = this.state.year;
+        if (prevWeek === 0) {
+            year = this.state.year - 1;
+            prevWeek = Moment().year(year).endOf('year').subtract(1, 'week').week();
+        }
         this.setState({
-            week: this.state.week - 1
+            year: year,
+            week: prevWeek
         }, function () {
-            this.props.prevWeek(this.state.week);
+            this.props.prevWeek(this.state.year, this.state.week);
         });
     },
 
     nextWeek: function () {
+        var nextWeek = this.state.week + 1;
+        var lastWeek = Moment().year(this.state.year).endOf('year').subtract(1, 'week').week();
+        var year = this.state.year;
+        if (nextWeek > lastWeek) {
+            year = this.state.year + 1;
+            nextWeek = 1;
+        }
         this.setState({
-            week: this.state.week + 1
+            week: nextWeek,
+            year: year
         }, function () {
-            this.props.nextWeek(this.state.week);
+            this.props.nextWeek(this.state.year, this.state.week);
         });
     }
 })
@@ -75,25 +99,31 @@ var WeeklyReport = React.createClass({
 
     getInitialState: function () {
         return {
-            week: this.props.week
+            week: this.props.week,
+            year: this.props.year
         };
     },
 
     getDefaultProps: function () {
+        var m = Moment();
         return {
-            week: new Moment().week(), //default week is current date week
+            year: m.year(),
+            week: m.week(), //default week is current date week
             showWeekPicker : true
         };
     },
 
     render: function () {
         var week = this.state.week;
+        var year = this.state.year;
+        var start = Moment().year(year).week(week).startOf('week').toDate();
+        var end = Moment().year(year).week(week).endOf('week').toDate();
         return (
             <div className="ltt_c-report ltt_c-report-WeeklyReport">
                 {this.props.showWeekPicker ?
                 <div className="Grid Grid--gutters Grid--stretch ltt_c-report-WeeklyReport-board">
-                    <div className="Grid-cell u-1of5">
-                        <WeekPicker value={week} prevWeek={this.onPrevWeek} nextWeek={this.onNextWeek}/>
+                    <div className="Grid-cell u-1of2">
+                        <WeekPicker year={year} week={week} prevWeek={this.onPrevWeek} nextWeek={this.onNextWeek}/>
                     </div>
                 </div>
                 :
@@ -103,12 +133,15 @@ var WeeklyReport = React.createClass({
                         <Board key={week} className="ltt-box-shadow" type="week" week={week}/>
                     </div>
                 </div>
+                <div>
+                    <WakeAndSleep start={start} end={end} key={"ltt-week" + week}/>
+                </div>
                 <div className="Grid Grid--gutters Grid--stretch">
                     <div className="Grid-cell u-1of2">
                         <TimeConsumeRanking className="chart"
                             params={{
-                                start: Moment().week(week).startOf('week').toDate(),
-                                end: Moment().week(week).endOf('week').toDate()
+                                start: start,
+                                end: end
                             }}/>
                     </div>
                     <div className="Grid-cell u-1of2">
@@ -119,14 +152,16 @@ var WeeklyReport = React.createClass({
         );
     },
 
-    onNextWeek: function (week) {
+    onNextWeek: function (year, week) {
         this.setState({
+            year: year,
             week: week
         });
     },
 
-    onPrevWeek: function (week) {
+    onPrevWeek: function (year, week) {
         this.setState({
+            year: year,
             week: week
         });
     }

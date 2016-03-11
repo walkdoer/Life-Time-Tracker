@@ -70,6 +70,10 @@ var Page = React.createClass({
 
     componentWillReceiveProps: function (nextProps) {
         var params = this.getParams();
+        var query = this.getQuery();
+        if (query && query.logOrigin) {
+            this._initOrigin = query.logOrigin;
+        }
         var date;
         if (params && params.date) {
             date = new Moment(params.date).format(DATE_FORMAT);

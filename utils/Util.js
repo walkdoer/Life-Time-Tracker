@@ -305,6 +305,32 @@ exports.fillDataGap = function (data, start, end, transformFun) {
 };
 
 
+exports.fillDataGapV2 = function (arr, start, end, transformFun, _dateKeyName) {
+    var dataLen = Moment(end).diff(start, 'day') + 1;
+    var result = [];
+    if (!_dateKeyName) {
+        _dateKeyName = 'date';
+    }
+    arr.sort(function (a,b) {
+        return (new Date(a[_dateKeyName]).getTime() - new Date(b[_dateKeyName]).getTime());
+    }).forEach(function (d) {
+        var diffStart = Moment(d[_dateKeyName]).diff(start, 'day');
+        var index = result.length;
+        while(index < diffStart) {
+            result.push(transformFun(new Moment(start).add(index, 'day').format('YYYY-MM-DD')));
+            index++;
+        }
+        result.push(d);
+    });
+    var index = result.length;
+    while(index < dataLen) {
+        result.push(transformFun(new Moment(start).add(index, 'day').format('YYYY-MM-DD')));
+        index++;
+    }
+    return result;
+};
+
+
 exports.getLogDesc = function (log) {
     var desc = [];
     if (log.subTask) {

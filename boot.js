@@ -36,7 +36,8 @@ var Dashboard = require('./pages/Dashboard'),
     LogCheck = require('./pages/LogCheck'),
     Settings = require('./pages/Settings'),
     Calendar = require('./pages/Calendar'),
-    Routine = require('./pages/Routine');
+    Routine = require('./pages/Routine'),
+    Lab = require('./pages/Lab');
 
 /** Components */
 var ProjectDetail = require('./components/ProjectDetail'),
@@ -50,7 +51,13 @@ var OverviewReport = require('./reports/Overview'),
     TagsReport = require('./reports/TagsReport'),
     TodayReport = require('./reports/todayReport'),
     ProjectReport = require('./reports/ProjectReport'),
-    WeeklyReport = require('./reports/WeeklyReport');
+    WeeklyReport = require('./reports/WeeklyReport'),
+    YearReport = require('./reports/YearReport')
+    RelationReport = require('./reports/RelationReport');
+
+/** LAB */
+var LabPieReport = require('./reports/lab/pie');
+var LabLifeClassReport = require('./reports/lab/LifeClass');
 
 /** Utils */
 var DataAPI = require('./utils/DataAPI');
@@ -71,6 +78,8 @@ var routes = (
             <Route name="todayReport" path="/reports/today" handler={TodayReport}/>
             <Route name="weeklyReport" path="/reports/weekly" handler={WeeklyReport}/>
             <Route name="projectReport" path="/reports/projects" handler={ProjectReport}/>
+            <Route name="yearReport" path="/reports/annual" handler={YearReport}/>
+            <Route name="relationship" path="/reports/relationship" handler={RelationReport}/>
             <DefaultRoute handler={OverviewReport}/>
         </Route>
         <Route name="dashboard" path="/dashboard" handler={Dashboard}/>
@@ -93,6 +102,10 @@ var routes = (
         <Route name="settings" path="settings" handler={Settings}/>
         <Route name="calendar" path="calendar" handler={Calendar}/>
         <Route name="routine" path="routine" handler={Routine}/>
+        <Route name="lab" path="/lab" handler={Lab}>
+            <Route name="labpie" path="report/pie" handler={LabPieReport}/>
+            <Route name="lablifeClass" path="report/lifeClass" handler={LabLifeClassReport}/>
+        </Route>
         <NotFoundRoute handler={Page404}/>
         <DefaultRoute handler={Dashboard}/>
     </Route>

@@ -121,6 +121,19 @@ var Task = React.createClass({
             dueDiffDays = dueTime.diff(Date.now(), 'day');
         }
 
+        var completeOrLastActivieTime;
+        if (!task.completeTime) {
+            completeOrLastActivieTime = <span  className="ltt_c-task-timeInfo-item" title={new Moment(task.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
+                <i className="fa fa-user" title="last active"></i>
+                {new Moment(task.lastActiveTime).fromNow()}
+            </span>
+        } else {
+            completeOrLastActivieTime = <span  className="ltt_c-task-timeInfo-item" title={new Moment(task.completeTime).format('YYYY-MM-DD HH:mm:ss')}>
+                <i className="fa fa-check-circle" title="completed time"></i>
+                {new Moment(task.completeTime).fromNow()}
+            </span>;
+        }
+
         return (
             <li className={cx({"ltt_c-task": true, "done": task.progress === 100})} data-id={task._id} onDoubleClick={this.props.onDoubleClick} onClick={this.select}>
                 <div className={cx({"ltt_c-task-title": true, 'selected' : this.state.selected})}>
@@ -159,14 +172,7 @@ var Task = React.createClass({
                                 {Moment.duration(task.totalTime, "minutes").format("M[m],d[d],h[h],mm[min]")} across {new Moment(task.lastActiveTime).from(task.createTime, true)}
                             </span> : null
                             }
-                            <span  className="ltt_c-task-timeInfo-item" title={new Moment(task.lastActiveTime).format('YYYY-MM-DD HH:mm:ss')}>
-                                <i className="fa fa-user" title="last active"></i>
-                                {new Moment(task.lastActiveTime).fromNow()}
-                            </span>
-                            <span  className="ltt_c-task-timeInfo-item" title={new Moment(task.completeTime).format('YYYY-MM-DD HH:mm:ss')}>
-                                <i className="fa fa-check-circle" title="completed time"></i>
-                                {new Moment(task.completeTime).fromNow()}
-                            </span>
+                            {completeOrLastActivieTime}
                         </div>
                     </div>
                     {progress}

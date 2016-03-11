@@ -29,6 +29,7 @@ var md5 = require('blueimp-md5').md5;
 var TodayReport = require('../../reports/TodayReport');
 var HelpDocument= require('../HelpDocument');
 var Progress = require('../Progress');
+var RecentActivities = require('../RecentActivities');
 
 //store key
 var SK_CONTENT = 'content';
@@ -279,6 +280,10 @@ var LogEditor = React.createClass({
                                 <HelpDocument src="./help/editor.logExample.md"/>
                             </TabPane>
                         </TabbedArea>
+                    </SlidePanel>
+                     <SlidePanel className="recent-activities" ref="recentActivitiesSlidePanel"
+                        open={false} openRight={true} onTransitionEnd={this.renderRecentActivities} afterClose={this.emptyRecentActivities}>
+                        <div ref="recentActivitiesContainer" style={{height: "100%"}}></div>
                     </SlidePanel>
                 </div>
             </div>
@@ -566,6 +571,15 @@ var LogEditor = React.createClass({
         var that = this;
         var editor = this.editor;
         var commands = editor.commands;
+
+        commands.addCommand({
+            name: "recentactivities",
+            bindKey: {win: "Ctrl-Shift-H", mac: "Command-Shift-H"},
+            exec: function(editor) {
+                that.openRecentActivities();
+            }
+        });
+
         commands.addCommand({
             name: "import",
             bindKey: {win: "Ctrl-S", mac: "Command-S"},
@@ -833,7 +847,8 @@ var LogEditor = React.createClass({
                 return cb(null, []);
             }
             var completions = tags.map(function (tag) {
-                return {name: tag.name, value: tag.name, meta: 'tag', score: 1000};
+                var score = new Date(tag.lastActiveTime).getTime();
+                return {name: tag.name, value: tag.name, meta: 'tag', score: score};
             });
             cb(null, completions);
         });
@@ -846,7 +861,7 @@ var LogEditor = React.createClass({
                 return cb(null, []);
             }
             var completions = peoples.map(function (people) {
-                var score = new Date(people.lastActiveTime).getTime()
+                var score = new Date(people.lastActiveTime).getTime();
                 return {name: people._id, value: people._id, meta: 'people', score: score};
             });
             cb(null, completions);
@@ -875,7 +890,13 @@ var LogEditor = React.createClass({
             if (_.isEmpty(projects)) {return cb(null, [])}
             var completions = projects.map(function(proj) {
                 var score = new Date(proj.lastActiveTime).getTime()
-                return {name: proj.name, value: proj.name, score: score, meta: progressTpl(proj)};
+                return {
+                    name:proj.name,
+                    caption: proj.name,
+                    value: that._getCompletetionsWithProgress(proj),
+                    score: score,
+                    meta: progressTpl(proj)
+                };
             });
             cb(null, completions);
         });
@@ -897,7 +918,8 @@ var LogEditor = React.createClass({
                     var score = new Date(ver.lastActiveTime).getTime();
                     return {
                         name: ver.name,
-                        value: ver.name,
+                        caption: ver.name,
+                        value: that._getCompletetionsWithProgress(ver),
                         score: score,
                         meta: 'version'
                     };
@@ -905,6 +927,15 @@ var LogEditor = React.createClass({
                 cb(null, completions);
             });
         })
+    },
+
+    _getCompletetionsWithProgress: function (item) {
+        var inputValue = item.name;
+        var progress = item.progress;
+        if (progress > 0 && progress < 100) {
+            inputValue += ':pg=' + progress;
+        }
+        return inputValue;
     },
 
     getTaskCompletions: function (line, cb) {
@@ -919,7 +950,8 @@ var LogEditor = React.createClass({
                         var score = new Date(task.lastActiveTime).getTime();
                         return {
                             name: task.name,
-                            value: task.name,
+                            caption: task.name,
+                            value: that._getCompletetionsWithProgress(task),
                             score: score,
                             meta: progressTpl(task),
                             identifierRegex:/[a-zA-Z_0-9\u00A2-\uFFFF]/
@@ -941,6 +973,7 @@ var LogEditor = React.createClass({
         var editor = this.editor;
         var session = editor.getSession();
         var selection = editor.getSelection();
+        var date = this.props.title;
         session.on('change', _.debounce(function (e) {
             var title = that.props.title; //title can not be outside of this function scope,make sure that the title is the lastest.
             var content = session.getValue();
@@ -972,8 +1005,21 @@ var LogEditor = React.createClass({
                 that.allocateLogInCalendar(log);
                 that.props.onLineChange(line, log);
                 that._currentRow = row;
+                if (that.__recentActivitiesOpend) {
+                    that.renderRecentActivities();
+                }
             }
         }, 200));
+
+        selection.on('changeSelection', _.debounce(function (e, sel) {
+            var range = selection.getRange();
+            var startRow = range.start.row;
+            var endRow = range.end.row;
+            var doc = session.getDocument();
+            var lines = doc.getLines(startRow, endRow);
+            var logs = TrackerHelper.getLogs(lines.join('\n'), date, true);
+            that._updateLogSumInfo(logs);
+        }, 100));
     },
 
     getCurrentLineIndex: function () {
@@ -1159,6 +1205,7 @@ var LogEditor = React.createClass({
                 that._activeCurrentLine();
                 that._updateLogProgress();
                 that._annotationOverTimeLog(that.getAllLogs(), content);
+                that._gotoLocate(that.props.locate, content);
                 that.props.onLoad(content, that.getDoingLog(content));
                 var timer = setTimeout(function() {
                     if (that.__reportOpened) {
@@ -1719,6 +1766,26 @@ var LogEditor = React.createClass({
         });
     },
 
+    openRecentActivities: function () {
+        this.__recentActivitiesOpend = !this.__recentActivitiesOpend;
+        this.refs.recentActivitiesSlidePanel.toggle({
+            width: $(this.getDOMNode()).width() * 0.3
+        });
+    },
+
+    emptyRecentActivities: function() {
+        this.refs.recentActivitiesContainer.getDOMNode().innerHTML = '';
+    },
+
+    renderRecentActivities: function () {
+        var currentLog = this.getCurrentLog();
+        var logIndex = this.getCurrentLineIndex();
+        React.render(
+            <RecentActivities key={currentLog.origin + logIndex} log={currentLog}/>,
+            this.refs.recentActivitiesContainer.getDOMNode()
+        );
+    },
+
     renderTodayReport: function () {
         React.render(
             <TodayReport key={this.props.title} date={this.props.title} showDatePicker={false}/>,
@@ -1777,10 +1844,14 @@ var LogEditor = React.createClass({
         this._gotoLocate(calEvent.origin, this.getContent(), 1000);
     },
 
-    _updateLogProgress: function () {
+    _updateLogProgress: function (selectLogs) {
         var logs = this.getAllLogs(true);
         var done = 0, plan = 0, total = 0;
+        var totalEstimatedTime = 0;
+        var consumeTime = 0;
         logs.forEach(function (log) {
+            totalEstimatedTime += (log.estimatedTime || 0);
+            consumeTime += (log.len || 0);
             if (log.start && log.end && log.len > 0) {
                 done++;
             } else if (log.start && !log.end) {
@@ -1791,7 +1862,11 @@ var LogEditor = React.createClass({
         });
 
         total = done + plan;
-        this.refs.logProgress.update(total, done);
+        this.refs.logProgress.update(total, done, totalEstimatedTime, consumeTime);
+    },
+
+    _updateLogSumInfo: function(selectLogs) {
+        this.refs.logProgress.updateSelection(selectLogs);
     }
 
 });
@@ -2152,21 +2227,65 @@ var LogProgress = React.createClass({
     getInitialState: function () {
         return {
             done: this.props.done,
-            total: this.props.total
+            total: this.props.total,
+            selectionLogCount: 0,
+            estimatedTime: 0,
+            totalTime: 0
         }
     },
 
     render: function () {
+        var state = this.state;
         return <div className="ltt_c-LogProgress">
-            <Progress value={this.state.done} max={this.state.total}/>
+            <Progress value={state.done} max={state.total}/>
+            {this.renderSelectionInfo()}
+            <div className="ltt-time">Total time: {Util.displayTime(this.state.totalTime)}</div>
+            <div className="ltt-time">Estimated Time: {Util.displayTime(this.state.estimatedTime)}</div>
         </div>
     },
 
-    update: function (total, done) {
+    updateTimeInfo: function (estimatedTime, totalTime) {
         this.setState({
             done: done,
-            total: total
+            total: total,
+            estimatedTime: estimatedTime,
+            totalTime: totalTime
         });
+    },
+
+    update: function (total, done, estimatedTime, totalTime) {
+        this.setState({
+            done: done,
+            total: total,
+            estimatedTime: estimatedTime || 0,
+            totalTime: totalTime || 0
+        });
+    },
+
+    updateSelection: function (logs){
+        var t = 0;
+        var et = 0;
+        logs.forEach(function (l) {
+            t += (l.len || 0);
+            et += (l.estimatedTime || 0);
+        });
+        this.setState({
+            selectionTotal: t,
+            selectionLogCount: logs.length,
+            selectionEstimatedTime: et
+        });
+    },
+
+
+    renderSelectionInfo: function () {
+        var state = this.state;
+        if (state.selectionLogCount > 0) {
+            return <div className="selection-info">
+                {state.selectionLogCount} logs, total <span class="ltt-time">{Util.displayTime(state.selectionTotal)}</span> estimate <span class="ltt-time">{Util.displayTime(state.selectionEstimatedTime)}</span>
+                </div>
+        } else {
+            return null;
+        }
     }
 });
 

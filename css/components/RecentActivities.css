@@ -1,0 +1,18 @@
+.ltt_c-RecentActivities{}
+
+.ltt_c-RecentActivities .ltt-time{
+    font-size: 2rem;
+    text-align: center;
+    margin-top: 10px;
+    color: #5F5F5F;
+    font-weight: bold;
+}
+
+.ltt_c-RecentActivities .ltt_c-chart-LogLine{
+  border-top:1px #dcdcdc solid;
+  padding-top: 4px;
+  height: 150px;
+  max-height: 150px;
+  min-height: 150px;
+  background: #FFF;
+}

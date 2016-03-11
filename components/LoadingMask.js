@@ -2,6 +2,7 @@
 var React = require('react');
 var R = React.DOM;
 var $ = require('jquery');
+var _ = require('lodash');
 
 var defaultHeight = 40,
     defaultWidth = 80;
@@ -60,6 +61,7 @@ module.exports = React.createClass({
         if (this.props.opacity !== undefined) {
             style.backgroundColor = 'rgba(254, 254, 254,' +  (1 - this.props.opacity) + ')';
         }
+        _.extend(style, this.props.style);
         return (
             <div className='loadingMask' style={style}>
                 <div className="vertical-align">

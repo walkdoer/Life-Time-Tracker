@@ -5,6 +5,19 @@
     padding: 20px;
 }
 
+.ltt_c-report .title{
+    margin-top: 0px;
+}
+
 .ltt_c-report-projects .ltt_c-FullDateRangePicker{
     margin-bottom:15px;
+}
+
+.ltt_c-report-YearReport{
+    padding: 20px;
+}
+
+.ltt_c-report-YearReport .tag-cloud{
+    width: 100%;
+    height: 500px;
 }

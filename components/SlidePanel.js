@@ -27,6 +27,7 @@ module.exports = React.createClass({
     onTransitionEnd: React.PropTypes.func,
     onClose: React.PropTypes.func,
     openRight: React.PropTypes.bool,
+    afterClose: React.PropTypes.func
   },
 
   windowListeners: {
@@ -37,6 +38,7 @@ module.exports = React.createClass({
   getDefaultProps: function() {
     return {
       onTransitionEnd: function() {},
+      afterClose: function () {},
       docked: true,
       width: 200,
       duration: 450
@@ -75,7 +77,11 @@ module.exports = React.createClass({
     }
     this.setState({ open: !this.state.open }, function() {
       var that = this;
-      this.afterOpen();
+      if (this.state.open) {
+        this.afterOpen();
+      } else {
+        this.afterClose();
+      }
     });
     return this;
   },
@@ -88,12 +94,14 @@ module.exports = React.createClass({
 
   afterOpen: function () {
     var that = this;
-    if (this.state.open) {
-      var timer = setTimeout(function () {
-        clearTimeout(timer);
-        that.props.onTransitionEnd();
-      }, this.props.duration);
-    }
+    var timer = setTimeout(function () {
+      clearTimeout(timer);
+      that.props.onTransitionEnd();
+    }, this.props.duration);
+  },
+
+  afterClose: function () {
+    this.props.afterClose();
   },
 
   getWidth: function () {

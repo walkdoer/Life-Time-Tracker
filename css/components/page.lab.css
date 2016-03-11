@@ -1,0 +1,28 @@
+.ltt_c-page-Lab {}
+
+.lab-report{
+    padding: 20px;
+    height: 100%;
+    overflow: scroll;
+}
+.lab-report.pie .ltt_c-LogClassPie{
+    width: 100px;
+    height: 100px;
+    float: left;
+}
+
+.lab-report.pie .ltt_c-LogClassPie h1{
+    color: #383838;
+    font-size: 10px;
+    font-weight: 100;
+    text-align: Center;
+    margin-bottom: -14px;
+}
+.lab-report.pie .ltt_c-LogClassPie .ltt_c-chart{
+    height:100px;
+    min-height:100px;
+}
+
+.lab-report .ltt_c-FullDateRangePicker {
+    margin-bottom: 10px;
+}

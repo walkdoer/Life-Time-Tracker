@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react');
+var Router = require('react-router');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var _ = require('lodash');
 var Moment = require('moment');
@@ -40,6 +41,8 @@ module.exports = React.createClass({
 
 var Activity = React.createClass({
 
+    mixins: [Router.Navigation],
+
     render: function () {
         var activity = this.props.data;
         var mStart = Moment(activity.start);
@@ -65,12 +68,15 @@ var Activity = React.createClass({
         if (!icon && activityCls && activityCls.icon) {
             icon = <i className={"fa " + activityCls.icon}/>
         }
+        var logDate = mStart.format('YYYY-MM-DD');
         return (
             <li className="ltt_c-VerticleTimeline-Activity">
                 { activityCls ? <div className="cbp_cls" style={{backgroundColor: activityCls.color}}>{activityCls.name}</div> : null }
                 <time className="cbp_tmtime" datetime={activity.start}>
-                    <span className="cbp_date">{mStart.format('YYYY-MM-DD')}</span>
-                    <span className="cbp_time">{mStart.format('HH:mm')}</span>
+                    <span className="cbp_date ltt-link" onClick={this.gotoLogEditor} title={"go to log of " + logDate}>
+                        {mStart.format('YYYY-MM-DD')}
+                    </span>
+                    <span className="cbp_time ltt-link" onClick={this.gotoLogEditorWithLogLocate}>{mStart.format('HH:mm')}</span>
                 </time>
                 <div className="cbp_tmicon" style={iconStyle}>{icon}</div>
                 <div className="cbp_tmlabel">
@@ -91,5 +97,20 @@ var Activity = React.createClass({
                 </div>
             </li>
         );
+    },
+
+    gotoLogEditor: function () {
+        var activity = this.props.data;
+        var mStart = Moment(activity.start);
+        var date = mStart.format('YYYY-MM-DD');
+        this.transitionTo('logEditor', {date: date});
+    },
+
+
+    gotoLogEditorWithLogLocate() {
+        var activity = this.props.data;
+        var mStart = Moment(activity.start);
+        var date = mStart.format('YYYY-MM-DD');
+        this.transitionTo('logEditor', {date: date}, {logOrigin: activity.origin});
     }
 });

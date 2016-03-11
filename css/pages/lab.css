@@ -1,0 +1,55 @@
+.ltt_c-page-Lab {
+    height: 100%;
+    width: 100%;
+    display:flex;
+    padding: 0;
+}
+
+.ltt_c-page-Lab-sidebar{
+    width: 180px;
+    margin:0;
+    padding: 0;
+    background-color: #333;
+    color:#FFF;
+}
+
+.ltt_c-page-Lab-sidebar li {
+    display: block;
+    padding: 3px 10px;
+    margin: 5px 0;
+}
+
+.ltt_c-page-Lab-sidebar a,
+.ltt_c-page-Lab-sidebar a:link,
+.ltt_c-page-Lab-sidebar a:visited{
+    color: #FFF;
+}
+
+.ltt_c-page-Lab-sidebar a:hover{
+    color:#FFF;
+}
+
+.ltt_c-page-Lab-content{
+    flex: 1;
+    overflow: scroll;
+    height: 100%;
+}
+
+
+.ltt_c-report-LifeClass .indicators {
+    display: flex;
+}
+
+.ltt_c-report-LifeClass .indicator-item {
+    flex: 1;
+    display: flex;
+}
+
+.ltt_c-report-LifeClass .indicator-text {
+    flex: 1;
+}
+
+.ltt_c-report-LifeClass .indicator-color {
+    width: 20px;
+    margin-right: 5px;
+}
