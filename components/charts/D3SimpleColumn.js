@@ -11,7 +11,7 @@ var extend = require('extend');
 var CommonFunction = require('./CommonFunction');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var d3 = require('d3');
-
+var noop = function () {};
 /**Utils */
 var DataAPI = require('../../utils/DataAPI');
 
@@ -22,6 +22,10 @@ module.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
+        onClick: noop,
+        onMouseOut: noop,
+        onMouseOver: noop,
+        fill: '#f2f2f2',
         height: 30
       };
     },
@@ -46,6 +50,7 @@ module.exports = React.createClass({
     },
 
     plot: function (data) {
+        var that = this;
         if (_.isEmpty(data)) {return;}
         var $el = $(this.getDOMNode()).empty();
         var dataLen = data.length;
@@ -79,7 +84,13 @@ module.exports = React.createClass({
                .attr("height", function(d) {
                     return y(d);
                })
-               .attr("fill", '#f2f2f2');
+               .attr("fill", this.props.fill)
+               .on('mouseover', this.props.onMouseOver)
+               .on('mouseout', this.props.onMouseOut)
+               .on('click', function (data, index) {
+                  d3.event.stopPropagation();
+                  that.props.onClick(this, data, index);
+               });
     }
 
 })

@@ -4,7 +4,6 @@ var Log = require('./Log');
 var DataAPI = require('../utils/DataAPI');
 var LoadingMask = require('./LoadingMask');
 var Util = require('../utils/Util');
-var LogLine = require('./charts/LogLine');
 
 
 module.exports = React.createClass({
@@ -29,12 +28,8 @@ module.exports = React.createClass({
             <LoadingMask loaded={this.state.loaded}/>
             <div className="ltt-time">{Util.displayTime(totalTime)}</div>
             {error}
-            {!_.isEmpty(this.state.activies) ?
-                <LogLine logs={this.state.activies} isSubTask={false} withProgress={true} name={"Progress trend line"}/>
-                : null
-            }
             {this.state.activies.map(function (log) {
-                return <Log {... log}/>
+                return <Log {... log} showDetail={true} showProject={false} showDate={false}/>
             })}
         </div>
         );
@@ -80,7 +75,7 @@ module.exports = React.createClass({
         params = _.extend({
             sort: 'date: -1'
         }, params);
-        params.populate = false;
+        params.populate = true;
         var promise = DataAPI.Log.load(params)
             .then(function (activies) {
                 that.setState({

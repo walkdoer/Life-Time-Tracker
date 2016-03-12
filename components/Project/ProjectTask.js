@@ -27,6 +27,8 @@ var DefaultRawTheme = require('material-ui/lib/styles/raw-themes/light-raw-theme
 var IScroll = require('../../libs/iscroll');
 var config = require('../../conf/config');
 var EasyPieChart = require('easyPieChart');
+var noop = function () {};
+
 
 
 /** mixins */
@@ -56,6 +58,8 @@ var TimeConsumeRanking = require('../TimeConsumeRanking');
 var D3SimpleColumn = require('../charts/D3SimpleColumn.js');
 var TinyBar = require('../charts/TinyBar.js');
 var TinyPie = require('../charts/TinyPie.js');
+var RecentActivitiesFull = require('../RecentActivitiesFull');
+
 
 /** components/charts */
 var TreeMap = require('../charts/TreeMap');
@@ -151,6 +155,7 @@ module.exports = React.createClass({
                 <main onClick={this.onMainClick}>
                     <div className="ltt_c-projectDetail">
                         <ProjectInfo ref="projectInfo"
+                            onDateColumnClick={this.openLogSlider}
                             project={project}
                             versionId={currentVersionId}
                             onDeleteVersion={this.deleteVersion}
@@ -177,6 +182,15 @@ module.exports = React.createClass({
                             <h3>Time TreeMap of {(project ? project.name : '') + (version ? '-' + version.name : '')}</h3>
                             <div className="closeBtn" onClick={this.closeTreeMap}><i className="fa fa-close"/></div>
                             <div ref="treeMapContainer"></div>
+                        </div>
+                    </SlidePanel>
+
+                    <SlidePanel key={this.props.projectId  + 's_logs'}
+                        stopPropagationClick={true}
+                        ref="logSlider" open={false} openRight={true} onTransitionEnd={this.renderLogsOfOneDate} position="fixed" zIndex={10000}>
+                        <div className="content">
+                            <div className="closeBtn" onClick={this.closeLogSlider}><i className="fa fa-close"/></div>
+                            <div ref="logsContainer"></div>
                         </div>
                     </SlidePanel>
                     <SlidePanel key={this.props.projectId + 's2'}
@@ -247,6 +261,7 @@ module.exports = React.createClass({
         );
     },
 
+
     onMainClick: function () {
         if (this.state.openTaskDetail) {
             this.setState({
@@ -258,6 +273,9 @@ module.exports = React.createClass({
         }
         if (this.__treeMapOpened) {
             this.closeTreeMap();
+        }
+        if (this.__logSliderOpened) {
+            this.closeLogSlider();
         }
     },
 
@@ -711,6 +729,36 @@ module.exports = React.createClass({
         this.refs.treeMapSlider.close();
     },
 
+    openLogSlider: function (dateData) {
+        this.__logSliderOpened = true;
+        this.__logsSliderDateData = dateData;
+        this.refs.logSlider.open({
+            width: 300
+        });
+    },
+
+    renderLogsOfOneDate: function (date) {
+        var that = this;
+        var project = this.state.project;
+        var dateData = this.__logsSliderDateData;
+        if (!dateData) { return; }
+        if (!project) { return; }
+        var date = dateData.date;
+        React.render(
+            //"Time TreeMap of " + project.name + (version ? '-' + version.name : '')
+            <div class="logsOfoneDate">
+                <h1 style={{textAlign: 'center'}}>{new Moment(dateData.date).format(Util.DATE_FORMAT)}</h1>
+                <RecentActivitiesFull key={'reactactivitys' + date} params={{projects: project.name, date: date}}/>
+            </div>,
+            this.refs.logsContainer.getDOMNode()
+        );
+    },
+
+    closeLogSlider: function () {
+        this.__logSliderOpened = false;
+        this.refs.logSlider.close();
+    },
+
     openStastics: function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -819,6 +867,12 @@ var ProjectInfo = React.createClass({
         onFilterTags: React.PropTypes.func
     },
 
+    getDefaultProps: function () {
+        return {
+            onDateColumnClick: noop
+        };
+    },
+
     getInitialState: function () {
         return {
             showProjectDetail: false,
@@ -885,7 +939,7 @@ var ProjectInfo = React.createClass({
                                 <div className="moreinfo-item"><span className="ltt-num">{logClasses.length}</span> Classes</div>
                             </div>
                         </div>
-                        <ActivityChart project={project} start={Moment(mProjectLastActiveTime).subtract(3, 'month').toDate()} end={mProjectLastActiveTime.toDate()}/>
+                        <ActivityChart project={project} onActicityClick={this.props.onDateColumnClick} start={Moment(mProjectLastActiveTime).subtract(3, 'month').toDate()} end={mProjectLastActiveTime.toDate()}/>
                     </div>
                     {this.props.versionId ?
                         <VersionInfo id={this.props.versionId}
@@ -1068,9 +1122,15 @@ var ActivityChart = React.createClass({
         };
     },
 
+    getDefaultProps: function () {
+        return {
+            onActicityClick: noop
+        };
+    },
+
     render: function () {
         return <div className="ActivityChart">
-            <D3SimpleColumn data={this.state.activityData} height={50}/>
+            <D3SimpleColumn data={this.state.activityData.map(function (d) { return d.count;})} height={50} onClick={this.handleD3ColumnClick} fill={'rgba(242, 242, 242, 0.66)'}/>
         </div>
     },
 
@@ -1090,13 +1150,19 @@ var ActivityChart = React.createClass({
             projects: this.props.project.name,
             group: 'date'
         }).then(function (data) {
-            var result = Util.fillDataGap(data, start, end, function (d) {
-                return d.count;
-            });
+            var result = Util.fillDataGap(data, start, end);
             that.setState({
                 activityData: result
             });
         });
+    },
+
+    handleD3ColumnClick: function(el, data, index) {
+        var data = this.state.activityData[index];
+        var date = data.date;
+        if (date) {
+            this.props.onActicityClick(data);
+        }
     }
 });
 
