@@ -47,7 +47,7 @@ var RelationReport = React.createClass({
                     start: this.state.start,
                     end: this.state.end
                 }}/>
-            {this.state.relationData ? <NodeChart width={600} height={300} data={this.state.relationData}/> : null}
+            {this.state.relationData ? <NodeChart  height={300} data={this.state.relationData}/> : null}
         </div>
     },
 
@@ -59,6 +59,8 @@ var RelationReport = React.createClass({
         this.setState({
             start: start,
             end: end
+        }, function () {
+            this.loadData();
         });
     },
 
