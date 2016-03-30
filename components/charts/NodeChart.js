@@ -72,6 +72,8 @@ module.exports = React.createClass({
     },
 
     plot: function () {
+        var graph = this.props.data;
+        if (!graph) {return;}
         var w = this.props.width;
         var h = this.props.height;
 
@@ -95,12 +97,20 @@ module.exports = React.createClass({
         var text_center = false;
         var outline = false;
 
-        var min_score = 0;
-        var max_score = 1;
+        var min_score = d3.min(graph.nodes, function (d) { return d.score; });
+        var max_score = d3.max(graph.nodes, function (d) { return d.score; });
 
-        var color = d3.scale.linear()
-          .domain([min_score, (min_score + max_score) / 2, max_score])
-          .range(["lime", "yellow", "red"]);
+        var colours = ["#6363FF", "#6373FF", "#63A3FF", "#63E3FF", "#63FFFB", "#63FFCB",
+               "#63FF9B", "#63FF6B", "#7BFF63", "#BBFF63", "#DBFF63", "#FBFF63",
+               "#FFD363", "#FFB363", "#FF8363", "#FF7363", "#FF6364"];
+        var heatmapColour = d3.scale.linear()
+            .domain(d3.range(0, 1, 1.0 / (colours.length - 1)))
+            .range(colours);
+        var __c = d3.scale.linear().domain([min_score, max_score]).range([0,1]);
+
+        var color = function (d) {
+            return heatmapColour(__c(d));
+        };
 
         var highlight_color = "blue";
         var highlight_trans = 0.1;
