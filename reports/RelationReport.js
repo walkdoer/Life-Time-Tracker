@@ -13,6 +13,7 @@ var LoadingMask = require('../components/LoadingMask');
 var FullDateRangePicker = require('../components/FullDateRangePicker');
 var DataAPI = require('../utils/DataAPI');
 var Util = require('../utils/Util');
+var NodeChart = require('../components/charts/NodeChart');
 
 
 /**charts*/
@@ -42,6 +43,7 @@ var RelationReport = React.createClass({
                     start: this.state.start,
                     end: this.state.end
                 }}/>
+            <NodeChart width={600} height={300}/>
         </div>
     },
 
@@ -68,8 +70,19 @@ var RelationReport = React.createClass({
     },
     adapteData: function (data) {
         return data.map(function (val) {});
+    },
+
+    loadPeoples: function () {
+        /*
+         * 建立起这部分数据格式
+         * {"source": 4, "target": 11},
+         * {"size": 10, "score": 0.2, "id": "Chenjesu", "type": "circle"},
+        */
     }
 });
+
+
+
 
 
 module.exports = RelationReport;
