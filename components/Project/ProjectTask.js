@@ -317,8 +317,10 @@ module.exports = React.createClass({
         this.loadTodayTaskTime();
         this.onDeleteTaskToken =  this.onDeleteTask.bind(this);
         this.onLogTaskToken = this.onLogTask.bind(this);
+        this.gotoLastLogToken = this.gotoLastLog.bind(this);
         Mt.bind(['command+d', 'ctrl+d'], this.onDeleteTaskToken);
         Mt.bind(['command+l', 'ctrl+l'], this.onLogTaskToken);
+        Mt.bind(['command+/', 'ctrl+/'], this.gotoLastLogToken);
         this.myScroll = new IScroll(this.refs.iscrollWrapper.getDOMNode(), {
             mouseWheel: true,
             scrollbars: true,
@@ -340,6 +342,22 @@ module.exports = React.createClass({
         }
     },
 
+    gotoLastLog: function (e) {
+        var that = this;
+        e.preventDefault();
+        var currentTask = this.currentTask;
+        DataAPI.Log.load({
+            taskId: currentTask._id,
+            sort: 'start:-1',
+            limit: 1
+        }).then(function (log) {
+            log = log[0];
+            if (log) {
+                location.hash = '/logEditor/' +  Moment(log.date).format(Util.DATE_FORMAT) + '?logOrigin=' +  encodeURIComponent(log.origin);
+            }
+        });
+    },
+
     onLogTask: function (e) {
         var that = this;
         e.preventDefault();
@@ -349,7 +367,9 @@ module.exports = React.createClass({
             sort: 'start:-1',
             limit: 1
         }).then(function (log) {
-            Bus.emit(EventConstant.INSERT_LOG_FROM_TASK, log[0]);
+            log = log[0];
+            if (!log) { return; }
+            Bus.emit(EventConstant.INSERT_LOG_FROM_TASK, log);
             that.transitionTo('logEditor', {date: new Moment().format('YYYY-MM-DD')});
         });
     },
@@ -399,6 +419,7 @@ module.exports = React.createClass({
     componentWillUnmount: function () {
         Mt.unbind(['command+d', 'ctrl+d'], this.onDeleteTaskToken);
         Mt.unbind(['command+l', 'ctrl+l'], this.onLogTaskToken);
+        Mt.unbind(['command+/', 'ctrl+/'], this.gotoLastLogToken);
     },
 
     /*shouldComponentUpdate: function (nextProps, nextState) {

@@ -15,6 +15,9 @@ var DataAPI = require('../utils/DataAPI');
 var Util = require('../utils/Util');
 var NodeChart = require('../components/charts/NodeChart');
 var d3 = require('d3');
+var RB = require('react-bootstrap');
+var TabbedArea = RB.TabbedArea;
+var TabPane = RB.TabPane;
 
 
 /**charts*/
@@ -40,14 +43,20 @@ var RelationReport = React.createClass({
             <FullDateRangePicker
                     period="month"
                     onDateRangeChange={this.onDateRangeChange}/>
-            <RankBar className="chart"
-                type="peoples"
-                backgroundColor="rgba(255, 255, 255, 0.1)"
-                params={{
-                    start: this.state.start,
-                    end: this.state.end
-                }}/>
-            {this.state.relationData ? <NodeChart  height={300} data={this.state.relationData}/> : null}
+            <TabbedArea style={{marginTop: 10}}>
+                <TabPane eventKey="cluster" tab="Cluster">
+                    <RankBar className="chart"
+                        type="peoples"
+                        backgroundColor="rgba(255, 255, 255, 0.1)"
+                        params={{
+                            start: this.state.start,
+                            end: this.state.end
+                        }}/>
+                </TabPane>
+                <TabPane eventKey="rank" tab="Rank">
+                    {this.state.relationData ? <NodeChart  height={300} data={this.state.relationData}/> : null}
+                </TabPane>
+            </TabbedArea>
         </div>
     },
 
