@@ -97,7 +97,7 @@ var YearReport = React.createClass({
                 <div className="achievement">
                 <h2> 成就 </h2>
                     <div>一共得到了<Calculator type="log.count"
-                            params={{tags: '启发', start: startOfYear, end: endOfYear}}/>次启发，<span class="ltt-link" onClick={this.viewLogs.bind(this, {tags: '启发', start: startOfYear.toDate(), end: endOfYear.toDate()})}>点击查看那些启发</span></div>
+                            params={{tags: '启发', start: startOfYear, end: endOfYear}}/>次启发，<span className="ltt-link" onClick={this.viewLogs.bind(this, {tags: '启发', start: startOfYear.toDate(), end: endOfYear.toDate()})}>点击查看那些启发</span></div>
                     <div>读了 <Calculator type="task.count"
                         params={{tags: 'rb', status: 'done', start: startOfYear, end: endOfYear, populate: false}}/>本书， 一共花了
                         <Calculator type="log.time"
@@ -122,7 +122,10 @@ var YearReport = React.createClass({
                 <h2> 娱乐 </h2>
                 <pre> 看电视，看美剧，等等花的时间</pre>
                 <ul>
-                    <li>电影: 看了<Calculator type="task.count" params={{status: 'done', projects: '看电影', start: startOfYear, end: endOfYear, populate: false}}/>部电影，一共花了<Calculator type="log.time" params={{tags: 'movie', start: startOfYear, end: endOfYear}}/>，认为是好电影的有<Calculator type="task.count" params={{status: 'done', projects: '看电影', tags:'好电影', start: startOfYear, end: endOfYear, populate: false}}/>部</li>
+                    <li>电影: 看了<Calculator type="task.count" params={{status: 'done', projects: '看电影', start: startOfYear, end: endOfYear, populate: false}}/>部电影， 一共花了<Calculator type="log.time" params={{tags: 'movie', start: startOfYear, end: endOfYear}}/>，
+                    认为是好电影的有<span className="ltt-link" onClick={this.viewLogs.bind(this, {projects: '看电影', tags:'好电影', start: startOfYear.toDate(), end: endOfYear.toDate()})}>
+                        <Calculator type="task.count" params={{status: 'done', projects: '看电影', tags:'好电影', start: startOfYear, end: endOfYear, populate: false}}/>
+                    </span>部</li>
                     <li>电视: <Calculator type="log.time" params={{tags: 'tv', start: startOfYear, end: endOfYear}}/>, 其中美剧花了 <Calculator type="log.time" params={{tags: '美剧', start: startOfYear, end: endOfYear}}/></li>
                 </ul>
                 <h2> 情感生活 </h2>
@@ -143,7 +146,7 @@ var YearReport = React.createClass({
     renderRecentActivities: function () {
         var params = this.getLogParams();
         React.render(
-            <RecentActivities params={params} progress={false}/>,
+            <RecentActivities key={JSON.stringify(params)} params={params} progress={false}/>,
             this.refs.recentActivitiesContainer.getDOMNode()
         );
     },
@@ -172,7 +175,9 @@ var YearReport = React.createClass({
         this.__params = params;
     },
 
-    viewLogs: function (params) {
+    viewLogs: function (params, e) {
+        e.preventDefault();
+        e.stopPropagation();
         if (!params) {return;}
         this.setLogParams(params);
         this.openRecentActivities();
