@@ -105,14 +105,31 @@ var YearReport = React.createClass({
                     <div>看了<Calculator type="task.count"
                             params={{start: startOfYear, end: endOfYear, projects: "OTD"}}/>个TED视频，花了 <Calculator type="log.time"
                             params={{projects: "OTD", start: startOfYear, end: endOfYear}}/>个小时</div>
-                    <div>运动花了多少时间，其中健身，跑步花了多少，热力图，还有其他那些类型的运动</div>
-                    <div>花了多少时间编程，bugfix时间占比</div>
-                    <div>创建了 1000 个task， 完成了800个</div>
+                    <div>运动花了 <Calculator type="log.time" params={{classes: 'SPR', start: startOfYear, end: endOfYear}}/>
+                        <ul>
+                            <li>健身: <Calculator type="log.time" params={{tags: '健身',classes: 'SPR', start: startOfYear, end: endOfYear}}/></li>
+                            <li>跑步: <Calculator type="log.time" params={{tags: '跑步',classes: 'SPR', start: startOfYear, end: endOfYear}}/></li>
+                            <li>短运: <Calculator type="log.time" params={{tags: '短运',classes: 'SPR', start: startOfYear, end: endOfYear}}/></li>
+                        </ul>热力图，还有其他那些类型的运动
+                    </div>
+                    <div>花了<Calculator type="log.time" params={{tags: '编程', start: startOfYear, end: endOfYear}}/>在编程上，bugfix时间是<Calculator type="log.time" params={{tags: 'bugfix', start: startOfYear, end: endOfYear}}/></div>
+                    <div>创建了<Calculator type="task.count"
+                        params={{start: startOfYear, end: endOfYear, populate: false}}/> 个task， 完成了<Calculator type="task.count"
+                        params={{status: 'done', start: startOfYear, end: endOfYear, populate: false}}/>个</div>
                 </div>
                 <h2> 娱乐 </h2>
-                <pre> 看电视花了，看美剧用了看了100部电影, 其中有 4部是纪录片，认为是好电影的有10部, 一共花了100个小时。</pre>
+                <pre> 看电视，看美剧，等等花的时间</pre>
+                <ul>
+                    <li>电影: 看了<Calculator type="task.count" params={{status: 'done', projects: '看电影', start: startOfYear, end: endOfYear, populate: false}}/>部电影，一共花了<Calculator type="log.time" params={{tags: 'movie', start: startOfYear, end: endOfYear}}/>，认为是好电影的有<Calculator type="task.count" params={{status: 'done', projects: '看电影', tags:'好电影', start: startOfYear, end: endOfYear, populate: false}}/>部</li>
+                    <li>电视: <Calculator type="log.time" params={{tags: 'tv', start: startOfYear, end: endOfYear}}/>, 其中美剧花了 <Calculator type="log.time" params={{tags: '美剧', start: startOfYear, end: endOfYear}}/></li>
+                </ul>
                 <h2> 情感生活 </h2>
                 <pre> 花了多少时间在家人上 ， 时间的热力图, 花了多少时间在恋爱, 时间的热力图 花了多少时间在朋友聚会</pre>
+                 <ul>
+                    <li>家庭: <Calculator type="log.time" params={{tags: '家庭', start: startOfYear, end: endOfYear}}/></li>
+                    <li>恋爱: <Calculator type="log.time" params={{tags: '恋爱', start: startOfYear, end: endOfYear}}/></li>
+                    <li>聚会: <Calculator type="log.time" params={{tags: '聚会', start: startOfYear, end: endOfYear}}/></li>
+                </ul>热力图，还有其他那些类型的运动
             </div>
         );
     }
