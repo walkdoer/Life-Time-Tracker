@@ -8,6 +8,12 @@ var LogLine = require('./charts/LogLine');
 
 
 module.exports = React.createClass({
+
+    getDefaultProps: function () {
+        return {
+            progress: true
+        };
+    },
     getInitialState: function  () {
         return {
             error: false,
@@ -29,7 +35,7 @@ module.exports = React.createClass({
             <LoadingMask loaded={this.state.loaded}/>
             <div className="ltt-time">{Util.displayTime(totalTime)}</div>
             {error}
-            {!_.isEmpty(this.state.activies) ?
+            {!_.isEmpty(this.state.activies) && this.props.progress ?
                 <LogLine logs={this.state.activies} isSubTask={false} withProgress={true} name={"Progress trend line"}/>
                 : null
             }

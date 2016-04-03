@@ -22,6 +22,8 @@ var RankBar = require('../components/RankBar');
 
 var WakeAndSleep = require('../components/WakeAndSleep');
 var Calculator = require('../components/Calculator');
+var RecentActivities = require('../components/RecentActivities');
+var SlidePanel = require('../components/SlidePanel');
 
 
 var YearReport = React.createClass({
@@ -37,7 +39,7 @@ var YearReport = React.createClass({
         var startOfYear = new Moment().year(year).startOf('year'),
             endOfYear = new Moment().year(year).endOf('year');
         return (
-            <div className="ltt_c-report ltt_c-report-YearReport">
+            <div className="ltt_c-report ltt_c-report-YearReport" onClick={this.onMainClick}>
                 <h1 className="title">{year}年度报告</h1>
                 <h2> 基本生活数据 </h2>
                 <WakeAndSleep start={startOfYear} end={endOfYear}/>
@@ -95,7 +97,7 @@ var YearReport = React.createClass({
                 <div className="achievement">
                 <h2> 成就 </h2>
                     <div>一共得到了<Calculator type="log.count"
-                            params={{tags: '启发', start: startOfYear, end: endOfYear}}/>次启发，点击查看那些启发</div>
+                            params={{tags: '启发', start: startOfYear, end: endOfYear}}/>次启发，<span class="ltt-link" onClick={this.viewLogs.bind(this, {tags: '启发', start: startOfYear.toDate(), end: endOfYear.toDate()})}>点击查看那些启发</span></div>
                     <div>读了 <Calculator type="task.count"
                         params={{tags: 'rb', status: 'done', start: startOfYear, end: endOfYear, populate: false}}/>本书， 一共花了
                         <Calculator type="log.time"
@@ -130,8 +132,56 @@ var YearReport = React.createClass({
                     <li>恋爱: <Calculator type="log.time" params={{tags: '恋爱', start: startOfYear, end: endOfYear}}/></li>
                     <li>聚会: <Calculator type="log.time" params={{tags: '聚会', start: startOfYear, end: endOfYear}}/></li>
                 </ul>热力图，还有其他那些类型的运动
+                <SlidePanel className="recent-activities" ref="recentActivitiesSlidePanel"
+                        open={false} openRight={true} onTransitionEnd={this.renderRecentActivities} afterClose={this.emptyRecentActivities}>
+                        <div ref="recentActivitiesContainer" style={{height: "100%", overflow: "auto"}}></div>
+                </SlidePanel>
             </div>
         );
+    },
+
+    renderRecentActivities: function () {
+        var params = this.getLogParams();
+        React.render(
+            <RecentActivities params={params} progress={false}/>,
+            this.refs.recentActivitiesContainer.getDOMNode()
+        );
+    },
+
+    openRecentActivities: function () {
+        this.__recentActivitiesOpend = !this.__recentActivitiesOpend;
+        this.refs.recentActivitiesSlidePanel.toggle({
+            width: $(this.getDOMNode()).width() * 0.3
+        });
+    },
+
+    closeRecentActivities: function () {
+        this.__recentActivitiesOpend = false;
+        this.refs.recentActivitiesSlidePanel.close();
+    },
+
+    emptyRecentActivities: function() {
+        this.refs.recentActivitiesContainer.getDOMNode().innerHTML = '';
+    },
+
+    getLogParams: function () {
+        return this.__params;
+    },
+
+    setLogParams: function (params) {
+        this.__params = params;
+    },
+
+    viewLogs: function (params) {
+        if (!params) {return;}
+        this.setLogParams(params);
+        this.openRecentActivities();
+    },
+
+    onMainClick: function () {
+        if (this.__recentActivitiesOpend) {
+            this.closeRecentActivities();
+        }
     }
 });
 
