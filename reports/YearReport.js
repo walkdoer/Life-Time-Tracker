@@ -103,7 +103,8 @@ var YearReport = React.createClass({
                         <Calculator type="log.time"
                             params={{tags: 'rb', start: startOfYear, end: endOfYear}}/>
                         个小时</div>
-                    <div></div>
+                    <div>吃饭用了 <Calculator type="log.time"
+                            params={{tags: '早餐,supper,lunch,聚餐', start: startOfYear, end: endOfYear}}/> </div>
                     <div>看了<Calculator type="task.count"
                             params={{start: startOfYear, end: endOfYear, projects: "OTD"}}/>个TED视频，花了 <Calculator type="log.time"
                             params={{projects: "OTD", start: startOfYear, end: endOfYear}}/>个小时</div>
