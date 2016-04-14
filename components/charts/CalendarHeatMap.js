@@ -60,7 +60,7 @@ var CalendarHeatMap = React.createClass({
 
     render: function() {
         return (
-            <div className="ltt_c-calendarHeapMap">
+            <div className="ltt_c-calendarHeapMap" style={this.props.style}>
                 {this.getStreakInfo(this.state.data)}
                 {this.props.noButton === true ? null : <div className="btn-group">
                     <button className="btn btn-xs" onClick={this.prev}><i className="fa fa-angle-left" title="previous"></i></button>

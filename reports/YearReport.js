@@ -18,6 +18,7 @@ var Util = require('../utils/Util');
 var WordsCloud = require('../components/charts/WordsCloud');
 var LogClassPie = require('../components/LogClassPie');
 var RankBar = require('../components/RankBar');
+var CalendarHeatMap = require('../components/charts/CalendarHeatMap');
 
 
 var WakeAndSleep = require('../components/WakeAndSleep');
@@ -109,11 +110,18 @@ var YearReport = React.createClass({
                             params={{start: startOfYear, end: endOfYear, projects: "OTD"}}/>个TED视频，花了 <Calculator type="log.time"
                             params={{projects: "OTD", start: startOfYear, end: endOfYear}}/>个小时</div>
                     <div>运动花了 <Calculator type="log.time" params={{classes: 'SPR', start: startOfYear, end: endOfYear}}/>
+                        <CalendarHeatMap
+                            style={{margin: "30px auto"}}
+                            range={12}
+                            start={startOfYear.toDate()}
+                            getData={this.loadSportCalendar}
+                            empty="no sport data"
+                            filled="{date} 运动时间 {count}分钟"/>
                         <ul>
                             <li>健身: <Calculator type="log.time" params={{tags: '健身',classes: 'SPR', start: startOfYear, end: endOfYear}}/></li>
                             <li>跑步: <Calculator type="log.time" params={{tags: '跑步',classes: 'SPR', start: startOfYear, end: endOfYear}}/></li>
                             <li>短运: <Calculator type="log.time" params={{tags: '短运',classes: 'SPR', start: startOfYear, end: endOfYear}}/></li>
-                        </ul>热力图，还有其他那些类型的运动
+                        </ul>
                     </div>
                     <div>花了<Calculator type="log.time" params={{tags: '编程', start: startOfYear, end: endOfYear}}/>在编程上，bugfix时间是<Calculator type="log.time" params={{tags: 'bugfix', start: startOfYear, end: endOfYear}}/></div>
                     <div>创建了<Calculator type="task.count"
@@ -188,6 +196,24 @@ var YearReport = React.createClass({
         if (this.__recentActivitiesOpend) {
             this.closeRecentActivities();
         }
+    },
+
+    loadSportCalendar: function () {
+        var year = this.state.year;
+         return DataAPI.Log.load({
+            sum: true,
+            group: 'date.day',
+            start: new Moment().year(year).startOf('year').toDate(),
+            end: new Moment().year(year).endOf('year').toDate(),
+            classes: 'SPR'
+        }).then(function (data) {
+            return data.map(function (item) {
+                return {
+                    date: item._id,
+                    count: item.totalTime
+                }
+            });
+        });
     }
 });
 
