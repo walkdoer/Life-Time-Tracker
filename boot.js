@@ -58,6 +58,7 @@ var OverviewReport = require('./reports/Overview'),
 /** LAB */
 var LabPieReport = require('./reports/lab/pie');
 var LabLifeClassReport = require('./reports/lab/LifeClass');
+var SunburstReport = require('./reports/lab/SunburstReport');
 
 /** Utils */
 var DataAPI = require('./utils/DataAPI');
@@ -105,6 +106,7 @@ var routes = (
         <Route name="lab" path="/lab" handler={Lab}>
             <Route name="labpie" path="report/pie" handler={LabPieReport}/>
             <Route name="lablifeClass" path="report/lifeClass" handler={LabLifeClassReport}/>
+            <Route name="sunburst" path="report/sunburst" handler={SunburstReport}/>
         </Route>
         <NotFoundRoute handler={Page404}/>
         <DefaultRoute handler={Dashboard}/>

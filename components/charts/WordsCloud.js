@@ -4,7 +4,6 @@ var React = require('react');
 var d3 = require('d3');
 var $ = require('jquery');
 var cloud = require('../../libs/d3.layout.cloud');
-var Immutable = require('immutable');
 
 module.exports = React.createClass({
 

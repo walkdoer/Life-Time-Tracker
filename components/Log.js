@@ -58,13 +58,15 @@ var Log = React.createClass({
         return {
             showDate: true,
             showTime: true,
-            showProgress: true
-        }
+            showProgress: true,
+            showProject: true,
+            showDetail: false
+        };
     },
 
     getInitialState: function () {
         return {
-            showDetail: false
+            showDetail: this.props.showDetail
         }
     },
 
@@ -90,7 +92,7 @@ var Log = React.createClass({
             });
         }
         var project = this.props.project;
-        if (_.isObject(project)) {
+        if (_.isObject(project) && this.props.showProject) {
             if (_.isObject(project.version)) {
                 var version = (<span className="ltt_c-log-project-version">{project.version}</span>);
             } else {
@@ -176,7 +178,6 @@ var Log = React.createClass({
 
     gotoEditor: function (e) {
         var date = this.props.date;
-        console.log('goto editor');
         location.hash = '/logEditor/' + date + '?logOrigin=' +  encodeURIComponent(this.props.origin);
         //this.transitionTo('logEditor', {date: date}, {logOrigin: this.props.origin});
     }

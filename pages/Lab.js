@@ -15,6 +15,7 @@ module.exports = React.createClass({
                 <ul className="ltt_c-page-Lab-sidebar">
                     <li><Link to="/lab/report/pie">多日Pie图</Link></li>
                     <li><Link to="/lab/report/lifeClass">生活Class图</Link></li>
+                    <li><Link to="/lab/report/sunburst">Sunburst图</Link></li>
                 </ul>
                 <div className="ltt_c-page-Lab-content">
                     <RouteHandler/>

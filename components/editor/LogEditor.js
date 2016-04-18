@@ -383,6 +383,9 @@ var LogEditor = React.createClass({
             getCompletions: function(editor, session, pos, prefix, callback) {
                 var token = session.getTokenAt(pos.row, pos.column);
                 var line = session.getLine(pos.row);
+                if (!token) {
+                    return that.getLastActivitiesCompletions(line, callback);
+                }
                 var tokenType = token.type;
                 var tokenValue = token.value;
                 console.info('tokenValue:' + tokenValue + ' prefix:' + prefix);
@@ -397,6 +400,8 @@ var LogEditor = React.createClass({
                         that.getTaskCompletions(line, callback);
                     } else if (tokenType === '{') {
                         that.getLogClassCompletions(line, callback);
+                    } else {
+                        that.getLastActivitiesCompletions(line, callback);
                     }
                 } else if (tokenType === 'ltt_logClass') {
                     that.getLogClassCompletions(line, callback);
@@ -484,7 +489,7 @@ var LogEditor = React.createClass({
         var dateParams = Util.toDate(period);
         this.getUnfinishLog(dateParams.start, dateParams.end).then(function (unfinishLogs) {
             that.insertLogToLastLine(unfinishLogs.map(function (log) {
-                return log.origin;
+                return log.origin.trim();
             }).join('\n'));
         }).catch(function (err) {
             console.err(err.stack);
@@ -496,7 +501,9 @@ var LogEditor = React.createClass({
         var session = this.editor.getSession();
         if (log) {
             var line = session.getLength();
-            log = log.replace(/\d{1,2}\s*[:]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:]\s*\d{1,2})*/ig, '').trim();
+            log = log.split('\n').map(function (l) {
+                return l.replace(/\d{1,2}\s*[:]\s*\d{1,2}\s*(\s*[~～-]\s*\d{1,2}\s*[:]\s*\d{1,2})*/ig, '').trim();
+            }).join('\n');
             session.insert({row: line + 1, column: 0}, '\n' + log);
             this.gotoLine(line + 1, log.length);
         }
@@ -571,6 +578,7 @@ var LogEditor = React.createClass({
         var that = this;
         var editor = this.editor;
         var commands = editor.commands;
+        var title = this.props.title;
 
         commands.addCommand({
             name: "recentactivities",
@@ -743,6 +751,26 @@ var LogEditor = React.createClass({
 
         commands.addCommand({
             name: 'continueActivity',
+            bindKey: {win: 'Ctrl-Alt-Shift-c', mac: 'Command-Option-Shift-c'},
+            exec: function (editor) {
+                var session = editor.getSession();
+                var doc = session.getDocument();
+                var validLog = that.getLastValidLog();
+                var timeStr = new Moment().format('HH:mm') + '~';
+                var pos = editor.getCursorPosition();
+                var line = session.getLine(pos.row);
+                var newIndex = validLog.index;
+                var newLine = timeStr + TrackerHelper.removeTimeString(line);
+                //insert contine log
+                session.insert({row: newIndex, column: 0},  newLine);
+                var pos = {row: newIndex, column: newLine.length};
+                session.insert(pos, '\n');
+                that.gotoLine(newIndex + 1, timeStr.length);
+            }
+        });
+
+        commands.addCommand({
+            name: 'continueActivityNew',
             bindKey: {win: 'Ctrl-Shift-c', mac: 'Command-Shift-c'},
             exec: function (editor) {
                 var session = editor.getSession();
@@ -752,6 +780,14 @@ var LogEditor = React.createClass({
                 var pos = editor.getCursorPosition();
                 var line = session.getLine(pos.row);
                 var newIndex = validLog.index;
+                var logObj = TrackerHelper.getLogs(line, title)[0];
+                if (logObj) {
+                    if (!_.isEmpty(logObj.projects)) {
+                        logObj.project = logObj.projects[0];
+                    }
+                    logObj.content = '';
+                    line = TrackerHelper.covertLogtoString(logObj);
+                }
                 var newLine = timeStr + TrackerHelper.removeTimeString(line);
                 //insert contine log
                 session.insert({row: newIndex, column: 0},  newLine);
@@ -927,6 +963,34 @@ var LogEditor = React.createClass({
                 cb(null, completions);
             });
         })
+    },
+
+    getLastActivitiesCompletions: function (line, cb) {
+        var that = this;
+        var end = new Moment().endOf('day');
+        var start = new Moment().subtract('7', 'day');
+        return DataAPI.Log.load({
+            start: start.toDate(),
+            end: end.toDate(),
+            populate: true,
+            sort: 'start:-1'
+        }).then(function (logs) {
+            if (_.isEmpty(logs)) {
+                return cb(null, []);
+            }
+            var maxLen = 28;
+            var completions = logs.map(function (log) {
+                var score = new Date(log.start).getTime();
+                var logContent = log.origin;
+                logContent = TrackerHelper.removeTimeString(logContent).trim();
+                var caption = logContent;
+                if (caption.length > maxLen) {
+                    caption = logContent.slice(0, maxLen) + '...';
+                }
+                return {name: logContent, caption: caption, value: logContent, meta: 'log', score: score};
+            });
+            cb(null, completions);
+        });
     },
 
     _getCompletetionsWithProgress: function (item) {

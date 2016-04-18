@@ -18,10 +18,13 @@ var Util = require('../utils/Util');
 var WordsCloud = require('../components/charts/WordsCloud');
 var LogClassPie = require('../components/LogClassPie');
 var RankBar = require('../components/RankBar');
+var CalendarHeatMap = require('../components/charts/CalendarHeatMap');
 
 
 var WakeAndSleep = require('../components/WakeAndSleep');
 var Calculator = require('../components/Calculator');
+var RecentActivities = require('../components/RecentActivities');
+var SlidePanel = require('../components/SlidePanel');
 
 
 var YearReport = React.createClass({
@@ -37,7 +40,7 @@ var YearReport = React.createClass({
         var startOfYear = new Moment().year(year).startOf('year'),
             endOfYear = new Moment().year(year).endOf('year');
         return (
-            <div className="ltt_c-report ltt_c-report-YearReport">
+            <div className="ltt_c-report ltt_c-report-YearReport" onClick={this.onMainClick}>
                 <h1 className="title">{year}年度报告</h1>
                 <h2> 基本生活数据 </h2>
                 <WakeAndSleep start={startOfYear} end={endOfYear}/>
@@ -95,26 +98,122 @@ var YearReport = React.createClass({
                 <div className="achievement">
                 <h2> 成就 </h2>
                     <div>一共得到了<Calculator type="log.count"
-                            params={{tags: '启发', start: startOfYear, end: endOfYear}}/>次启发，点击查看那些启发</div>
+                            params={{tags: '启发', start: startOfYear, end: endOfYear}}/>次启发，<span className="ltt-link" onClick={this.viewLogs.bind(this, {tags: '启发', start: startOfYear.toDate(), end: endOfYear.toDate()})}>点击查看那些启发</span></div>
                     <div>读了 <Calculator type="task.count"
                         params={{tags: 'rb', status: 'done', start: startOfYear, end: endOfYear, populate: false}}/>本书， 一共花了
                         <Calculator type="log.time"
                             params={{tags: 'rb', start: startOfYear, end: endOfYear}}/>
                         个小时</div>
-                    <div></div>
+                    <div>吃饭用了 <Calculator type="log.time"
+                            params={{tags: '早餐,supper,lunch,聚餐', start: startOfYear, end: endOfYear}}/> </div>
                     <div>看了<Calculator type="task.count"
                             params={{start: startOfYear, end: endOfYear, projects: "OTD"}}/>个TED视频，花了 <Calculator type="log.time"
                             params={{projects: "OTD", start: startOfYear, end: endOfYear}}/>个小时</div>
-                    <div>运动花了多少时间，其中健身，跑步花了多少，热力图，还有其他那些类型的运动</div>
-                    <div>花了多少时间编程，bugfix时间占比</div>
-                    <div>创建了 1000 个task， 完成了800个</div>
+                    <div>运动花了 <Calculator type="log.time" params={{classes: 'SPR', start: startOfYear, end: endOfYear}}/>
+                        <CalendarHeatMap
+                            style={{margin: "30px auto"}}
+                            range={12}
+                            start={startOfYear.toDate()}
+                            getData={this.loadSportCalendar}
+                            empty="no sport data"
+                            filled="{date} 运动时间 {count}分钟"/>
+                        <ul>
+                            <li>健身: <Calculator type="log.time" params={{tags: '健身',classes: 'SPR', start: startOfYear, end: endOfYear}}/></li>
+                            <li>跑步: <Calculator type="log.time" params={{tags: '跑步',classes: 'SPR', start: startOfYear, end: endOfYear}}/></li>
+                            <li>短运: <Calculator type="log.time" params={{tags: '短运',classes: 'SPR', start: startOfYear, end: endOfYear}}/></li>
+                        </ul>
+                    </div>
+                    <div>花了<Calculator type="log.time" params={{tags: '编程', start: startOfYear, end: endOfYear}}/>在编程上，bugfix时间是<Calculator type="log.time" params={{tags: 'bugfix', start: startOfYear, end: endOfYear}}/></div>
+                    <div>创建了<Calculator type="task.count"
+                        params={{start: startOfYear, end: endOfYear, populate: false}}/> 个task， 完成了<Calculator type="task.count"
+                        params={{status: 'done', start: startOfYear, end: endOfYear, populate: false}}/>个</div>
                 </div>
                 <h2> 娱乐 </h2>
-                <pre> 看电视花了，看美剧用了看了100部电影, 其中有 4部是纪录片，认为是好电影的有10部, 一共花了100个小时。</pre>
+                <pre> 看电视，看美剧，等等花的时间</pre>
+                <ul>
+                    <li>电影: 看了<Calculator type="task.count" params={{status: 'done', projects: '看电影', start: startOfYear, end: endOfYear, populate: false}}/>部电影， 一共花了<Calculator type="log.time" params={{tags: 'movie', start: startOfYear, end: endOfYear}}/>，
+                    认为是好电影的有<span className="ltt-link" onClick={this.viewLogs.bind(this, {projects: '看电影', tags:'好电影', start: startOfYear.toDate(), end: endOfYear.toDate()})}>
+                        <Calculator type="task.count" params={{status: 'done', projects: '看电影', tags:'好电影', start: startOfYear, end: endOfYear, populate: false}}/>
+                    </span>部</li>
+                    <li>电视: <Calculator type="log.time" params={{tags: 'tv', start: startOfYear, end: endOfYear}}/>, 其中美剧花了 <Calculator type="log.time" params={{tags: '美剧', start: startOfYear, end: endOfYear}}/></li>
+                </ul>
                 <h2> 情感生活 </h2>
                 <pre> 花了多少时间在家人上 ， 时间的热力图, 花了多少时间在恋爱, 时间的热力图 花了多少时间在朋友聚会</pre>
+                 <ul>
+                    <li>家庭: <Calculator type="log.time" params={{tags: '家庭', start: startOfYear, end: endOfYear}}/></li>
+                    <li>恋爱: <Calculator type="log.time" params={{tags: '恋爱', start: startOfYear, end: endOfYear}}/></li>
+                    <li>聚会: <Calculator type="log.time" params={{tags: '聚会', start: startOfYear, end: endOfYear}}/></li>
+                </ul>热力图，还有其他那些类型的运动
+                <SlidePanel className="recent-activities" ref="recentActivitiesSlidePanel"
+                        open={false} openRight={true} onTransitionEnd={this.renderRecentActivities} afterClose={this.emptyRecentActivities}>
+                        <div ref="recentActivitiesContainer" style={{height: "100%", overflow: "auto"}}></div>
+                </SlidePanel>
             </div>
         );
+    },
+
+    renderRecentActivities: function () {
+        var params = this.getLogParams();
+        React.render(
+            <RecentActivities key={JSON.stringify(params)} params={params} progress={false}/>,
+            this.refs.recentActivitiesContainer.getDOMNode()
+        );
+    },
+
+    openRecentActivities: function () {
+        this.__recentActivitiesOpend = !this.__recentActivitiesOpend;
+        this.refs.recentActivitiesSlidePanel.toggle({
+            width: $(this.getDOMNode()).width() * 0.3
+        });
+    },
+
+    closeRecentActivities: function () {
+        this.__recentActivitiesOpend = false;
+        this.refs.recentActivitiesSlidePanel.close();
+    },
+
+    emptyRecentActivities: function() {
+        this.refs.recentActivitiesContainer.getDOMNode().innerHTML = '';
+    },
+
+    getLogParams: function () {
+        return this.__params;
+    },
+
+    setLogParams: function (params) {
+        this.__params = params;
+    },
+
+    viewLogs: function (params, e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!params) {return;}
+        this.setLogParams(params);
+        this.openRecentActivities();
+    },
+
+    onMainClick: function () {
+        if (this.__recentActivitiesOpend) {
+            this.closeRecentActivities();
+        }
+    },
+
+    loadSportCalendar: function () {
+        var year = this.state.year;
+         return DataAPI.Log.load({
+            sum: true,
+            group: 'date.day',
+            start: new Moment().year(year).startOf('year').toDate(),
+            end: new Moment().year(year).endOf('year').toDate(),
+            classes: 'SPR'
+        }).then(function (data) {
+            return data.map(function (item) {
+                return {
+                    date: item._id,
+                    count: item.totalTime
+                }
+            });
+        });
     }
 });
 

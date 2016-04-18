@@ -248,6 +248,7 @@
 
 .projectInfo-container .ActivityChart{
   position: absolute;
+  z-index:2;
   height: 50px;
   right: 0;
   bottom: -10px;
@@ -530,6 +531,7 @@
   right: 0px;
   font-size:1.5rem;
   padding: 20px;
+  z-index: 10;
 }
 
 .ltt_c-projectTask-moreInfo{

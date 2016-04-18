@@ -134,6 +134,10 @@ module.exports = {
             return get(url('/logs'), params);
         },
 
+        classify: function (params) {
+            return get(url('/classifyLogs'), params);
+        },
+
         totalTime: function (force) {
             if (_totalTime !== undefined && !force) {
                 return Q(_totalTime);
